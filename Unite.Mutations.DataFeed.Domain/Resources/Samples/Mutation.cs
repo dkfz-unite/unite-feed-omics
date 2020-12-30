@@ -24,7 +24,7 @@ namespace Unite.Mutations.DataFeed.Domain.Resources.Samples
             Id = Id?.Trim();
             Contig = Contig?.Trim();
             Ref = Ref?.Trim().ToUpper();
-            Alt = Ref?.Trim().ToUpper();
+            Alt = Alt?.Trim().ToUpper();
             Quality = Quality?.Trim();
             Filter = Filter?.Trim();
             Info = Info?.Trim();
