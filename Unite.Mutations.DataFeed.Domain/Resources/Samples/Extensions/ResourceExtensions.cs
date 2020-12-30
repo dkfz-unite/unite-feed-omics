@@ -15,6 +15,7 @@
         {
             var sample = new Data.Entities.Samples.Sample();
 
+            sample.DonorId = sampleResource.Pid;
             sample.Name = sampleResource.Name;
             sample.Link = sampleResource.Link;
             sample.TypeId = sampleResource.Type;

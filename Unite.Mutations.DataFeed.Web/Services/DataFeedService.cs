@@ -103,7 +103,7 @@ namespace Unite.Mutations.DataFeed.Web.Services
 
         private Sample GetOrCreate(in Sample sample, ref UploadAudit audit)
         {
-            var entity = _sampleRepository.Find(sample.Donor.Id, sample.Name, sample.TypeId, sample.SubtypeId);
+            var entity = _sampleRepository.Find(sample.DonorId, sample.Name, sample.TypeId, sample.SubtypeId);
 
             if (entity == null)
             {
