@@ -25,28 +25,6 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories
             return mutation;
         }
 
-        public override void Update(ref Mutation entity, in Mutation model)
-        {
-            if (model.Gene != null)
-            {
-                if (entity.Gene == null)
-                {
-                    entity.Gene = GetOrCreateGene(model.Gene.Name);
-
-                    Entities.Update(entity);
-
-                    _database.SaveChanges();
-                }
-                else
-                {
-                    if (entity.Gene.Name != model.Gene.Name)
-                    {
-                        _logger.LogWarning($"Ignoring attempt to update mutation '{entity.Code}' gene from '{entity.Gene.Name}' to '{model.Gene.Name}'");
-                    }
-                }
-            }
-        }
-
         protected override void Map(in Mutation source, ref Mutation target)
         {
             target.Name = source.Name;
@@ -57,8 +35,8 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories
             target.SequenceTypeId = source.SequenceTypeId;
             target.Position = source.Position;
             target.TypeId = source.TypeId;
-            target.ReferenceAllele = source.ReferenceAllele;
-            target.AlternateAllele = source.AlternateAllele;
+            target.ReferenceBase = source.ReferenceBase;
+            target.AlternateBase = source.AlternateBase;
         }
 
         protected override IQueryable<Mutation> Include(IQueryable<Mutation> query)

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using Unite.Mutations.DataFeed.Domain.Resources.Samples;
 
 namespace Unite.Mutations.DataFeed.Web.Services
 {
-    public interface IDataFeedService
+    public interface IDataFeedService<T> where T : class
     {
-        void ProcessSamples(IEnumerable<Sample> samples);
+        void ProcessResources(IEnumerable<T> resources);
     }
 }

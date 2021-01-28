@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using Unite.Data.Entities.Samples;
-using Unite.Data.Entities.Samples.Enums;
+using Unite.Data.Entities.Mutations;
+using Unite.Data.Entities.Mutations.Enums;
 using Unite.Data.Services;
 
 namespace Unite.Mutations.DataFeed.Web.Services.Repositories
@@ -26,7 +26,6 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories
         {
             target.DonorId = source.DonorId;
             target.Name = source.Name;
-            target.Link = source.Link;
             target.TypeId = source.TypeId;
             target.SubtypeId = source.SubtypeId;
             target.Date = source.Date;

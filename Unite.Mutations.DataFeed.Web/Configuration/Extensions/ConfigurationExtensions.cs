@@ -23,8 +23,8 @@ namespace Unite.Mutations.DataFeed.Web.Configuration.Extensions
 
             services.AddTransient<UniteDbContext>();
 
-            services.AddTransient<IDataFeedService, DataFeedService>();
-            services.AddTransient<IIndexCreationService, IndexCreationService>();
+            services.AddTransient<IDataFeedService<Domain.Resources.Mutations.Resource>, DataFeedService>();
+            services.AddTransient<IIndexCreationService<MutationIndex>, MutationIndexCreationService>();
             services.AddTransient<IIndexingService<MutationIndex>, MutationIndexingService>();
             services.AddTransient<ITaskProcessingService, TaskProcessingService>();
 
@@ -40,8 +40,7 @@ namespace Unite.Mutations.DataFeed.Web.Configuration.Extensions
 
         private static void AddValidation(this IServiceCollection services)
         {
-            services.AddTransient<IValidator<IEnumerable<Domain.Resources.Samples.Sample>>, Domain.Resources.Samples.Validation.SamplesValidator>();
-            services.AddTransient<IValidator<IEnumerable<Domain.Resources.Mutations.Mutation>>, Domain.Resources.Mutations.Validation.MutationsValidator>();
+            services.AddTransient<IValidator<IEnumerable<Domain.Resources.Mutations.Resource>>, Domain.Resources.Mutations.Validation.ResourcesValidator>();
 
             services.AddTransient<IValidationService, ValidationService>();
         }

@@ -3,7 +3,6 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Unite.Mutations.DataFeed.Domain.Resources.Mutations;
-using Unite.Mutations.DataFeed.Domain.Resources.Mutations.Extensions;
 using Unite.Mutations.DataFeed.Domain.Validation;
 using Unite.Mutations.DataFeed.Web.Controllers.Extensions;
 using Unite.Mutations.DataFeed.Web.Services;
@@ -14,14 +13,14 @@ namespace Unite.Mutations.DataFeed.Web.Controllers
     public class MutationsController : Controller
     {
         private readonly IValidationService _validationService;
-        private readonly IValidator<IEnumerable<Mutation>> _validator;
-        private readonly IDataFeedService _dataFeedService;
+        private readonly IValidator<IEnumerable<Resource>> _validator;
+        private readonly IDataFeedService<Resource> _dataFeedService;
         private readonly ILogger _logger;
 
         public MutationsController(
             IValidationService validationService,
-            IValidator<IEnumerable<Mutation>> validator,
-            IDataFeedService dataFeedService,
+            IValidator<IEnumerable<Resource>> validator,
+            IDataFeedService<Resource> dataFeedService,
             ILogger<MutationsController> logger)
         {
             _validationService = validationService;
@@ -31,7 +30,7 @@ namespace Unite.Mutations.DataFeed.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] Mutation[] mutations)
+        public IActionResult Post([FromBody] Resource[] resources)
         {
             if (!ModelState.IsValid(out string modelStateErrorMessage))
             {
@@ -40,14 +39,14 @@ namespace Unite.Mutations.DataFeed.Web.Controllers
                 return BadRequest(modelStateErrorMessage);
             }
 
-            if (!_validationService.ValidateParameter(mutations, _validator, out string modelErrorMessage))
+            if (!_validationService.ValidateParameter(resources, _validator, out string modelErrorMessage))
             {
                 _logger.LogWarning(modelErrorMessage);
 
                 return BadRequest(modelErrorMessage);
             }
 
-            _dataFeedService.ProcessSamples(mutations.AsSamples());
+            _dataFeedService.ProcessResources(resources);
 
             return Ok();
         }

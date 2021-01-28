@@ -10,6 +10,7 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories
         {
         }
 
+
         public Contig Find(string value)
         {
             var contig = Find(contig =>

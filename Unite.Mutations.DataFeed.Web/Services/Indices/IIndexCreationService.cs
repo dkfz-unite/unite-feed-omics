@@ -1,9 +1,7 @@
-﻿using Unite.Indices.Entities.Mutations;
-
-namespace Unite.Mutations.DataFeed.Web.Services.Indices
+﻿namespace Unite.Mutations.DataFeed.Web.Services.Indices
 {
-    public interface IIndexCreationService
+    public interface IIndexCreationService<T> where T : class
     {
-        MutationIndex CreateIndex(int mutationId);
+        T CreateIndex(int id);
     }
 }

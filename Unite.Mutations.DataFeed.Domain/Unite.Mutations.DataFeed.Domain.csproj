@@ -7,15 +7,12 @@
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Resources\Mutations\" />
-    <Folder Include="Resources\Samples\" />
-    <Folder Include="Resources\Samples\Validation\" />
     <Folder Include="Resources\Mutations\Validation\" />
     <Folder Include="Validation\" />
     <Folder Include="Resources\Mutations\Extensions\" />
-    <Folder Include="Resources\Samples\Extensions\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="9.3.0" />
-    <PackageReference Include="Unite.Data" Version="1.0.7" />
+    <PackageReference Include="FluentValidation" Version="9.4.0" />
+    <PackageReference Include="Unite.Data" Version="1.1.6" />
   </ItemGroup>
 </Project>

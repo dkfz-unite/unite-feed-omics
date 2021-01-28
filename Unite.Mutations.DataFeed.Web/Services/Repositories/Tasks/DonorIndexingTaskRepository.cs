@@ -29,6 +29,7 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories.Tasks
             });
 
             _database.DonorIndexingTasks.AddRange(entities);
+
             _database.SaveChanges();
         }
     }

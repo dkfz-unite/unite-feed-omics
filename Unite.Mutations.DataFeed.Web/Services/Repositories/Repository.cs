@@ -23,13 +23,7 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories
     public abstract class Repository<T> : Repository
         where T : class, new()
     {
-        protected DbSet<T> Entities
-        {
-            get
-            {
-                return _database.Set<T>();
-            }
-        }
+        protected DbSet<T> Entities => _database.Set<T>();
 
 
         protected Repository(UniteDbContext database, ILogger logger) : base(database, logger)
@@ -77,5 +71,7 @@ namespace Unite.Mutations.DataFeed.Web.Services.Repositories
         }
 
         protected abstract void Map(in T source, ref T target);
+
+        
     }
 }

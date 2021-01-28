@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Unite.Data.Services;
@@ -11,13 +12,13 @@ namespace Unite.Mutations.DataFeed.Web.Services
     public class TaskProcessingService : ITaskProcessingService
     {
         private readonly UniteDbContext _database;
-        private readonly IIndexCreationService _indexCreationService;
+        private readonly IIndexCreationService<MutationIndex> _indexCreationService;
         private readonly IIndexingService<MutationIndex> _indexingService;
         private readonly ILogger _logger;
 
         public TaskProcessingService(
             UniteDbContext database,
-            IIndexCreationService indexCreationService,
+            IIndexCreationService<MutationIndex> indexCreationService,
             IIndexingService<MutationIndex> indexingService,
             ILogger<TaskProcessingService> logger)
         {
@@ -40,11 +41,18 @@ namespace Unite.Mutations.DataFeed.Web.Services
 
                 foreach (var task in tasks)
                 {
-                    var index = _indexCreationService.CreateIndex(task.MutationId);
-
-                    if (index != null)
+                    try
                     {
-                        indices.Add(index);
+                        var index = _indexCreationService.CreateIndex(task.MutationId);
+
+                        if (index != null)
+                        {
+                            indices.Add(index);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Could not create index fro mutation '{task.MutationId}'");
                     }
                 }
 
