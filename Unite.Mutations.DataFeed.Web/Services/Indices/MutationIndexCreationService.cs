@@ -72,6 +72,8 @@ namespace Unite.Mutations.DataFeed.Web.Services.Indices
                 .Include(donor => donor.PrimarySite)
                 .Include(donor => donor.ClinicalData)
                     .ThenInclude(clinicalData => clinicalData.Localization)
+                .Include(donor => donor.Treatments)
+                    .ThenInclude(treatment => treatment.Therapy)
                 .Include(donor => donor.DonorWorkPackages)
                     .ThenInclude(workPackageDonor => workPackageDonor.WorkPackage)
                 .Include(donor => donor.DonorStudies)
