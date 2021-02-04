@@ -7,6 +7,7 @@ using Unite.Data.Services;
 
 namespace Unite.Mutations.DataFeed.Web.Controllers
 {
+    [Route("api/[controller]")]
     public class IndicesController : Controller
     {
         private readonly UniteDbContext _database;
