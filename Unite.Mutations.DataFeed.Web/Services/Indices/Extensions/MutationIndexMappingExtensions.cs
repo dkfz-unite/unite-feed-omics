@@ -21,6 +21,8 @@ namespace Unite.Mutations.DataFeed.Web.Services.Indices.Extensions
             index.SequenceType = mutation.SequenceTypeId.ToDefinitionString();
             index.Position = mutation.Position;
             index.Type = mutation.TypeId.ToDefinitionString();
+            index.Ref = mutation.ReferenceBase;
+            index.Alt = mutation.AlternateBase;
 
             index.Gene = CreateFrom(mutation.Gene);
         }
