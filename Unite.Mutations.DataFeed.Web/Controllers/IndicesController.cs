@@ -22,6 +22,13 @@ namespace Unite.Mutations.DataFeed.Web.Controllers
         [HttpPost]
         public ActionResult Post()
         {
+            var toRemove = _database.Mutations
+                .Where(mutation => mutation.SequenceTypeId == Data.Entities.Mutations.Enums.SequenceType.CodingDNA)
+                .ToArray();
+
+            _database.Mutations.RemoveRange(toRemove);
+            _database.SaveChanges();
+
             var mutations = _database.Mutations
                 .Select(mutation => mutation.Id)
                 .ToArray();
