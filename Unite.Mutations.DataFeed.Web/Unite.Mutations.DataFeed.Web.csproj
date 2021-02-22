@@ -21,7 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Macross.Json.Extensions" Version="1.5.0" />
     <PackageReference Include="Unite.Data" Version="1.2.0" />
-    <PackageReference Include="Unite.Indices" Version="1.0.8" />
+    <PackageReference Include="Unite.Indices" Version="1.0.9" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Unite.Mutations.DataFeed.Domain\Unite.Mutations.DataFeed.Domain.csproj">

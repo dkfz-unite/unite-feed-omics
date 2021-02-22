@@ -56,6 +56,11 @@ namespace Unite.Mutations.DataFeed.Web.Services.Indices
 
             index.Donors = CreateDonorIndices(mutation.Id);
 
+            index.NumberOfDonors = index.Donors
+                .Select(donor => donor.Id)
+                .Distinct()
+                .Count();
+
             return index;
         }
 
