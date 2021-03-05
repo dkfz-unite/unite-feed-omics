@@ -27,8 +27,6 @@ namespace Unite.Mutations.DataFeed.Web.Services.Indices
         private Mutation LoadMutation(int mutationId)
         {
             var mutation = _database.Mutations
-                .Include(mutation => mutation.Gene)
-                .Include(mutation => mutation.Contig)
                 .FirstOrDefault(mutation => mutation.Id == mutationId);
 
             return mutation;

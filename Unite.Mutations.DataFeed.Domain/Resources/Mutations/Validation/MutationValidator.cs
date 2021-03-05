@@ -4,36 +4,18 @@ namespace Unite.Mutations.DataFeed.Domain.Resources.Mutations.Validation
 {
     public class MutationValidator : AbstractValidator<Mutation>
     {
-        private readonly IValidator<Gene> _geneValidator;
-
         public MutationValidator()
         {
-            _geneValidator = new GeneValidator();
-
-            RuleFor(mutation => mutation.Id)
-                .MaximumLength(100).WithMessage("Maximum length is 100");
 
             RuleFor(mutation => mutation.Chromosome)
-                .NotEmpty().When(mutation => string.IsNullOrWhiteSpace(mutation.Contig)).WithMessage("Should not be empty if 'Contig' is not set");
-
-            RuleFor(mutation => mutation.Chromosome)
-               .Empty().When(mutation => !string.IsNullOrWhiteSpace(mutation.Contig)).WithMessage("Should be empty if 'Contig' is set");
-
-            RuleFor(mutation => mutation.Contig)
-                .NotEmpty().When(mutation => !mutation.Chromosome.HasValue).WithMessage("Should not be empty if 'Chromosome' is not set")
-                .MaximumLength(50).WithMessage("Maximum length is 50");
-
-            RuleFor(mutation => mutation.Contig)
-                .Empty().When(mutation => mutation.Chromosome.HasValue).WithMessage("Should be empty if 'Chromosome' is set");
+                .NotEmpty().WithMessage("Should not be empty");
 
             RuleFor(mutation => mutation.SequenceType)
                 .NotEmpty().WithMessage("Should not be empty");
 
             RuleFor(mutation => mutation.Position)
-                .NotEmpty().WithMessage("Should not be empty");
-
-            RuleFor(mutation => mutation.Type)
-                .NotEmpty().WithMessage("Should not be empty");
+                .NotEmpty().WithMessage("Should not be empty")
+                .Must(IsNumberOrRange).WithMessage("Should be number '1234567890' or range '1234567890-1234567890'");
 
             RuleFor(mutation => mutation.Ref)
                 .NotEmpty().When(mutation => string.IsNullOrWhiteSpace(mutation.Alt)).WithMessage("At least one of 'Ref' or 'Alt' fields has to be set")
@@ -42,9 +24,34 @@ namespace Unite.Mutations.DataFeed.Domain.Resources.Mutations.Validation
             RuleFor(mutation => mutation.Alt)
                 .NotEmpty().When(mutation => string.IsNullOrWhiteSpace(mutation.Ref)).WithMessage("At least one of 'Ref' or 'Alt' fields has to be set")
                 .MaximumLength(200).WithMessage("Maximum length is 200");
+        }
 
-            RuleFor(mutation => mutation.Gene)
-                .SetValidator(_geneValidator).When(mutation => mutation.Gene != null);
+        private bool IsNumberOrRange(string position)
+        {
+            var normalized = position.Trim();
+
+            if (normalized.Contains('-'))
+            {
+                var blocks = normalized.Split('-');
+
+                if(blocks.Length != 2)
+                {
+                    return false;
+                }
+                else
+                {
+                    var startIsNumber = int.TryParse(blocks[0], out _);
+                    var endIsNumber = int.TryParse(blocks[1], out _);
+
+                    return startIsNumber && endIsNumber;
+                }
+            }
+            else
+            {
+                var isNumber = int.TryParse(normalized, out _);
+
+                return isNumber;
+            }
         }
     }
 }

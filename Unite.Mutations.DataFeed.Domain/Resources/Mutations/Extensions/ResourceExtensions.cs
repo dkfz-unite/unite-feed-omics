@@ -71,46 +71,16 @@ namespace Unite.Mutations.DataFeed.Domain.Resources.Mutations.Extensions
         {
             var mutation = new Data.Entities.Mutations.Mutation();
 
-            mutation.Name = mutationResource.Id;
-            mutation.Gene = GetGene(mutationResource.Gene);
             mutation.Code = mutationResource.Code;
             mutation.ChromosomeId = mutationResource.Chromosome;
-            mutation.Contig = GetConting(mutationResource.Contig);
-            mutation.SequenceTypeId = mutationResource.SequenceType.Value;
-            mutation.Position = mutationResource.Position.Value;
+            mutation.SequenceTypeId = mutationResource.SequenceType;
+            mutation.Start = mutationResource.Start;
+            mutation.End = mutationResource.End;
             mutation.TypeId = mutationResource.Type;
             mutation.ReferenceBase = mutationResource.Ref;
             mutation.AlternateBase = mutationResource.Alt;
 
             return mutation;
-        }
-
-        private static Data.Entities.Mutations.Contig GetConting(string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return null;
-            }
-
-            var contig = new Data.Entities.Mutations.Contig();
-
-            contig.Value = value;
-
-            return contig;
-        }
-
-        private static Data.Entities.Mutations.Gene GetGene(Gene geneResource)
-        {
-            if (geneResource == null)
-            {
-                return null;
-            }
-
-            var gene = new Data.Entities.Mutations.Gene();
-
-            gene.Name = geneResource.Name;
-
-            return gene;
         }
     }
 }
