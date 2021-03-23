@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -13,7 +14,8 @@ namespace Unite.Mutations.Feed.Annotations.Common.Http
 
         public JsonHttpClient()
         {
-            _httpClient = new HttpClient();
+            var handler = new HttpClientHandler { UseProxy = false };
+            _httpClient = new HttpClient(handler);
         }
 
         public JsonHttpClient(string baseUrl) : this()
