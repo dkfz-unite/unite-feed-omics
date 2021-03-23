@@ -1,5 +1,4 @@
-﻿using System;
-using Unite.Mutations.Feed.Annotations.Common.Http;
+﻿using Unite.Mutations.Feed.Annotations.Common.Http;
 using Unite.Mutations.Feed.Annotations.VEP.Configuration.Options;
 using Unite.Mutations.Feed.Annotations.VEP.Resources;
 
@@ -15,11 +14,6 @@ namespace Unite.Mutations.Feed.Annotations.VEP
         public VepAnnotationApiClient(IVepOptions options)
         {
             _options = options;
-
-            Console.WriteLine("====VEP HOST====");
-            Console.WriteLine(_options.Host);
-            Console.WriteLine();
-            Console.WriteLine();
         }
 
         public AnnotationResource GetAnnotations(string hgvsCode)

@@ -38,7 +38,8 @@ namespace Unite.Mutations.Feed.Annotations.Common.Http
             }
             else
             {
-                return default(T);
+                var message = await response.Content?.ReadAsStringAsync();
+                throw new HttpRequestException($"{response.StatusCode} - {response.ReasonPhrase} - {message}");
             }
         }
 
@@ -70,7 +71,8 @@ namespace Unite.Mutations.Feed.Annotations.Common.Http
             }
             else
             {
-                return default(T);
+                var message = await response.Content?.ReadAsStringAsync();
+                throw new HttpRequestException($"{response.StatusCode} - {response.ReasonPhrase} - {message}");
             }
         }
 
