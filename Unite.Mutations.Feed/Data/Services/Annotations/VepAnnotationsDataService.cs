@@ -216,15 +216,15 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
 
                 transaction.Commit();
             }
-            catch
+            catch (Exception exception)
             {
                 audit = null;
 
                 transaction.Rollback();
 
-                Console.WriteLine(JsonSerializer.Serialize(models));
+                var data = JsonSerializer.Serialize(models.ToArray());
 
-                throw;
+                throw new Exception(data, exception);
             }
         }
 
