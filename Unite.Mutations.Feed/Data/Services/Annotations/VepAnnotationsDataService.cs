@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Mutations;
@@ -222,9 +223,12 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
 
                 transaction.Rollback();
 
-                var data = JsonSerializer.Serialize(models.ToArray());
 
-                throw new Exception(data, exception);
+                var data = new StringBuilder();
+                data.AppendLine($"Mutations: {string.Join(", ", models.Select(model => model.Mutation.Code))}");
+                data.AppendLine($"Affected transcripts: {string.Join(", ", models.Select(model => model.AffectedTranscripts.Count()))}");
+
+                throw new Exception(data.ToString(), exception);
             }
         }
 
