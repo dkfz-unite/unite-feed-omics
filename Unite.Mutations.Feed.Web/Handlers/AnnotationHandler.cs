@@ -84,7 +84,7 @@ namespace Unite.Mutations.Feed.Web.Handlers
                 _logger.LogWarning("=================");
 
                 _logger.LogInformation("Writing annotations to database");
-                var annotationModels = annotationResources.Select(resource => AnnotationResourceConverter.From(resource));
+                var annotationModels = annotationResources.Select(resource => AnnotationResourceConverter.From(resource)).ToArray();
 
                 _logger.LogWarning("====MODELS====");
                 _logger.LogWarning(JsonSerializer.Serialize(annotationModels));

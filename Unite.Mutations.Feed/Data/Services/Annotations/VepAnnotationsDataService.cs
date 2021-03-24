@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Unite.Data.Entities.Mutations;
@@ -66,8 +64,6 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
             try
             {
                 audit = new AnnotationsUploadAudit();
-
-                _logger.LogWarning(JsonSerializer.Serialize<IEnumerable<AnnotationModel>>(models));
 
                 var annotationModels = models.Where(model => model.AffectedTranscripts != null).ToArray();
 
