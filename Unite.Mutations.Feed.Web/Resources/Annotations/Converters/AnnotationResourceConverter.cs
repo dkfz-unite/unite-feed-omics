@@ -52,8 +52,8 @@ namespace Unite.Mutations.Feed.Web.Resources.Annotations.Converters
             if(resources != null)
             {
                 return resources
-                .Select(resource => GetAffectedTranscriptModel(resource))
-                .ToArray();
+                    .Select(resource => GetAffectedTranscriptModel(resource))
+                    .ToArray();
             }
             else
             {
