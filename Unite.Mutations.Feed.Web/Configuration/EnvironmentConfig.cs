@@ -15,11 +15,11 @@ namespace Unite.Mutations.Feed.Web.Configuration
 
 		private static string _defaultVepHost = "http://localhost:5110";
 
-		private static string _defaultIndexingInterval = "30";
-		private static string _defaultIndexingBucketSize = "100";
+		private static string _defaultIndexingInterval = "10";
+		private static string _defaultIndexingBucketSize = "300";
 
-		private static string _defaultAnnotationInterval = "30";
-		private static string _defaultAnnotationBucketSize = "100";
+		private static string _defaultAnnotationInterval = "10";
+		private static string _defaultAnnotationBucketSize = "30";
 
 
 		public static string SqlHost => GetEnvironmentVariable("UNITE_SQL_HOST", _defaultSqlHost);
