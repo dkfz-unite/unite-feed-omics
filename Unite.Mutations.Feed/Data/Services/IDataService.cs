@@ -5,7 +5,6 @@ namespace Unite.Mutations.Feed.Data.Services
     public interface IDataService<TModel>
         where TModel : class
     {
-        void SaveData(TModel model);
         void SaveData(IEnumerable<TModel> models);
     }
 
@@ -13,7 +12,6 @@ namespace Unite.Mutations.Feed.Data.Services
         where TModel : class
         where TAudit : class
     {
-        void SaveData(TModel model, out TAudit audit);
         void SaveData(IEnumerable<TModel> models, out TAudit audit);
     }
 }
