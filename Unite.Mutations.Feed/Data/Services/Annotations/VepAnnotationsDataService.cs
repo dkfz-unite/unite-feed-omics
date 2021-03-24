@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Unite.Data.Entities.Mutations;
@@ -31,34 +30,21 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
             {
                 audit = new AnnotationsUploadAudit();
 
-                var annotationModels = Enumerable.Empty<AnnotationModel>();
-
-                annotationModels = models
+                var annotationModels = models
                     .Where(model => model.AffectedTranscripts != null)
                     .ToArray();
 
                 #region Mutations
-                var mutationModels = Enumerable.Empty<Mutation>();
-
-                try
-                {
-                    mutationModels = annotationModels
+                var mutationModels = annotationModels
                     .Select(annotationModel => annotationModel.Mutation.ToEntity())
                     .ToArray();
 
-                    foreach (var mutationModel in mutationModels)
-                    {
-                        var mutation = _dbContext.Mutations
-                            .First(mutation => mutation.Code == mutationModel.Code);
-
-                        audit.Mutations.Add(mutation.Id);
-                    }
-                }
-                catch
+                foreach (var mutationModel in mutationModels)
                 {
-                    _logger.LogError("Could not parse mutations.");
+                    var mutation = _dbContext.Mutations
+                        .First(mutation => mutation.Code == mutationModel.Code);
 
-                    throw;
+                    audit.Mutations.Add(mutation.Id);
                 }
                 #endregion
 
@@ -212,91 +198,46 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
 
         private int GetMutationId(string code)
         {
-            try
-            {
-                return _dbContext.Mutations
-                    .Where(mutation => mutation.Code == code)
-                    .Select(mutation => mutation.Id)
-                    .First();
-            }
-            catch
-            {
-                _logger.LogError($"Mutation with code '{code}' was not found");
+            return _dbContext.Mutations
+                .Where(mutation => mutation.Code == code)
+                .Select(mutation => mutation.Id)
+                .First();
 
-                throw;
-            }
-            
         }
 
         private int GetBiotypeId(string value)
         {
-            try
-            {
-                return _dbContext.Biotypes
-                    .Where(biotype => biotype.Value == value)
-                    .Select(biotype => biotype.Id)
-                    .First();
-            }
-            catch
-            {
-                _logger.LogError($"Biotype with value '{value}' was not found");
-
-                throw;
-            }
+            return _dbContext.Biotypes
+                .Where(biotype => biotype.Value == value)
+                .Select(biotype => biotype.Id)
+                .First();
         }
 
         private int GetGeneId(string ensemblId)
         {
-            try
-            {
-                return _dbContext.Genes
-                    .Where(gene => gene.Info.EnsemblId == ensemblId)
-                    .Select(gene => gene.Id)
-                    .First();
-            }
-            catch
-            {
-                _logger.LogError($"Gene with EnsemblId '{ensemblId}' was not found");
-
-                throw;
-            }
+            return _dbContext.Genes
+                .Where(gene => gene.Info.EnsemblId == ensemblId)
+                .Select(gene => gene.Id)
+                .First();
         }
 
         private int GetTranscriptId(string ensemblId)
         {
-            try
-            {
-                return _dbContext.Transcripts
-                    .Where(transcript => transcript.Info.EnsemblId == ensemblId)
-                    .Select(transcript => transcript.Id)
-                    .First();
-            }
-            catch
-            {
-                _logger.LogError($"Transcript with EnsemblId '{ensemblId}' was not found");
-
-                throw;
-            }
+            return _dbContext.Transcripts
+                .Where(transcript => transcript.Info.EnsemblId == ensemblId)
+                .Select(transcript => transcript.Id)
+                .First();
         }
 
         private AffectedTranscriptConsequence[] GetConsequences(IEnumerable<ConsequenceModel> consequences)
         {
-            try
-            {
-                var consequenceTypes = consequences.Select(consequence => consequence.Type).ToArray();
+            var consequenceTypes = consequences.Select(consequence => consequence.Type).ToArray();
 
-                return _dbContext.Consequences
-                    .ToArray()
-                    .Where(consequence => consequenceTypes.Any(typeId => consequence.TypeId == typeId))
-                    .Select(consequece => new AffectedTranscriptConsequence { ConsequenceId = consequece.TypeId })
-                    .ToArray();
-            }
-            catch
-            {
-                _logger.LogError($"Consequences were not found");
-
-                throw;
-            }
+            return _dbContext.Consequences
+                .ToArray()
+                .Where(consequence => consequenceTypes.Any(typeId => consequence.TypeId == typeId))
+                .Select(consequece => new AffectedTranscriptConsequence { ConsequenceId = consequece.TypeId })
+                .ToArray();
         }
     }
 }

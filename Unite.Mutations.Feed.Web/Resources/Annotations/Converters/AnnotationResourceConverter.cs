@@ -23,6 +23,7 @@ namespace Unite.Mutations.Feed.Web.Resources.Annotations.Converters
         {
             var model = new MutationModel();
 
+            model.Code = resource.Code;
             model.Chromosome = resource.Chromosome;
             model.SequenceType = SequenceType.LinearGenomicDNA;
             model.Start = resource.Start;
@@ -30,14 +31,14 @@ namespace Unite.Mutations.Feed.Web.Resources.Annotations.Converters
             model.ReferenceBase = resource.AlleleChange.Split('/')[0];
             model.AlternateBase = resource.AlleleChange.Split('/')[1];
 
-            model.Code = MutationCodeHelper.GetCode(
-                model.Chromosome,
-                model.SequenceType,
-                model.Start,
-                model.End,
-                model.ReferenceBase,
-                model.AlternateBase
-            );
+            //model.Code = MutationCodeHelper.GetCode(
+            //    model.Chromosome,
+            //    model.SequenceType,
+            //    model.Start,
+            //    model.End,
+            //    model.ReferenceBase,
+            //    model.AlternateBase
+            //);
 
             model.Type = MutationTypeHelper.GetMutationType(
                 model.ReferenceBase,
