@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
@@ -68,13 +70,10 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
                     .Select(annotationModel => annotationModel.Mutation.ToEntity())
                     .ToArray();
 
-                var mutationsCache = new List<Mutation>();
                 foreach (var mutationModel in mutationModels)
                 {
                     var mutation = _dbContext.Mutations
                         .First(mutation => mutation.Code == mutationModel.Code);
-
-                    mutationsCache.Add(mutation);
 
                     audit.Mutations.Add(mutation.Id);
                 }
@@ -222,6 +221,8 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
                 audit = null;
 
                 transaction.Rollback();
+
+                Console.WriteLine(JsonSerializer.Serialize(models));
 
                 throw;
             }
