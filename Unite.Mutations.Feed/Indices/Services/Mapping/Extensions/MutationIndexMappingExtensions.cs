@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Unite.Data.Entities.Extensions;
 using Unite.Data.Entities.Mutations;
@@ -25,7 +26,14 @@ namespace Unite.Mutations.Feed.Indices.Services.Mapping.Extensions
             index.Ref = mutation.ReferenceBase;
             index.Alt = mutation.AlternateBase;
 
-            index.AffectedTranscripts = CreateFrom(mutation.AffectedTranscripts);
+            try
+            {
+                index.AffectedTranscripts = CreateFrom(mutation.AffectedTranscripts);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Could not create affected transcript index for mutation '{mutation.Code}'", ex);
+            }
         }
 
         private static AffectedTranscriptIndex[] CreateFrom(in IEnumerable<AffectedTranscript> affectedTranscripts)
