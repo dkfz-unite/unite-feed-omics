@@ -33,30 +33,32 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
 
                 var annotationModels = Enumerable.Empty<AnnotationModel>();
 
-                try
-                {
-                    annotationModels = models
-                        .Where(model => model.AffectedTranscripts != null)
-                        .ToArray();
-
-                    _logger.LogWarning($"Models with transcript consequences: {annotationModels.Count()}");
-                }
-                catch
-                {
-                    _logger.LogError("Can not extract models with transcript consequences.");
-                }
+                annotationModels = models
+                    .Where(model => model.AffectedTranscripts != null)
+                    .ToArray();
 
                 #region Mutations
-                var mutationModels = annotationModels
+                var mutationModels = Enumerable.Empty<Mutation>();
+
+                try
+                {
+                    mutationModels = annotationModels
                     .Select(annotationModel => annotationModel.Mutation.ToEntity())
                     .ToArray();
 
-                foreach (var mutationModel in mutationModels)
-                {
-                    var mutation = _dbContext.Mutations
-                        .First(mutation => mutation.Code == mutationModel.Code);
+                    foreach (var mutationModel in mutationModels)
+                    {
+                        var mutation = _dbContext.Mutations
+                            .First(mutation => mutation.Code == mutationModel.Code);
 
-                    audit.Mutations.Add(mutation.Id);
+                        audit.Mutations.Add(mutation.Id);
+                    }
+                }
+                catch
+                {
+                    _logger.LogError("Could not parse mutations.");
+
+                    throw;
                 }
                 #endregion
 

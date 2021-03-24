@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Unite.Data.Entities.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
@@ -79,17 +78,10 @@ namespace Unite.Mutations.Feed.Web.Handlers
                 _logger.LogInformation("Requesting annotations from VEP service");
                 var annotationResources = _vepAnnotationApiClient.GetAnnotations(hgvsCodes);
 
-                _logger.LogWarning("====RESOURCES====");
-                _logger.LogWarning(JsonSerializer.Serialize(annotationResources));
-                _logger.LogWarning("=================");
-
-                _logger.LogInformation("Writing annotations to database");
+                _logger.LogInformation("Converting VEP resources to UNITE models");
                 var annotationModels = annotationResources.Select(resource => AnnotationResourceConverter.From(resource)).ToArray();
 
-                _logger.LogWarning("====MODELS====");
-                _logger.LogWarning(JsonSerializer.Serialize(annotationModels));
-                _logger.LogWarning("==============");
-
+                _logger.LogInformation("Writing annotations to database");
                 _vepAnnotationDataService.SaveData(annotationModels, out var audit);
                 _logger.LogInformation(audit.ToString());
 
