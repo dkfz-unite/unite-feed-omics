@@ -31,15 +31,6 @@ namespace Unite.Mutations.Feed.Web.Resources.Annotations.Converters
             model.ReferenceBase = resource.AlleleChange.Split('/')[0];
             model.AlternateBase = resource.AlleleChange.Split('/')[1];
 
-            //model.Code = MutationCodeHelper.GetCode(
-            //    model.Chromosome,
-            //    model.SequenceType,
-            //    model.Start,
-            //    model.End,
-            //    model.ReferenceBase,
-            //    model.AlternateBase
-            //);
-
             model.Type = MutationTypeHelper.GetMutationType(
                 model.ReferenceBase,
                 model.AlternateBase

@@ -61,10 +61,19 @@ namespace Unite.Mutations.Feed.Web.Handlers
 
                 var indices = tasks.Select(task =>
                 {
-                    var id = int.Parse(task.Target);
-                    var index = _indexCreationService.CreateIndex(id);
+                    try
+                    {
+                        var id = int.Parse(task.Target);
+                        var index = _indexCreationService.CreateIndex(id);
 
-                    return index;
+                        return index;
+                    }
+                    catch
+                    {
+                        _logger.LogError($"Could not create index for mutation: {task.Target}");
+
+                        throw;
+                    }
 
                 }).ToArray();
 

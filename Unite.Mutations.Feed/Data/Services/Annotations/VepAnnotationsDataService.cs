@@ -202,7 +202,6 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
                 .Where(mutation => mutation.Code == code)
                 .Select(mutation => mutation.Id)
                 .First();
-
         }
 
         private int GetBiotypeId(string value)
