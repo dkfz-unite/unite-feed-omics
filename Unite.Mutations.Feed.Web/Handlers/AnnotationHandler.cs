@@ -78,11 +78,18 @@ namespace Unite.Mutations.Feed.Web.Handlers
 
                 _logger.LogInformation("Requesting annotations from VEP service");
                 var annotationResources = _vepAnnotationApiClient.GetAnnotations(hgvsCodes);
+
+                _logger.LogWarning("====RESOURCES====");
                 _logger.LogWarning(JsonSerializer.Serialize(annotationResources));
+                _logger.LogWarning("=================");
 
                 _logger.LogInformation("Writing annotations to database");
                 var annotationModels = annotationResources.Select(resource => AnnotationResourceConverter.From(resource));
+
+                _logger.LogWarning("====MODELS====");
                 _logger.LogWarning(JsonSerializer.Serialize(annotationModels));
+                _logger.LogWarning("==============");
+
                 _vepAnnotationDataService.SaveData(annotationModels, out var audit);
                 _logger.LogInformation(audit.ToString());
 
