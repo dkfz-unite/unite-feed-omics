@@ -137,7 +137,8 @@ namespace Unite.Mutations.Feed.Indices.Services.Mapping.Extensions
         {
             if (start != null && end != null && !string.IsNullOrWhiteSpace(change))
             {
-                var position = start == end ? $"{start}" : $"{start}-{end}";
+                //var position = start == end ? $"{start}" : $"{start}-{end}";
+                var position = start;
                 var referenceBase = ParseChange(change).ReferenceBase;
                 var alternateBase = ParseChange(change).AlternateBase;
 
@@ -153,7 +154,8 @@ namespace Unite.Mutations.Feed.Indices.Services.Mapping.Extensions
         {
             if (start != null && end != null && !string.IsNullOrWhiteSpace(change))
             {
-                var position = start == end ? $"{start}" : $"{start}-{end}";
+                //var position = start == end ? $"{start}" : $"{start}-{end}";
+                var position = start;
                 var referenceBase = GetChangedAlleles(ParseChange(change).ReferenceBase) ?? "-";
                 var alternateBase = GetChangedAlleles(ParseChange(change).AlternateBase) ?? "-";
 
@@ -179,9 +181,7 @@ namespace Unite.Mutations.Feed.Indices.Services.Mapping.Extensions
         {
             if (sequence != null)
             {
-                var alleles = sequence
-                    .Where(allele => char.IsUpper(allele))
-                    .ToArray();
+                var alleles = sequence.Where(allele => char.IsUpper(allele)).ToArray();
 
                 return alleles.Any() ? new string(alleles) : null;
             }
