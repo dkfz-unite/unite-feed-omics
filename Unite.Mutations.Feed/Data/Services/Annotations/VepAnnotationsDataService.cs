@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Mutations;
@@ -75,6 +76,9 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
 
                     audit.Mutations.Add(mutation.Id);
                 }
+
+                Console.WriteLine("Mutations");
+                Console.WriteLine(string.Join(", ", mutationModels.Select(model => model.Code).ToArray()));
                 #endregion
 
                 #region Biotypes
