@@ -80,6 +80,7 @@ namespace Unite.Mutations.Feed.Web.Handlers
                 var annotationResources = _vepAnnotationApiClient.GetAnnotations(hgvsCodes);
 
                 _logger.LogWarning(JsonSerializer.Serialize(hgvsCodes));
+                _logger.LogWarning(JsonSerializer.Serialize(annotationResources));
 
                 _logger.LogInformation("Writing annotations to database");
                 var annotationModels = annotationResources.Select(resource => AnnotationResourceConverter.From(resource));
