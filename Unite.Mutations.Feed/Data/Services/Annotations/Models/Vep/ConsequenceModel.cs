@@ -5,7 +5,7 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations.Models.Vep
 {
     public class ConsequenceModel
     {
-        public ConsequenceType Type;
+        public ConsequenceType Type { get; set; }
 
         public Consequence ToEntity()
         {

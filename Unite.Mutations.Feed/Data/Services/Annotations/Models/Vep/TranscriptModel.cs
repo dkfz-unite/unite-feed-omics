@@ -4,10 +4,10 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations.Models.Vep
 {
     public class TranscriptModel
     {
-        public string Biotype;
-        public bool Strand;
+        public string Biotype { get; set; }
+        public bool Strand { get; set; }
 
-        public string EnsemblId;
+        public string EnsemblId { get; set; }
 
 
         public Transcript ToEntity()

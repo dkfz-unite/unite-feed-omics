@@ -4,11 +4,11 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations.Models.Vep
 {
     public class GeneModel
     {
-        public string Symbol;
-        public bool Strand;
-        public string Biotype;
+        public string Symbol { get; set; }
+        public bool Strand { get; set; }
+        public string Biotype { get; set; }
 
-        public string EnsemblId;
+        public string EnsemblId { get; set; }
 
         public Gene ToEntity()
         {

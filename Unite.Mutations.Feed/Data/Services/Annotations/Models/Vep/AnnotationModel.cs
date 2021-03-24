@@ -4,8 +4,8 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations.Models.Vep
 {
     public class AnnotationModel
     {
-        public MutationModel Mutation;
+        public MutationModel Mutation { get; set; }
 
-        public IEnumerable<AffectedTranscriptModel> AffectedTranscripts;
+        public IEnumerable<AffectedTranscriptModel> AffectedTranscripts { get; set; }
     }
 }
