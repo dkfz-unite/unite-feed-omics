@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Unite.Data.Entities.Mutations;
@@ -30,9 +31,20 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
             {
                 audit = new AnnotationsUploadAudit();
 
-                var annotationModels = models
-                    .Where(model => model.AffectedTranscripts != null)
-                    .ToArray();
+                var annotationModels = Enumerable.Empty<AnnotationModel>();
+
+                try
+                {
+                    annotationModels = models
+                        .Where(model => model.AffectedTranscripts != null)
+                        .ToArray();
+
+                    _logger.LogWarning($"Models with transcript consequences: {annotationModels.Count()}");
+                }
+                catch
+                {
+                    _logger.LogError("Can not extract models with transcript consequences.");
+                }
 
                 #region Mutations
                 var mutationModels = annotationModels
