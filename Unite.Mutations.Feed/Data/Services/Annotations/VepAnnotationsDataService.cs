@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
 using Unite.Mutations.Feed.Data.Repositories;
@@ -20,8 +22,9 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
         private readonly Repository<AffectedTranscript> _affectedTranscriptRepository;
         private readonly Repository<AffectedTranscriptConsequence> _affectedTranscriptConsequenceRepository;
         private readonly Repository<Consequence> _consequenceRepository;
+        private readonly ILogger _logger;
 
-        public VepAnnotationsDataService(UniteDbContext dbContext)
+        public VepAnnotationsDataService(UniteDbContext dbContext, ILogger<VepAnnotationsDataService> logger)
         {
             _dbContext = dbContext;
             _mutationRepository = new MutationRepository(dbContext);
@@ -30,6 +33,8 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
             _affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext);
             _affectedTranscriptConsequenceRepository = new AffectedTranscriptConsequenceRepository(dbContext);
             _consequenceRepository = new ConsequenceRepository(dbContext);
+
+            _logger = logger;
         }
 
         public void SaveData(AnnotationModel model, out AnnotationsUploadAudit audit)
@@ -62,6 +67,8 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
             {
                 audit = new AnnotationsUploadAudit();
 
+                _logger.LogWarning(JsonSerializer.Serialize<IEnumerable<AnnotationModel>>(models));
+
                 var annotationModels = models.Where(model => model.AffectedTranscripts != null).ToArray();
 
                 #region Mutations
@@ -76,9 +83,6 @@ namespace Unite.Mutations.Feed.Data.Services.Annotations
 
                     audit.Mutations.Add(mutation.Id);
                 }
-
-                Console.WriteLine("Mutations");
-                Console.WriteLine(string.Join(", ", mutationModels.Select(model => model.Code).ToArray()));
                 #endregion
 
                 #region Biotypes
