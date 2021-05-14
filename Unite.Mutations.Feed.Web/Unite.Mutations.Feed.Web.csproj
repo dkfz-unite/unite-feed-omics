@@ -10,21 +10,17 @@
     <Folder Include="Configuration\Options\" />
     <Folder Include="Configuration\Filters\" />
     <Folder Include="Configuration\Extensions\" />
-    <Folder Include="HostedServices\" />
-    <Folder Include="Controllers\Extensions\" />
-    <Folder Include="Resources\" />
-    <Folder Include="Resources\Validation\" />
-    <Folder Include="Resources\Mutations\" />
-    <Folder Include="Resources\Mutations\Validators\" />
-    <Folder Include="Resources\Mutations\Converters\" />
-    <Folder Include="Resources\Mutations\Converters\Helpers\" />
-    <Folder Include="Resources\Extensions\" />
-    <Folder Include="Handlers\" />
-    <Folder Include="Resources\Annotations\" />
-    <Folder Include="Resources\Annotations\Converters\" />
+    <Folder Include="Models\" />
+    <Folder Include="Models\Validation\" />
+    <Folder Include="Models\Mutations\" />
+    <Folder Include="Models\Mutations\Validators\" />
+    <Folder Include="Models\Extensions\" />
+    <Folder Include="Models\Mutations\Converters\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Macross.Json.Extensions" Version="2.0.0" />
+    <PackageReference Include="FluentValidation" Version="10.1.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Unite.Mutations.Feed\Unite.Mutations.Feed.csproj">

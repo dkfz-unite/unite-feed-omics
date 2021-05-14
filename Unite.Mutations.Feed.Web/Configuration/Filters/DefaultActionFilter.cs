@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Unite.Mutations.Feed.Web.Controllers.Extensions;
+using Unite.Mutations.Feed.Web.Configuration.Extensions;
 
 namespace Unite.Mutations.Feed.Web.Configuration.Filters
 {

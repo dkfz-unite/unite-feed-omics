@@ -5,35 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Annotations\" />
-    <Folder Include="Annotations\VEP\" />
-    <Folder Include="Annotations\VEP\Resources\" />
-    <Folder Include="Annotations\VEP\Resources\" />
-    <Folder Include="Annotations\Common\" />
-    <Folder Include="Annotations\Common\Http\" />
-    <Folder Include="Data\" />
-    <Folder Include="Data\Repositories\" />
-    <Folder Include="Indices\" />
-    <Folder Include="Data\Services\" />
-    <Folder Include="Data\Services\Mutations\" />
-    <Folder Include="Data\Services\Annotations\" />
-    <Folder Include="Data\Services\Mutations\Models\" />
-    <Folder Include="Data\Services\Annotations\Models\" />
-    <Folder Include="Data\Services\Annotations\Models\Vep\" />
-    <Folder Include="Data\Services\Mutations\Models\Audit\" />
-    <Folder Include="Data\Services\Annotations\Models\Vep\Audit\" />
-    <Folder Include="Data\Repositories\Entities\" />
-    <Folder Include="Data\Repositories\Entities\Extensions\" />
-    <Folder Include="Indices\Services\" />
-    <Folder Include="Indices\Services\Mapping\" />
-    <Folder Include="Indices\Services\Mapping\Extensions\" />
-    <Folder Include="Annotations\VEP\Configuration\" />
+    <Folder Include="Mutations\" />
+    <Folder Include="Mutations\Data\" />
+    <Folder Include="Mutations\Data\Repositories\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="5.0.1" />
-    <PackageReference Include="Unite.Data" Version="1.4.0" />
-    <PackageReference Include="FluentValidation" Version="9.5.3" />
-    <PackageReference Include="Unite.Indices" Version="1.3.3" />
-    <PackageReference Include="Macross.Json.Extensions" Version="2.0.0" />
+    <PackageReference Include="Unite.Data" Version="1.5.8" />
   </ItemGroup>
 </Project>

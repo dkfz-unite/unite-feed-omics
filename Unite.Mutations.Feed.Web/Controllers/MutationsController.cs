@@ -3,13 +3,12 @@ using System.Linq;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Unite.Mutations.Feed.Data.Services;
-using Unite.Mutations.Feed.Data.Services.Mutations.Models;
-using Unite.Mutations.Feed.Data.Services.Mutations.Models.Audit;
-using Unite.Mutations.Feed.Web.Resources.Extensions;
-using Unite.Mutations.Feed.Web.Resources.Mutations;
-using Unite.Mutations.Feed.Web.Resources.Mutations.Converters;
-using Unite.Mutations.Feed.Web.Resources.Validation;
+using Unite.Mutations.Feed.Mutations.Data;
+using Unite.Mutations.Feed.Web.Models.Extensions;
+using Unite.Mutations.Feed.Web.Models.Mutations;
+using Unite.Mutations.Feed.Web.Models.Mutations.Converters;
+using Unite.Mutations.Feed.Web.Models.Validation;
+using Unite.Mutations.Feed.Web.Services;
 
 namespace Unite.Mutations.Feed.Web.Controllers
 {
@@ -17,49 +16,53 @@ namespace Unite.Mutations.Feed.Web.Controllers
     public class MutationsController : Controller
     {
         private readonly IValidationService _validationService;
-        private readonly IValidator<IEnumerable<MutationsResource>> _validator;
-        private readonly IDataService<MutationsModel, MutationsUploadAudit> _dataService;
-        private readonly VepAnnotationTaskService _annotationTaskService;
+        private readonly IValidator<IEnumerable<MutationsModel>> _validator;
+        private readonly MutationDataWriter _dataWriter;
+        private readonly MutationIndexingTaskService _indexingTaskService;
+        private readonly MutationAnnotationTaskService _annotationTaskService;
         private readonly ILogger _logger;
+
+        private readonly AnalysisModelConverter _converter;
 
         public MutationsController(
             IValidationService validationService,
-            IValidator<IEnumerable<MutationsResource>> validator,
-            IDataService<MutationsModel, MutationsUploadAudit> dataService,
-            VepAnnotationTaskService annotationTaskService,
+            IValidator<IEnumerable<MutationsModel>> validator,
+            MutationDataWriter dataWriter,
+            MutationIndexingTaskService indexingTaskService,
+            MutationAnnotationTaskService annotationTaskService,
             ILogger<MutationsController> logger)
         {
             _validationService = validationService;
             _validator = validator;
-            _dataService = dataService;
+            _dataWriter = dataWriter;
+            _indexingTaskService = indexingTaskService;
             _annotationTaskService = annotationTaskService;
             _logger = logger;
+
+            _converter = new AnalysisModelConverter();
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] MutationsResource[] resources)
+        public IActionResult Post([FromBody] MutationsModel[] models)
         {
-            if (!_validationService.ValidateParameter(resources, _validator, out string modelErrorMessage))
+            if (!_validationService.ValidateParameter(models, _validator, out string modelErrorMessage))
             {
                 _logger.LogWarning(modelErrorMessage);
 
                 return BadRequest(modelErrorMessage);
             }
 
-            _logger.LogInformation("Processing mutations");
+            models.ForEach(model => model.Sanitise());
 
-            _logger.LogInformation("Sanitising data");
-            resources.ForEach(resource => resource.Sanitise());
+            var dataModels = models.Select(model => _converter.Convert(model));
 
-            _logger.LogInformation("Writing data to database");
-            var models = resources.Select(resource => MutationsResourceConverter.From(resource));
-            _dataService.SaveData(models, out var audit);
+            _dataWriter.SaveData(dataModels, out var audit);
+
             _logger.LogInformation(audit.ToString());
 
-            _logger.LogInformation("Populating annotation tasks");
-            _annotationTaskService.PopulateTasks(audit.Mutations);
+            _indexingTaskService.PopulateTasks(audit.Mutations);
 
-            _logger.LogInformation("Processing mutations completed");
+            _annotationTaskService.PopulateTasks(audit.Mutations);
 
             return Ok();
         }
