@@ -17,6 +17,8 @@
     <Folder Include="Models\Extensions\" />
     <Folder Include="Models\Mutations\Converters\" />
     <Folder Include="Services\" />
+    <Folder Include="Handlers\" />
+    <Folder Include="HostedServices\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Macross.Json.Extensions" Version="2.0.0" />
@@ -24,6 +26,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Unite.Mutations.Feed\Unite.Mutations.Feed.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\Unite.Mutations.Annotations\Unite.Mutations.Annotations.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\Unite.Mutations.Indices\Unite.Mutations.Indices.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

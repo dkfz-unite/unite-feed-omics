@@ -8,8 +8,12 @@ ARG USER
 ARG TOKEN
 WORKDIR /src
 RUN dotnet nuget add source https://nuget.pkg.github.com/dkfz-unite/index.json -n github -u ${USER} -p ${TOKEN} --store-password-in-clear-text
+COPY ["Unite.Mutations.Annotations/Unite.Mutations.Annotations.csproj", "Unite.Mutations.Annotations/"]
+COPY ["Unite.Mutations.Indices/Unite.Mutations.Indices.csproj", "Unite.Mutations.Indices/"]
 COPY ["Unite.Mutations.Feed/Unite.Mutations.Feed.csproj", "Unite.Mutations.Feed/"]
 COPY ["Unite.Mutations.Feed.Web/Unite.Mutations.Feed.Web.csproj", "Unite.Mutations.Feed.Web/"]
+RUN dotnet restore "Unite.Mutations.Annotations/Unite.Mutations.Annotations.csproj"
+RUN dotnet restore "Unite.Mutations.Indices/Unite.Mutations.Indices.csproj"
 RUN dotnet restore "Unite.Mutations.Feed/Unite.Mutations.Feed.csproj"
 RUN dotnet restore "Unite.Mutations.Feed.Web/Unite.Mutations.Feed.Web.csproj"
 

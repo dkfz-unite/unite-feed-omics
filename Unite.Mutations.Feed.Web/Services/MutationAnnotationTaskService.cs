@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Entities.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
@@ -21,38 +22,51 @@ namespace Unite.Mutations.Feed.Web.Services
         }
 
 
+        /// <summary>
+        /// Creates only mutation annotation tasks for all existing mutations
+        /// </summary>
+        public void CreateTasks()
+        {
+            IterateMutations(mutation => true, mutations =>
+            {
+                CreateMutationAnnotationTasks(mutations);
+            });
+        }
+
+        /// <summary>
+        /// Creates only mutation annotation tasks for all mutations with given identifiers
+        /// </summary>
+        /// <param name="mutationIds">Identifiers of mutations</param>
+        public void CreateTasks(IEnumerable<long> mutationIds)
+        {
+            IterateMutations(mutation => mutationIds.Contains(mutation.Id), mutations =>
+            {
+                CreateMutationAnnotationTasks(mutations);
+            });
+        }
+
+        /// <summary>
+        /// Populates all types of annotation tasks for mutations with given identifiers
+        /// </summary>
+        /// <param name="mutationIds">Identifiers of mutations</param>
         public void PopulateTasks(IEnumerable<long> mutationIds)
         {
-            var position = 0;
-
-            var mutations = Enumerable.Empty<Mutation>();
-
-            do
+            IterateMutations(mutation => mutationIds.Contains(mutation.Id), mutations =>
             {
-                mutations = _dbContext.Mutations
-                    .Where(mutation => mutationIds.Contains(mutation.Id))
-                    .Skip(position)
-                    .Take(BUCKET_SIZE)
-                    .ToArray();
-
-                PopulateAnnotationTasks(mutations);
-
-                position += mutations.Count();
-
-            }
-            while (mutations.Count() == BUCKET_SIZE);
+                CreateMutationAnnotationTasks(mutations);
+            });
         }
 
 
-        private void PopulateAnnotationTasks(IEnumerable<Mutation> mutations)
+        private void CreateMutationAnnotationTasks(IEnumerable<long> mutationIds)
         {
-            var tasks = mutations.Select(mutation =>
+            var tasks = mutationIds.Select(mutationId =>
             {
                 var task = new Task
                 {
                     TypeId = TaskType.Annotation,
                     TargetTypeId = TaskTargetType.Mutation,
-                    Target = mutation.Id.ToString(),
+                    Target = mutationId.ToString(),
                     Data = null,
                     Date = DateTime.UtcNow
                 };
@@ -63,6 +77,29 @@ namespace Unite.Mutations.Feed.Web.Services
 
             _dbContext.Tasks.AddRange(tasks);
             _dbContext.SaveChanges();
+        }
+
+        private void IterateMutations(Expression<Func<Mutation, bool>> condition, Action<IEnumerable<long>> handler)
+        {
+            var position = 0;
+
+            var mutations = Enumerable.Empty<long>();
+
+            do
+            {
+                mutations = _dbContext.Mutations
+                    .Where(condition)
+                    .Skip(position)
+                    .Take(BUCKET_SIZE)
+                    .Select(mutation => mutation.Id)
+                    .ToArray();
+
+                handler.Invoke(mutations);
+
+                position += mutations.Count();
+
+            }
+            while (mutations.Count() == BUCKET_SIZE);
         }
     }
 }
