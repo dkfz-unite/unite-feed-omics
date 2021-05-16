@@ -18,7 +18,6 @@ namespace Unite.Mutations.Feed.Web.Controllers
         private readonly IValidationService _validationService;
         private readonly IValidator<IEnumerable<MutationsModel>> _validator;
         private readonly MutationDataWriter _dataWriter;
-        private readonly MutationIndexingTaskService _indexingTaskService;
         private readonly MutationAnnotationTaskService _annotationTaskService;
         private readonly ILogger _logger;
 
@@ -35,7 +34,6 @@ namespace Unite.Mutations.Feed.Web.Controllers
             _validationService = validationService;
             _validator = validator;
             _dataWriter = dataWriter;
-            _indexingTaskService = indexingTaskService;
             _annotationTaskService = annotationTaskService;
             _logger = logger;
 
@@ -59,8 +57,6 @@ namespace Unite.Mutations.Feed.Web.Controllers
             _dataWriter.SaveData(dataModels, out var audit);
 
             _logger.LogInformation(audit.ToString());
-
-            _indexingTaskService.PopulateTasks(audit.Mutations);
 
             _annotationTaskService.PopulateTasks(audit.Mutations);
 
