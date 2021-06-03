@@ -1,6 +1,6 @@
 ﻿using Unite.Data.Entities.Mutations.Enums;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Models
+namespace Unite.Mutations.Feed.Data.Mutations.Models
 {
     public class MutationModel
     {

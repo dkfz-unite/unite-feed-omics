@@ -5,11 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Mutations\" />
-    <Folder Include="Mutations\Data\" />
-    <Folder Include="Mutations\Data\Repositories\" />
+    <Folder Include="Data\" />
+    <Folder Include="Data\Mutations\" />
+    <Folder Include="Data\Mutations\Repositories\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Unite.Data" Version="1.5.8" />
+    <PackageReference Include="Unite.Data" Version="1.5.13" />
   </ItemGroup>
 </Project>

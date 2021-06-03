@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Models.Audit
+namespace Unite.Mutations.Feed.Data.Mutations.Models.Audit
 {
     public class MutationsUploadAudit
     {   

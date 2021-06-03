@@ -2,9 +2,9 @@
 using System.Linq;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
-using Unite.Mutations.Feed.Mutations.Data.Models;
+using Unite.Mutations.Feed.Data.Mutations.Models;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Repositories
+namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class MutationRepository
     {
@@ -33,7 +33,9 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
 
         public Mutation Create(MutationModel mutationModel)
         {
-            var mutation = Convert(mutationModel);
+            var mutation = new Mutation();
+
+            Map(mutationModel, mutation);
 
             _dbContext.Mutations.Add(mutation);
             _dbContext.SaveChanges();
@@ -51,7 +53,9 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
 
                 if (mutation == null)
                 {
-                    mutation = Convert(mutationModel);
+                    mutation = new Mutation();
+
+                    Map(mutationModel, mutation);
 
                     mutationsToAdd.Add(mutation);
                 }
@@ -67,10 +71,8 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
         }
 
 
-        private Mutation Convert(MutationModel mutationModel)
+        private void Map(MutationModel mutationModel, Mutation mutation)
         {
-            var mutation = new Mutation();
-
             mutation.Code = mutationModel.Code;
             mutation.ChromosomeId = mutationModel.Chromosome;
             mutation.SequenceTypeId = mutationModel.SequenceType;
@@ -79,8 +81,6 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
             mutation.ReferenceBase = mutationModel.ReferenceBase;
             mutation.AlternateBase = mutationModel.AlternateBase;
             mutation.TypeId = mutationModel.Type;
-
-            return mutation;
         }
     }
 }

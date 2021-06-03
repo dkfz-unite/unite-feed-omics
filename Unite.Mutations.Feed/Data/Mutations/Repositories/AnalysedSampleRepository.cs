@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
-using Unite.Mutations.Feed.Mutations.Data.Models;
+using Unite.Mutations.Feed.Data.Mutations.Models;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Repositories
+namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class AnalysedSampleRepository
     {
@@ -18,28 +18,37 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
         }
 
 
+        public AnalysedSample FindOrCreate(int analysisId, SampleModel sampleModel)
+        {
+            return Find(analysisId, sampleModel) ?? Create(analysisId, sampleModel);
+        }
+
         public AnalysedSample Find(int analysisId, SampleModel sampleModel)
         {
             var sample = _sampleRepository.Find(sampleModel);
 
-            if(sample != null)
+            if (sample == null)
             {
-                return Find(analysisId, sample.Id);
+                return null;
             }
 
-            return null;
+            return Find(analysisId, sample.Id);
         }
 
         public AnalysedSample Create(int analysisId, SampleModel sampleModel)
         {
             var sample = _sampleRepository.FindOrCreate(sampleModel);
 
-            return Create(analysisId, sample.Id);
-        }
+            var analysedSample = new AnalysedSample
+            {
+                AnalysisId = analysisId,
+                SampleId = sample.Id
+            };
 
-        public AnalysedSample FindOrCreate(int analysisId, SampleModel sampleModel)
-        {
-            return Find(analysisId, sampleModel) ?? Create(analysisId, sampleModel);
+            _dbContext.AnalysedSamples.Add(analysedSample);
+            _dbContext.SaveChanges();
+
+            return analysedSample;
         }
 
 
@@ -49,19 +58,6 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
                 analysedSample.AnalysisId == analysisId &&
                 analysedSample.SampleId == sampleId
             );
-
-            return analysedSample;
-        }
-
-        private AnalysedSample Create(int analysisId, int sampleId)
-        {
-            var analysedSample = new AnalysedSample();
-
-            analysedSample.AnalysisId = analysisId;
-            analysedSample.SampleId = sampleId;
-
-            _dbContext.AnalysedSamples.Add(analysedSample);
-            _dbContext.SaveChanges();
 
             return analysedSample;
         }

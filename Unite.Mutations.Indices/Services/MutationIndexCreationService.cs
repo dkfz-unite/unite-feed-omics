@@ -125,10 +125,7 @@ namespace Unite.Mutations.Indices.Services
         private Donor[] LoadDonors(long mutationId)
         {
             var donorIds = _dbContext.MutationOccurrences
-                .Where(mutationOccurrence =>
-                    mutationOccurrence.MutationId == mutationId &&
-                    mutationOccurrence.AnalysedSample.Sample.Specimen.DonorId != null
-                )
+                .Where(mutationOccurrence => mutationOccurrence.MutationId == mutationId)
                 .Select(mutationOccurrence => mutationOccurrence.AnalysedSample.Sample.Specimen.DonorId)
                 .Distinct()
                 .ToArray();

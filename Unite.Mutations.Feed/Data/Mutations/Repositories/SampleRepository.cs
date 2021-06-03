@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
-using Unite.Mutations.Feed.Mutations.Data.Models;
+using Unite.Mutations.Feed.Data.Mutations.Models;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Repositories
+namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class SampleRepository
     {
@@ -25,41 +25,52 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
 
         public Sample Find(SampleModel sampleModel)
         {
+            var specimen = _specimenRepository.Find(sampleModel.Specimen);
+
+            if(specimen == null)
+            {
+                return null;
+            }
+
             if (!string.IsNullOrWhiteSpace(sampleModel.ReferenceId))
             {
-                return Find(sampleModel.ReferenceId);
+                return FindByReference(specimen.Id, sampleModel.ReferenceId);
             }
             else
             {
-                var specimen = _specimenRepository.Find(sampleModel.Specimen);
-
-                if (specimen != null)
-                {
-                    return Find(specimen.Id, sampleModel);
-                }
+                return FindByModel(specimen.Id, sampleModel);
             }
-
-            return null;
         }
 
         public Sample Create(SampleModel sampleModel)
         {
             var specimen = _specimenRepository.FindOrCreate(sampleModel.Specimen);
 
-            return Create(specimen.Id, sampleModel);
+            var sample = new Sample
+            {
+                SpecimenId = specimen.Id
+            };
+
+            Map(sampleModel, sample);
+
+            _dbContext.Samples.Add(sample);
+            _dbContext.SaveChanges();
+
+            return sample;
         }
 
 
-        private Sample Find(string referenceId)
+        private Sample FindByReference(int specimenId, string referenceId)
         {
             var sample = _dbContext.Samples.FirstOrDefault(sample =>
+                sample.SpecimenId == specimenId &&
                 sample.ReferenceId == referenceId
             );
 
             return sample;
         }
 
-        private Sample Find(int specimenId, SampleModel sampleModel)
+        private Sample FindByModel(int specimenId, SampleModel sampleModel)
         {
             var sample = _dbContext.Samples.FirstOrDefault(sample =>
                 sample.SpecimenId == specimenId &&
@@ -69,19 +80,11 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
             return sample;
         }
 
-        private Sample Create(int specimenId, SampleModel sampleModel)
+        private void Map(SampleModel sampleModel, Sample sample)
         {
-            var sample = new Sample();
-
             sample.ReferenceId = sampleModel.ReferenceId;
+
             sample.Date = sampleModel.Date;
-
-            sample.SpecimenId = specimenId;
-
-            _dbContext.Samples.Add(sample);
-            _dbContext.SaveChanges();
-
-            return sample;
         }
     }
 }

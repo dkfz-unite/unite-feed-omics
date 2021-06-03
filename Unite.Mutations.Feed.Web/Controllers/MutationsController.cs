@@ -3,7 +3,7 @@ using System.Linq;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Unite.Mutations.Feed.Mutations.Data;
+using Unite.Mutations.Feed.Data.Mutations;
 using Unite.Mutations.Feed.Web.Models.Extensions;
 using Unite.Mutations.Feed.Web.Models.Mutations;
 using Unite.Mutations.Feed.Web.Models.Mutations.Converters;

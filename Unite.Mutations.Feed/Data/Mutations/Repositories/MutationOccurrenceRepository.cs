@@ -2,9 +2,9 @@
 using System.Linq;
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
-using Unite.Mutations.Feed.Mutations.Data.Models;
+using Unite.Mutations.Feed.Data.Mutations.Models;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Repositories
+namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class MutationOccurrenceRepository
     {

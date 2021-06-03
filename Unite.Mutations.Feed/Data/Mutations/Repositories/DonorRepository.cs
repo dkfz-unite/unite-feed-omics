@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Services;
-using Unite.Mutations.Feed.Mutations.Data.Models;
+using Unite.Mutations.Feed.Data.Mutations.Models;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Repositories
+namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class DonorRepository
     {
@@ -23,19 +23,18 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
 
         public Donor Find(DonorModel donorModel)
         {
-            if (!string.IsNullOrWhiteSpace(donorModel.ReferenceId))
-            {
-                return Find(donorModel.ReferenceId);
-            }
+            var donor = _dbContext.Donors.FirstOrDefault(donor =>
+                donor.ReferenceId == donorModel.ReferenceId
+            );
 
-            return null;
+            return donor;
         }
 
         public Donor Create(DonorModel donorModel)
         {
             var donor = new Donor();
 
-            donor.ReferenceId = donorModel.ReferenceId;
+            Map(donorModel, donor);
 
             _dbContext.Donors.Add(donor);
             _dbContext.SaveChanges();
@@ -44,13 +43,9 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
         }
 
 
-        private Donor Find(string referenceId)
+        private void Map(DonorModel donorModel, Donor donor)
         {
-            var donor = _dbContext.Donors.FirstOrDefault(donor =>
-                donor.ReferenceId == referenceId
-            );
-
-            return donor;
+            donor.ReferenceId = donorModel.ReferenceId;
         }
     }
 }

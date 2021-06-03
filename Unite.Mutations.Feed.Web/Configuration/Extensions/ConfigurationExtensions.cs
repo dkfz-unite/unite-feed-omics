@@ -8,7 +8,7 @@ using Unite.Indices.Services;
 using Unite.Indices.Services.Configuration.Options;
 using Unite.Mutations.Annotations.Vep.Configuration.Options;
 using Unite.Mutations.Annotations.Vep.Services;
-using Unite.Mutations.Feed.Mutations.Data;
+using Unite.Mutations.Feed.Data.Mutations;
 using Unite.Mutations.Feed.Web.Configuration.Options;
 using Unite.Mutations.Feed.Web.Handlers;
 using Unite.Mutations.Feed.Web.HostedServices;

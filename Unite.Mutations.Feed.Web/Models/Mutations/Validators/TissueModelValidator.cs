@@ -3,32 +3,18 @@ using Unite.Data.Entities.Specimens.Tissues.Enums;
 
 namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
 {
-    public class TissueModelValidator : AbstractValidator<TissueModel>
+    public class TissueModelValidator : SpecimenModelValidator<TissueModel>
     {
-        public TissueModelValidator()
+        public TissueModelValidator() : base()
         {
-            RuleFor(model => model.Id)
-                .MaximumLength(255)
-                .WithMessage("Maximum length is 255");
-
-            RuleFor(model => model.Id)
-                .NotEmpty()
-                .When(model => string.IsNullOrWhiteSpace(model.DonorId))
-                .WithMessage("Tissue external identifier should be set if donor external identifier is empty");
-
-            RuleFor(model => model.DonorId)
-                .MaximumLength(255)
-                .WithMessage("Maximum length is 255");
-
-            RuleFor(model => model.Type)
-                .NotEmpty()
-                .When(model => string.IsNullOrWhiteSpace(model.Id))
-                .WithMessage("Tissue type should be set if tissue external identifier is empty");
-
             RuleFor(model => model.TumourType)
                 .Empty()
-                .When(model => model.Type == TissueType.Control)
+                .When(model => model.Type != TissueType.Tumour)
                 .WithMessage("Tumour type can be set only for tumour tissues");
+
+            RuleFor(model => model.Source)
+                .MaximumLength(100)
+                .WithMessage("Maximum length is 100");
 
         }
     }

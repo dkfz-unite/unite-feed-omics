@@ -19,14 +19,14 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
                 .SetValidator(_analysisModelValidator)
                 .When(model => model.Analysis != null);
 
+
             RuleFor(model => model.Samples)
                 .NotEmpty()
                 .WithMessage("Should not be empty");
 
-
             RuleForEach(model => model.Samples)
-                .SetValidator(_analysedSampleModelValidator)
-                .When(model => model.Samples != null);
+                .SetValidator(_analysedSampleModelValidator);
+
 
             RuleFor(model => model)
                 .Must(EachSampleNameIsUnique)

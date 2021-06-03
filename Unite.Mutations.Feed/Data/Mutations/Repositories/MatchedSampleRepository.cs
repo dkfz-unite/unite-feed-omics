@@ -2,7 +2,7 @@
 using Unite.Data.Entities.Mutations;
 using Unite.Data.Services;
 
-namespace Unite.Mutations.Feed.Mutations.Data.Repositories
+namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class MatchedSampleRepository
     {
@@ -32,10 +32,11 @@ namespace Unite.Mutations.Feed.Mutations.Data.Repositories
 
         public MatchedSample Create(int analysedSampleId, int matchedSampleId)
         {
-            var matchedSample = new MatchedSample();
-
-            matchedSample.AnalysedSampleId = analysedSampleId;
-            matchedSample.MatchedSampleId = matchedSampleId;
+            var matchedSample = new MatchedSample
+            {
+                AnalysedSampleId = analysedSampleId,
+                MatchedSampleId = matchedSampleId
+            };
 
             _dbContext.MatchedSamples.Add(matchedSample);
             _dbContext.SaveChanges();
