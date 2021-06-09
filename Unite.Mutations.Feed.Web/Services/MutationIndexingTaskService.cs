@@ -55,7 +55,7 @@ namespace Unite.Mutations.Feed.Web.Services
             {
                 CreateMutationIndexingTasks(mutations);
                 CreateDonorIndexingTasks(mutations);
-                //CreateSpecimenIndexingTasks(mutations);
+                CreateSpecimenIndexingTasks(mutations);
             });
         }
 
