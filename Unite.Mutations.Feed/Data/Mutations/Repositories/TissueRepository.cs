@@ -57,7 +57,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 
             specimen.Tissue.ReferenceId = tissueModel.ReferenceId;
             specimen.Tissue.TypeId = tissueModel.Type;
-            specimen.Tissue.TumourTypeId = tissueModel.TumourType;
+            specimen.Tissue.TumorTypeId = tissueModel.TumorType;
             specimen.Tissue.ExtractionDate = tissueModel.ExtractionDate;
             specimen.Tissue.Source = GetTissueSource(tissueModel.Source);
         }

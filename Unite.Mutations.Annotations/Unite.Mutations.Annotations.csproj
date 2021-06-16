@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Unite.Data" Version="1.5.13" />
+    <PackageReference Include="Unite.Data" Version="1.5.14" />
     <PackageReference Include="Macross.Json.Extensions" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>

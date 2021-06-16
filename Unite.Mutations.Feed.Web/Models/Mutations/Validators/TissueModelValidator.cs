@@ -7,10 +7,10 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
     {
         public TissueModelValidator() : base()
         {
-            RuleFor(model => model.TumourType)
+            RuleFor(model => model.TumorType)
                 .Empty()
-                .When(model => model.Type != TissueType.Tumour)
-                .WithMessage("Tumour type can be set only for tumour tissues");
+                .When(model => model.Type != TissueType.Tumor)
+                .WithMessage("Tumor type can be set only for tumor tissues");
 
             RuleFor(model => model.Source)
                 .MaximumLength(100)

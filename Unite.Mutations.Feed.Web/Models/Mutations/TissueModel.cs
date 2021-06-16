@@ -6,7 +6,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations
     public class TissueModel : SpecimenModel
     {
         public TissueType? Type { get; set; }
-        public TumourType? TumourType { get; set; }
+        public TumorType? TumorType { get; set; }
         public DateTime? ExtractionDate { get; set; }
         public string Source { get; set; }
 

@@ -106,7 +106,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
 
             target.ReferenceId = source.Id;
             target.Type = source.Type;
-            target.TumourType = source.TumourType;
+            target.TumorType = source.TumorType;
             target.ExtractionDate = source.ExtractionDate;
             target.Source = source.Source;
         }
