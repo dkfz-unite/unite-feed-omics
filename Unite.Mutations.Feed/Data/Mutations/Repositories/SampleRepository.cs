@@ -27,19 +27,17 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         {
             var specimen = _specimenRepository.Find(sampleModel.Specimen);
 
-            if(specimen == null)
+            if (specimen == null)
             {
                 return null;
             }
 
-            if (!string.IsNullOrWhiteSpace(sampleModel.ReferenceId))
-            {
-                return FindByReference(specimen.Id, sampleModel.ReferenceId);
-            }
-            else
-            {
-                return FindByModel(specimen.Id, sampleModel);
-            }
+            var sample = _dbContext.Samples.FirstOrDefault(sample =>
+                sample.SpecimenId == specimen.Id &&
+                sample.Date == sampleModel.Date
+            );
+
+            return sample;
         }
 
         public Sample Create(SampleModel sampleModel)
@@ -60,30 +58,8 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         }
 
 
-        private Sample FindByReference(int specimenId, string referenceId)
-        {
-            var sample = _dbContext.Samples.FirstOrDefault(sample =>
-                sample.SpecimenId == specimenId &&
-                sample.ReferenceId == referenceId
-            );
-
-            return sample;
-        }
-
-        private Sample FindByModel(int specimenId, SampleModel sampleModel)
-        {
-            var sample = _dbContext.Samples.FirstOrDefault(sample =>
-                sample.SpecimenId == specimenId &&
-                sample.Date == sampleModel.Date
-            );
-
-            return sample;
-        }
-
         private void Map(SampleModel sampleModel, Sample sample)
         {
-            sample.ReferenceId = sampleModel.ReferenceId;
-
             sample.Date = sampleModel.Date;
         }
     }

@@ -8,8 +8,12 @@
     <Folder Include="Data\" />
     <Folder Include="Data\Mutations\" />
     <Folder Include="Data\Mutations\Repositories\" />
+    <Folder Include="Data\Mutations\Models\Enums\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Unite.Data" Version="1.5.14" />
+    <PackageReference Include="Unite.Data" Version="1.6.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Data\Mutations\Models\Enums\" />
   </ItemGroup>
 </Project>

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
 {
     public class AnalysisModelConverter
     {
-        public Feed.Data.Mutations.Models.AnalysisModel Convert(MutationsModel source)
+        public Data.Mutations.Models.AnalysisModel Convert(MutationsModel source)
         {
-            var analysisModel = new Feed.Data.Mutations.Models.AnalysisModel();
+            var analysisModel = new Data.Mutations.Models.AnalysisModel();
 
             if (source.Analysis != null)
             {
@@ -16,7 +15,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
 
             analysisModel.AnalysedSamples = source.Samples.Select(analysedSample =>
             {
-                var analysedSampleModel = new Feed.Data.Mutations.Models.AnalysedSampleModel();
+                var analysedSampleModel = new Data.Mutations.Models.AnalysedSampleModel();
 
                 Map(analysedSample, analysedSampleModel);
 
@@ -26,7 +25,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
                     {
                         var matchedAnalysedSample = source.Samples.Single(analysedSample => analysedSample.Name == matchedSampleName);
 
-                        var matchedSampleModel = new Feed.Data.Mutations.Models.MatchedSampleModel();
+                        var matchedSampleModel = new Data.Mutations.Models.MatchedSampleModel();
 
                         Map(matchedAnalysedSample, matchedSampleModel);
 
@@ -39,7 +38,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
                 {
                     analysedSampleModel.Mutations = analysedSample.Mutations.Select(mutation =>
                     {
-                        var mutationModel = new Feed.Data.Mutations.Models.MutationModel();
+                        var mutationModel = new Data.Mutations.Models.MutationModel();
 
                         Map(mutation, mutationModel);
 
@@ -56,20 +55,20 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
         }
 
 
-        private static void Map(in AnalysisModel source, Feed.Data.Mutations.Models.AnalysisModel target)
+        private static void Map(in AnalysisModel source, Data.Mutations.Models.AnalysisModel target)
         {
             target.Type = source.Type;
             target.Date = source.Date;
 
             if (source.File != null)
             {
-                target.File = new Feed.Data.Mutations.Models.FileModel();
+                target.File = new Data.Mutations.Models.FileModel();
 
                 Map(source.File, target.File);
             }
         }
 
-        private static void Map(in FileModel source, Feed.Data.Mutations.Models.FileModel target)
+        private static void Map(in FileModel source, Data.Mutations.Models.FileModel target)
         {
             target.Name = source.Name;
             target.Link = source.Link;
@@ -77,48 +76,19 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
             target.Updated = source.Updated;
         }
 
-        private static void Map(in SampleModel source, Feed.Data.Mutations.Models.SampleModel target)
+        private static void Map(in SampleModel source, Data.Mutations.Models.SampleModel target)
         {
-            target.ReferenceId = source.Id;
             target.Date = source.Date;
 
-            if (source.Tissue != null)
-            {
-                target.Specimen = new Feed.Data.Mutations.Models.TissueModel();
+            target.Specimen = new Data.Mutations.Models.SpecimenModel();
+            target.Specimen.ReferenceId = source.SpecimenId;
+            target.Specimen.Type = source.SpecimenType.Value;
 
-                Map(source.Tissue, (Feed.Data.Mutations.Models.TissueModel)target.Specimen);
-            }
-            else if (source.CellLine != null)
-            {
-                target.Specimen = new Feed.Data.Mutations.Models.CellLineModel();
-
-                Map(source.CellLine, (Feed.Data.Mutations.Models.CellLineModel)target.Specimen);
-            }
-            else if (source.Xenograft != null)
-            {
-                throw new NotImplementedException("Xenograft specimens are not supported yet");
-            }
+            target.Specimen.Donor = new Data.Mutations.Models.DonorModel();
+            target.Specimen.Donor.ReferenceId = source.DonorId;
         }
 
-        private static void Map(TissueModel source, Feed.Data.Mutations.Models.TissueModel target)
-        {
-            target.Donor = new Feed.Data.Mutations.Models.DonorModel { ReferenceId = source.DonorId };
-
-            target.ReferenceId = source.Id;
-            target.Type = source.Type;
-            target.TumorType = source.TumorType;
-            target.ExtractionDate = source.ExtractionDate;
-            target.Source = source.Source;
-        }
-
-        private static void Map(CellLineModel source, Feed.Data.Mutations.Models.CellLineModel target)
-        {
-            target.Donor = new Feed.Data.Mutations.Models.DonorModel { ReferenceId = source.DonorId };
-
-            target.ReferenceId = source.Id;
-        }
-
-        private static void Map(in MutationModel source, Feed.Data.Mutations.Models.MutationModel target)
+        private static void Map(in MutationModel source, Data.Mutations.Models.MutationModel target)
         {
             target.Code = source.GetCode();
             target.Chromosome = source.Chromosome.Value;

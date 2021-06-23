@@ -1,17 +1,17 @@
 ﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Specimens;
-using Unite.Data.Entities.Specimens.Cells;
+using Unite.Data.Entities.Specimens.Organoids;
 using Unite.Data.Services;
 
 namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
-    public class CellLineRepository
+    internal class OrganoidRepository
     {
         private readonly UniteDbContext _dbContext;
 
 
-        public CellLineRepository(UniteDbContext dbContext)
+        public OrganoidRepository(UniteDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -25,10 +25,10 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         public Specimen Find(int donorId, string referenceId)
         {
             var specimen = _dbContext.Specimens
-                .Include(specimen => specimen.CellLine)
+                .Include(specimen => specimen.Organoid)
                 .FirstOrDefault(specimen =>
                     specimen.DonorId == donorId &&
-                    specimen.CellLine.ReferenceId == referenceId
+                    specimen.Organoid.ReferenceId == referenceId
                 );
 
             return specimen;
@@ -39,7 +39,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
             var specimen = new Specimen
             {
                 DonorId = donorId,
-                CellLine = new CellLine { ReferenceId = referenceId }
+                Organoid = new Organoid { ReferenceId = referenceId }
             };
 
             _dbContext.Specimens.Add(specimen);

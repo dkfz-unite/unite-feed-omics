@@ -14,9 +14,9 @@ namespace Unite.Mutations.Indices.Services
     public class MutationIndexCreationService : IIndexCreationService<MutationIndex>
     {
         private readonly UniteDbContext _dbContext;
-        private readonly IMapper<Mutation, Unite.Indices.Entities.Basic.Mutations.MutationIndex> _mutationIndexMapper;
-        private readonly IMapper<Donor, Unite.Indices.Entities.Basic.Donors.DonorIndex> _donorIndexMapper;
-        private readonly IMapper<Specimen, Unite.Indices.Entities.Basic.Specimens.SpecimenIndex> _specimenIndexMapper;
+        private readonly MutationIndexMapper _mutationIndexMapper;
+        private readonly DonorIndexMapper _donorIndexMapper;
+        private readonly SpecimenIndexMapper _specimenIndexMapper;
 
         public MutationIndexCreationService(UniteDbContext dbContext)
         {
@@ -152,7 +152,7 @@ namespace Unite.Mutations.Indices.Services
         {
             var specimens = LoadSpecimens(donorId, mutationId);
 
-            if(specimens == null)
+            if (specimens == null)
             {
                 return null;
             }
@@ -188,6 +188,13 @@ namespace Unite.Mutations.Indices.Services
                 .Include(specimen => specimen.Tissue)
                     .ThenInclude(tissue => tissue.Source)
                 .Include(specimen => specimen.CellLine)
+                    .ThenInclude(cellLine => cellLine.Info)
+                .Include(specimen => specimen.Organoid)
+                    .ThenInclude(organoid => organoid.Interventions)
+                        .ThenInclude(intervention => intervention.Type)
+                .Include(specimen => specimen.Xenograft)
+                    .ThenInclude(xenograft => xenograft.Interventions)
+                        .ThenInclude(intervention => intervention.Type)
                 .Include(specimen => specimen.MolecularData)
                 .Where(specimen => specimenIds.Contains(specimen.Id))
                 .ToArray();

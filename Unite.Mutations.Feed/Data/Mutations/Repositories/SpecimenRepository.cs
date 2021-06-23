@@ -2,6 +2,7 @@
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Services;
 using Unite.Mutations.Feed.Data.Mutations.Models;
+using Unite.Mutations.Feed.Data.Mutations.Models.Enums;
 
 namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
@@ -11,6 +12,8 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         private readonly DonorRepository _donorRepository;
         private readonly TissueRepository _tissueRepository;
         private readonly CellLineRepository _cellLineRepository;
+        private readonly OrganoidRepository _organoidRepository;
+        private readonly XenograftRepository _xenograftRepository;
 
 
         public SpecimenRepository(UniteDbContext dbContext)
@@ -19,6 +22,8 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
             _donorRepository = new DonorRepository(dbContext);
             _tissueRepository = new TissueRepository(dbContext);
             _cellLineRepository = new CellLineRepository(dbContext);
+            _organoidRepository = new OrganoidRepository(dbContext);
+            _xenograftRepository = new XenograftRepository(dbContext);
         }
 
 
@@ -36,13 +41,21 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
                 return null;
             }
 
-            if (specimenModel is TissueModel tissueModel)
+            if (specimenModel.Type == SpecimenType.Tissue)
             {
-                return _tissueRepository.Find(donor.Id, tissueModel);
+                return _tissueRepository.Find(donor.Id, specimenModel.ReferenceId);
             }
-            else if (specimenModel is CellLineModel cellLineModel)
+            else if (specimenModel.Type == SpecimenType.CellLine)
             {
-                return _cellLineRepository.Find(donor.Id, cellLineModel);
+                return _cellLineRepository.Find(donor.Id, specimenModel.ReferenceId);
+            }
+            else if (specimenModel.Type == SpecimenType.Organoid)
+            {
+                return _organoidRepository.Find(donor.Id, specimenModel.ReferenceId);
+            }
+            else if (specimenModel.Type == SpecimenType.Xenograft)
+            {
+                return _xenograftRepository.Find(donor.Id, specimenModel.ReferenceId);
             }
             else
             {
@@ -54,13 +67,21 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         {
             var donor = _donorRepository.FindOrCreate(specimenModel.Donor);
 
-            if (specimenModel is TissueModel tissueModel)
+            if (specimenModel.Type == SpecimenType.Tissue)
             {
-                return _tissueRepository.Create(donor.Id, tissueModel);
+                return _tissueRepository.Create(donor.Id, specimenModel.ReferenceId);
             }
-            else if (specimenModel is CellLineModel cellLineModel)
+            else if (specimenModel.Type == SpecimenType.CellLine)
             {
-                return _cellLineRepository.Create(donor.Id, cellLineModel);
+                return _cellLineRepository.Create(donor.Id, specimenModel.ReferenceId);
+            }
+            else if (specimenModel.Type == SpecimenType.Organoid)
+            {
+                return _organoidRepository.Create(donor.Id, specimenModel.ReferenceId);
+            }
+            else if (specimenModel.Type == SpecimenType.Xenograft)
+            {
+                return _xenograftRepository.Create(donor.Id, specimenModel.ReferenceId);
             }
             else
             {

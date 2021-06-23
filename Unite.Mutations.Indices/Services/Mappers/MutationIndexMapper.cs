@@ -7,7 +7,7 @@ using Unite.Indices.Entities.Basic.Mutations;
 
 namespace Unite.Mutations.Indices.Services.Mappers
 {
-    public class MutationIndexMapper : IMapper<Mutation, MutationIndex>
+    public class MutationIndexMapper
     {
         public void Map(in Mutation mutation, MutationIndex index)
         {
@@ -32,7 +32,7 @@ namespace Unite.Mutations.Indices.Services.Mappers
 
         private static AffectedTranscriptIndex[] CreateFrom(in IEnumerable<AffectedTranscript> affectedTranscripts)
         {
-            if (affectedTranscripts == null)
+            if (affectedTranscripts == null || !affectedTranscripts.Any())
             {
                 return null;
             }
@@ -106,7 +106,7 @@ namespace Unite.Mutations.Indices.Services.Mappers
 
         private static ConsequenceIndex[] CreateFrom(in IEnumerable<AffectedTranscriptConsequence> consequences)
         {
-            if (consequences == null)
+            if (consequences == null || !consequences.Any())
             {
                 return null;
             }
