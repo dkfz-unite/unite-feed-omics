@@ -5,8 +5,8 @@ namespace Unite.Mutations.Annotations.Vep.Client
 {
     internal class VepAnnotationApiClient
     {
-        private const string _annotationUrl = @"/api/hgvs?input={0}";
-        private const string _annotationsUrl = @"/api/hgvs";
+        private const string _annotationUrl = @"/api/vep?input={0}";
+        private const string _annotationsUrl = @"/api/vep";
 
         private readonly IVepOptions _options;
 
@@ -15,24 +15,24 @@ namespace Unite.Mutations.Annotations.Vep.Client
             _options = options;
         }
 
-        public AnnotationsResource LoadAnnotations(string hgvsCode)
+        public AnnotationsResource LoadAnnotations(string vepCode)
         {
             using var httpClient = new JsonHttpClient(_options.Host);
 
-            var url = string.Format(_annotationUrl, hgvsCode);
+            var url = string.Format(_annotationUrl, vepCode);
 
             var resource = httpClient.GetAsync<AnnotationsResource>(url).Result;
 
             return resource;
         }
 
-        public AnnotationsResource[] LoadAnnotations(string[] hgvsCodes)
+        public AnnotationsResource[] LoadAnnotations(string[] vepCodes)
         {
             using var httpClient = new JsonHttpClient(_options.Host);
 
             var url = string.Format(_annotationsUrl);
 
-            var resources = httpClient.PostAsync<AnnotationsResource[], string[]>(url, hgvsCodes).Result;
+            var resources = httpClient.PostAsync<AnnotationsResource[], string[]>(url, vepCodes).Result;
 
             return resources;
         }

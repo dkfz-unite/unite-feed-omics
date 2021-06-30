@@ -15,10 +15,6 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
                 .NotEmpty()
                 .WithMessage("Should not be empty");
 
-            RuleFor(model => model.Date)
-                .NotEmpty()
-                .WithMessage("Should not be empty");
-
 
             RuleFor(model => model.File)
                 .SetValidator(_fileModelValidator)

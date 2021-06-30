@@ -5,7 +5,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations
     public class AnalysedSampleModel : SampleModel
     {
         /// <summary>
-        /// List of matched sample names
+        /// List of matched sample id
         /// </summary>
         public string[] MatchedSamples { get; set; }
 

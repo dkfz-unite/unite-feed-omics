@@ -26,7 +26,7 @@
         "UNITE_INDEXING_INTERVAL": "10",
         "UNITE_INDEXING_BUCKET_SIZE": "1000",
         "UNITE_ANNOTATION_INTERVAL": "10",
-        "UNITE_ANNOTATION_BUCKET_SIZE": "30"
+        "UNITE_ANNOTATION_BUCKET_SIZE": "100"
       }
     },
     "Unite.Mutations.Feed.Web": {
@@ -47,7 +47,7 @@
         "UNITE_INDEXING_INTERVAL": "10",
         "UNITE_INDEXING_BUCKET_SIZE": "1000",
         "UNITE_ANNOTATION_INTERVAL": "10",
-        "UNITE_ANNOTATION_BUCKET_SIZE": "30"
+        "UNITE_ANNOTATION_BUCKET_SIZE": "100"
       }
     }
   }

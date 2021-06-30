@@ -9,10 +9,12 @@ namespace Unite.Mutations.Feed.Data.Mutations.Models.Audit
         public int MutationsAssociated;
 
         public HashSet<long> Mutations;
+        public HashSet<long> MutationOccurrences;
 
         public MutationsUploadAudit()
         {
             Mutations = new HashSet<long>();
+            MutationOccurrences = new HashSet<long>();
         }
 
         public override string ToString()

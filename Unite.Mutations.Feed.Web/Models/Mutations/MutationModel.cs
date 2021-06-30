@@ -1,5 +1,5 @@
 ﻿using Unite.Data.Entities.Mutations.Enums;
-using Unite.Data.Extensions;
+using Unite.Data.Utilities.Mutations;
 
 namespace Unite.Mutations.Feed.Web.Models.Mutations
 {
@@ -25,13 +25,9 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations
 
         public string GetCode()
         {
-            var chromosome = $"chr{Chromosome.ToDefinitionString()}";
-            var sequenceType = SequenceType.ToDefinitionString();
-            var position = Position;
-            var referenceBase = Ref ?? "-";
-            var alternateBase = Alt ?? "-";
+            var position = PositionParser.Parse(Position).Start.ToString();
 
-            return $"{chromosome}:{sequenceType}.{position}{referenceBase}>{alternateBase}";
+            return HGVsCodeGenerator.Generate(Chromosome.Value, SequenceType.Value, position, Ref, Alt);
         }
     }
 }

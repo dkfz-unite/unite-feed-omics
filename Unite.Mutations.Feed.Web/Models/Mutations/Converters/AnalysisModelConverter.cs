@@ -11,6 +11,13 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
             if (source.Analysis != null)
             {
                 Map(source.Analysis, analysisModel);
+
+                if (source.Analysis.File != null)
+                {
+                    analysisModel.File = new Data.Mutations.Models.FileModel();
+
+                    Map(source.Analysis.File, analysisModel.File);
+                }
             }
 
             analysisModel.AnalysedSamples = source.Samples.Select(analysedSample =>
@@ -21,9 +28,9 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
 
                 if (analysedSample.MatchedSamples != null)
                 {
-                    analysedSampleModel.MatchedSamples = analysedSample.MatchedSamples.Select(matchedSampleName =>
+                    analysedSampleModel.MatchedSamples = analysedSample.MatchedSamples.Select(matchedSampleId =>
                     {
-                        var matchedAnalysedSample = source.Samples.Single(analysedSample => analysedSample.Name == matchedSampleName);
+                        var matchedAnalysedSample = source.Samples.Single(analysedSample => analysedSample.Id == matchedSampleId);
 
                         var matchedSampleModel = new Data.Mutations.Models.MatchedSampleModel();
 
@@ -58,14 +65,6 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
         private static void Map(in AnalysisModel source, Data.Mutations.Models.AnalysisModel target)
         {
             target.Type = source.Type;
-            target.Date = source.Date;
-
-            if (source.File != null)
-            {
-                target.File = new Data.Mutations.Models.FileModel();
-
-                Map(source.File, target.File);
-            }
         }
 
         private static void Map(in FileModel source, Data.Mutations.Models.FileModel target)
@@ -78,7 +77,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
 
         private static void Map(in SampleModel source, Data.Mutations.Models.SampleModel target)
         {
-            target.Date = source.Date;
+            target.ReferenceId = source.Id;
 
             target.Specimen = new Data.Mutations.Models.SpecimenModel();
             target.Specimen.ReferenceId = source.SpecimenId;

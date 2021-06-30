@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Mutations.Annotations.Vep.Client;
 using Unite.Mutations.Annotations.Vep.Configuration.Options;
@@ -29,9 +30,9 @@ namespace Unite.Mutations.Annotations.Vep.Services
 
         public void Annotate(long[] mutationIds, out AnnotationsUploadAudit audit)
         {
-            var mutationCodes = GetMutationCodes(mutationIds);
+            var codes = GetVepCodes(mutationIds);
 
-            var resources = _apiClient.LoadAnnotations(mutationCodes);
+            var resources = _apiClient.LoadAnnotations(codes);
 
             var models = resources.Select(resource => _modelConverter.Convert(resource)).ToArray();
 
@@ -39,14 +40,25 @@ namespace Unite.Mutations.Annotations.Vep.Services
         }
 
 
-        private string[] GetMutationCodes(long[] mutationIds)
+        private string[] GetVepCodes(long[] mutationIds)
         {
-            var mutationCodes = _dbContext.Mutations
+            var codes = _dbContext.Mutations
                 .Where(mutation => mutationIds.Contains(mutation.Id))
-                .Select(mutation => mutation.Code)
+                .Select(mutation => GetVepCode(mutation))
                 .ToArray();
 
-            return mutationCodes;
+            return codes;
+        }
+
+        private static string GetVepCode(Unite.Data.Entities.Mutations.Mutation mutation)
+        {
+            var chromosome = mutation.ChromosomeId.ToDefinitionString();
+            var start = mutation.ReferenceBase != null ? mutation.Start : mutation.End + 1;
+            var end = mutation.End;
+            var referenceBase = mutation.ReferenceBase ?? "-";
+            var alternateBase = mutation.AlternateBase ?? "-";
+
+            return $"{chromosome} {start} {end} {referenceBase}/{alternateBase}";
         }
     }
 }

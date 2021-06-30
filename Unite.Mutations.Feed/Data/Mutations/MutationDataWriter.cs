@@ -57,7 +57,7 @@ namespace Unite.Mutations.Feed.Data.Mutations
 
                     foreach (var mutationOccurrence in mutationOccurrences)
                     {
-                        audit.Mutations.Add(mutationOccurrence.MutationId);
+                        audit.MutationOccurrences.Add(mutationOccurrence.MutationId);
 
                         audit.MutationsAssociated++;
                     }

@@ -29,39 +29,39 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
 
 
             RuleFor(model => model)
-                .Must(EachSampleNameIsUnique)
+                .Must(EachSampleIdIsUnique)
                 .When(model => model.Samples != null)
-                .WithMessage("Each sample name should be unique");
+                .WithMessage("Each sample id should be unique");
 
             RuleFor(model => model)
-                .Must(EachMatchedSampleNameMatchesSingleAnalysedSampleName)
+                .Must(EachMatchedSampleIdMatchesSingleAnalysedSampleId)
                 .When(model => model.Samples != null)
-                .WithMessage("Each matched sample name should match single analysed sample name");
+                .WithMessage("Each matched sample id should match single analysed sample id");
         }
 
 
-        private bool EachSampleNameIsUnique(MutationsModel model)
+        private bool EachSampleIdIsUnique(MutationsModel model)
         {
-            var names = model.Samples.Select(sample => sample.Name.Trim());
-            var allNamesNumber = names.Count();
-            var uniqueNamesNumber = names.Distinct().Count();
+            var ids = model.Samples.Select(sample => sample.Id.Trim());
+            var allIdsNumber = ids.Count();
+            var uniqueIdsNumber = ids.Distinct().Count();
 
-            return allNamesNumber == uniqueNamesNumber;
+            return allIdsNumber == uniqueIdsNumber;
         }
 
-        private bool EachMatchedSampleNameMatchesSingleAnalysedSampleName(MutationsModel model)
+        private bool EachMatchedSampleIdMatchesSingleAnalysedSampleId(MutationsModel model)
         {
-            foreach(var sample in model.Samples)
+            foreach (var sample in model.Samples)
             {
-                if(sample.MatchedSamples != null)
+                if (sample.MatchedSamples != null)
                 {
-                    foreach(var matchedSampleName in sample.MatchedSamples)
+                    foreach (var matchedSampleId in sample.MatchedSamples)
                     {
                         var samples = model.Samples
-                            .Where(sample => string.Equals(sample.Name.Trim(), matchedSampleName.Trim()))
+                            .Where(sample => string.Equals(sample.Id.Trim(), matchedSampleId.Trim()))
                             .ToArray();
 
-                        if(samples.Length != 1)
+                        if (samples.Length != 1)
                         {
                             return false;
                         }

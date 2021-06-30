@@ -33,10 +33,6 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
             );
 
             query = query.Where(analysis =>
-                analysis.Date == analysisModel.Date
-            );
-
-            query = query.Where(analysis =>
                 analysis.AnalysedSamples.Count() == analysisModel.AnalysedSamples.Count()
             );
 
@@ -63,19 +59,20 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 
         public Analysis Create(AnalysisModel analysisModel)
         {
-            var analysis = new Analysis();
-
-            analysis.TypeId = analysisModel.Type;
-            analysis.Date = analysisModel.Date;
+            var analysis = new Analysis
+            {
+                TypeId = analysisModel.Type
+            };
 
             if (analysisModel.File != null)
             {
-                analysis.File = new File();
-
-                analysis.File.Name = analysisModel.File.Name;
-                analysis.File.Link = analysisModel.File.Link;
-                analysis.File.Created = analysisModel.File.Created;
-                analysis.File.Updated = analysisModel.File.Updated;
+                analysis.File = new File
+                {
+                    Name = analysisModel.File.Name,
+                    Link = analysisModel.File.Link,
+                    Created = analysisModel.File.Created,
+                    Updated = analysisModel.File.Updated
+                };
             }
 
             _dbContext.Analyses.Add(analysis);

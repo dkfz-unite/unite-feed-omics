@@ -1,21 +1,17 @@
-﻿using System;
-using Unite.Mutations.Feed.Data.Mutations.Models.Enums;
+﻿using Unite.Mutations.Feed.Data.Mutations.Models.Enums;
 
 namespace Unite.Mutations.Feed.Web.Models.Mutations
 {
     public class SampleModel
     {
-        public string Name { get; set; }
-        public DateTime? Date { get; set; }
-
+        public string Id { get; set; }
         public string DonorId { get; set; }
         public string SpecimenId { get; set; }
         public SpecimenType? SpecimenType { get; set; }
 
         public virtual void Sanitise()
         {
-            Name = Name?.Trim();
-
+            Id = Id?.Trim();
             DonorId = DonorId?.Trim();
             SpecimenId = SpecimenId?.Trim();
         }

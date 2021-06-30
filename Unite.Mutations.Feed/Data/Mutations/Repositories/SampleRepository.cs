@@ -34,7 +34,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 
             var sample = _dbContext.Samples.FirstOrDefault(sample =>
                 sample.SpecimenId == specimen.Id &&
-                sample.Date == sampleModel.Date
+                sample.ReferenceId == sampleModel.ReferenceId
             );
 
             return sample;
@@ -46,21 +46,15 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 
             var sample = new Sample
             {
-                SpecimenId = specimen.Id
+                SpecimenId = specimen.Id,
+                ReferenceId = sampleModel.ReferenceId,
+                Date = sampleModel.Date
             };
-
-            Map(sampleModel, sample);
 
             _dbContext.Samples.Add(sample);
             _dbContext.SaveChanges();
 
             return sample;
-        }
-
-
-        private void Map(SampleModel sampleModel, Sample sample)
-        {
-            sample.Date = sampleModel.Date;
         }
     }
 }
