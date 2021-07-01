@@ -47,8 +47,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
             var sample = new Sample
             {
                 SpecimenId = specimen.Id,
-                ReferenceId = sampleModel.ReferenceId,
-                Date = sampleModel.Date
+                ReferenceId = sampleModel.ReferenceId
             };
 
             _dbContext.Samples.Add(sample);
