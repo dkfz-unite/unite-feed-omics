@@ -51,20 +51,17 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
 
         private bool EachMatchedSampleIdMatchesSingleAnalysedSampleId(MutationsModel model)
         {
-            foreach (var sample in model.Samples)
+            foreach (var analysedSample in model.Samples)
             {
-                if (sample.MatchedSamples != null)
+                if (!string.IsNullOrWhiteSpace(analysedSample.MatchedSampleId))
                 {
-                    foreach (var matchedSampleId in sample.MatchedSamples)
-                    {
-                        var samples = model.Samples
-                            .Where(sample => string.Equals(sample.Id.Trim(), matchedSampleId.Trim()))
-                            .ToArray();
+                    var samples = model.Samples
+                        .Where(sample => string.Equals(sample.Id.Trim(), analysedSample.MatchedSampleId.Trim()))
+                        .ToArray();
 
-                        if (samples.Length != 1)
-                        {
-                            return false;
-                        }
+                    if (samples.Length != 1)
+                    {
+                        return false;
                     }
                 }
             }

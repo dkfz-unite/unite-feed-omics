@@ -9,7 +9,6 @@ namespace Unite.Mutations.Feed.Data.Mutations
     {
         private readonly AnalysisRepository _analysisRepository;
         private readonly AnalysedSampleRepository _analysedSampleRepository;
-        private readonly MatchedSampleRepository _matchedSampleRepository;
         private readonly MutationRepository _mutationRepository;
         private readonly MutationOccurrenceRepository _mutationOccurrenceRepository;
 
@@ -18,7 +17,6 @@ namespace Unite.Mutations.Feed.Data.Mutations
         {
             _analysisRepository = new AnalysisRepository(dbContext);
             _analysedSampleRepository = new AnalysedSampleRepository(dbContext);
-            _matchedSampleRepository = new MatchedSampleRepository(dbContext);
             _mutationRepository = new MutationRepository(dbContext);
             _mutationOccurrenceRepository = new MutationOccurrenceRepository(dbContext);
         }
@@ -30,17 +28,7 @@ namespace Unite.Mutations.Feed.Data.Mutations
 
             foreach (var analysedSampleModel in analysisModel.AnalysedSamples)
             {
-                var sample = _analysedSampleRepository.FindOrCreate(analysis.Id, analysedSampleModel);
-
-                if (analysedSampleModel.MatchedSamples != null)
-                {
-                    foreach (var matchedSampleModel in analysedSampleModel.MatchedSamples)
-                    {
-                        var matchingSample = _analysedSampleRepository.FindOrCreate(analysis.Id, matchedSampleModel);
-
-                        _matchedSampleRepository.FindOrCreate(sample.Id, matchingSample.Id);
-                    }
-                }
+                var analysedSample = _analysedSampleRepository.FindOrCreate(analysis.Id, analysedSampleModel);
 
                 if (analysedSampleModel.Mutations != null)
                 {
@@ -53,7 +41,7 @@ namespace Unite.Mutations.Feed.Data.Mutations
                         audit.MutationsCreated++;
                     }
 
-                    var mutationOccurrences = _mutationOccurrenceRepository.CreateMissing(sample.Id, analysedSampleModel.Mutations);
+                    var mutationOccurrences = _mutationOccurrenceRepository.CreateMissing(analysedSample.Id, analysedSampleModel.Mutations);
 
                     foreach (var mutationOccurrence in mutationOccurrences)
                     {

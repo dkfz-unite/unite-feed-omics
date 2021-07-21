@@ -11,7 +11,7 @@
     <Folder Include="Data\Mutations\Models\Enums\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Unite.Data" Version="1.6.4" />
+    <PackageReference Include="Unite.Data" Version="1.7.2" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Data\Mutations\Models\Enums\" />

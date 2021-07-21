@@ -2,9 +2,10 @@
 
 namespace Unite.Mutations.Feed.Data.Mutations.Models
 {
-    public class AnalysedSampleModel : SampleModel
+    public class AnalysedSampleModel
     {
-        public IEnumerable<SampleModel> MatchedSamples { get; set; }
+        public SampleModel AnalysedSample { get; set; }
+        public SampleModel MatchedSample { get; set; }
 
         public IEnumerable<MutationModel> Mutations { get; set; }
     }

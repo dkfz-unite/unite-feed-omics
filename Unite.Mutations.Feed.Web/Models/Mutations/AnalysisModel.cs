@@ -9,7 +9,9 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations
         /// </summary>
         public AnalysisType? Type { get; set; }
 
-
+        /// <summary>
+        /// File generated during the analysis
+        /// </summary>
         public FileModel File { get; set; }
 
 

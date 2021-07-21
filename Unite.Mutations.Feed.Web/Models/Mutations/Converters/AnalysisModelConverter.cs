@@ -24,22 +24,22 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
             {
                 var analysedSampleModel = new Data.Mutations.Models.AnalysedSampleModel();
 
-                Map(analysedSample, analysedSampleModel);
+                analysedSampleModel.AnalysedSample = new Data.Mutations.Models.SampleModel();
 
-                if (analysedSample.MatchedSamples != null)
+                Map(analysedSample, analysedSampleModel.AnalysedSample);
+
+
+                if (!string.IsNullOrWhiteSpace(analysedSample.MatchedSampleId))
                 {
-                    analysedSampleModel.MatchedSamples = analysedSample.MatchedSamples.Select(matchedSampleId =>
-                    {
-                        var matchedAnalysedSample = source.Samples.Single(analysedSample => analysedSample.Id == matchedSampleId);
+                    var matchedSampleId = analysedSample.MatchedSampleId;
 
-                        var matchedSampleModel = new Data.Mutations.Models.MatchedSampleModel();
+                    var matchedAnalysedSample = source.Samples.Single(analysedSample => analysedSample.Id == matchedSampleId);
 
-                        Map(matchedAnalysedSample, matchedSampleModel);
+                    analysedSampleModel.MatchedSample = new Data.Mutations.Models.SampleModel();
 
-                        return matchedSampleModel;
-
-                    }).ToArray();
+                    Map(matchedAnalysedSample, analysedSampleModel.MatchedSample);
                 }
+
 
                 if (analysedSample.Mutations != null)
                 {
@@ -53,6 +53,7 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
 
                     }).ToArray();
                 }
+
 
                 return analysedSampleModel;
 
@@ -71,8 +72,6 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
         {
             target.Name = source.Name;
             target.Link = source.Link;
-            target.Created = source.Created;
-            target.Updated = source.Updated;
         }
 
         private static void Map(in SampleModel source, Data.Mutations.Models.SampleModel target)

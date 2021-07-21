@@ -8,7 +8,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
     internal class AnalysedSampleRepository
     {
         private UniteDbContext _dbContext;
-        private SampleRepository _sampleRepository;
+        private readonly SampleRepository _sampleRepository;
 
 
         public AnalysedSampleRepository(UniteDbContext dbContext)
@@ -18,12 +18,37 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         }
 
 
-        public AnalysedSample FindOrCreate(int analysisId, SampleModel sampleModel)
+        public AnalysedSample FindOrCreate(int analysisId, AnalysedSampleModel analysedSampleModel)
         {
-            return Find(analysisId, sampleModel) ?? Create(analysisId, sampleModel);
+            return Find(analysisId, analysedSampleModel) ?? Create(analysisId, analysedSampleModel);
         }
 
-        public AnalysedSample Find(int analysisId, SampleModel sampleModel)
+        public AnalysedSample Find(int analysisId, AnalysedSampleModel analysedSampleModel)
+        {
+            if (analysedSampleModel.MatchedSample == null)
+            {
+                return Find(analysisId, analysedSampleModel.AnalysedSample);
+            }
+            else
+            {
+                return Find(analysisId, analysedSampleModel.AnalysedSample, analysedSampleModel.MatchedSample);
+            }
+        }
+
+        public AnalysedSample Create(int analysisId, AnalysedSampleModel analysedSampleModel)
+        {
+            if (analysedSampleModel.MatchedSample == null)
+            {
+                return Create(analysisId, analysedSampleModel.AnalysedSample);
+            }
+            else
+            {
+                return Create(analysisId, analysedSampleModel.AnalysedSample, analysedSampleModel.MatchedSample);
+            }
+        }
+
+
+        private AnalysedSample Find(int analysisId, SampleModel sampleModel)
         {
             var sample = _sampleRepository.Find(sampleModel);
 
@@ -31,18 +56,44 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
             {
                 return null;
             }
-
-            return Find(analysisId, sample.Id);
+            else
+            {
+                return _dbContext.AnalysedSamples.FirstOrDefault(analysedSample =>
+                    analysedSample.AnalysisId == analysisId &&
+                    analysedSample.SampleId == sample.Id &&
+                    analysedSample.MatchedSampleId == null
+                );
+            }
         }
 
-        public AnalysedSample Create(int analysisId, SampleModel sampleModel)
+        private AnalysedSample Find(int analysisId, SampleModel sampleModel, SampleModel matchedSampleModel)
+        {
+            var sample = _sampleRepository.Find(sampleModel);
+            var matchedSample = _sampleRepository.Find(matchedSampleModel);
+
+            if (sample == null || matchedSample == null)
+            {
+                return null;
+            }
+            else
+            {
+                return _dbContext.AnalysedSamples.FirstOrDefault(analysedSample =>
+                    analysedSample.AnalysisId == analysisId &&
+                    analysedSample.SampleId == sample.Id &&
+                    analysedSample.MatchedSampleId == matchedSample.Id
+                );
+            }
+        }
+
+        private AnalysedSample Create(int analysisId, SampleModel sampleModel)
         {
             var sample = _sampleRepository.FindOrCreate(sampleModel);
 
             var analysedSample = new AnalysedSample
             {
                 AnalysisId = analysisId,
-                SampleId = sample.Id
+                SampleId = sample.Id,
+                MatchedSampleId = null
             };
 
             _dbContext.AnalysedSamples.Add(analysedSample);
@@ -51,13 +102,20 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
             return analysedSample;
         }
 
-
-        private AnalysedSample Find(int analysisId, int sampleId)
+        private AnalysedSample Create(int analysisId, SampleModel sampleModel, SampleModel matchedSampleModel)
         {
-            var analysedSample = _dbContext.AnalysedSamples.FirstOrDefault(analysedSample =>
-                analysedSample.AnalysisId == analysisId &&
-                analysedSample.SampleId == sampleId
-            );
+            var sample = _sampleRepository.FindOrCreate(sampleModel);
+            var matchedSample = _sampleRepository.FindOrCreate(matchedSampleModel);
+
+            var analysedSample = new AnalysedSample
+            {
+                AnalysisId = analysisId,
+                SampleId = sample.Id,
+                MatchedSampleId = matchedSample.Id
+            };
+
+            _dbContext.AnalysedSamples.Add(analysedSample);
+            _dbContext.SaveChanges();
 
             return analysedSample;
         }

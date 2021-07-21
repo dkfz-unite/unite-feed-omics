@@ -5,9 +5,9 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations
     public class AnalysedSampleModel : SampleModel
     {
         /// <summary>
-        /// List of matched sample id
+        /// Matched sample id
         /// </summary>
-        public string[] MatchedSamples { get; set; }
+        public string MatchedSampleId { get; set; }
 
         /// <summary>
         /// List of mutations appeared in the sample after analysis
@@ -19,7 +19,8 @@ namespace Unite.Mutations.Feed.Web.Models.Mutations
         {
             base.Sanitise();
 
-            MatchedSamples?.ForEach(matchedSample => matchedSample.Trim());
+            MatchedSampleId = MatchedSampleId?.Trim();
+
             Mutations?.ForEach(mutation => mutation.Sanitise());
         }
     }
