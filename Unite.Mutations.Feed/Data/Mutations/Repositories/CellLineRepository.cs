@@ -8,10 +8,10 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     public class CellLineRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public CellLineRepository(UniteDbContext dbContext)
+        public CellLineRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }

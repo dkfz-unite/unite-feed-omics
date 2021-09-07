@@ -3,12 +3,12 @@ using System.Linq;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Unite.Data.Extensions;
 using Unite.Mutations.Feed.Data.Mutations;
-using Unite.Mutations.Feed.Web.Models.Extensions;
-using Unite.Mutations.Feed.Web.Models.Mutations;
-using Unite.Mutations.Feed.Web.Models.Mutations.Converters;
-using Unite.Mutations.Feed.Web.Models.Validation;
 using Unite.Mutations.Feed.Web.Services;
+using Unite.Mutations.Feed.Web.Services.Mutations;
+using Unite.Mutations.Feed.Web.Services.Mutations.Converters;
+using Unite.Mutations.Feed.Web.Services.Validation;
 
 namespace Unite.Mutations.Feed.Web.Controllers
 {

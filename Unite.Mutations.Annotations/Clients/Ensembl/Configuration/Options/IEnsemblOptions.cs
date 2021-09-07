@@ -1,0 +1,7 @@
+﻿namespace Unite.Mutations.Annotations.Clients.Ensembl.Configuration.Options
+{
+    public interface IEnsemblOptions
+    {
+        string Host { get; }
+    }
+}

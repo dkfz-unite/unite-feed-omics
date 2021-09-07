@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Unite.Mutations.Annotations
 {
-    internal class JsonHttpClient: IDisposable
+    internal class JsonHttpClient : IDisposable
     {
         private readonly HttpClient _httpClient;
 
@@ -24,7 +24,7 @@ namespace Unite.Mutations.Annotations
             _httpClient.BaseAddress = new Uri(baseUrl);
         }
 
-        public async Task<T> GetAsync<T>(string url, (string name, string value)[] headers = null)
+        public async Task<T> GetAsync<T>(string url, params (string name, string value)[] headers)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
@@ -34,8 +34,14 @@ namespace Unite.Mutations.Annotations
 
             if (response.IsSuccessStatusCode)
             {
+                var options = new JsonSerializerOptions()
+                {
+                    Converters = { new JsonStringEnumMemberConverter() },
+                    WriteIndented = true
+                };
+
                 var dataJson = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<T>(dataJson);
+                var data = JsonSerializer.Deserialize<T>(dataJson, options);
 
                 return data;
             }
@@ -46,7 +52,7 @@ namespace Unite.Mutations.Annotations
             }
         }
 
-        public async Task<T> PostAsync<T, TBody>(string url, TBody body, (string name, string value)[] headers = null)
+        public async Task<T> PostAsync<T, TBody>(string url, TBody body, params (string name, string value)[] headers)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, url);
 

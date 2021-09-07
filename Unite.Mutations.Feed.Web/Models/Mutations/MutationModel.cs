@@ -1,7 +1,7 @@
 ﻿using Unite.Data.Entities.Mutations.Enums;
 using Unite.Data.Utilities.Mutations;
 
-namespace Unite.Mutations.Feed.Web.Models.Mutations
+namespace Unite.Mutations.Feed.Web.Services.Mutations
 {
     public class MutationModel
     {

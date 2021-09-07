@@ -13,7 +13,7 @@ namespace Unite.Mutations.Feed.Data.Mutations
         private readonly MutationOccurrenceRepository _mutationOccurrenceRepository;
 
 
-        public MutationDataWriter(UniteDbContext dbContext) : base(dbContext)
+        public MutationDataWriter(DomainDbContext dbContext) : base(dbContext)
         {
             _analysisRepository = new AnalysisRepository(dbContext);
             _analysedSampleRepository = new AnalysedSampleRepository(dbContext);

@@ -1,6 +1,6 @@
-﻿using Unite.Mutations.Feed.Web.Models.Extensions;
+﻿using Unite.Data.Extensions;
 
-namespace Unite.Mutations.Feed.Web.Models.Mutations
+namespace Unite.Mutations.Feed.Web.Services.Mutations
 {
     public class AnalysedSampleModel : SampleModel
     {

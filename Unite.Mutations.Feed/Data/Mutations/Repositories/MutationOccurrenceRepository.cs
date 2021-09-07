@@ -8,11 +8,11 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class MutationOccurrenceRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
         private readonly MutationRepository _mutationRepository;
 
 
-        public MutationOccurrenceRepository(UniteDbContext dbContext)
+        public MutationOccurrenceRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
             _mutationRepository = new MutationRepository(dbContext);

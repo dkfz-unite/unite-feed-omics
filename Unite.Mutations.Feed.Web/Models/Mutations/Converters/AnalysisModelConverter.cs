@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Unite.Mutations.Feed.Web.Models.Mutations.Converters
+namespace Unite.Mutations.Feed.Web.Services.Mutations.Converters
 {
     public class AnalysisModelConverter
     {

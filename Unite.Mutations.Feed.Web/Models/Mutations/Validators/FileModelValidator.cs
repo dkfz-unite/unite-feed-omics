@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
+namespace Unite.Mutations.Feed.Web.Services.Mutations.Validators
 {
     public class FileModelValidator : AbstractValidator<FileModel>
     {

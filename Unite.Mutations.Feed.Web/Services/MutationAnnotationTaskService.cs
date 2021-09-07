@@ -13,10 +13,10 @@ namespace Unite.Mutations.Feed.Web.Services
     {
         private const int BUCKET_SIZE = 1000;
 
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public MutationAnnotationTaskService(UniteDbContext dbContext)
+        public MutationAnnotationTaskService(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }

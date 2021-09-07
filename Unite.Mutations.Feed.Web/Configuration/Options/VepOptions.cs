@@ -1,5 +1,5 @@
 ﻿using System;
-using Unite.Mutations.Annotations.Vep.Configuration.Options;
+using Unite.Mutations.Annotations.Clients.Vep.Configuration.Options;
 
 namespace Unite.Mutations.Feed.Web.Configuration.Options
 {

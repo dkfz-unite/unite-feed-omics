@@ -8,7 +8,7 @@ using Unite.Indices.Entities.Basic.Donors;
 
 namespace Unite.Mutations.Indices.Services.Mappers
 {
-    public class DonorIndexMapper
+    internal class DonorIndexMapper
     {
         public void Map(in Donor donor, DonorIndex index)
         {

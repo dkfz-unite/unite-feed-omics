@@ -2,7 +2,7 @@
 using System.Linq;
 using FluentValidation;
 
-namespace Unite.Mutations.Feed.Web.Models.Mutations.Validators
+namespace Unite.Mutations.Feed.Web.Services.Mutations.Validators
 {
     public class MutationsModelValidator : AbstractValidator<MutationsModel>
     {

@@ -8,10 +8,10 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     public class XenograftRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public XenograftRepository(UniteDbContext dbContext)
+        public XenograftRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }

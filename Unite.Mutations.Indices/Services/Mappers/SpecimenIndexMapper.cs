@@ -11,7 +11,7 @@ using Unite.Indices.Entities.Basic.Specimens;
 
 namespace Unite.Mutations.Indices.Services.Mappers
 {
-    public class SpecimenIndexMapper
+    internal class SpecimenIndexMapper
     {
         public void Map(in Specimen specimen, SpecimenIndex index)
         {

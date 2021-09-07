@@ -8,10 +8,10 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class OrganoidRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public OrganoidRepository(UniteDbContext dbContext)
+        public OrganoidRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }

@@ -7,11 +7,11 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class SampleRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
         private readonly SpecimenRepository _specimenRepository;
 
 
-        public SampleRepository(UniteDbContext dbContext)
+        public SampleRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
             _specimenRepository = new SpecimenRepository(dbContext);

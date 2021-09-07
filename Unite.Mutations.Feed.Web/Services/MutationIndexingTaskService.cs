@@ -13,10 +13,10 @@ namespace Unite.Mutations.Feed.Web.Services
     {
         private const int BUCKET_SIZE = 1000;
 
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public MutationIndexingTaskService(UniteDbContext dbContext)
+        public MutationIndexingTaskService(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -55,6 +55,7 @@ namespace Unite.Mutations.Feed.Web.Services
             {
                 CreateMutationIndexingTasks(mutations);
                 CreateDonorIndexingTasks(mutations);
+                CreateGeneIndexingTasks(mutations);
                 CreateSpecimenIndexingTasks(mutations);
             });
         }
@@ -90,6 +91,28 @@ namespace Unite.Mutations.Feed.Web.Services
                     TypeId = TaskType.Indexing,
                     TargetTypeId = TaskTargetType.Donor,
                     Target = donorId.ToString(),
+                    Date = DateTime.UtcNow
+                })
+                .ToArray();
+
+            _dbContext.Tasks.AddRange(tasks);
+            _dbContext.SaveChanges();
+        }
+
+        private void CreateGeneIndexingTasks(IEnumerable<long> mutationIds)
+        {
+            var geneIds = _dbContext.AffectedTranscripts
+                .Where(affectedTranscript => mutationIds.Contains(affectedTranscript.MutationId))
+                .Select(affectedTranscript => affectedTranscript.Transcript.GeneId)
+                .Distinct()
+                .ToArray();
+
+            var tasks = geneIds
+                .Select(geneId => new Task
+                {
+                    TypeId = TaskType.Indexing,
+                    TargetTypeId = TaskTargetType.Gene,
+                    Target = geneId.ToString(),
                     Date = DateTime.UtcNow
                 })
                 .ToArray();

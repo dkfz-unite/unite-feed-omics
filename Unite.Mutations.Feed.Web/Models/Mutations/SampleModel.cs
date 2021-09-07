@@ -1,6 +1,6 @@
 ﻿using Unite.Mutations.Feed.Data.Mutations.Models.Enums;
 
-namespace Unite.Mutations.Feed.Web.Models.Mutations
+namespace Unite.Mutations.Feed.Web.Services.Mutations
 {
     public class SampleModel
     {

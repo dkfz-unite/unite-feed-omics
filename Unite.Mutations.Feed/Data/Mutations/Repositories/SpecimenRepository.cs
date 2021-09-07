@@ -8,7 +8,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class SpecimenRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
         private readonly DonorRepository _donorRepository;
         private readonly TissueRepository _tissueRepository;
         private readonly CellLineRepository _cellLineRepository;
@@ -16,7 +16,7 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
         private readonly XenograftRepository _xenograftRepository;
 
 
-        public SpecimenRepository(UniteDbContext dbContext)
+        public SpecimenRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
             _donorRepository = new DonorRepository(dbContext);

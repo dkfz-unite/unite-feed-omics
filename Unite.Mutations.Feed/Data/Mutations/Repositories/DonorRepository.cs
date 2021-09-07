@@ -7,10 +7,10 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class DonorRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public DonorRepository(UniteDbContext dbContext)
+        public DonorRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }

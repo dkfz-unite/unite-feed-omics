@@ -8,10 +8,10 @@ namespace Unite.Mutations.Feed.Web.Services
 {
     public class TaskProcessingService
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public TaskProcessingService(UniteDbContext dbContext)
+        public TaskProcessingService(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -23,7 +23,7 @@ namespace Unite.Mutations.Feed.Web.Services
             {
                 var tasks = _dbContext.Tasks
                     .Where(task => task.TypeId == type && task.TargetTypeId == targetType)
-                    .OrderByDescending(task => task.Data)
+                    .OrderByDescending(task => task.Date)
                     .Take(bucketSize)
                     .ToArray();
 

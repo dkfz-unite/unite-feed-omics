@@ -8,10 +8,10 @@ namespace Unite.Mutations.Feed.Data.Mutations.Repositories
 {
     internal class TissueRepository
     {
-        private readonly UniteDbContext _dbContext;
+        private readonly DomainDbContext _dbContext;
 
 
-        public TissueRepository(UniteDbContext dbContext)
+        public TissueRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }
