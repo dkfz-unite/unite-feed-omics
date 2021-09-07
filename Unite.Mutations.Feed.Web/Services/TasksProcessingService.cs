@@ -6,12 +6,12 @@ using Unite.Data.Services;
 
 namespace Unite.Mutations.Feed.Web.Services
 {
-    public class TaskProcessingService
+    public class TasksProcessingService
     {
         private readonly DomainDbContext _dbContext;
 
 
-        public TaskProcessingService(DomainDbContext dbContext)
+        public TasksProcessingService(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }

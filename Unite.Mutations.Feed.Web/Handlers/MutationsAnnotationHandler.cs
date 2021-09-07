@@ -8,14 +8,14 @@ namespace Unite.Mutations.Feed.Web.Handlers
 {
     public class MutationsAnnotationHandler
     {
-        private readonly TaskProcessingService _taskProcessingService;
+        private readonly TasksProcessingService _taskProcessingService;
         private readonly AnnotationService _annotationService;
         private readonly MutationIndexingTaskService _indexingTaskService;
         private readonly ILogger _logger;
 
 
         public MutationsAnnotationHandler(
-            TaskProcessingService taskProcessingService,
+            TasksProcessingService taskProcessingService,
             AnnotationService annotationService,
             MutationIndexingTaskService indexingTaskService,
             ILogger<MutationsAnnotationHandler> logger)

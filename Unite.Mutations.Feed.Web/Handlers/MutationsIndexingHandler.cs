@@ -9,13 +9,13 @@ namespace Unite.Mutations.Feed.Web.Handlers
 {
     public class MutationsIndexingHandler
     {
-        private readonly TaskProcessingService _taskProcessingService;
+        private readonly TasksProcessingService _taskProcessingService;
         private readonly IIndexCreationService<MutationIndex> _indexCreationService;
         private readonly IIndexingService<MutationIndex> _indexingService;
         private readonly ILogger _logger;
 
         public MutationsIndexingHandler(
-            TaskProcessingService taskProcessingService,
+            TasksProcessingService taskProcessingService,
             IIndexCreationService<MutationIndex> indexCreationService,
             IIndexingService<MutationIndex> indexingService,
             ILogger<MutationsIndexingHandler> logger)

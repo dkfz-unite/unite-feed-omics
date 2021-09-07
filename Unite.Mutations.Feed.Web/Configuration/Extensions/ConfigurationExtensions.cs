@@ -55,7 +55,7 @@ namespace Unite.Mutations.Feed.Web.Configuration.Extensions
         {
             services.AddTransient<MutationDataWriter>();
 
-            services.AddTransient<TaskProcessingService>();
+            services.AddTransient<TasksProcessingService>();
 
             services.AddTransient<MutationIndexingTaskService>();
             services.AddTransient<IIndexCreationService<Unite.Indices.Entities.Mutations.MutationIndex>, MutationIndexCreationService>();
