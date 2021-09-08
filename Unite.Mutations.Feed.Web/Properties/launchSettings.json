@@ -22,10 +22,10 @@
         "UNITE_ELASTIC_HOST": "http://localhost:9200",
         "UNITE_ELASTIC_USER": "elastic",
         "UNITE_ELASTIC_PASSWORD": "Long-p@55w0rd",
-        "UNITE_VEP_HOST": "http://localhost:5110",
+        "UNITE_VEP_HOST": "http://localhost:5200",
         "UNITE_ENSEMBL_HOST": "https://grch37.rest.ensembl.org",
         "UNITE_INDEXING_INTERVAL": "10",
-        "UNITE_INDEXING_BUCKET_SIZE": "1000",
+        "UNITE_INDEXING_BUCKET_SIZE": "300",
         "UNITE_ANNOTATION_INTERVAL": "10",
         "UNITE_ANNOTATION_BUCKET_SIZE": "100"
       }
@@ -44,10 +44,10 @@
         "UNITE_ELASTIC_HOST": "http://localhost:9200",
         "UNITE_ELASTIC_USER": "elastic",
         "UNITE_ELASTIC_PASSWORD": "Long-p@55w0rd",
-        "UNITE_VEP_HOST": "http://localhost:5110",
+        "UNITE_VEP_HOST": "http://localhost:5200",
         "UNITE_ENSEMBL_HOST": "https://grch37.rest.ensembl.org",
         "UNITE_INDEXING_INTERVAL": "10",
-        "UNITE_INDEXING_BUCKET_SIZE": "1000",
+        "UNITE_INDEXING_BUCKET_SIZE": "300",
         "UNITE_ANNOTATION_INTERVAL": "10",
         "UNITE_ANNOTATION_BUCKET_SIZE": "100"
       }
