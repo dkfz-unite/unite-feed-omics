@@ -4,39 +4,39 @@ using Unite.Data.Services;
 
 namespace Unite.Mutations.Annotations.Data.Repositories
 {
-    internal class BiotypeRepository
+    internal class TranscriptBiotypeRepository
     {
         private readonly DomainDbContext _dbContext;
 
 
-        public BiotypeRepository(DomainDbContext dbContext)
+        public TranscriptBiotypeRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
 
-        public Biotype FindOrCreate(string value)
+        public TranscriptBiotype FindOrCreate(string value)
         {
             return Find(value) ?? Create(value);
         }
 
-        public Biotype Find(string value)
+        public TranscriptBiotype Find(string value)
         {
-            var biotype = _dbContext.Biotypes.FirstOrDefault(biotype =>
+            var biotype = _dbContext.TranscriptBiotypes.FirstOrDefault(biotype =>
                 biotype.Value == value
             );
 
             return biotype;
         }
 
-        public Biotype Create(string value)
+        public TranscriptBiotype Create(string value)
         {
-            var biotype = new Biotype
+            var biotype = new TranscriptBiotype
             {
                 Value = value
             };
 
-            _dbContext.Biotypes.Add(biotype);
+            _dbContext.TranscriptBiotypes.Add(biotype);
             _dbContext.SaveChanges();
 
             return biotype;

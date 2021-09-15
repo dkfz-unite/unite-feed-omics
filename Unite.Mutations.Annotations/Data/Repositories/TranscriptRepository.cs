@@ -9,7 +9,7 @@ namespace Unite.Mutations.Annotations.Data.Repositories
     public class TranscriptRepository
     {
         private readonly DomainDbContext _dbContext;
-        private readonly BiotypeRepository _biotypeRepository;
+        private readonly TranscriptBiotypeRepository _biotypeRepository;
         private readonly GeneRepository _geneRepository;
         private readonly ProteinRepository _proteinRepository;
 
@@ -17,7 +17,7 @@ namespace Unite.Mutations.Annotations.Data.Repositories
         public TranscriptRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
-            _biotypeRepository = new BiotypeRepository(dbContext);
+            _biotypeRepository = new TranscriptBiotypeRepository(dbContext);
             _geneRepository = new GeneRepository(dbContext);
             _proteinRepository = new ProteinRepository(dbContext);
         }

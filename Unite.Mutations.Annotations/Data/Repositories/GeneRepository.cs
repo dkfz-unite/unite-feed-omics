@@ -9,13 +9,13 @@ namespace Unite.Mutations.Annotations.Data.Repositories
     internal class GeneRepository
     {
         private readonly DomainDbContext _dbContext;
-        private readonly BiotypeRepository _biotypeRepository;
+        private readonly GeneBiotypeRepository _biotypeRepository;
 
 
         public GeneRepository(DomainDbContext dbContext)
         {
             _dbContext = dbContext;
-            _biotypeRepository = new BiotypeRepository(dbContext);
+            _biotypeRepository = new GeneBiotypeRepository(dbContext);
         }
 
 
