@@ -12,14 +12,14 @@ namespace Unite.Mutations.Annotations
         private readonly HttpClient _httpClient;
 
 
-        public JsonHttpClient()
+        public JsonHttpClient(bool useProxy = false)
         {
-            var handler = new HttpClientHandler { UseProxy = false };
+            var handler = new HttpClientHandler { UseProxy = useProxy };
             _httpClient = new HttpClient(handler);
         }
 
 
-        public JsonHttpClient(string baseUrl) : this()
+        public JsonHttpClient(string baseUrl, bool useProxy = false) : this(useProxy)
         {
             _httpClient.BaseAddress = new Uri(baseUrl);
         }

@@ -29,7 +29,7 @@ namespace Unite.Mutations.Annotations.Clients.Ensembl
         /// <returns>Ensembl object mapped to given type if was found.</returns>
         public async Task<T> Lookup<T>(string ensemblId, bool expand = false) where T : IEnsemblResource
         {
-            using var httpClient = new JsonHttpClient(_options.Host);
+            using var httpClient = new JsonHttpClient(_options.Host, true);
 
             var url = string.Format(_lookupOneUrl, ensemblId);
 
@@ -54,7 +54,7 @@ namespace Unite.Mutations.Annotations.Clients.Ensembl
         /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
         public async Task<T[]> Lookup<T>(IEnumerable<string> ensemblIds, bool expand = false) where T : IEnsemblResource
         {
-            using var httpClient = new JsonHttpClient(_options.Host);
+            using var httpClient = new JsonHttpClient(_options.Host, true);
 
             var url = _lookupManyUrl;
 
@@ -81,7 +81,7 @@ namespace Unite.Mutations.Annotations.Clients.Ensembl
         /// <returns>References of the object stored in ensembl given ensembl databases if were found.</returns>
         public async Task<ReferenceResource[]> Xrefs(string ensemblid, string source = null)
         {
-            using var httpClient = new JsonHttpClient(_options.Host);
+            using var httpClient = new JsonHttpClient(_options.Host, true);
 
             var url = string.Format(_xrefsOneUrl, ensemblid);
 
