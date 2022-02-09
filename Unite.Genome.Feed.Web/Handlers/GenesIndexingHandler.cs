@@ -1,24 +1,25 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Logging;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Indices.Entities.Mutations;
-using Unite.Indices.Services;
 using Unite.Genome.Feed.Web.Services;
+using Unite.Indices.Entities.Genes;
+using Unite.Indices.Services;
 
 namespace Unite.Genome.Feed.Web.Handlers
 {
-    public class MutationsIndexingHandler
+    public class GenesIndexingHandler
     {
         private readonly TasksProcessingService _taskProcessingService;
-        private readonly IIndexCreationService<MutationIndex> _indexCreationService;
-        private readonly IIndexingService<MutationIndex> _indexingService;
+        private readonly IIndexCreationService<GeneIndex> _indexCreationService;
+        private readonly IIndexingService<GeneIndex> _indexingService;
         private readonly ILogger _logger;
 
-        public MutationsIndexingHandler(
+
+        public GenesIndexingHandler(
             TasksProcessingService taskProcessingService,
-            IIndexCreationService<MutationIndex> indexCreationService,
-            IIndexingService<MutationIndex> indexingService,
-            ILogger<MutationsIndexingHandler> logger)
+            IIndexCreationService<GeneIndex> indexCreationService,
+            IIndexingService<GeneIndex> indexingService,
+            ILogger<GenesIndexingHandler> logger)
         {
             _taskProcessingService = taskProcessingService;
             _indexCreationService = indexCreationService;
@@ -35,11 +36,11 @@ namespace Unite.Genome.Feed.Web.Handlers
 
         private void ProcessIndexingTasks(int bucketSize)
         {
-            _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Mutation, bucketSize, (tasks) =>
+            _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Gene, bucketSize, (tasks) =>
             {
                 var indices = tasks.Select(task =>
                 {
-                    var id = long.Parse(task.Target);
+                    var id = int.Parse(task.Target);
 
                     var index = _indexCreationService.CreateIndex(id);
 
@@ -49,7 +50,7 @@ namespace Unite.Genome.Feed.Web.Handlers
 
                 _indexingService.IndexMany(indices);
 
-                _logger.LogInformation($"Finished indexing of {tasks.Length} mutations");
+                _logger.LogInformation($"Finished indexing of {tasks.Length} genes");
             });
         }
     }

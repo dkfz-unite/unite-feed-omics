@@ -8,17 +8,17 @@ using Unite.Genome.Feed.Web.Handlers;
 
 namespace Unite.Genome.Feed.Web.HostedServices
 {
-    public class MutationsIndexingHostedService : BackgroundService
+    public class GenesIndexingHostedService : BackgroundService
     {
-        private readonly MutationsIndexingOptions _options;
-        private readonly MutationsIndexingHandler _handler;
-        private readonly ILogger<MutationsIndexingHostedService> _logger;
+        private readonly GenesIndexingOptions _options;
+        private readonly GenesIndexingHandler _handler;
+        private readonly ILogger<GenesIndexingHostedService> _logger;
 
 
-        public MutationsIndexingHostedService(
-            MutationsIndexingOptions options,
-            MutationsIndexingHandler handler,
-            ILogger<MutationsIndexingHostedService> logger)
+        public GenesIndexingHostedService(
+            GenesIndexingOptions options,
+            GenesIndexingHandler handler,
+            ILogger<GenesIndexingHostedService> logger)
         {
             _options = options;
             _handler = handler;
@@ -28,9 +28,9 @@ namespace Unite.Genome.Feed.Web.HostedServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Indexing service started");
+            _logger.LogInformation("Genes indexing service started");
 
-            stoppingToken.Register(() => _logger.LogInformation("Indexing service stopped"));
+            stoppingToken.Register(() => _logger.LogInformation("Genes indexing service stopped"));
 
             while (!stoppingToken.IsCancellationRequested)
             {

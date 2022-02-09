@@ -24,56 +24,38 @@ namespace Unite.Genome.Feed.Web.Configuration.Extensions
     {
         public static void Configure(this IServiceCollection services)
         {
-            AddOptions(services);
-            AddDatabases(services);
-            AddValidation(services);
-            AddServices(services);
-            AddHostedService(services);
-        }
-
-        private static void AddOptions(IServiceCollection services)
-        {
             services.AddTransient<ISqlOptions, SqlOptions>();
             services.AddTransient<IElasticOptions, ElasticOptions>();
             services.AddTransient<IVepOptions, VepOptions>();
             services.AddTransient<IEnsemblOptions, EnsemblOptions>();
-        }
-
-        private static void AddDatabases(IServiceCollection services)
-        {
-            services.AddTransient<DomainDbContext>();
-        }
-
-        private static void AddValidation(IServiceCollection services)
-        {
-            services.AddTransient<IValidator<IEnumerable<MutationsModel>>, MutationsModelsValidator>();
 
             services.AddTransient<IValidationService, ValidationService>();
-        }
+            services.AddTransient<IValidator<IEnumerable<MutationsModel>>, MutationsModelsValidator>();
 
-        private static void AddServices(IServiceCollection services)
-        {
+            services.AddTransient<DomainDbContext>();
             services.AddTransient<MutationDataWriter>();
 
+            services.AddTransient<AnnotationService>();
+            services.AddTransient<GeneIndexingTaskService>();
+            services.AddTransient<MutationAnnotationTaskService>();
+            services.AddTransient<MutationIndexingTaskService>();
             services.AddTransient<TasksProcessingService>();
 
-            services.AddTransient<MutationIndexingTaskService>();
+            services.AddHostedService<MutationsAnnotationHostedService>();
+            services.AddTransient<MutationsAnnotationOptions>();
+            services.AddTransient<MutationsAnnotationHandler>();
+
+            services.AddHostedService<MutationsIndexingHostedService>();
+            services.AddTransient<MutationsIndexingOptions>();
+            services.AddTransient<MutationsIndexingHandler>();
             services.AddTransient<IIndexCreationService<Unite.Indices.Entities.Mutations.MutationIndex>, MutationIndexCreationService>();
             services.AddTransient<IIndexingService<Unite.Indices.Entities.Mutations.MutationIndex>, MutationsIndexingService>();
 
-            services.AddTransient<MutationAnnotationTaskService>();
-            services.AddTransient<AnnotationService>();
-        }
-
-        private static void AddHostedService(IServiceCollection services)
-        {
-            services.AddTransient<IndexingOptions>();
-            services.AddTransient<MutationsIndexingHandler>();
-            services.AddHostedService<MutationsIndexingHostedService>();
-
-            services.AddTransient<AnnotationOptions>();
-            services.AddTransient<MutationsAnnotationHandler>();
-            services.AddHostedService<MutationsAnnotationHostedService>();
+            services.AddHostedService<GenesIndexingHostedService>();
+            services.AddTransient<GenesIndexingOptions>();
+            services.AddTransient<GenesIndexingHandler>();
+            services.AddTransient<IIndexCreationService<Unite.Indices.Entities.Genes.GeneIndex>, GeneIndexCreationService>();
+            services.AddTransient<IIndexingService<Unite.Indices.Entities.Genes.GeneIndex>, GenesIndexingService>();
         }
     }
 }

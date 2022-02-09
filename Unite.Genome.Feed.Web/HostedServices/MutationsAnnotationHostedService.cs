@@ -10,13 +10,13 @@ namespace Unite.Genome.Feed.Web.HostedServices
 {
     public class MutationsAnnotationHostedService : BackgroundService
     {
-        private readonly AnnotationOptions _options;
+        private readonly MutationsAnnotationOptions _options;
         private readonly MutationsAnnotationHandler _handler;
         private readonly ILogger _logger;
 
 
         public MutationsAnnotationHostedService(
-            AnnotationOptions options,
+            MutationsAnnotationOptions options,
             MutationsAnnotationHandler handler,
             ILogger<MutationsAnnotationHostedService> logger)
         {

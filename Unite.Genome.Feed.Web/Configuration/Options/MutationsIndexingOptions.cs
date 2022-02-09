@@ -2,7 +2,7 @@
 
 namespace Unite.Genome.Feed.Web.Configuration.Options
 {
-    public class IndexingOptions
+    public class MutationsIndexingOptions
     {
         /// <summary>
         /// Indexing interval in milliseconds
@@ -11,7 +11,7 @@ namespace Unite.Genome.Feed.Web.Configuration.Options
         {
             get
             {
-                var option = Environment.GetEnvironmentVariable("UNITE_INDEXING_INTERVAL");
+                var option = Environment.GetEnvironmentVariable("UNITE_MUTATIONS_INDEXING_INTERVAL");
                 var seconds = int.Parse(option);
 
                 return seconds * 1000;
@@ -25,7 +25,7 @@ namespace Unite.Genome.Feed.Web.Configuration.Options
         {
             get
             {
-                var option = Environment.GetEnvironmentVariable("UNITE_INDEXING_BUCKET_SIZE");
+                var option = Environment.GetEnvironmentVariable("UNITE_MUTATIONS_INDEXING_BUCKET_SIZE");
                 var size = int.Parse(option);
 
                 return size;

@@ -2,7 +2,7 @@
 
 namespace Unite.Genome.Feed.Web.Configuration.Options
 {
-    public class AnnotationOptions
+    public class MutationsAnnotationOptions
     {
 		/// <summary>
 		/// Annotation interval in milliseconds
@@ -11,7 +11,7 @@ namespace Unite.Genome.Feed.Web.Configuration.Options
 		{
 			get
 			{
-				var option = Environment.GetEnvironmentVariable("UNITE_ANNOTATION_INTERVAL");
+				var option = Environment.GetEnvironmentVariable("UNITE_MUTATIONS_ANNOTATION_INTERVAL");
 				var seconds = int.Parse(option);
 
 				return seconds * 1000;
@@ -25,7 +25,7 @@ namespace Unite.Genome.Feed.Web.Configuration.Options
 		{
 			get
 			{
-				var option = Environment.GetEnvironmentVariable("UNITE_ANNOTATION_BUCKET_SIZE");
+				var option = Environment.GetEnvironmentVariable("UNITE_MUTATIONS_ANNOTATION_BUCKET_SIZE");
 				var size = int.Parse(option);
 
 				return size;

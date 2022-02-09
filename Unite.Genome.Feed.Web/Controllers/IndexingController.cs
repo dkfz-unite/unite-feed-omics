@@ -6,19 +6,31 @@ namespace Unite.Genome.Feed.Web.Controllers
     [Route("api/[controller]/[action]")]
     public class IndexingController : Controller
     {
-        private readonly MutationIndexingTaskService _indexingTaskService;
+        private readonly GeneIndexingTaskService _geneIndexingTaskService;
+        private readonly MutationIndexingTaskService _mutationIndexingTaskService;
 
 
-        public IndexingController(MutationIndexingTaskService indexingTaskService)
+        public IndexingController(
+            GeneIndexingTaskService geneIndexingTaskService,
+            MutationIndexingTaskService mutationIndexingTaskService)
         {
-            _indexingTaskService = indexingTaskService;
+            _geneIndexingTaskService = geneIndexingTaskService;
+            _mutationIndexingTaskService = mutationIndexingTaskService;
         }
 
 
         [HttpPost]
+        public IActionResult Genes()
+        {
+            _geneIndexingTaskService.CreateTasks();
+
+            return Ok();
+        }
+
+        [HttpPost]
         public IActionResult Mutations()
         {
-            _indexingTaskService.CreateTasks();
+            _mutationIndexingTaskService.CreateTasks();
 
             return Ok();
         }
