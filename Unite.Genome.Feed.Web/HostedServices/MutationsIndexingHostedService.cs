@@ -28,9 +28,9 @@ namespace Unite.Genome.Feed.Web.HostedServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Indexing service started");
+            _logger.LogInformation("SSM indexing service started");
 
-            stoppingToken.Register(() => _logger.LogInformation("Indexing service stopped"));
+            stoppingToken.Register(() => _logger.LogInformation("SSM indexing service stopped"));
 
             while (!stoppingToken.IsCancellationRequested)
             {

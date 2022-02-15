@@ -5,7 +5,6 @@
   </PropertyGroup>
 
 
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Unite.Mutations.Feed.Web' " />
   <ItemGroup>
     <Folder Include="Configuration\" />
     <Folder Include="Configuration\Options\" />

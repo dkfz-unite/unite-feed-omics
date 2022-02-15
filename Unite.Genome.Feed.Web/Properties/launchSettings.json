@@ -32,7 +32,7 @@
         "UNITE_GENES_INDEXING_BUCKET_SIZE": "300"
       }
     },
-    "Unite.Mutations.Feed.Web": {
+    "Unite.Genome.Feed.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api",
