@@ -37,6 +37,8 @@ namespace Unite.Genome.Feed.Web.Handlers
         {
             _taskProcessingService.Process(TaskType.Annotation, TaskTargetType.Mutation, bucketSize, (tasks) =>
             {
+                _logger.LogInformation($"Annotating {tasks.Length} mutations");
+
                 var mutationIds = tasks
                     .Select(task => long.Parse(task.Target))
                     .ToArray();
@@ -47,7 +49,7 @@ namespace Unite.Genome.Feed.Web.Handlers
 
                 _logger.LogInformation(audit.ToString());
 
-                _logger.LogInformation($"Finished annotation of {tasks.Length} mutations");
+                _logger.LogInformation($"Annotation of {tasks.Length} mutations completed");
             });
         }
     }

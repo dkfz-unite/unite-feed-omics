@@ -38,6 +38,8 @@ namespace Unite.Genome.Feed.Web.Handlers
         {
             _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Gene, bucketSize, (tasks) =>
             {
+                _logger.LogInformation($"Indexing {tasks.Length} genes");
+
                 var indices = tasks.Select(task =>
                 {
                     var id = int.Parse(task.Target);
@@ -50,7 +52,7 @@ namespace Unite.Genome.Feed.Web.Handlers
 
                 _indexingService.IndexMany(indices);
 
-                _logger.LogInformation($"Finished indexing of {tasks.Length} genes");
+                _logger.LogInformation($"Indexing of {tasks.Length} genes completed");
             });
         }
     }
