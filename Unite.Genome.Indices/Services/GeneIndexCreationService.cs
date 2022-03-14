@@ -6,6 +6,8 @@ using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Mutations;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
+using Unite.Data.Entities.Specimens.Tissues.Enums;
+using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
@@ -158,9 +160,13 @@ namespace Unite.Genome.Indices.Services
 
             _donorIndexMapper.Map(donor, index);
 
-            index.Images = CreateImageIndices(donor.Id, diagnosisDate);
-
             index.Specimens = CreateSpecimenIndices(donor.Id, mutationId, diagnosisDate);
+
+            // Images can be asociated only with genes mutated in tumor tissues
+            if (index.Specimens.Any(specimen => string.Equals(specimen.Tissue?.Type, TissueType.Tumor.ToDefinitionString())))
+            {
+                index.Images = CreateImageIndices(donor.Id, diagnosisDate);
+            }
 
             return index;
         }
