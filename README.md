@@ -4,7 +4,9 @@
 Genome data feed service provides the following functionality:
 - [Genome data feed web API](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome.md) - REST API for uploading sequencing data to the portal (including input data validation).
 - Genes data indexing service - background service responsible for gene-centric data index creation.
-- Mutations data annotation service - background service responsible for annotation of uploaded mutations with local installation of Ensembl VEP service.
+- Mutations data annotation service (_requires internet access_) - background service responsible for annotation of mutations, genes and transcripts.
+  - Mutations are annotated with local installation of Ensembl VEP, as they might be treated as personal information.
+  - Genes and transcripts are annotated with public Ensembl web API.
 - Mutations data indexing service - background service responsible for mutation-centric data index creation.
 
 Genome data feed service is written in ASP.NET (.NET 5)
@@ -32,8 +34,8 @@ UNITE_SQL_PASSWORD|SQL server password||
 UNITE_ELASTIC_HOST|ES service host|http://localhost:9200|es.unite.net:9200
 UNITE_ELASTIC_USER|ES service user||
 UNITE_ELASTIC_PASSWORD|ES service password||
-UNITE_VEP_HOST|Local Ensembl VEP host|ensembl.unite.net|
-UNITE_ENSEMBL_HOST|Public Ensembl host|https://grch37.rest.ensembl.org|
+UNITE_VEP_HOST|Local Ensembl VEP host|http://localhost:5200|ensembl.unite.net|
+UNITE_ENSEMBL_HOST|Public Ensembl host|https://grch37.rest.ensembl.org|...|
 UNITE_GENES_INDEXING_INTERVAL|Genes indexing interval (seconds)|10|
 UNITE_GENES_INDEXING_BUCKET_SIZE|Genes indexing bucket size|300|
 UNITE_MUTATIONS_ANNOTATION_INTERVAL|Mutations annotation interval (seconds)|10|
