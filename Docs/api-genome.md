@@ -49,14 +49,12 @@ Request implements **UPSERT** logic:
                     },
                     {
                         "Chromosome": "4",
-                        "SequenceType": "g",
                         "Position": "110895931",
                         "Ref": "A",
                         "Alt": "T"
                     },
                     {
                         "Chromosome": "13",
-                        "SequenceType": "g",
                         "Position": "100515267",
                         "Ref": "A",
                         "Alt": "G"
