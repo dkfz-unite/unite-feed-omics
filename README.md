@@ -32,6 +32,8 @@ UNITE_SQL_PASSWORD|SQL server password||
 UNITE_ELASTIC_HOST|ES service host|http://localhost:9200|es.unite.net:9200
 UNITE_ELASTIC_USER|ES service user||
 UNITE_ELASTIC_PASSWORD|ES service password||
+UNITE_VEP_HOST|Local Ensembl VEP host|ensembl.unite.net|
+UNITE_ENSEMBL_HOST|Public Ensembl host|https://grch37.rest.ensembl.org|
 UNITE_GENES_INDEXING_INTERVAL|Genes indexing interval (seconds)|10|
 UNITE_GENES_INDEXING_BUCKET_SIZE|Genes indexing bucket size|300|
 UNITE_MUTATIONS_ANNOTATION_INTERVAL|Mutations annotation interval (seconds)|10|
@@ -75,6 +77,8 @@ docker run \
 -e UNITE_SQL_PORT=5432 \
 -e UNITE_SQL_USER=[sql_user] \
 -e UNITE_SQL_PASSWORD=[sql_password] \
+-e UNITE_VEP_HOST=ensembl.unite.net \
+-e UNITE_ENSEMBL_HOST=https://grch37.rest.ensembl.org \
 -e UNITE_GENES_INDEXING_INTERVAL=10 \
 -e UNITE_GENES_INDEXING_BUCKET_SIZE=300 \
 -e UNITE_MUTATIONS_ANNOTATION_INTERVAL=10 \
