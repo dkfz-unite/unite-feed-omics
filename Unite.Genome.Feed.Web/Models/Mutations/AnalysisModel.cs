@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome.Mutations.Enums;
+﻿using System;
+using Unite.Data.Entities.Genome.Mutations.Enums;
 
 namespace Unite.Genome.Feed.Web.Services.Mutations
 {
@@ -10,14 +11,14 @@ namespace Unite.Genome.Feed.Web.Services.Mutations
         public AnalysisType? Type { get; set; }
 
         /// <summary>
-        /// File generated during the analysis
+        /// Date when the analysis was performed
         /// </summary>
-        public FileModel File { get; set; }
+        public DateTime? Date { get; set; }
+
 
 
         public void Sanitise()
         {
-            File?.Sanitise();
         }
     }
 }

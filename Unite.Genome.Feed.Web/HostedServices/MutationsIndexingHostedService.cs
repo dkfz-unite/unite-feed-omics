@@ -32,6 +32,9 @@ namespace Unite.Genome.Feed.Web.HostedServices
 
             stoppingToken.Register(() => _logger.LogInformation("SSM indexing service stopped"));
 
+            // Delay 5 seconds to let the web api start working
+            await Task.Delay(5000, stoppingToken);
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try

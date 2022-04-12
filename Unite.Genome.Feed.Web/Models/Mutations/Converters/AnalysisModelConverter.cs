@@ -11,13 +11,6 @@ namespace Unite.Genome.Feed.Web.Services.Mutations.Converters
             if (source.Analysis != null)
             {
                 Map(source.Analysis, analysisModel);
-
-                if (source.Analysis.File != null)
-                {
-                    analysisModel.File = new Data.Mutations.Models.FileModel();
-
-                    Map(source.Analysis.File, analysisModel.File);
-                }
             }
 
             analysisModel.AnalysedSamples = source.Samples.Select(analysedSample =>
@@ -66,12 +59,7 @@ namespace Unite.Genome.Feed.Web.Services.Mutations.Converters
         private static void Map(in AnalysisModel source, Data.Mutations.Models.AnalysisModel target)
         {
             target.Type = source.Type;
-        }
-
-        private static void Map(in FileModel source, Data.Mutations.Models.FileModel target)
-        {
-            target.Name = source.Name;
-            target.Link = source.Link;
+            target.Date = source.Date;
         }
 
         private static void Map(in SampleModel source, Data.Mutations.Models.SampleModel target)

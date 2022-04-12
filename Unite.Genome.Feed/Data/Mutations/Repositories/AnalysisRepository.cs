@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Unite.Data.Entities;
 using Unite.Data.Entities.Genome.Mutations;
 using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Mutations.Models;
@@ -31,6 +30,11 @@ namespace Unite.Genome.Feed.Data.Mutations.Repositories
             // Analysis type should match
             query = query.Where(analysis =>
                 analysis.TypeId == model.Type
+            );
+
+            // Analysis date should match
+            query = query.Where(analysis =>
+                analysis.Date == model.Date
             );
 
             // Number of analysed samples should match
@@ -103,17 +107,7 @@ namespace Unite.Genome.Feed.Data.Mutations.Repositories
         private void Map(in AnalysisModel model, ref Analysis entity)
         {
             entity.TypeId = model.Type;
-
-            if (model.File != null)
-            {
-                if (entity.File == null)
-                {
-                    entity.File = new File();
-                }
-
-                entity.File.Name = model.File.Name;
-                entity.File.Link = model.File.Link;
-            }
+            entity.Date = model.Date;
         }
     }
 }
