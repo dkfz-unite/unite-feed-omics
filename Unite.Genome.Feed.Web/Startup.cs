@@ -1,8 +1,6 @@
-using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +23,8 @@ namespace Unite.Genome.Feed.Web
             services.Configure();
 
             services.AddControllers(options => options.AddMvcOptions())
-                    .AddJsonOptions(options => options.AddJsonOptions());
+                    .AddJsonOptions(options => options.AddJsonOptions())
+                    .AddFluentValidation();
 
         }
 

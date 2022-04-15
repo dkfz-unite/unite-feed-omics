@@ -1,22 +1,20 @@
-﻿using System.Collections.Generic;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Unite.Data.Services;
 using Unite.Data.Services.Configuration.Options;
-using Unite.Indices.Services;
-using Unite.Indices.Services.Configuration.Options;
+using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
 using Unite.Genome.Annotations.Services;
 using Unite.Genome.Feed.Data.Mutations;
 using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers;
 using Unite.Genome.Feed.Web.HostedServices;
+using Unite.Genome.Feed.Web.Services;
 using Unite.Genome.Feed.Web.Services.Mutations;
 using Unite.Genome.Feed.Web.Services.Mutations.Validators;
-using Unite.Genome.Feed.Web.Services.Validation;
-using Unite.Genome.Feed.Web.Services;
 using Unite.Genome.Indices.Services;
-using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
+using Unite.Indices.Services;
+using Unite.Indices.Services.Configuration.Options;
 
 namespace Unite.Genome.Feed.Web.Configuration.Extensions
 {
@@ -29,8 +27,7 @@ namespace Unite.Genome.Feed.Web.Configuration.Extensions
             services.AddTransient<IVepOptions, VepOptions>();
             services.AddTransient<IEnsemblOptions, EnsemblOptions>();
 
-            services.AddTransient<IValidationService, ValidationService>();
-            services.AddTransient<IValidator<IEnumerable<MutationsModel>>, MutationsModelsValidator>();
+            services.AddTransient<IValidator<MutationsModel[]>, MutationsModelsValidator>();
 
             services.AddTransient<DomainDbContext>();
             services.AddTransient<MutationDataWriter>();

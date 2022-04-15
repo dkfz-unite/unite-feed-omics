@@ -71,7 +71,7 @@ namespace Unite.Genome.Feed.Web.Services.Mutations.Validators
     }
 
 
-    public class MutationsModelsValidator : AbstractValidator<IEnumerable<MutationsModel>>
+    public class MutationsModelsValidator : AbstractValidator<MutationsModel[]>
     {
         private readonly IValidator<MutationsModel> _mutationsModelValidator;
 
