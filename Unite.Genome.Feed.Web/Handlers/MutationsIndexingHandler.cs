@@ -28,7 +28,7 @@ namespace Unite.Genome.Feed.Web.Handlers
 
         public void Prepare()
         {
-            _indexingService.UpdateMapping().RunSynchronously();
+            _indexingService.UpdateMapping().GetAwaiter().GetResult();
         }
 
         public void Handle(int bucketSize)
