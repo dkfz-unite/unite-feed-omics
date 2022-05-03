@@ -26,6 +26,10 @@ namespace Unite.Genome.Feed.Web.Handlers
             _logger = logger;
         }
 
+        public void Prepare()
+        {
+
+        }
 
         public void Handle(int bucketSize)
         {
