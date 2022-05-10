@@ -24,6 +24,7 @@ namespace Unite.Genome.Indices.Services.Mappers
             }
 
             index.Id = specimen.Id;
+            index.ParentId = specimen.ParentId;
             index.CreationDay = specimen.CreationDate.RelativeFrom(diagnosisDate) ?? specimen.CreationDay;
 
             index.Tissue = CreateFrom(specimen.Tissue, specimen.MolecularData);
