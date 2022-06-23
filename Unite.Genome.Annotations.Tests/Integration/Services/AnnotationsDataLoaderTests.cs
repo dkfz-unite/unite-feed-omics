@@ -1,51 +1,49 @@
-﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
 using Unite.Genome.Annotations.Services;
 
-namespace Unite.Genome.Annotations.Tests.Integration.Data
+namespace Unite.Genome.Annotations.Tests.Integration.Services;
+
+[TestClass]
+public class AnnotationsDataLoaderTests
 {
-    [TestClass]
-    public class AnnotationsDataLoaderTests
+    private AnnotationsDataLoader _annotationDataLoader;
+
+    [TestInitialize]
+    public void InitializeTest()
     {
-        private AnnotationsDataLoader _annotationDataLoader;
+        var vepOptions = new VepOptions();
+        var ensemblOptions = new EnsemblOptions();
 
-        [TestInitialize]
-        public void InitializeTest()
+        _annotationDataLoader = new AnnotationsDataLoader(vepOptions, ensemblOptions);
+    }
+
+
+    [TestMethod]
+    public void LoadData_ShouldLoadAnnotationsDataForMutations()
+    {
+        var vepCodes = new string[]
         {
-            var vepOptions = new VepOptions();
-            var ensemblOptions = new EnsemblOptions();
+            "1 14142850 14142850 G/A",
+            "22 40139912 40139911 -/GA",
+            "3 65369232 65369233 AG/-"
+        };
 
-            _annotationDataLoader = new AnnotationsDataLoader(vepOptions, ensemblOptions);
-        }
+        var mutationModels = _annotationDataLoader.LoadData(vepCodes).Result;
 
-
-        [TestMethod]
-        public void LoadData_ShouldLoadAnnotationsDataForMutations()
-        {
-            var vepCodes = new string[]
-            {
-                "1 14142850 14142850 G/A",
-                "22 40139912 40139911 -/GA",
-                "3 65369232 65369233 AG/-"
-            };
-
-            var mutationModels = _annotationDataLoader.LoadData(vepCodes).Result;
-
-            Assert.IsNotNull(mutationModels);
-            Assert.AreEqual(mutationModels.Count(), 3);
-        }
+        Assert.IsNotNull(mutationModels);
+        Assert.AreEqual(mutationModels.Count(), 3);
+    }
 
 
-        private class VepOptions : IVepOptions
-        {
-            public string Host => @"http://localhost:5110";
-        }
+    private class VepOptions : IVepOptions
+    {
+        public string Host => @"http://localhost:5110";
+    }
 
-        private class EnsemblOptions : IEnsemblOptions
-        {
-            public string Host => @"https://grch37.rest.ensembl.org";
-        }
+    private class EnsemblOptions : IEnsemblOptions
+    {
+        public string Host => @"https://grch37.rest.ensembl.org";
     }
 }

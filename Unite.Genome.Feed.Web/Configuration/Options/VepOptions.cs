@@ -1,10 +1,8 @@
-﻿using System;
-using Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
+﻿using Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
 
-namespace Unite.Genome.Feed.Web.Configuration.Options
+namespace Unite.Genome.Feed.Web.Configuration.Options;
+
+public class VepOptions : IVepOptions
 {
-    public class VepOptions : IVepOptions
-    {
-        public string Host => Environment.GetEnvironmentVariable("UNITE_VEP_HOST");
-    }
+    public string Host => Environment.GetEnvironmentVariable("UNITE_VEP_HOST");
 }

@@ -1,7 +1,6 @@
-﻿namespace Unite.Genome.Annotations.Clients.Vep.Configuration.Options
+﻿namespace Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
+
+public interface IVepOptions
 {
-    public interface IVepOptions
-    {
-        string Host { get; }
-    }
+    string Host { get; }
 }

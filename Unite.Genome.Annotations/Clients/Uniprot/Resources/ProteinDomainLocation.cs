@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Unite.Genome.Annotations.Clients.Uniprot.Resources
+namespace Unite.Genome.Annotations.Clients.Uniprot.Resources;
+
+public class ProteinDomainLocation
 {
-    public class ProteinDomainLocation
-    {
-        [JsonPropertyName("fragments")]
-        public ProteinDomainFragment[] Fragments { get; set; }
-    }
+    [JsonPropertyName("fragments")]
+    public ProteinDomainFragment[] Fragments { get; set; }
 }

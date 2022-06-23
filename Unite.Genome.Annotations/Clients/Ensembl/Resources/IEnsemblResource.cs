@@ -1,6 +1,5 @@
-﻿namespace Unite.Genome.Annotations.Clients.Ensembl.Resources
+﻿namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
+
+public interface IEnsemblResource
 {
-    public interface IEnsemblResource
-    {
-    }
 }

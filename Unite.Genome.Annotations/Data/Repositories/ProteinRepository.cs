@@ -1,88 +1,85 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Unite.Data.Entities.Genome;
+﻿using Unite.Data.Entities.Genome;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Data.Models;
 
-namespace Unite.Genome.Annotations.Data.Repositories
+namespace Unite.Genome.Annotations.Data.Repositories;
+
+internal class ProteinRepository
 {
-    internal class ProteinRepository
+    private readonly DomainDbContext _dbContext;
+
+
+    public ProteinRepository(DomainDbContext dbContext)
     {
-        private readonly DomainDbContext _dbContext;
+        _dbContext = dbContext;
+    }
 
 
-        public ProteinRepository(DomainDbContext dbContext)
+    public Protein FindOrCreate(ProteinModel model)
+    {
+        return Find(model) ?? Create(model);
+    }
+
+    public Protein Find(ProteinModel proteinModel)
+    {
+        var entity = _dbContext.Set<Protein>()
+            .FirstOrDefault(entity =>
+                entity.Info.EnsemblId == proteinModel.EnsemblId
+            );
+
+        return entity;
+    }
+
+    public Protein Create(ProteinModel model)
+    {
+        var protein = Convert(model);
+
+        _dbContext.Add(protein);
+        _dbContext.SaveChanges();
+
+        return protein;
+    }
+
+    public IEnumerable<Protein> CreateMissing(IEnumerable<ProteinModel> models)
+    {
+        var entitiesToAdd = new List<Protein>();
+
+        foreach (var model in models)
         {
-            _dbContext = dbContext;
+            var entity = Find(model);
+
+            if (entity == null)
+            {
+                entity = Convert(model);
+
+                entitiesToAdd.Add(entity);
+            }
         }
 
-
-        public Protein FindOrCreate(ProteinModel model)
+        if (entitiesToAdd.Any())
         {
-            return Find(model) ?? Create(model);
-        }
-
-        public Protein Find(ProteinModel proteinModel)
-        {
-            var entity = _dbContext.Set<Protein>()
-                .FirstOrDefault(entity =>
-                    entity.Info.EnsemblId == proteinModel.EnsemblId
-                );
-
-            return entity;
-        }
-
-        public Protein Create(ProteinModel model)
-        {
-            var protein = Convert(model);
-
-            _dbContext.Add(protein);
+            _dbContext.AddRange(entitiesToAdd);
             _dbContext.SaveChanges();
-
-            return protein;
         }
 
-        public IEnumerable<Protein> CreateMissing(IEnumerable<ProteinModel> models)
+        return entitiesToAdd;
+    }
+
+
+    private Protein Convert(ProteinModel model)
+    {
+        var entity = new Protein
         {
-            var entitiesToAdd = new List<Protein>();
+            Start = model.Start,
+            End = model.End,
+            Length = model.Length,
 
-            foreach (var model in models)
+            Info = new ProteinInfo
             {
-                var entity = Find(model);
-
-                if (entity == null)
-                {
-                    entity = Convert(model);
-
-                    entitiesToAdd.Add(entity);
-                }
+                EnsemblId = model.EnsemblId
             }
+        };
 
-            if (entitiesToAdd.Any())
-            {
-                _dbContext.AddRange(entitiesToAdd);
-                _dbContext.SaveChanges();
-            }
-
-            return entitiesToAdd;
-        }
-
-
-        private Protein Convert(ProteinModel model)
-        {
-            var entity = new Protein
-            {
-                Start = model.Start,
-                End = model.End,
-                Length = model.Length,
-
-                Info = new ProteinInfo
-                {
-                    EnsemblId = model.EnsemblId
-                }
-            };
-
-            return entity;
-        }
+        return entity;
     }
 }

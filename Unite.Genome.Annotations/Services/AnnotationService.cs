@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Unite.Data.Entities.Genome.Mutations;
+﻿using Unite.Data.Entities.Genome.Mutations;
 using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -8,55 +6,54 @@ using Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
 using Unite.Genome.Annotations.Data;
 using Unite.Genome.Annotations.Data.Models.Audit;
 
-namespace Unite.Genome.Annotations.Services
+namespace Unite.Genome.Annotations.Services;
+
+public class AnnotationService
 {
-    public class AnnotationService
+    private readonly DomainDbContext _dbContext;
+    private readonly AnnotationsDataLoader _dataLoader;
+    private readonly AnnotationsDataWriter _dataWriter;
+
+
+    public AnnotationService(
+        DomainDbContext dbContext,
+        IVepOptions vepOptions,
+        IEnsemblOptions ensemblOptions)
     {
-        private readonly DomainDbContext _dbContext;
-        private readonly AnnotationsDataLoader _dataLoader;
-        private readonly AnnotationsDataWriter _dataWriter;
+        _dbContext = dbContext;
+        _dataLoader = new AnnotationsDataLoader(vepOptions, ensemblOptions);
+        _dataWriter = new AnnotationsDataWriter(dbContext);
+    }
 
 
-        public AnnotationService(
-            DomainDbContext dbContext,
-            IVepOptions vepOptions,
-            IEnsemblOptions ensemblOptions)
-        {
-            _dbContext = dbContext;
-            _dataLoader = new AnnotationsDataLoader(vepOptions, ensemblOptions);
-            _dataWriter = new AnnotationsDataWriter(dbContext);
-        }
+    public void Annotate(long[] mutationIds, out AnnotationsUploadAudit audit)
+    {
+        var codes = GetVepCodes(mutationIds);
+
+        var annotations = _dataLoader.LoadData(codes).Result;
+
+        _dataWriter.SaveData(annotations, out audit);
+    }
 
 
-        public void Annotate(long[] mutationIds, out AnnotationsUploadAudit audit)
-        {
-            var codes = GetVepCodes(mutationIds);
+    private string[] GetVepCodes(long[] mutationIds)
+    {
+        var codes = _dbContext.Set<Mutation>()
+            .Where(entity => mutationIds.Contains(entity.Id))
+            .Select(entity => GetVepCode(entity))
+            .ToArray();
 
-            var annotations = _dataLoader.LoadData(codes).Result;
+        return codes;
+    }
 
-            _dataWriter.SaveData(annotations, out audit);
-        }
+    private static string GetVepCode(Mutation mutation)
+    {
+        var chromosome = mutation.ChromosomeId.ToDefinitionString();
+        var start = mutation.ReferenceBase != null ? mutation.Start : mutation.End + 1;
+        var end = mutation.End;
+        var referenceBase = mutation.ReferenceBase ?? "-";
+        var alternateBase = mutation.AlternateBase ?? "-";
 
-
-        private string[] GetVepCodes(long[] mutationIds)
-        {
-            var codes = _dbContext.Set<Mutation>()
-                .Where(entity => mutationIds.Contains(entity.Id))
-                .Select(entity => GetVepCode(entity))
-                .ToArray();
-
-            return codes;
-        }
-
-        private static string GetVepCode(Mutation mutation)
-        {
-            var chromosome = mutation.ChromosomeId.ToDefinitionString();
-            var start = mutation.ReferenceBase != null ? mutation.Start : mutation.End + 1;
-            var end = mutation.End;
-            var referenceBase = mutation.ReferenceBase ?? "-";
-            var alternateBase = mutation.AlternateBase ?? "-";
-
-            return $"{chromosome} {start} {end} {referenceBase}/{alternateBase}";
-        }
+        return $"{chromosome} {start} {end} {referenceBase}/{alternateBase}";
     }
 }

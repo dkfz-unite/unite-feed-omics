@@ -1,25 +1,23 @@
-﻿using System.Linq;
-using Unite.Data.Extensions;
+﻿using Unite.Data.Extensions;
 
-namespace Unite.Genome.Feed.Web.Services.Mutations
+namespace Unite.Genome.Feed.Web.Services.Mutations;
+
+public class MutationsModel
 {
-    public class MutationsModel
+    public AnalysisModel Analysis { get; set; }
+
+    public AnalysedSampleModel[] Samples { get; set; }
+
+
+    public AnalysedSampleModel FindSample(string id)
     {
-        public AnalysisModel Analysis { get; set; }
+        return Samples.FirstOrDefault(analysedSample => analysedSample.Id == id);
+    }
 
-        public AnalysedSampleModel[] Samples { get; set; }
+    public void Sanitise()
+    {
+        Analysis?.Sanitise();
 
-
-        public AnalysedSampleModel FindSample(string id)
-        {
-            return Samples.FirstOrDefault(analysedSample => analysedSample.Id == id);
-        }
-
-        public void Sanitise()
-        {
-            Analysis?.Sanitise();
-
-            Samples?.ForEach(sample => sample.Sanitise());
-        }
+        Samples?.ForEach(sample => sample.Sanitise());
     }
 }

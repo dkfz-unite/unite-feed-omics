@@ -1,33 +1,31 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace Unite.Genome.Annotations.Data.Models.Audit
+namespace Unite.Genome.Annotations.Data.Models.Audit;
+
+public class AnnotationsUploadAudit
 {
-    public class AnnotationsUploadAudit
+    public int GenesCreated;
+    public int TranscriptsCreated;
+    public int ProteinsCreated;
+    public int AffectedTranscriptsCreated;
+
+    public HashSet<long> Mutations;
+
+    public AnnotationsUploadAudit()
     {
-        public int GenesCreated;
-        public int TranscriptsCreated;
-        public int ProteinsCreated;
-        public int AffectedTranscriptsCreated;
+        Mutations = new HashSet<long>();
+    }
 
-        public HashSet<long> Mutations;
+    public override string ToString()
+    {
+        var message = new StringBuilder();
 
-        public AnnotationsUploadAudit()
-        {
-            Mutations = new HashSet<long>();
-        }
+        message.AppendLine($"{Mutations.Count} mutations updated");
+        message.AppendLine($"{GenesCreated} genes created");
+        message.AppendLine($"{TranscriptsCreated} transcripts created");
+        message.AppendLine($"{ProteinsCreated} proteins created");
+        message.AppendLine($"{AffectedTranscriptsCreated} affected transcripts created");
 
-        public override string ToString()
-        {
-            var message = new StringBuilder();
-
-            message.AppendLine($"{Mutations.Count} mutations updated");
-            message.AppendLine($"{GenesCreated} genes created");
-            message.AppendLine($"{TranscriptsCreated} transcripts created");
-            message.AppendLine($"{ProteinsCreated} proteins created");
-            message.AppendLine($"{AffectedTranscriptsCreated} affected transcripts created");
-
-            return message.ToString();
-        }
+        return message.ToString();
     }
 }

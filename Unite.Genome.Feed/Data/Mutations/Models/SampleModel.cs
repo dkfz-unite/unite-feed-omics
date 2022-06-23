@@ -1,9 +1,8 @@
-﻿namespace Unite.Genome.Feed.Data.Mutations.Models
-{
-    public class SampleModel
-    {
-        public string ReferenceId { get; set; }
+﻿namespace Unite.Genome.Feed.Data.Mutations.Models;
 
-        public SpecimenModel Specimen { get; set; }
-    }
+public class SampleModel
+{
+    public string ReferenceId { get; set; }
+
+    public SpecimenModel Specimen { get; set; }
 }

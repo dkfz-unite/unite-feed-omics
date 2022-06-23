@@ -1,10 +1,9 @@
-﻿namespace Unite.Genome.Annotations.Data.Models
+﻿namespace Unite.Genome.Annotations.Data.Models;
+
+public class AnnotationsModel
 {
-    public class AnnotationsModel
-    {
-        public MutationModel Mutation { get; set; }
+    public MutationModel Mutation { get; set; }
 
-        public AffectedTranscriptModel[] AffectedTranscripts { get; set; }
+    public AffectedTranscriptModel[] AffectedTranscripts { get; set; }
 
-    }
 }

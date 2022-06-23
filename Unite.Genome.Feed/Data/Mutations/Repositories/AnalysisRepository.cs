@@ -1,113 +1,111 @@
-﻿using System.Linq;
-using Unite.Data.Entities.Genome.Mutations;
+﻿using Unite.Data.Entities.Genome.Mutations;
 using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Mutations.Models;
 
-namespace Unite.Genome.Feed.Data.Mutations.Repositories
+namespace Unite.Genome.Feed.Data.Mutations.Repositories;
+
+internal class AnalysisRepository
 {
-    internal class AnalysisRepository
+    private readonly DomainDbContext _dbContext;
+    private readonly SampleRepository _sampleRepository;
+
+
+    public AnalysisRepository(DomainDbContext dbContext)
     {
-        private readonly DomainDbContext _dbContext;
-        private readonly SampleRepository _sampleRepository;
+        _dbContext = dbContext;
+        _sampleRepository = new SampleRepository(dbContext);
+    }
 
 
-        public AnalysisRepository(DomainDbContext dbContext)
+    public Analysis FindOrCreate(AnalysisModel model)
+    {
+        return Find(model) ?? Create(model);
+    }
+
+    public Analysis Find(AnalysisModel model)
+    {
+        var query = _dbContext.Set<Analysis>().AsQueryable();
+
+        // Analysis type should match
+        query = query.Where(analysis =>
+            analysis.TypeId == model.Type
+        );
+
+        // Analysis date should match
+        query = query.Where(analysis =>
+            analysis.Date == model.Date
+        );
+
+        // Number of analysed samples should match
+        query = query.Where(analysis =>
+            analysis.AnalysedSamples.Count() == model.AnalysedSamples.Count()
+        );
+
+        // Each analysed sample should match
+        foreach (var analysedSampleModel in model.AnalysedSamples)
         {
-            _dbContext = dbContext;
-            _sampleRepository = new SampleRepository(dbContext);
-        }
-
-
-        public Analysis FindOrCreate(AnalysisModel model)
-        {
-            return Find(model) ?? Create(model);
-        }
-
-        public Analysis Find(AnalysisModel model)
-        {
-            var query = _dbContext.Set<Analysis>().AsQueryable();
-
-            // Analysis type should match
-            query = query.Where(analysis =>
-                analysis.TypeId == model.Type
-            );
-
-            // Analysis date should match
-            query = query.Where(analysis =>
-                analysis.Date == model.Date
-            );
-
-            // Number of analysed samples should match
-            query = query.Where(analysis =>
-                analysis.AnalysedSamples.Count() == model.AnalysedSamples.Count()
-            );
-
-            // Each analysed sample should match
-            foreach (var analysedSampleModel in model.AnalysedSamples)
+            if (analysedSampleModel.MatchedSample == null)
             {
-                if (analysedSampleModel.MatchedSample == null)
-                {
-                    // Analysed sample should match
-                    var sample = _sampleRepository.Find(analysedSampleModel.AnalysedSample);
+                // Analysed sample should match
+                var sample = _sampleRepository.Find(analysedSampleModel.AnalysedSample);
 
-                    if (sample == null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        query = query.Where(analysis =>
-                            analysis.AnalysedSamples.Any(analysedSample =>
-                                analysedSample.SampleId == sample.Id &&
-                                analysedSample.MatchedSampleId == null
-                            )
-                        );
-                    }
+                if (sample == null)
+                {
+                    return null;
                 }
                 else
                 {
-                    // Analysed sample should match
-                    var sample = _sampleRepository.Find(analysedSampleModel.AnalysedSample);
-
-                    // Matched sample should match
-                    var matchedSample = _sampleRepository.Find(analysedSampleModel.MatchedSample);
-
-                    if (sample == null || matchedSample == null)
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        query = query.Where(analysis =>
-                            analysis.AnalysedSamples.Any(analysedSample =>
-                                analysedSample.SampleId == sample.Id &&
-                                analysedSample.MatchedSampleId == matchedSample.Id
-                            )
-                        );
-                    }
+                    query = query.Where(analysis =>
+                        analysis.AnalysedSamples.Any(analysedSample =>
+                            analysedSample.SampleId == sample.Id &&
+                            analysedSample.MatchedSampleId == null
+                        )
+                    );
                 }
             }
+            else
+            {
+                // Analysed sample should match
+                var sample = _sampleRepository.Find(analysedSampleModel.AnalysedSample);
 
-            return query.FirstOrDefault();
+                // Matched sample should match
+                var matchedSample = _sampleRepository.Find(analysedSampleModel.MatchedSample);
+
+                if (sample == null || matchedSample == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    query = query.Where(analysis =>
+                        analysis.AnalysedSamples.Any(analysedSample =>
+                            analysedSample.SampleId == sample.Id &&
+                            analysedSample.MatchedSampleId == matchedSample.Id
+                        )
+                    );
+                }
+            }
         }
 
-        public Analysis Create(AnalysisModel model)
-        {
-            var entity = new Analysis();
+        return query.FirstOrDefault();
+    }
 
-            Map(model, ref entity);
+    public Analysis Create(AnalysisModel model)
+    {
+        var entity = new Analysis();
 
-            _dbContext.Add(entity);
-            _dbContext.SaveChanges();
+        Map(model, ref entity);
 
-            return entity;
-        }
+        _dbContext.Add(entity);
+        _dbContext.SaveChanges();
+
+        return entity;
+    }
 
 
-        private void Map(in AnalysisModel model, ref Analysis entity)
-        {
-            entity.TypeId = model.Type;
-            entity.Date = model.Date;
-        }
+    private void Map(in AnalysisModel model, ref Analysis entity)
+    {
+        entity.TypeId = model.Type;
+        entity.Date = model.Date;
     }
 }

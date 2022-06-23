@@ -1,55 +1,52 @@
-﻿using System.Linq;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Unite.Data.Extensions;
 using Unite.Genome.Feed.Data.Mutations;
+using Unite.Genome.Feed.Web.Services.Mutations.Converters;
 using Unite.Genome.Feed.Web.Services;
 using Unite.Genome.Feed.Web.Services.Mutations;
-using Unite.Genome.Feed.Web.Services.Mutations.Converters;
 
-namespace Unite.Genome.Feed.Web.Controllers
+namespace Unite.Genome.Feed.Web.Controllers;
+
+[Route("api/[controller]")]
+public class MutationsController : Controller
 {
-    [Route("api/[controller]")]
-    public class MutationsController : Controller
+    private readonly MutationDataWriter _dataWriter;
+    //private readonly MutationIndexingTaskService _indexingTaskService;
+    private readonly MutationAnnotationTaskService _annotationTaskService;
+    private readonly ILogger _logger;
+
+    private readonly AnalysisModelConverter _converter;
+
+    public MutationsController(
+        MutationDataWriter dataWriter,
+        //MutationIndexingTaskService indexingTaskService,
+        MutationAnnotationTaskService annotationTaskService,
+        ILogger<MutationsController> logger)
     {
-        private readonly MutationDataWriter _dataWriter;
-        //private readonly MutationIndexingTaskService _indexingTaskService;
-        private readonly MutationAnnotationTaskService _annotationTaskService;
-        private readonly ILogger _logger;
+        _dataWriter = dataWriter;
+        //_indexingTaskService = indexingTaskService;
+        _annotationTaskService = annotationTaskService;
+        _logger = logger;
 
-        private readonly AnalysisModelConverter _converter;
+        _converter = new AnalysisModelConverter();
+    }
 
-        public MutationsController(
-            MutationDataWriter dataWriter,
-            //MutationIndexingTaskService indexingTaskService,
-            MutationAnnotationTaskService annotationTaskService,
-            ILogger<MutationsController> logger)
-        {
-            _dataWriter = dataWriter;
-            //_indexingTaskService = indexingTaskService;
-            _annotationTaskService = annotationTaskService;
-            _logger = logger;
+    [HttpPost]
+    public IActionResult Post([FromBody] MutationsModel[] models)
+    {
+        models.ForEach(model => model.Sanitise());
 
-            _converter = new AnalysisModelConverter();
-        }
+        var dataModels = models.Select(model => _converter.Convert(model));
 
-        [HttpPost]
-        public IActionResult Post([FromBody] MutationsModel[] models)
-        {
-            models.ForEach(model => model.Sanitise());
+        _dataWriter.SaveData(dataModels, out var audit);
 
-            var dataModels = models.Select(model => _converter.Convert(model));
+        _logger.LogInformation(audit.ToString());
 
-            _dataWriter.SaveData(dataModels, out var audit);
-
-            _logger.LogInformation(audit.ToString());
-
-            _annotationTaskService.PopulateTasks(audit.Mutations);
-            //_indexingTaskService.PopulateTasks(audit.MutationOccurrences.Where(id => !audit.Mutations.Contains(id)).ToArray());
+        _annotationTaskService.PopulateTasks(audit.Mutations);
+        //_indexingTaskService.PopulateTasks(audit.MutationOccurrences.Where(id => !audit.Mutations.Contains(id)).ToArray());
 
 
-            return Ok();
-        }
+        return Ok();
     }
 }

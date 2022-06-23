@@ -1,17 +1,15 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Unite.Genome.Feed.Web.Controllers
+namespace Unite.Genome.Feed.Web.Controllers;
+
+[Route("api/")]
+public class DefaultController : Controller
 {
-    [Route("api/")]
-    public class DefaultController : Controller
+    [HttpGet]
+    public IActionResult Get()
     {
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var date = DateTime.UtcNow;
+        var date = DateTime.UtcNow;
 
-            return Json(date);
-        }
+        return Json(date);
     }
 }

@@ -1,7 +1,6 @@
-﻿namespace Unite.Genome.Annotations.Clients.Ensembl.Models.Constants
+﻿namespace Unite.Genome.Annotations.Clients.Ensembl.Models.Constants;
+
+public static class ProteinDataSources
 {
-    public static class ProteinDataSources
-    {
-        public const string Uniprot = @"Uniprot/SWISSPROT";
-    }
+    public const string Uniprot = @"Uniprot/SWISSPROT";
 }
