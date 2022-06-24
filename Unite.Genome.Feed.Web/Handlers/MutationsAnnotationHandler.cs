@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Tasks.Enums;
+﻿using System.Diagnostics;
+using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
 using Unite.Genome.Annotations.Services;
 using Unite.Genome.Feed.Web.Services;
@@ -38,9 +39,13 @@ public class MutationsAnnotationHandler
 
     private void ProcessAnnotationTasks(int bucketSize)
     {
+        var stopwatch = new Stopwatch();
+
         _taskProcessingService.Process(TaskType.Annotation, TaskTargetType.Mutation, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Annotating {tasks.Length} mutations");
+
+            stopwatch.Restart();
 
             var mutationIds = tasks
                 .Select(task => long.Parse(task.Target))
@@ -52,7 +57,9 @@ public class MutationsAnnotationHandler
 
             _logger.LogInformation(audit.ToString());
 
-            _logger.LogInformation($"Annotation of {tasks.Length} mutations completed");
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Annotation of {tasks.Length} mutations completed in {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)}s");
         });
     }
 }

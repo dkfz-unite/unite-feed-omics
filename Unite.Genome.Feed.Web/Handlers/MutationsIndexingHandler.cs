@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Tasks.Enums;
+﻿using System.Diagnostics;
+using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
 using Unite.Indices.Entities.Mutations;
 using Unite.Indices.Services;
@@ -37,9 +38,13 @@ public class MutationsIndexingHandler
 
     private void ProcessIndexingTasks(int bucketSize)
     {
+        var stopwatch = new Stopwatch();
+
         _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Mutation, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} mutations");
+
+            stopwatch.Restart();
 
             var indices = tasks.Select(task =>
             {
@@ -53,7 +58,9 @@ public class MutationsIndexingHandler
 
             _indexingService.IndexMany(indices);
 
-            _logger.LogInformation($"Indexing of {tasks.Length} mutations completed");
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Indexing of {tasks.Length} mutations completed in {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)}s");
         });
     }
 }

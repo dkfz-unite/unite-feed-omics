@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Tasks.Enums;
+﻿using System.Diagnostics;
+using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
 using Unite.Indices.Entities.Genes;
 using Unite.Indices.Services;
@@ -39,9 +40,13 @@ public class GenesIndexingHandler
 
     private void ProcessIndexingTasks(int bucketSize)
     {
+        var stopwatch = new Stopwatch();
+
         _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Gene, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} genes");
+
+            stopwatch.Restart();
 
             var indices = tasks.Select(task =>
             {
@@ -55,7 +60,9 @@ public class GenesIndexingHandler
 
             _indexingService.IndexMany(indices);
 
-            _logger.LogInformation($"Indexing of {tasks.Length} genes completed");
+            stopwatch.Stop();
+
+            _logger.LogInformation($"Indexing of {tasks.Length} genes completed in {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)}s");
         });
     }
 }
