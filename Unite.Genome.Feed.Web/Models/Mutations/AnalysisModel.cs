@@ -12,7 +12,7 @@ public class AnalysisModel
     /// <summary>
     /// Date when the analysis was performed
     /// </summary>
-    public DateTime? Date { get; set; }
+    public DateOnly? Date { get; set; }
 
 
 

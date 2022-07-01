@@ -189,7 +189,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private ImageIndex[] CreateImageIndices(int donorId, DateTime? diagnosisDate)
+    private ImageIndex[] CreateImageIndices(int donorId, DateOnly? diagnosisDate)
     {
         var images = LoadImages(donorId);
 
@@ -205,7 +205,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return indices;
     }
 
-    private ImageIndex CreateImageIndex(Image image, DateTime? diagnosisDate)
+    private ImageIndex CreateImageIndex(Image image, DateOnly? diagnosisDate)
     {
         var index = new ImageIndex();
 
@@ -225,7 +225,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(int donorId, long mutationId, DateTime? diagnosisDate)
+    private SpecimenIndex[] CreateSpecimenIndices(int donorId, long mutationId, DateOnly? diagnosisDate)
     {
         var specimens = LoadSpecimens(donorId, mutationId);
 
@@ -241,7 +241,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return indices;
     }
 
-    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, DateTime? diagnosisDate)
+    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, DateOnly? diagnosisDate)
     {
         var index = new SpecimenIndex();
 
