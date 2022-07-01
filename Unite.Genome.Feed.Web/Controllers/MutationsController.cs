@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Extensions;
 using Unite.Genome.Feed.Data.Mutations;
-using Unite.Genome.Feed.Web.Services.Mutations.Converters;
 using Unite.Genome.Feed.Web.Services;
 using Unite.Genome.Feed.Web.Services.Mutations;
+using Unite.Genome.Feed.Web.Models.Mutations.Converters;
 
 namespace Unite.Genome.Feed.Web.Controllers;
 

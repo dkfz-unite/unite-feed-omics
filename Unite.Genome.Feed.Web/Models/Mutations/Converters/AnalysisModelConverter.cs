@@ -1,6 +1,6 @@
 ﻿using Unite.Genome.Feed.Web.Services.Mutations;
 
-namespace Unite.Genome.Feed.Web.Services.Mutations.Converters;
+namespace Unite.Genome.Feed.Web.Models.Mutations.Converters;
 
 public class AnalysisModelConverter
 {
@@ -59,7 +59,7 @@ public class AnalysisModelConverter
     private static void Map(in AnalysisModel source, Data.Mutations.Models.AnalysisModel target)
     {
         target.Type = source.Type;
-        target.Date = source.Date;
+        target.Date = FromDateTime(source.Date);
     }
 
     private static void Map(in SampleModel source, Data.Mutations.Models.SampleModel target)
@@ -83,5 +83,13 @@ public class AnalysisModelConverter
         target.ReferenceBase = source.Ref;
         target.AlternateBase = source.Alt;
         target.Type = Unite.Data.Utilities.Mutations.MutationTypeDetector.Detect(source.Ref, source.Alt);
+    }
+
+
+    private static DateOnly? FromDateTime(DateTime? date)
+    {
+        return date != null
+             ? DateOnly.FromDateTime(date.Value)
+             : null;
     }
 }
