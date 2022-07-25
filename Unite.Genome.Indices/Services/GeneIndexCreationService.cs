@@ -267,6 +267,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .IncludeOrganoid()
             .IncludeXenograft()
             .IncludeMolecularData()
+            .IncludeDrugScreeningData()
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .ToArray();
 

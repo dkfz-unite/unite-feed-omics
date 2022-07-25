@@ -223,6 +223,7 @@ public class MutationIndexCreationService : IIndexCreationService<MutationIndex>
             .IncludeOrganoid()
             .IncludeXenograft()
             .IncludeMolecularData()
+            .IncludeDrugScreeningData()
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .ToArray();
 
