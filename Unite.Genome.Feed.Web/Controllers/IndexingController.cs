@@ -8,14 +8,19 @@ public class IndexingController : Controller
 {
     private readonly GeneIndexingTaskService _geneIndexingTaskService;
     private readonly MutationIndexingTaskService _mutationIndexingTaskService;
-
+    private readonly CopyNumberVariantIndexingTaskService _copyNumberVariantIndexingTaskService;
+    private readonly StructuralVariantIndexingTaskService _structuralVariantIndexingTaskService;
 
     public IndexingController(
         GeneIndexingTaskService geneIndexingTaskService,
-        MutationIndexingTaskService mutationIndexingTaskService)
+        MutationIndexingTaskService mutationIndexingTaskService,
+        CopyNumberVariantIndexingTaskService copyNumberVariantIndexingTaskService,
+        StructuralVariantIndexingTaskService structuralVariantIndexingTaskService)
     {
         _geneIndexingTaskService = geneIndexingTaskService;
         _mutationIndexingTaskService = mutationIndexingTaskService;
+        _copyNumberVariantIndexingTaskService = copyNumberVariantIndexingTaskService;
+        _structuralVariantIndexingTaskService = structuralVariantIndexingTaskService;
     }
 
 
@@ -28,9 +33,11 @@ public class IndexingController : Controller
     }
 
     [HttpPost]
-    public IActionResult Mutations()
+    public IActionResult Variants()
     {
         _mutationIndexingTaskService.CreateTasks();
+        _copyNumberVariantIndexingTaskService.CreateTasks();
+        _structuralVariantIndexingTaskService.CreateTasks();
 
         return Ok();
     }

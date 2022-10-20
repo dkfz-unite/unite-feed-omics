@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Genome.Annotations.Clients.Vep.Configuration.Options;
-using Unite.Genome.Annotations.Services;
 
 namespace Unite.Genome.Annotations.Tests.Integration.Services;
 
@@ -37,7 +35,7 @@ public class AnnotationsDataLoaderTests
     }
 
 
-    private class VepOptions : IVepOptions
+    private class VepOptions : IEnsemblVepOptions
     {
         public string Host => @"http://localhost:5110";
     }

@@ -6,14 +6,19 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Folder Include="Data\" />
-		<Folder Include="Data\Mutations\" />
-		<Folder Include="Data\Mutations\Repositories\" />
-		<Folder Include="Data\Mutations\Models\Enums\" />
+		<Folder Include="Data\Audit\" />
+		<Folder Include="Data\Models\" />
+		<Folder Include="Data\Repositories\" />
+		<Folder Include="Data\Repositories\Specimens\" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Unite.Data" Version="3.2.3" />
+		<PackageReference Include="Unite.Data" Version="3.4.12" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="Data\Mutations\Models\Enums\" />
+		<None Remove="Data\Audit\" />
+		<None Remove="Data\Models\" />
+		<None Remove="Data\Repositories\" />
+		<None Remove="Data\Repositories\Specimens\" />
 	</ItemGroup>
 </Project>

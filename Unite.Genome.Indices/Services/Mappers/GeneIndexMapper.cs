@@ -10,7 +10,7 @@ public class GeneIndexMapper
     {
         index.Id = gene.Id;
         index.Symbol = gene.Symbol;
-        index.Biotype = gene.Biotype?.Value;
+        index.Biotype = gene.Biotype;
         index.Chromosome = gene.ChromosomeId.ToDefinitionString();
         index.Start = gene.Start;
         index.End = gene.End;

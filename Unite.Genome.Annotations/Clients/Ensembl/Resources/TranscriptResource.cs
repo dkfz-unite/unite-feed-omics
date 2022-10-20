@@ -3,11 +3,8 @@ using Unite.Data.Entities.Genome.Enums;
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
-public class TranscriptResource : IEnsemblResource
+public class TranscriptResource : LookupResource
 {
-    [JsonPropertyName("id")]
-    public string Id { get; set; }
-
     [JsonPropertyName("Parent")]
     public string GeneId { get; set; }
 
