@@ -10,12 +10,31 @@
 		<Folder Include="Configuration\Filters\" />
 		<Folder Include="Configuration\Extensions\" />
 		<Folder Include="Models\" />
-		<Folder Include="Models\Mutations\" />
-		<Folder Include="Models\Mutations\Validators\" />
-		<Folder Include="Models\Mutations\Converters\" />
 		<Folder Include="Services\" />
 		<Folder Include="Handlers\" />
 		<Folder Include="HostedServices\" />
+		<Folder Include="Models\Variants\" />
+		<Folder Include="Models\Variants\SSM\" />
+		<Folder Include="Models\Transcriptome\" />
+		<Folder Include="Models\Base\" />
+		<Folder Include="Models\Base\Validators\" />
+		<Folder Include="Models\Transcriptome\Validators\" />
+		<Folder Include="Models\Transcriptome\Converters\" />
+		<Folder Include="Models\Variants\Validators\" />
+		<Folder Include="Models\Variants\SSM\Validators\" />
+		<Folder Include="Models\Variants\CNV\" />
+		<Folder Include="Models\Variants\CNV\Validators\" />
+		<Folder Include="Models\Variants\SV\" />
+		<Folder Include="Models\Variants\SV\Validators\" />
+		<Folder Include="Models\Variants\SSM\Mappers\" />
+		<Folder Include="Models\Variants\SSM\Converters\" />
+		<Folder Include="Models\Variants\CNV\Mappers\" />
+		<Folder Include="Models\Variants\CNV\Converters\" />
+		<Folder Include="Models\Variants\Base\" />
+		<Folder Include="Models\Variants\SV\Mappers\" />
+		<Folder Include="Models\Variants\SV\Converters\" />
+		<Folder Include="Models\Variants\Base\Converters\" />
+		<Folder Include="Controllers\Variants\" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Macross.Json.Extensions" Version="3.0.0" />
@@ -23,6 +42,28 @@
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="FluentValidation.AspNetCore" />
+		<None Remove="Models\Variants\" />
+		<None Remove="Models\Variants\SSM\" />
+		<None Remove="Models\Transcriptome\" />
+		<None Remove="Models\Base\" />
+		<None Remove="Models\Base\Validators\" />
+		<None Remove="Models\Transcriptome\Validators\" />
+		<None Remove="Models\Transcriptome\Converters\" />
+		<None Remove="Models\Variants\Validators\" />
+		<None Remove="Models\Variants\SSM\Validators\" />
+		<None Remove="Models\Variants\CNV\" />
+		<None Remove="Models\Variants\CNV\Validators\" />
+		<None Remove="Models\Variants\SV\" />
+		<None Remove="Models\Variants\SV\Validators\" />
+		<None Remove="Models\Variants\SSM\Mappers\" />
+		<None Remove="Models\Variants\SSM\Converters\" />
+		<None Remove="Models\Variants\CNV\Mappers\" />
+		<None Remove="Models\Variants\CNV\Converters\" />
+		<None Remove="Models\Variants\Base\" />
+		<None Remove="Models\Variants\SV\Mappers\" />
+		<None Remove="Models\Variants\SV\Converters\" />
+		<None Remove="Models\Variants\Base\Converters\" />
+		<None Remove="Controllers\Variants\" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Unite.Genome.Feed\Unite.Genome.Feed.csproj">

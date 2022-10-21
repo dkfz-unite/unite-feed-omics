@@ -7,7 +7,6 @@ namespace Unite.Genome.Annotations.Data.Repositories;
 public class TranscriptRepository
 {
     private readonly DomainDbContext _dbContext;
-    private readonly TranscriptBiotypeRepository _biotypeRepository;
     private readonly GeneRepository _geneRepository;
     private readonly ProteinRepository _proteinRepository;
 
@@ -15,7 +14,6 @@ public class TranscriptRepository
     public TranscriptRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
-        _biotypeRepository = new TranscriptBiotypeRepository(dbContext);
         _geneRepository = new GeneRepository(dbContext);
         _proteinRepository = new ProteinRepository(dbContext);
     }
@@ -81,17 +79,13 @@ public class TranscriptRepository
             Start = model.Start,
             End = model.End,
             Strand = model.Strand,
+            Biotype = model.Biotype,
 
             Info = new TranscriptInfo
             {
                 EnsemblId = model.EnsemblId
             }
         };
-
-        if (model.Biotype != null)
-        {
-            entity.BiotypeId = _biotypeRepository.FindOrCreate(model.Biotype).Id;
-        }
 
         if (model.Gene != null)
         {

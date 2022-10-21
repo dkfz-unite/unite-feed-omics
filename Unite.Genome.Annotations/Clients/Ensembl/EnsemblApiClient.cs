@@ -24,7 +24,7 @@ public class EnsemblApiClient
     /// <param name="ensemblId">Ensembl object identifier</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
     /// <returns>Ensembl object mapped to given type if was found.</returns>
-    public async Task<T> Lookup<T>(string ensemblId, bool expand = false) where T : IEnsemblResource
+    public async Task<T> Lookup<T>(string ensemblId, bool expand = false) where T : LookupResource
     {
         using var httpClient = new JsonHttpClient(_options.Host, true);
 
@@ -49,7 +49,7 @@ public class EnsemblApiClient
     /// <param name="ensemblIds">Ensembl object identifiers</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
     /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
-    public async Task<T[]> Lookup<T>(IEnumerable<string> ensemblIds, bool expand = false) where T : IEnsemblResource
+    public async Task<T[]> Lookup<T>(IEnumerable<string> ensemblIds, bool expand = false) where T : LookupResource
     {
         using var httpClient = new JsonHttpClient(_options.Host, true);
 
@@ -73,14 +73,14 @@ public class EnsemblApiClient
     /// Searching references of Ensembl object with given identifier in databases of given types.
     /// </summary>
     /// <typeparam name="T">Object type for decerialization</typeparam>
-    /// <param name="ensemblid">Ensembl object identifier</param>
+    /// <param name="ensemblId">Ensembl object identifier</param>
     /// <param name="source">Specific type of external source of information (all by default)</param>
     /// <returns>References of the object stored in ensembl given ensembl databases if were found.</returns>
-    public async Task<ReferenceResource[]> Xrefs(string ensemblid, string source = null)
+    public async Task<ReferenceResource[]> Xrefs(string ensemblId, string source = null)
     {
         using var httpClient = new JsonHttpClient(_options.Host, true);
 
-        var url = string.Format(_xrefsOneUrl, ensemblid);
+        var url = string.Format(_xrefsOneUrl, ensemblId);
 
         if (!string.IsNullOrWhiteSpace(source))
         {

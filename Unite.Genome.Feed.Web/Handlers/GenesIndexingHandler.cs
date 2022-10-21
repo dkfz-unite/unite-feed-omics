@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
+using Unite.Genome.Indices.Services;
 using Unite.Indices.Entities.Genes;
 using Unite.Indices.Services;
 
@@ -9,15 +10,15 @@ namespace Unite.Genome.Feed.Web.Handlers;
 public class GenesIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly IIndexCreationService<GeneIndex> _indexCreationService;
-    private readonly IIndexingService<GeneIndex> _indexingService;
+    private readonly GeneIndexCreationService _indexCreationService;
+    private readonly GenesIndexingService _indexingService;
     private readonly ILogger _logger;
 
 
     public GenesIndexingHandler(
         TasksProcessingService taskProcessingService,
-        IIndexCreationService<GeneIndex> indexCreationService,
-        IIndexingService<GeneIndex> indexingService,
+        GeneIndexCreationService indexCreationService,
+        GenesIndexingService indexingService,
         ILogger<GenesIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
@@ -42,7 +43,7 @@ public class GenesIndexingHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Gene, bucketSize, (tasks) =>
+        _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} genes");
 

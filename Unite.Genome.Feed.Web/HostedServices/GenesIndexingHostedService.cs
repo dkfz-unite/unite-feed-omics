@@ -7,7 +7,7 @@ public class GenesIndexingHostedService : BackgroundService
 {
     private readonly GenesIndexingOptions _options;
     private readonly GenesIndexingHandler _handler;
-    private readonly ILogger<GenesIndexingHostedService> _logger;
+    private readonly ILogger _logger;
 
 
     public GenesIndexingHostedService(
@@ -51,7 +51,7 @@ public class GenesIndexingHostedService : BackgroundService
             }
             finally
             {
-                await Task.Delay(_options.Interval, stoppingToken);
+                await Task.Delay(10000, stoppingToken);
             }
         }
     }

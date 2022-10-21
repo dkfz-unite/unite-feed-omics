@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
-using Unite.Genome.Annotations.Services;
+using Unite.Genome.Annotations.Services.Vep;
 using Unite.Genome.Feed.Web.Services;
 
 namespace Unite.Genome.Feed.Web.Handlers;
@@ -9,14 +9,14 @@ namespace Unite.Genome.Feed.Web.Handlers;
 public class MutationsAnnotationHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly AnnotationService _annotationService;
+    private readonly MutationsAnnotationService _annotationService;
     private readonly MutationIndexingTaskService _indexingTaskService;
     private readonly ILogger _logger;
 
 
     public MutationsAnnotationHandler(
         TasksProcessingService taskProcessingService,
-        AnnotationService annotationService,
+        MutationsAnnotationService annotationService,
         MutationIndexingTaskService indexingTaskService,
         ILogger<MutationsAnnotationHandler> logger)
     {
@@ -25,6 +25,7 @@ public class MutationsAnnotationHandler
         _indexingTaskService = indexingTaskService;
         _logger = logger;
     }
+
 
     public void Prepare()
     {
@@ -41,19 +42,19 @@ public class MutationsAnnotationHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(TaskType.Annotation, TaskTargetType.Mutation, bucketSize, (tasks) =>
+        _taskProcessingService.Process(AnnotationTaskType.SSM, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Annotating {tasks.Length} mutations");
 
             stopwatch.Restart();
 
-            var mutationIds = tasks
+            var variantIds = tasks
                 .Select(task => long.Parse(task.Target))
                 .ToArray();
 
-            _annotationService.Annotate(mutationIds, out var audit);
+            _annotationService.Annotate(variantIds, out var audit);
 
-            _indexingTaskService.PopulateTasks(audit.Mutations);
+            _indexingTaskService.PopulateTasks(audit.Variants);
 
             _logger.LogInformation(audit.ToString());
 

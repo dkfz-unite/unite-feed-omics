@@ -3,11 +3,8 @@ using Unite.Data.Entities.Genome.Enums;
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
-public class GeneResource : IEnsemblResource
+public class GeneResource : LookupResource
 {
-    [JsonPropertyName("id")]
-    public string Id { get; set; }
-
     [JsonPropertyName("display_name")]
     public string Symbol { get; set; }
 

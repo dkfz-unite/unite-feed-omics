@@ -1,16 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
-using Unite.Data.Entities.Genome.Mutations;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Tissues.Enums;
-using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
 using Unite.Indices.Entities.Genes;
 using Unite.Indices.Services;
+
+using CNV = Unite.Data.Entities.Genome.Variants.CNV;
+using SSM = Unite.Data.Entities.Genome.Variants.SSM;
+using SV = Unite.Data.Entities.Genome.Variants.SV;
 
 namespace Unite.Genome.Indices.Services;
 
@@ -18,7 +20,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 {
     private readonly DomainDbContext _dbContext;
     private readonly GeneIndexMapper _geneIndexMapper;
-    private readonly MutationIndexMapper _mutationIndexMapper;
+    private readonly VariantIndexMapper _mutationIndexMapper;
     private readonly DonorIndexMapper _donorIndexMapper;
     private readonly ImageIndexMapper _imageIndexMapper;
     private readonly SpecimenIndexMapper _specimenIndexMapper;
@@ -28,7 +30,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         _dbContext = dbContext;
         _geneIndexMapper = new GeneIndexMapper();
-        _mutationIndexMapper = new MutationIndexMapper();
+        _mutationIndexMapper = new VariantIndexMapper();
         _donorIndexMapper = new DonorIndexMapper();
         _imageIndexMapper = new ImageIndexMapper();
         _specimenIndexMapper = new SpecimenIndexMapper();
@@ -63,26 +65,45 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         _geneIndexMapper.Map(gene, index);
 
-        index.Mutations = CreateMutationIndices(gene.Id);
+        index.Specimens = CreateSpecimenIndices(gene.Id);
 
-        index.NumberOfDonors = index.Mutations
-            .SelectMany(mutation => mutation.Donors)
-            .Select(donor => donor.Id)
-            .Distinct()
+        index.NumberOfDonors = index.Specimens
+            .DistinctBy(specimen => specimen.Donor.Id)
             .Count();
 
-        index.NumberOfMutations = index.Mutations
-            .Select(mutation => mutation.Id)
-            .Distinct()
+        index.NumberOfSpecimens = index.Specimens
+            .DistinctBy(specimen => specimen.Id)
+            .Count();
+
+        index.NumberOfMutations = index.Specimens
+            .SelectMany(specimen => specimen.Variants)
+            .Where(variant => variant.Mutation != null)
+            .DistinctBy(variant => variant.Id)
+            .Count();
+
+        index.NumberOfCopyNumberVariants = index.Specimens
+            .SelectMany(specimen => specimen.Variants)
+            .Where(variant => variant.CopyNumberVariant != null)
+            .DistinctBy(variant => variant.Id)
+            .Count();
+
+        index.NumberOfStructuralVariants = index.Specimens
+            .SelectMany(specimen => specimen.Variants)
+            .Where(variant => variant.StructuralVariant != null)
+            .DistinctBy(variant => variant.Id)
             .Count();
 
         return index;
     }
 
+    /// <summary>
+    /// Loads specified gene.
+    /// </summary>
+    /// <param name="geneId">Gene identifier.</param>
+    /// <returns>Gene.</returns>
     private Gene LoadGene(int geneId)
     {
-        var gene = _dbContext.Genes
-            .Include(gene => gene.Biotype)
+        var gene = _dbContext.Set<Gene>()
             .Include(gene => gene.Info)
             .FirstOrDefault(gene => gene.Id == geneId);
 
@@ -90,108 +111,128 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private MutationIndex[] CreateMutationIndices(int geneId)
+    private SpecimenIndex[] CreateSpecimenIndices(int geneId)
     {
-        var mutations = LoadMutations(geneId);
+        var specimens = LoadSpecimens(geneId);
 
-        if (mutations == null)
+        if (specimens == null)
         {
             return null;
         }
 
-        var indices = mutations
-            .Select(mutation => CreateMutationIndex(mutation, geneId))
+        var indices = specimens
+            .Select(specimen => CreateSpecimenIndex(specimen, geneId))
             .ToArray();
 
         return indices;
     }
 
-    private MutationIndex CreateMutationIndex(Mutation mutation, int geneId)
+    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, int geneId)
     {
-        var index = new MutationIndex();
+        var index = new SpecimenIndex();
 
-        _mutationIndexMapper.Map(mutation, index);
+        index.Donor = CreateDonorIndex(specimen.Id, out var donor);
 
-        index.Donors = CreateDonorIndices(mutation.Id);
+        index.Images = CreateImageIndices(specimen.Id, donor?.ClinicalData.DiagnosisDate);
+
+        index.Variants = CreateVariantIndices(specimen.Id, geneId);
+
+        _specimenIndexMapper.Map(specimen, index, donor?.ClinicalData.DiagnosisDate);
 
         return index;
     }
 
-    private Mutation[] LoadMutations(int geneId)
+    /// <summary>
+    /// Loads specimens having variants affecting specified gene.
+    /// </summary>
+    /// <param name="geneId">Gene identifier.</param>
+    /// <returns>Array of specimens.</returns>
+    private Specimen[] LoadSpecimens(int geneId)
     {
-        var mutationIds = _dbContext.AffectedTranscripts
-            .Where(affectedTranscript => affectedTranscript.Transcript.GeneId == geneId)
-            .Select(affectedTranscript => affectedTranscript.MutationId)
+        var ssmAffectedSpecimenIds = _dbContext.Set<Unite.Data.Entities.Genome.Variants.SSM.VariantOccurrence>()
+            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
             .Distinct()
             .ToArray();
 
-        var mutations = _dbContext.Mutations
-            .IncludeAffectedTranscripts()
-            .Where(mutation => mutationIds.Contains(mutation.Id))
+        var cnvAffectedSpecimenIds = _dbContext.Set<Unite.Data.Entities.Genome.Variants.CNV.VariantOccurrence>()
+            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
+            .Distinct()
             .ToArray();
 
-        return mutations;
+        var svAffectedSpecimenIds = _dbContext.Set<Unite.Data.Entities.Genome.Variants.SV.VariantOccurrence>()
+            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
+            .Distinct()
+            .ToArray();
+
+        var specimenIds = ssmAffectedSpecimenIds.Union(cnvAffectedSpecimenIds).Union(svAffectedSpecimenIds).ToArray();
+
+        var specimens = _dbContext.Set<Specimen>()
+            .IncludeTissue()
+            .IncludeCellLine()
+            .IncludeOrganoid()
+            .IncludeXenograft()
+            .IncludeMolecularData()
+            .IncludeDrugScreeningData()
+            .Where(specimen => specimenIds.Contains(specimen.Id))
+            .ToArray();
+
+        return specimens;
     }
 
 
-    private DonorIndex[] CreateDonorIndices(long mutationId)
+    private DonorIndex CreateDonorIndex(int specimenId, out Donor donor)
     {
-        var donors = LoadDonors(mutationId);
+        donor = LoadDonor(specimenId);
 
-        if (donors == null)
+        if (donor == null)
         {
             return null;
         }
 
-        var indices = donors
-            .Select(donor => CreateDonorindex(donor, mutationId))
-            .ToArray();
+        var index = CreateDonorIndex(donor);
 
-        return indices;
+        return index;
     }
 
-    private DonorIndex CreateDonorindex(Donor donor, long mutationId)
+    private DonorIndex CreateDonorIndex(Donor donor)
     {
         var index = new DonorIndex();
 
-        var diagnosisDate = donor.ClinicalData?.DiagnosisDate;
-
         _donorIndexMapper.Map(donor, index);
-
-        index.Specimens = CreateSpecimenIndices(donor.Id, mutationId, diagnosisDate);
-
-        // Images can be asociated only with genes mutated in tumor tissues
-        if (index.Specimens.Any(specimen => string.Equals(specimen.Tissue?.Type, TissueType.Tumor.ToDefinitionString())))
-        {
-            index.Images = CreateImageIndices(donor.Id, diagnosisDate);
-        }
 
         return index;
     }
 
-    private Donor[] LoadDonors(long mutationId)
+    /// <summary>
+    /// Loads the donor of the specified specimen.
+    /// </summary>
+    /// <param name="specimenId">Specimen identifier.</param>
+    /// <returns>Donor.</returns>
+    private Donor LoadDonor(int specimenId)
     {
-        var donorIds = _dbContext.MutationOccurrences
-            .Where(mutationOccurrence => mutationOccurrence.MutationId == mutationId)
-            .Select(mutationOccurrence => mutationOccurrence.AnalysedSample.Sample.Specimen.DonorId)
-            .Distinct()
-            .ToArray();
+        var donorId = _dbContext.Set<Specimen>()
+            .Where(specimen => specimen.Id == specimenId)
+            .Select(specimen => specimen.DonorId)
+            .FirstOrDefault();
 
-        var donors = _dbContext.Donors
+        var donor = _dbContext.Set<Donor>()
             .IncludeClinicalData()
             .IncludeTreatments()
-            .IncludeWorkPackages()
+            .IncludeProjects()
             .IncludeStudies()
-            .Where(donor => donorIds.Contains(donor.Id))
-            .ToArray();
+            .Where(donor => donor.Id == donorId)
+            .FirstOrDefault();
 
-        return donors;
+        return donor;
     }
 
 
-    private ImageIndex[] CreateImageIndices(int donorId, DateOnly? diagnosisDate)
+    private ImageIndex[] CreateImageIndices(int specimenId, DateOnly? diagnosisDate)
     {
-        var images = LoadImages(donorId);
+        var images = LoadImages(specimenId);
 
         if (images == null)
         {
@@ -214,8 +255,20 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Image[] LoadImages(int donorId)
+    /// <summary>
+    /// Loads images of the specified specimen donor if the specimen is donor derived (e.g. tissue).
+    /// </summary>
+    /// <param name="specimenId">Specimen identifier.</param>
+    /// <returns>Array of images.</returns>
+    private Image[] LoadImages(int specimenId)
     {
+        var donorId = _dbContext.Set<Specimen>()
+            .Include(specimen => specimen.Tissue)
+            .Where(specimen => specimen.Tissue != null && specimen.Tissue.TypeId == TissueType.Tumor)
+            .Where(specimen => specimen.Id == specimenId)
+            .Select(specimen => specimen.DonorId)
+            .FirstOrDefault();
+
         var images = _dbContext.Set<Image>()
             .Include(image => image.MriImage)
             .Where(image => image.DonorId == donorId)
@@ -225,52 +278,128 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(int donorId, long mutationId, DateOnly? diagnosisDate)
+    private VariantIndex[] CreateVariantIndices(int specimenId, int geneId)
     {
-        var specimens = LoadSpecimens(donorId, mutationId);
+        var mutations = LoadMutations(specimenId, geneId);
+        var copyNumberVariants = LoadCopyNumberVariants(specimenId, geneId);
+        var structuralVariants = LoadStructuralVariants(specimenId, geneId);
 
-        if (specimens == null)
+        var indices = new List<VariantIndex>();
+
+        if (mutations != null)
         {
-            return null;
+            indices.AddRange(mutations.Select(variant => CreateVariantIndex(variant)));
         }
 
-        var indices = specimens
-            .Select(specimen => CreateSpecimenIndex(specimen, diagnosisDate))
-            .ToArray();
+        if (copyNumberVariants != null)
+        {
+            indices.AddRange(copyNumberVariants.Select(variant => CreateVariantIndex(variant)));
+        }
 
-        return indices;
+        if (structuralVariants != null)
+        {
+            indices.AddRange(structuralVariants.Select(variant => CreateVariantIndex(variant)));
+        }
+
+        return indices.Any() ? indices.ToArray() : null;
     }
 
-    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, DateOnly? diagnosisDate)
+    private VariantIndex CreateVariantIndex(SSM.Variant variant)
     {
-        var index = new SpecimenIndex();
+        var index = new VariantIndex();
 
-        _specimenIndexMapper.Map(specimen, index, diagnosisDate);
+        _mutationIndexMapper.Map(variant, index);
 
         return index;
     }
 
-    private Specimen[] LoadSpecimens(int donorId, long mutationId)
+    private VariantIndex CreateVariantIndex(CNV.Variant variant)
     {
-        var specimenIds = _dbContext.MutationOccurrences
-            .Where(mutationOccurrence =>
-                mutationOccurrence.MutationId == mutationId &&
-                mutationOccurrence.AnalysedSample.Sample.Specimen.DonorId == donorId
-            )
-            .Select(mutationOccurrence => mutationOccurrence.AnalysedSample.Sample.SpecimenId)
-            .Distinct()
+        var index = new VariantIndex();
+
+        _mutationIndexMapper.Map(variant, index);
+
+        return index;
+    }
+
+    private VariantIndex CreateVariantIndex(SV.Variant variant)
+    {
+        var index = new VariantIndex();
+
+        _mutationIndexMapper.Map(variant, index);
+
+        return index;
+    }
+
+    /// <summary>
+    /// Loads all mutations affecting specified gene in specified specimen.
+    /// </summary>
+    /// <param name="specimenId">Specimen identifier.</param>
+    /// <param name="geneId">Gene identifier.</param>
+    /// <returns>Array of mutations.</returns>
+    private SSM.Variant[] LoadMutations(int specimenId, int geneId)
+    {
+        // Variants should be filtered by the gene the're affecting.
+        var variantIds = _dbContext.Set<SSM.VariantOccurrence>()
+            .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
+            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .DistinctBy(occurrence => occurrence.VariantId)
+            .Select(occurrence => occurrence.VariantId)
             .ToArray();
 
-        var specimens = _dbContext.Specimens
-            .IncludeTissue()
-            .IncludeCellLine()
-            .IncludeOrganoid()
-            .IncludeXenograft()
-            .IncludeMolecularData()
-            .IncludeDrugScreeningData()
-            .Where(specimen => specimenIds.Contains(specimen.Id))
+        var variants = _dbContext.Set<SSM.Variant>()
+            .IncludeAffectedTranscripts()
+            .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
 
-        return specimens;
+        return variants;
+    }
+
+    /// <summary>
+    /// Loads all copy number variants affecting specified gene in specified specimen.
+    /// </summary>
+    /// <param name="specimenId">Specimen identifier.</param>
+    /// <param name="geneId">Gene identifier.</param>
+    /// <returns>Array of copy number variants.</returns>
+    private CNV.Variant[] LoadCopyNumberVariants(int specimenId, int geneId)
+    {
+        // Variants should be filtered by the gene the're affecting.
+        var variantIds = _dbContext.Set<CNV.VariantOccurrence>()
+            .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
+            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .DistinctBy(occurrence => occurrence.VariantId)
+            .Select(occurrence => occurrence.VariantId)
+            .ToArray();
+
+        var variants = _dbContext.Set<CNV.Variant>()
+            .IncludeAffectedTranscripts()
+            .Where(variant => variantIds.Contains(variant.Id))
+            .ToArray();
+
+        return variants;
+    }
+
+    /// <summary>
+    /// Loads all structural variants affecting specified gene in specified specimen.
+    /// </summary>
+    /// <param name="specimenId">Specimen identifier.</param>
+    /// <param name="geneId">Gene identifier.</param>
+    /// <returns>Array of structural variants.</returns>
+    private SV.Variant[] LoadStructuralVariants(int specimenId, int geneId)
+    {
+        // Variants should be filtered by the gene the're affecting.
+        var variantIds = _dbContext.Set<SV.VariantOccurrence>()
+            .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
+            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .DistinctBy(occurrence => occurrence.VariantId)
+            .Select(occurrence => occurrence.VariantId)
+            .ToArray();
+
+        var variants = _dbContext.Set<SV.Variant>()
+            .IncludeAffectedTranscripts()
+            .Where(variant => variantIds.Contains(variant.Id))
+            .ToArray();
+
+        return variants;
     }
 }

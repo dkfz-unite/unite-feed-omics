@@ -19,7 +19,7 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
     {
         IterateEntities<Gene, int>(gene => true, gene => gene.Id, genes =>
         {
-            CreateTasks(TaskType.Indexing, TaskTargetType.Gene, genes);
+            CreateTasks(IndexingTaskType.Gene, genes);
         });
     }
 
@@ -27,7 +27,7 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
     {
         IterateEntities<Gene, int>(gene => keys.Contains(gene.Id), gene => gene.Id, genes =>
         {
-            CreateTasks(TaskType.Indexing, TaskTargetType.Gene, genes);
+            CreateTasks(IndexingTaskType.Gene, genes);
         });
     }
 
@@ -42,14 +42,19 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
         throw new NotImplementedException();
     }
 
-    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
-    {
-        return keys;
-    }
-
     protected override IEnumerable<int> LoadRelatedImages(IEnumerable<int> keys)
     {
         throw new NotImplementedException();
+    }
+
+    protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<int> keys)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
+    {
+        return keys;
     }
 
     protected override IEnumerable<long> LoadRelatedMutations(IEnumerable<int> keys)
@@ -57,7 +62,12 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
         throw new NotImplementedException();
     }
 
-    protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<int> keys)
+    protected override IEnumerable<long> LoadRelatedCopyNumberVariants(IEnumerable<int> keys)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override IEnumerable<long> LoadRelatedStructuralVariants(IEnumerable<int> keys)
     {
         throw new NotImplementedException();
     }

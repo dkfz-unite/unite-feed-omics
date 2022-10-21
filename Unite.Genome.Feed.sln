@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unite.Genome.Indices", "Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unite.Genome.Annotations", "Unite.Genome.Annotations\Unite.Genome.Annotations.csproj", "{1E1446AA-12E4-43B3-B622-23AB92777984}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unite.Genome.Annotations.Tests", "Unite.Genome.Annotations.Tests\Unite.Genome.Annotations.Tests.csproj", "{FCEBAD03-97F9-4D5E-BA46-F022A94DD3BA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +31,5 @@ Global
 		{1E1446AA-12E4-43B3-B622-23AB92777984}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E1446AA-12E4-43B3-B622-23AB92777984}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E1446AA-12E4-43B3-B622-23AB92777984}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FCEBAD03-97F9-4D5E-BA46-F022A94DD3BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FCEBAD03-97F9-4D5E-BA46-F022A94DD3BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FCEBAD03-97F9-4D5E-BA46-F022A94DD3BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FCEBAD03-97F9-4D5E-BA46-F022A94DD3BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

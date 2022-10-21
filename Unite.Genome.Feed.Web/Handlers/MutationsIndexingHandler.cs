@@ -1,22 +1,22 @@
 ﻿using System.Diagnostics;
+using Unite.Data.Entities.Genome.Variants.SSM;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
-using Unite.Indices.Entities.Mutations;
-using Unite.Indices.Services;
+using Unite.Genome.Indices.Services;
 
 namespace Unite.Genome.Feed.Web.Handlers;
 
 public class MutationsIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly IIndexCreationService<MutationIndex> _indexCreationService;
-    private readonly IIndexingService<MutationIndex> _indexingService;
+    private readonly VariantIndexCreationService<Variant, VariantOccurrence> _indexCreationService;
+    private readonly VariantsIndexingService _indexingService;
     private readonly ILogger _logger;
 
     public MutationsIndexingHandler(
         TasksProcessingService taskProcessingService,
-        IIndexCreationService<MutationIndex> indexCreationService,
-        IIndexingService<MutationIndex> indexingService,
+        VariantIndexCreationService<Variant, VariantOccurrence> indexCreationService,
+        VariantsIndexingService indexingService,
         ILogger<MutationsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
@@ -40,7 +40,7 @@ public class MutationsIndexingHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(TaskType.Indexing, TaskTargetType.Mutation, bucketSize, (tasks) =>
+        _taskProcessingService.Process(IndexingTaskType.SSM, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} mutations");
 

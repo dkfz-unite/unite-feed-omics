@@ -7,13 +7,11 @@ namespace Unite.Genome.Annotations.Data.Repositories;
 internal class GeneRepository
 {
     private readonly DomainDbContext _dbContext;
-    private readonly GeneBiotypeRepository _biotypeRepository;
 
 
     public GeneRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
-        _biotypeRepository = new GeneBiotypeRepository(dbContext);
     }
 
 
@@ -77,17 +75,13 @@ internal class GeneRepository
             Start = model.Start,
             End = model.End,
             Strand = model.Strand,
+            Biotype = model.Biotype,
 
             Info = new GeneInfo
             {
                 EnsemblId = model.EnsemblId
             }
         };
-
-        if (model.Biotype != null)
-        {
-            entity.BiotypeId = _biotypeRepository.FindOrCreate(model.Biotype).Id;
-        }
 
         return entity;
     }
