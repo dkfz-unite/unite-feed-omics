@@ -3,6 +3,7 @@ using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
+using Unite.Data.Entities.Specimens.Tissues.Enums;
 using Unite.Data.Services;
 using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
@@ -263,7 +264,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         var donorId = _dbContext.Set<Specimen>()
             .Include(specimen => specimen.Tissue)
-            .Where(specimen => specimen.Tissue != null)
+            .Where(specimen => specimen.Tissue != null && specimen.Tissue.TypeId == TissueType.Tumor)
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();

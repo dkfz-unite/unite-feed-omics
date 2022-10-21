@@ -7,6 +7,7 @@ public class AnalysisModel
     private string _id;
     private AnalysisType? _type;
     private DateTime? _date;
+    private Dictionary<string, string> _parameters;
 
 
     /// <summary>
@@ -27,5 +28,11 @@ public class AnalysisModel
     /// <summary>
     /// Analysis parameters
     /// </summary>
-    public Dictionary<string, string> Parameters { get; set; }
+    public Dictionary<string, string> Parameters { get => Trim(_parameters); set => _parameters = value; }
+
+
+    private static Dictionary<string, string> Trim(Dictionary<string, string> dictionary)
+    {
+        return dictionary?.ToDictionary(entry => entry.Key.Trim(), entry => entry.Value.Trim());
+    }
 }
