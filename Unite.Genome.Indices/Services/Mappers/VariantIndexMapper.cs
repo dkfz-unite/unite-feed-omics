@@ -41,7 +41,6 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.Id = entity.Id;
         index.Mutation = CreateFrom(entity);
         index.AffectedTranscripts = CreateFrom(entity.AffectedTranscripts);
     }
@@ -53,7 +52,6 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.Id = entity.Id;
         index.CopyNumberVariant = CreateFrom(entity);
         index.AffectedTranscripts = CreateFrom(entity.AffectedTranscripts);
     }
@@ -65,7 +63,6 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.Id = entity.Id;
         index.StructuralVariant = CreateFrom(entity);
         index.AffectedTranscripts = CreateFrom(entity.AffectedTranscripts);
     }
@@ -80,6 +77,7 @@ internal class VariantIndexMapper
 
         var index = new MutationIndex();
 
+        index.Id = entity.Id;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
@@ -99,6 +97,7 @@ internal class VariantIndexMapper
 
         var index = new CopyNumberVariantIndex();
 
+        index.Id = entity.Id;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
@@ -126,6 +125,7 @@ internal class VariantIndexMapper
 
         var index = new StructuralVariantIndex();
 
+        index.Id = entity.Id;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
