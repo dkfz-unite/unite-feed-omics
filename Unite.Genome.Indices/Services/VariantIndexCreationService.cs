@@ -2,6 +2,7 @@
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
+using Unite.Data.Entities.Specimens.Tissues.Enums;
 using Unite.Data.Services;
 using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
@@ -60,20 +61,6 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
         _variantIndexMapper.Map(variant, index);
 
         index.Specimens = CreateSpecimenIndices(variant.Id);
-
-        index.NumberOfDonors = index.Specimens
-            .DistinctBy(specimen => specimen.Donor.Id)
-            .Count();
-
-        index.NumberOfSpecimens = index.Specimens
-            .DistinctBy(specimen => specimen.Id)
-            .Count();
-
-        index.NumberOfGenes += index.AffectedTranscripts?
-            .Where(affectedTranscript => affectedTranscript.Gene != null)
-            .DistinctBy(affectedTranscript => affectedTranscript.Gene.Id)
-            .Count() ?? 0;
-
 
         return index;
     }
@@ -210,7 +197,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     {
         var donorId = _dbContext.Set<Specimen>()
             .Include(specimen => specimen.Tissue)
-            .Where(specimen => specimen.Tissue != null)
+            .Where(specimen => specimen.Tissue != null && specimen.Tissue.TypeId == TissueType.Tumor)
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();

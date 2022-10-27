@@ -67,32 +67,6 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         index.Specimens = CreateSpecimenIndices(gene.Id);
 
-        index.NumberOfDonors = index.Specimens
-            .DistinctBy(specimen => specimen.Donor.Id)
-            .Count();
-
-        index.NumberOfSpecimens = index.Specimens
-            .DistinctBy(specimen => specimen.Id)
-            .Count();
-
-        index.NumberOfMutations = index.Specimens
-            .SelectMany(specimen => specimen.Variants)
-            .Where(variant => variant.Mutation != null)
-            .DistinctBy(variant => variant.Id)
-            .Count();
-
-        index.NumberOfCopyNumberVariants = index.Specimens
-            .SelectMany(specimen => specimen.Variants)
-            .Where(variant => variant.CopyNumberVariant != null)
-            .DistinctBy(variant => variant.Id)
-            .Count();
-
-        index.NumberOfStructuralVariants = index.Specimens
-            .SelectMany(specimen => specimen.Variants)
-            .Where(variant => variant.StructuralVariant != null)
-            .DistinctBy(variant => variant.Id)
-            .Count();
-
         return index;
     }
 
@@ -149,19 +123,19 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     /// <returns>Array of specimens.</returns>
     private Specimen[] LoadSpecimens(int geneId)
     {
-        var ssmAffectedSpecimenIds = _dbContext.Set<Unite.Data.Entities.Genome.Variants.SSM.VariantOccurrence>()
+        var ssmAffectedSpecimenIds = _dbContext.Set<SSM.VariantOccurrence>()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
             .Distinct()
             .ToArray();
 
-        var cnvAffectedSpecimenIds = _dbContext.Set<Unite.Data.Entities.Genome.Variants.CNV.VariantOccurrence>()
+        var cnvAffectedSpecimenIds = _dbContext.Set<CNV.VariantOccurrence>()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
             .Distinct()
             .ToArray();
 
-        var svAffectedSpecimenIds = _dbContext.Set<Unite.Data.Entities.Genome.Variants.SV.VariantOccurrence>()
+        var svAffectedSpecimenIds = _dbContext.Set<SV.VariantOccurrence>()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
             .Distinct()
