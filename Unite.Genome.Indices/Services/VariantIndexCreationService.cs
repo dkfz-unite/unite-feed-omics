@@ -196,8 +196,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private Image[] LoadImages(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
-            .Include(specimen => specimen.Tissue)
-            .Where(specimen => specimen.Tissue != null && specimen.Tissue.TypeId == TissueType.Tumor)
+            .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();
