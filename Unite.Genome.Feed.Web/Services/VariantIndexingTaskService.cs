@@ -1,6 +1,7 @@
 ﻿using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Variants;
 using Unite.Data.Entities.Images;
+using Unite.Data.Entities.Specimens.Tissues.Enums;
 using Unite.Data.Services;
 using Unite.Data.Services.Tasks;
 
@@ -63,6 +64,7 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
     {
         var donorIds = _dbContext.Set<TVariantOccurrence>()
             .Where(occurrence => keys.Contains(occurrence.VariantId))
+            .Where(occurrence => occurrence.AnalysedSample.Sample.Specimen.Tissue.TypeId == TissueType.Tumor)
             .Select(occurrence => occurrence.AnalysedSample.Sample.Specimen.DonorId)
             .Distinct()
             .ToArray();
