@@ -93,7 +93,7 @@ internal class ConsequencesDataWriter<TVariant, TAffectedTranscript> : DataWrite
         audit.TranscriptsCreated += transcriptsCreated;
 
 
-        if (consequencesDataModels.Any(consequencesDataModel => consequencesDataModel.AffectedTranscripts.Any()))
+        if (consequencesDataModels.Any(consequencesDataModel => consequencesDataModel.AffectedTranscripts != null))
         {
             var affectedTranscriptModels = consequencesDataModels
             .Where(annotationsModel => annotationsModel.AffectedTranscripts != null)

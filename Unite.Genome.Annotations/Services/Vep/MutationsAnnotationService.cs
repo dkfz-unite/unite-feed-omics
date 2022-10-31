@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome.Variants.SSM;
+﻿using System.Text.Json;
+using Unite.Data.Entities.Genome.Variants.SSM;
 using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -47,7 +48,10 @@ public class MutationsAnnotationService
 
     private IQueryable<Variant> LoadVariants(long[] variantIds)
     {
-        return _dbContext.Set<Variant>();
+        return _dbContext.Set<Variant>()
+            .Where(entity => variantIds.Contains(entity.Id))
+            .OrderBy(entity => entity.ChromosomeId)
+            .ThenBy(entity => entity.Start);
     }
 
     private string GetVepVariantCode(Variant variant)

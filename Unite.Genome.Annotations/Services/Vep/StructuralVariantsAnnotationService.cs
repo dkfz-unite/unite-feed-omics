@@ -51,7 +51,10 @@ public class StructuralVariantsAnnotationService
         var supportedTypes = new SvType?[] { SvType.DUP, SvType.INS, SvType.DEL };
 
         return _dbContext.Set<Variant>()
-            .Where(entity => supportedTypes.Contains(entity.TypeId));
+            .Where(entity => supportedTypes.Contains(entity.TypeId))
+            .Where(entity => variantIds.Contains(entity.Id))
+            .OrderBy(entity => entity.ChromosomeId)
+            .ThenBy(entity => entity.Start);
     }
 
     private string GetVepVariantCode(Variant variant)

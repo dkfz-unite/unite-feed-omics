@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Unite.Genome.Annotations.Data.Models;
+﻿namespace Unite.Genome.Annotations.Data.Models;
 
 public class ConsequencesDataUploadAudit
 {
@@ -18,14 +16,14 @@ public class ConsequencesDataUploadAudit
 
     public override string ToString()
     {
-        var message = new StringBuilder();
+        var messages = new List<string>();
 
-        message.AppendLine($"{Variants.Count} variants updated");
-        message.AppendLine($"{GenesCreated} genes created");
-        message.AppendLine($"{TranscriptsCreated} transcripts created");
-        message.AppendLine($"{ProteinsCreated} proteins created");
-        message.AppendLine($"{AffectedTranscriptsCreated} affected transcripts created");
+        messages.Add($"{Variants.Count} variants updated");
+        messages.Add($"{GenesCreated} genes created");
+        messages.Add($"{TranscriptsCreated} transcripts created");
+        messages.Add($"{ProteinsCreated} proteins created");
+        messages.Add($"{AffectedTranscriptsCreated} affected transcripts created");
 
-        return message.ToString();
+        return string.Join(Environment.NewLine, messages);
     }
 }

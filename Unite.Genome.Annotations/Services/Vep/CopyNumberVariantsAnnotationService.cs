@@ -51,7 +51,10 @@ public class CopyNumberVariantsAnnotationService
         var supportedTypes = new SvType?[] { SvType.DUP, SvType.DEL };
 
         return _dbContext.Set<Variant>()
-            .Where(entity => supportedTypes.Contains(entity.SvTypeId));
+            .Where(entity => supportedTypes.Contains(entity.SvTypeId))
+            .Where(entity => variantIds.Contains(entity.Id))
+            .OrderBy(entity => entity.ChromosomeId)
+            .ThenBy(entity => entity.Start);
     }
 
     private string GetVepVariantCode(Variant variant)

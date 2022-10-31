@@ -21,7 +21,7 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
 
     public override void CreateTasks()
     {
-        IterateEntities<Variant, long>(variant => true, variant => variant.Id, variants =>
+        IterateEntities<TVariant, long>(variant => true, variant => variant.Id, variants =>
         {
             CreateVariantIndexingTasks(variants);
         });
@@ -29,7 +29,7 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
 
     public override void CreateTasks(IEnumerable<long> variantIds)
     {
-        IterateEntities<Variant, long>(variant => variantIds.Contains(variant.Id), variant => variant.Id, variants =>
+        IterateEntities<TVariant, long>(variant => variantIds.Contains(variant.Id), variant => variant.Id, variants =>
         {
             CreateVariantIndexingTasks(variants);
         });
@@ -37,7 +37,7 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
 
     public override void PopulateTasks(IEnumerable<long> variantIds)
     {
-        IterateEntities<Variant, long>(variant => variantIds.Contains(variant.Id), variant => variant.Id, variants =>
+        IterateEntities<TVariant, long>(variant => variantIds.Contains(variant.Id), variant => variant.Id, variants =>
         {
             CreateDonorIndexingTasks(variants);
             CreateImageIndexingTasks(variantIds);

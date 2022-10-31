@@ -317,8 +317,8 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         var variantIds = _dbContext.Set<SSM.VariantOccurrence>()
             .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .DistinctBy(occurrence => occurrence.VariantId)
-            .Select(occurrence => occurrence.VariantId)
+            .GroupBy(occurrence => occurrence.VariantId)
+            .Select(group => group.First().VariantId)
             .ToArray();
 
         var variants = _dbContext.Set<SSM.Variant>()
@@ -341,8 +341,8 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         var variantIds = _dbContext.Set<CNV.VariantOccurrence>()
             .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .DistinctBy(occurrence => occurrence.VariantId)
-            .Select(occurrence => occurrence.VariantId)
+            .GroupBy(occurrence => occurrence.VariantId)
+            .Select(group => group.First().VariantId)
             .ToArray();
 
         var variants = _dbContext.Set<CNV.Variant>()
@@ -365,8 +365,8 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         var variantIds = _dbContext.Set<SV.VariantOccurrence>()
             .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .DistinctBy(occurrence => occurrence.VariantId)
-            .Select(occurrence => occurrence.VariantId)
+            .GroupBy(occurrence => occurrence.VariantId)
+            .Select(group => group.First().VariantId)
             .ToArray();
 
         var variants = _dbContext.Set<SV.Variant>()
