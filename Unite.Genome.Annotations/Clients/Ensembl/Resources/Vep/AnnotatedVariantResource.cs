@@ -38,4 +38,7 @@ internal class AnnotatedVariantResource
 
     [JsonPropertyName("transcript_consequences")]
     public AffectedTranscriptResource[] AffectedTranscripts { get; set; }
+
+    [JsonIgnore]
+    public long VariantId => long.Parse(Id.Split(".").First());
 }

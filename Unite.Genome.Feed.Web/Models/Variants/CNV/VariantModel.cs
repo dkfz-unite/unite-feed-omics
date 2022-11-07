@@ -48,12 +48,12 @@ public class VariantModel
     /// <summary>
     /// Loss of heterozygosity (either C1 or C2 are 0)
     /// </summary>
-    public bool? Loh { get => _loh; set => _loh = value; }
+    public bool? Loh { get => _loh ?? GetLoh(C1, C2); set => _loh = value; }
 
     /// <summary>
     /// Homozygous deletion (both C1 and C2 are 0)
     /// </summary>
-    public bool? HomoDel { get => _homoDel; set => _homoDel = value; }
+    public bool? HomoDel { get => _homoDel ?? GetHomoDel(C1, C2); set => _homoDel = value; }
 
     /// <summary>
     /// Mean number of copies in minor allele
@@ -68,22 +68,22 @@ public class VariantModel
     /// <summary>
     /// Mean total number of copies (C1Mean + C2Mean)
     /// </summary>
-    public double? TcnMean { get => _tcnMean; set => _tcnMean = value; }
+    public double? TcnMean { get => _tcnMean ?? C1Mean + C2Mean; set => _tcnMean = value; }
 
     /// <summary>
     /// Rounded number of copies in minor allele (-1 for subclonal values if values is 0.3+ far from closest integer)
     /// </summary>
-    public int? C1 { get => _c1; set => _c1 = value; }
+    public int? C1 { get => _c1 ?? RoundToInteger(C1Mean); set => _c1 = value; }
 
     /// <summary>
     /// Rounded number of copies in major allele (-1 for subclonal values if values is 0.3+ far from closest integer)
     /// </summary>
-    public int? C2 { get => _c2; set => _c2 = value; }
+    public int? C2 { get => _c2 ?? RoundToInteger(C2Mean); set => _c2 = value; }
 
     /// <summary>
     /// Rounded total number of copies (-1 for subclonal values if values is 0.3+ far from closest integer)
     /// </summary>
-    public int? Tcn { get => _tcn; set => _tcn = value; }
+    public int? Tcn { get => _tcn ?? GetTcn(C1, C2) ?? RoundToInteger(TcnMean); set => _tcn = value; }
 
     /// <summary>
     /// Estimated maximum decrease of heterozygosity
@@ -112,5 +112,40 @@ public class VariantModel
         C2 = aceSeqModel.GetC2();
         Tcn = aceSeqModel.GetTcn();
         DhMax = aceSeqModel.DhMax;
+    }
+
+
+    private static bool? GetHomoDel(int? c1, int? c2)
+    {
+        return (c1 == -1 || c2 == -1) ? null : (c1 == 0 && c2 == 2);
+    }
+
+    private static bool? GetLoh(int? c1, int? c2)
+    {
+        return (c1 == -1 && c2 == -1) ? null : (c1 == 0 && c2 != 0) || (c2 == 0 && c1 != 0);
+    }
+
+    private static int? GetTcn(int? c1, int? c2)
+    {
+        return (c1 == -1 || c2 == -1) ? -1 : c1 + c2;
+    }
+
+    /// <summary>
+    /// Rounds value based on maximum distance to nearest integer
+    /// </summary>
+    /// <param name="value">Value</param>
+    /// <param name="maxDistance">Maximum distance to nearest integer</param>
+    /// <returns>Rounded value if it is close enough to nearest integer, otherwise -1.</returns>
+    private static int? RoundToInteger(in double? value, double maxDistance = 0.3)
+    {
+        if (value != null)
+        {
+            return value - Math.Truncate(value.Value) > maxDistance ? (int)Math.Round(value.Value) : -1;
+        }
+        else
+        {
+            return null;
+        }
+
     }
 }

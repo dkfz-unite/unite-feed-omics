@@ -34,9 +34,9 @@ internal class ConsequencesDataWriter<TVariant, TAffectedTranscript> : DataWrite
 
     protected override void ProcessModel(ConsequencesDataModel consequencesDataModel, ref ConsequencesDataUploadAudit audit)
     {
-        var mutation = _variantRepository.Find(consequencesDataModel.Variant);
+        var variant = _variantRepository.Find(consequencesDataModel.Variant);
 
-        audit.Variants.Add(mutation.Id);
+        audit.Variants.Add(variant.Id);
 
 
         var geneModels = GetUniqueGeneModels(consequencesDataModel);

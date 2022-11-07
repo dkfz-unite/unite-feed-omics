@@ -1,5 +1,4 @@
 ﻿using Unite.Data.Entities.Genome.Variants.CNV;
-using Unite.Data.Entities.Genome.Variants.CNV.Enums;
 using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -36,7 +35,7 @@ public class CopyNumberVariantsAnnotationService
 
     public void Annotate(long[] variantIds, out ConsequencesDataUploadAudit audit)
     {
-        var variants = LoadVariants(variantIds);
+        var variants = LoadVariants(variantIds).ToArray();
 
         var codes = variants.Select(GetVepVariantCode).ToArray();
 
@@ -48,39 +47,22 @@ public class CopyNumberVariantsAnnotationService
 
     private IQueryable<Variant> LoadVariants(long[] variantIds)
     {
-        var supportedTypes = new SvType?[] { SvType.DUP, SvType.DEL };
-
         return _dbContext.Set<Variant>()
-            .Where(entity => supportedTypes.Contains(entity.SvTypeId))
             .Where(entity => variantIds.Contains(entity.Id))
+            .Where(entity => entity.CnaTypeId != null)
             .OrderBy(entity => entity.ChromosomeId)
             .ThenBy(entity => entity.Start);
     }
 
     private string GetVepVariantCode(Variant variant)
     {
-        var id = variant.Id.ToString();
-        var chromosome = variant.ChromosomeId.ToDefinitionString();
+
+        var id = variant.Id;
+        var chr = variant.ChromosomeId.ToDefinitionString();
         var start = variant.Start;
         var end = variant.End;
-        var type = GetVepVariantType(variant);
+        var type = "CNV";
 
-        return $"{chromosome} {start} {end} {type} + {id}";
-    }
-
-    private string GetVepVariantType(Variant variant)
-    {
-        if (variant.SvTypeId == SvType.DUP)
-        {
-            return "DUP";
-        }
-        else if (variant.SvTypeId == SvType.DEL)
-        {
-            return "DEL";
-        }
-        else
-        {
-            throw new NotSupportedException($"Copy number variant type '{variant.SvTypeId.ToDefinitionString()}' is not supported by Ensembl VEP");
-        }
+        return string.Join('\t', chr, start, id, ".", $"<{type}>", ".", ".", $"SVTYPE={type};END={end}", ".");
     }
 }

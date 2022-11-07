@@ -1,52 +1,80 @@
-﻿using Unite.Data.Entities.Genome.Enums;
+﻿using System.Text.Json.Serialization;
+using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Entities.Genome.Variants.SV.Enums;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SV;
 
 public class VariantModel
 {
-    /// <summary>
-    /// Chromosome
-    /// </summary>
-    public Chromosome? Chromosome { get; set; }
+    private Chromosome? _chromosome;
+    private int? _start;
+    private int? _end;
+    private Chromosome? _otherChromosome;
+    private int? _otherStart;
+    private int? _otherEnd;
+    private SvType? _type;
+    private bool? _inverted;
+    private string _flankingSequenceFrom;
+    private string _flankingSequenceTo;
+
 
     /// <summary>
-    /// Chromosome region start
+    /// Frist breakpoint chromosome.
     /// </summary>
-    public int? Start { get; set; }
+    [JsonPropertyName("Chromosome1")]
+    public Chromosome? Chromosome { get => _chromosome; set => _chromosome = value; }
 
     /// <summary>
-    /// Chromosome region end
+    /// Frist breakpoint start..
     /// </summary>
-    public int? End { get; set; }
+    [JsonPropertyName("Start1")]
+    public int? Start { get => _start; set => _start = value; }
 
     /// <summary>
-    /// New chromosome (for translocated or duplicated regions)
+    /// Frist breakpoint end.
     /// </summary>
-    public Chromosome? NewChromosome { get; set; }
+    [JsonPropertyName("End1")]
+    public int? End { get => _end ?? _start + 1; set => _end = value; }
 
     /// <summary>
-    /// New chromosome region start (for translocated or duplicated regions)
+    /// Second breakpoint chromosome.
     /// </summary>
-    public double? NewStart { get; set; }
+    [JsonPropertyName("Chromosome2")]
+    public Chromosome? OtherChromosome { get => _otherChromosome; set => _otherChromosome = value; }
 
     /// <summary>
-    /// New chromosome region end (for translocated or duplicated regions)
+    /// Second breakpoint start.
     /// </summary>
-    public double? NewEnd { get; set; }
+    [JsonPropertyName("Start2")]
+    public int? OtherStart { get => _otherStart; set => _otherStart = value; }
 
     /// <summary>
-    /// Structural variant type
+    /// Second breakpoint end.
     /// </summary>
-    public SvType? Type { get; set; }
+    [JsonPropertyName("End2")]
+    public int? OtherEnd { get => _otherEnd ?? _otherStart + 1; set => _otherEnd = value; }
 
     /// <summary>
-    /// Reference genomic sequence of chromosome region
+    /// Structural variant type.
     /// </summary>
-    public string Ref { get; set; }
+    [JsonPropertyName("Type")]
+    public SvType? Type { get => _type; set => _type = value; }
 
     /// <summary>
-    /// Alternate genomic sequence of chromosome region
+    /// Whether event is inverted or not.
     /// </summary>
-    public string Alt { get; set; }
+    [JsonPropertyName("Inverted")]
+    public bool? Inverted { get => _inverted; set => _inverted = value; }
+
+    /// <summary>
+    /// Flanking genomic sequence 200bp around first breakpoint.
+    /// </summary>
+    [JsonPropertyName("FlankingSequenceFrom")]
+    public string FlankingSequenceFrom { get => _flankingSequenceFrom; set => _flankingSequenceFrom = value; }
+
+    /// <summary>
+    /// Flanking genomic sequence 200bp around second breakpoint.
+    /// </summary>
+    [JsonPropertyName("FlankingSequenceTo")]
+    public string FlankingSequenceTo { get => _flankingSequenceTo; set => _flankingSequenceTo = value; }
 }

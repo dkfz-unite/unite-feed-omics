@@ -5,10 +5,11 @@ namespace Unite.Genome.Feed.Data.Models.Variants.SV;
 
 public class VariantModel : Variants.VariantModel
 {
-    public Chromosome? NewChromosome { get; set; }
-    public double? NewStart { get; set; }
-    public double? NewEnd { get; set; }
+    public Chromosome OtherChromosome { get; set; }
+    public int OtherStart { get; set; }
+    public int OtherEnd { get; set; }
     public SvType Type { get; set; }
-    public string ReferenceBase { get; set; }
-    public string AlternateBase { get; set; }
+    public bool? Inverted { get; set; }
+    public string FlankingSequenceFrom { get; set; }
+    public string FlankingSequenceTo { get; set; }
 }

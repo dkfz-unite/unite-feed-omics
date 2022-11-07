@@ -14,7 +14,11 @@ internal class VariantRepository : VariantRepository<Variant, VariantModel>
     {
         var entity = _dbContext.Set<Variant>()
             .FirstOrDefault(entity =>
-                entity.Code == model.Code
+                entity.ChromosomeId == model.Chromosome &&
+                entity.Start == model.Start &&
+                entity.End == model.End &&
+                entity.ReferenceBase == model.ReferenceBase &&
+                entity.AlternateBase == model.AlternateBase
             );
 
         return entity;
@@ -24,7 +28,6 @@ internal class VariantRepository : VariantRepository<Variant, VariantModel>
     {
         base.Map(model, ref entity);
 
-        entity.Code = model.Code;
         entity.TypeId = model.Type;
         entity.ReferenceBase = model.ReferenceBase;
         entity.AlternateBase = model.AlternateBase;

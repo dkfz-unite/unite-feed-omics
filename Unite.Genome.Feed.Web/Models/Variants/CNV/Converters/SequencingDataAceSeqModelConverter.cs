@@ -20,7 +20,7 @@ public class SequencingDataAceSeqModelConverter : SequencingDataModelConverterBa
         {
             var variantModel = new Data.Models.Variants.CNV.VariantModel();
 
-            _variantsModelMapper.Map(variant, variantModel, source.Ploidy.Value);
+            _variantsModelMapper.Map(variant, variantModel, source.Ploidy ?? 2);
 
             return variantModel;
 

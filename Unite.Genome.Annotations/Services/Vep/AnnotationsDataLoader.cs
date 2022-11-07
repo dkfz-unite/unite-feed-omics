@@ -34,7 +34,16 @@ internal class AnnotationsDataLoader
 
     private async Task<AnnotatedVariantResource[]> AnnotateVariants(string[] vepCodes)
     {
-        var variants = await _ensemblVepApiClient.LoadAnnotations(vepCodes);
+        var annotations = await _ensemblVepApiClient.LoadAnnotations(vepCodes);
+
+        var variants = annotations
+            .GroupBy(annotation => annotation.VariantId)
+            .Select(group => new AnnotatedVariantResource()
+            {
+                Id = group.Key.ToString(),
+                AffectedTranscripts = group.SelectMany(annotation => annotation.AffectedTranscripts).ToArray()
+            })
+            .ToArray();
 
         return variants;
     }

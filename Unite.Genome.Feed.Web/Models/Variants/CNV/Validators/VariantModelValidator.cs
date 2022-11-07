@@ -18,19 +18,21 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
         RuleFor(model => model.CnaType)
-            .NotEmpty()
-            .WithMessage("Should not be empty");
+            .NotEmpty().When(model => model.Tcn == null).WithMessage("Should not be empty");
 
         RuleFor(model => model.C1Mean)
-            .NotEmpty().WithMessage("Should not be empty")
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
         RuleFor(model => model.C2Mean)
-            .NotEmpty().WithMessage("Should not be empty")
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
+        RuleFor(model => model.TcnMean)
+            .Must(value => value > 0).WithMessage("Should be greater than 0");
+
+        RuleFor(model => model.Tcn)
+            .NotEmpty().When(model => model.CnaType == null).WithMessage("Should not be empty");
+
         RuleFor(model => model.DhMax)
-            .NotEmpty().WithMessage("Should not be empty")
             .Must(value => value > 0).WithMessage("Should be greater than 0");
     }
 }

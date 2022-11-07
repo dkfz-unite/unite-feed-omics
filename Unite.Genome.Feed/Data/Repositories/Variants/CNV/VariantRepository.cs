@@ -18,8 +18,15 @@ internal class VariantRepository : VariantRepository<Variant, VariantModel>
                 entity.Start == model.Start &&
                 entity.End == model.End &&
                 entity.SvTypeId == model.SvType &&
+                entity.CnaTypeId == model.CnaType &&
+                entity.HomoDel == model.HomoDel &&
+                entity.Loh == model.Loh &&
                 entity.C1Mean == model.C1Mean &&
                 entity.C2Mean == model.C2Mean &&
+                entity.TcnMean == model.TcnMean &&
+                entity.C1 == model.C1 &&
+                entity.C2 == model.C2 &&
+                entity.Tcn == model.Tcn &&
                 entity.DhMax == model.DhMax
             );
 

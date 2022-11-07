@@ -36,9 +36,9 @@ public class StructuralVariantsAnnotationService
 
     public void Annotate(long[] variantIds, out ConsequencesDataUploadAudit audit)
     {
-        var variants = LoadVariants(variantIds);
+        var variants = LoadVariants(variantIds).ToArray();
 
-        var codes = variants.Select(GetVepVariantCode).ToArray();
+        var codes = variants.SelectMany(GetVepVariantCodes).ToArray();
 
         var annotations = _dataLoader.LoadData(codes).Result;
 
@@ -48,45 +48,57 @@ public class StructuralVariantsAnnotationService
 
     private IQueryable<Variant> LoadVariants(long[] variantIds)
     {
-        var supportedTypes = new SvType?[] { SvType.DUP, SvType.INS, SvType.DEL };
-
         return _dbContext.Set<Variant>()
-            .Where(entity => supportedTypes.Contains(entity.TypeId))
             .Where(entity => variantIds.Contains(entity.Id))
+            .Where(entity => entity.TypeId != SvType.COM)
             .OrderBy(entity => entity.ChromosomeId)
             .ThenBy(entity => entity.Start);
     }
 
-    private string GetVepVariantCode(Variant variant)
+    private IEnumerable<string> GetVepVariantCodes(Variant variant)
     {
-        var id = variant.Id.ToString();
-        var chromosome = variant.ChromosomeId.ToDefinitionString();
-        var start = variant.Start;
-        var end = variant.End;
-        var type = GetVepVariantType(variant);
+        var chr1 = variant.ChromosomeId.ToDefinitionString();
+        var start1 = variant.Start;
+        var end1 = variant.End;
 
-        return $"{chromosome} {start} {end} {type} + {id}";
-    }
+        var chr2 = variant.OtherChromosomeId.ToDefinitionString();
+        var start2 = variant.OtherStart;
+        var end2 = variant.OtherEnd;
 
-    private string GetVepVariantType(Variant variant)
-    {
-        if (variant.TypeId == SvType.DUP)
+        if (variant.TypeId == SvType.ITX && variant.TypeId == SvType.CTX)
         {
-            var isTandem = variant.NewChromosomeId == variant.ChromosomeId && variant.NewStart == variant.End + 1;
+            var mate1s = $"{variant.Id}.1S";
+            var mate1e = $"{variant.Id}.1E";
+            var mate2s = $"{variant.Id}.2S";
+            var mate2e = $"{variant.Id}.2E";
 
-            return isTandem ? "TDUP" : "DUP";
-        }
-        else if (variant.TypeId == SvType.INS)
-        {
-            return "INS";
-        }
-        else if (variant.TypeId == SvType.DEL)
-        {
-            return "DEL";
+            if (variant.Inverted == null && variant.Inverted == false)
+            {
+                // mate1s-mate2e; mate2s-mate1e
+                yield return string.Join('\t', chr1, start1, mate1s, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate2e}", ".");
+                yield return string.Join('\t', chr1, end1, mate1e, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate2s}", ".");
+                yield return string.Join('\t', chr2, start2, mate2s, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate1e}", ".");
+                yield return string.Join('\t', chr2, end2, mate2e, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate1s}", ".");
+            }
+            else
+            {
+                // mate1s-mate2s; mate1e-mate2e
+                yield return string.Join('\t', chr1, start1, mate1s, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate2s}", ".");
+                yield return string.Join('\t', chr1, end1, mate1e, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate2e}", ".");
+                yield return string.Join('\t', chr2, start2, mate2s, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate1s}", ".");
+                yield return string.Join('\t', chr2, end2, mate2e, ".", ".", ".", ".", $"SVTYPE=BND;MATEID={mate1e}", ".");
+            }
         }
         else
         {
-            throw new NotSupportedException($"Structural variant type '{variant.TypeId.ToDefinitionString()}' is not supported by Ensembl VEP");
+            var id = variant.Id;
+            var positions = new int[] { start1, end1, start2, end2 };
+            var start = positions.Min();
+            var end = positions.Max();
+            var chr = variant.ChromosomeId.ToDefinitionString();
+            var type = variant.TypeId == SvType.TDUP ? "DUP:TANDEM" : variant.TypeId.ToDefinitionString();
+
+            yield return string.Join('\t', chr, start, id, ".", $"<{type}>", ".", ".", $"SVTYPE={type};END={end}", ".");
         }
     }
 }

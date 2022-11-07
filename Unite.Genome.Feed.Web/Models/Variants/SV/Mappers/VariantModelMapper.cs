@@ -8,13 +8,14 @@ public class VariantModelMapper
         target.Start = source.Start.Value;
         target.End = source.End.Value;
 
-        target.NewChromosome = source.NewChromosome;
-        target.NewStart = source.NewStart;
-        target.NewEnd = source.NewEnd;
+        target.OtherChromosome = source.OtherChromosome.Value;
+        target.OtherStart = source.OtherStart.Value;
+        target.OtherEnd = source.OtherEnd.Value;
 
-        target.ReferenceBase = source.Ref;
-        target.AlternateBase = source.Alt;
+        target.FlankingSequenceFrom = source.FlankingSequenceFrom;
+        target.FlankingSequenceTo = source.FlankingSequenceFrom;
 
         target.Type = source.Type.Value;
+        target.Inverted = source.Inverted;
     }
 }

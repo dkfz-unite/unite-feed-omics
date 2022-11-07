@@ -17,12 +17,13 @@ internal class VariantRepository : VariantRepository<Variant, VariantModel>
                 entity.ChromosomeId == model.Chromosome &&
                 entity.Start == model.Start &&
                 entity.End == model.End &&
-                entity.NewChromosomeId == model.NewChromosome &&
-                entity.NewStart == model.NewStart &&
-                entity.NewEnd == model.NewEnd &&
+                entity.OtherChromosomeId == model.OtherChromosome &&
+                entity.OtherStart == model.OtherStart &&
+                entity.OtherEnd == model.OtherEnd &&
                 entity.TypeId == model.Type &&
-                entity.ReferenceBase == model.ReferenceBase &&
-                entity.AlternateBase == model.AlternateBase
+                entity.Inverted == model.Inverted &&
+                entity.FlankingSequenceFrom == model.FlankingSequenceFrom &&
+                entity.FlankingSequenceTo == model.FlankingSequenceTo
             );
 
         return entity;
@@ -32,11 +33,12 @@ internal class VariantRepository : VariantRepository<Variant, VariantModel>
     {
         base.Map(model, ref entity);
 
-        entity.NewChromosomeId = model.NewChromosome;
-        entity.NewStart = model.NewStart;
-        entity.NewEnd = model.NewEnd;
+        entity.OtherChromosomeId = model.OtherChromosome;
+        entity.OtherStart = model.OtherStart;
+        entity.OtherEnd = model.OtherEnd;
         entity.TypeId = model.Type;
-        entity.ReferenceBase = model.ReferenceBase;
-        entity.AlternateBase = model.AlternateBase;
+        entity.Inverted = model.Inverted;
+        entity.FlankingSequenceFrom = model.FlankingSequenceFrom;
+        entity.FlankingSequenceTo = model.FlankingSequenceTo;
     }
 }
