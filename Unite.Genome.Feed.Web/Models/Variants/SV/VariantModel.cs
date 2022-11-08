@@ -69,12 +69,12 @@ public class VariantModel
     /// <summary>
     /// Flanking genomic sequence 200bp around first breakpoint.
     /// </summary>
-    [JsonPropertyName("FlankingSequenceFrom")]
+    [JsonPropertyName("FlankingSequence1")]
     public string FlankingSequenceFrom { get => _flankingSequenceFrom; set => _flankingSequenceFrom = value; }
 
     /// <summary>
     /// Flanking genomic sequence 200bp around second breakpoint.
     /// </summary>
-    [JsonPropertyName("FlankingSequenceTo")]
+    [JsonPropertyName("FlankingSequence2")]
     public string FlankingSequenceTo { get => _flankingSequenceTo; set => _flankingSequenceTo = value; }
 }

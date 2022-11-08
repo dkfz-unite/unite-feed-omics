@@ -41,7 +41,10 @@ internal class AnnotationsDataLoader
             .Select(group => new AnnotatedVariantResource()
             {
                 Id = group.Key.ToString(),
-                AffectedTranscripts = group.SelectMany(annotation => annotation.AffectedTranscripts).ToArray()
+                AffectedTranscripts = group
+                    .Where(annotation => annotation.AffectedTranscripts != null)
+                    .SelectMany(annotation => annotation.AffectedTranscripts)
+                    .ToArray()
             })
             .ToArray();
 
