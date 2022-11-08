@@ -11,7 +11,7 @@ public class AffectedTranscriptModel
     public string AminoAcidChange { get; set; }
     public string CodonChange { get; set; }
     public int? OverlapBpNumber { get; set; }
-    public int? OverlapPercentage { get; set; }
+    public double? OverlapPercentage { get; set; }
     public int? Distance { get; set; }
     public string[] Consequences { get; set; }
 

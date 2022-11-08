@@ -37,7 +37,7 @@ public class StructuralVariantsController : Controller
 
         _logger.LogInformation(audit.ToString());
 
-        _annotationTaskService.PopulateTasks(audit.Mutations);
+        _annotationTaskService.PopulateTasks(audit.StructuralVariants);
 
         return Ok();
     }

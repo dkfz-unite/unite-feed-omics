@@ -36,8 +36,8 @@ public class SequencingDataUploadAudit
         message.AppendLine($"{MutationsAssociated} mutations associations created");
         message.AppendLine($"{CopyNumberVariantsCreated} copy number variants created");
         message.AppendLine($"{CopyNumberVariantsAssociated} copy number variants associations created");
-        message.AppendLine($"{CopyNumberVariantsCreated} structural variants created");
-        message.Append($"{CopyNumberVariantsAssociated} structural variants associations created");
+        message.AppendLine($"{StructuralVariantsCreated} structural variants created");
+        message.Append($"{StructuralVariantsAssociated} structural variants associations created");
 
         return message.ToString();
     }

@@ -18,9 +18,9 @@ public class AnalysedSampleModelValidator<TModel, TModelValidator> : SampleModel
     {
         _variantModelValidator = new TModelValidator();
 
-        RuleFor(model => model.Ploidy)
-            .NotEmpty().WithMessage("Should not be empty")
-            .When(IsCnvSequencingSample);
+        //RuleFor(model => model.Ploidy)
+        //    .NotEmpty().WithMessage("Should not be empty")
+        //    .When(IsCnvSequencingSample);
 
         RuleForEach(model => model.Variants)
             .SetValidator(_variantModelValidator);

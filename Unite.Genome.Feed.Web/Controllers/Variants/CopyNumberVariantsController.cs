@@ -39,7 +39,7 @@ public class CopyNumberVariantsController : Controller
 
         _logger.LogInformation(audit.ToString());
 
-        _annotationTaskService.PopulateTasks(audit.Mutations);
+        _annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
 
         return Ok();
     }
@@ -53,7 +53,7 @@ public class CopyNumberVariantsController : Controller
 
         _logger.LogInformation(audit.ToString());
 
-        _annotationTaskService.PopulateTasks(audit.Mutations);
+        _annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
 
         return Ok();
     }

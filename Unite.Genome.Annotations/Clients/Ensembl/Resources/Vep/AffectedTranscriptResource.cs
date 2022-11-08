@@ -36,13 +36,13 @@ internal class AffectedTranscriptResource
     public string CodonChange { get; set; }
 
     [JsonPropertyName("bp_overlap")]
-    public int OverlapBpNumber { get; set; }
+    public int? OverlapBpNumber { get; set; }
 
     [JsonPropertyName("percentage_overlap")]
-    public int OverlapPercentage { get; set; }
+    public double? OverlapPercentage { get; set; }
 
     [JsonPropertyName("distance")]
-    public int Distance { get; set; }
+    public int? Distance { get; set; }
 
 
     [JsonPropertyName("consequence_terms")]
