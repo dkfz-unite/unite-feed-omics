@@ -10,6 +10,9 @@ internal class AffectedTranscriptResource
     [JsonPropertyName("transcript_id")]
     public string TranscriptId { get; set; }
 
+    [JsonPropertyName("canonical")]
+    public int? Canonical { get; set; }
+
 
     [JsonPropertyName("cdna_start")]
     public int? CDNAStart { get; set; }

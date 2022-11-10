@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using System.Linq.Expressions;
+using Unite.Data.Entities.Genome;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Data.Models;
 
@@ -15,17 +16,17 @@ internal class GeneRepository
     }
 
 
-    public Gene FindOrCreate(GeneModel model)
+    public Gene FindOrCreate(GeneModel model, IEnumerable<Gene> cache = null)
     {
-        return Find(model) ?? Create(model);
+        return Find(model, cache) ?? Create(model);
     }
 
-    public Gene Find(GeneModel model)
+    public Gene Find(GeneModel model, IEnumerable<Gene> cache = null)
     {
-        var entity = _dbContext.Set<Gene>()
-            .FirstOrDefault(entity =>
-                entity.Info.EnsemblId == model.EnsemblId
-            );
+        Expression<Func<Gene, bool>> predicate = (entity) =>
+            entity.Info.EnsemblId == model.EnsemblId;
+
+        var entity = cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<Gene>().FirstOrDefault(predicate);
 
         return entity;
     }
@@ -40,13 +41,13 @@ internal class GeneRepository
         return gene;
     }
 
-    public IEnumerable<Gene> CreateMissing(IEnumerable<GeneModel> models)
+    public IEnumerable<Gene> CreateMissing(IEnumerable<GeneModel> models, IEnumerable<Gene> cache = null)
     {
         var entitiesToAdd = new List<Gene>();
 
         foreach (var model in models)
         {
-            var entity = Find(model);
+            var entity = Find(model, cache);
 
             if (entity == null)
             {

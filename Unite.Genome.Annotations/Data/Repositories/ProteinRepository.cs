@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using System.Linq.Expressions;
+using Unite.Data.Entities.Genome;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Data.Models;
 
@@ -15,17 +16,17 @@ internal class ProteinRepository
     }
 
 
-    public Protein FindOrCreate(ProteinModel model)
+    public Protein FindOrCreate(ProteinModel model, IEnumerable<Protein> cache = null)
     {
-        return Find(model) ?? Create(model);
+        return Find(model, cache) ?? Create(model);
     }
 
-    public Protein Find(ProteinModel proteinModel)
+    public Protein Find(ProteinModel model, IEnumerable<Protein> cache = null)
     {
-        var entity = _dbContext.Set<Protein>()
-            .FirstOrDefault(entity =>
-                entity.Info.EnsemblId == proteinModel.EnsemblId
-            );
+        Expression<Func<Protein, bool>> predicate = (entity) =>
+            entity.Info.EnsemblId == model.EnsemblId;
+
+        var entity = cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<Protein>().FirstOrDefault(predicate);
 
         return entity;
     }
@@ -40,13 +41,13 @@ internal class ProteinRepository
         return protein;
     }
 
-    public IEnumerable<Protein> CreateMissing(IEnumerable<ProteinModel> models)
+    public IEnumerable<Protein> CreateMissing(IEnumerable<ProteinModel> models, IEnumerable<Protein> cache = null)
     {
         var entitiesToAdd = new List<Protein>();
 
         foreach (var model in models)
         {
-            var entity = Find(model);
+            var entity = Find(model, cache);
 
             if (entity == null)
             {

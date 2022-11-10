@@ -48,7 +48,7 @@ internal class ConsequencesDataWriter<TVariant, TAffectedTranscript> : DataWrite
         var proteinsCreated = proteins.Count();
 
         var transcriptModels = GetUniqueTranscriptModels(consequencesDataModel);
-        var transcripts = _transcriptRepository.CreateMissing(transcriptModels);
+        var transcripts = _transcriptRepository.CreateMissing(transcriptModels, genes, proteins);
         var transcriptsCreated = transcripts.Count();
 
         audit.GenesCreated += genesCreated;
@@ -59,7 +59,7 @@ internal class ConsequencesDataWriter<TVariant, TAffectedTranscript> : DataWrite
         if (consequencesDataModel.AffectedTranscripts != null)
         {
             var affectedTranscriptModels = consequencesDataModel.AffectedTranscripts;
-            var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels);
+            var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels, null, transcripts);
             var affectedTranscriptsCreated = affectedTranscripts.Count();
 
             audit.AffectedTranscriptsCreated += affectedTranscriptsCreated;
@@ -68,10 +68,11 @@ internal class ConsequencesDataWriter<TVariant, TAffectedTranscript> : DataWrite
 
     protected override void ProcessModels(IEnumerable<ConsequencesDataModel> consequencesDataModels, ref ConsequencesDataUploadAudit audit)
     {
-        foreach (var consequencesDataModel in consequencesDataModels)
-        {
-            var variant = _variantRepository.Find(consequencesDataModel.Variant);
+        var variantModels = consequencesDataModels.Select(model => model.Variant).ToArray();
+        var variants = _variantRepository.Find(variantModels);
 
+        foreach (var variant in variants)
+        {
             audit.Variants.Add(variant.Id);
         }
 
@@ -96,10 +97,10 @@ internal class ConsequencesDataWriter<TVariant, TAffectedTranscript> : DataWrite
         if (consequencesDataModels.Any(consequencesDataModel => consequencesDataModel.AffectedTranscripts != null))
         {
             var affectedTranscriptModels = consequencesDataModels
-            .Where(annotationsModel => annotationsModel.AffectedTranscripts != null)
-            .SelectMany(annotationsModel => annotationsModel.AffectedTranscripts);
+                .Where(annotationsModel => annotationsModel.AffectedTranscripts != null)
+                .SelectMany(annotationsModel => annotationsModel.AffectedTranscripts);
 
-            var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels);
+            var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels, variants, transcripts);
 
             var affectedTranscriptsCreated = affectedTranscripts.Count();
 

@@ -1,4 +1,5 @@
 ﻿
+using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Variants.SSM;
 using Unite.Data.Services;
 
@@ -11,9 +12,12 @@ internal class AffectedTranscriptRepository : AffectedTranscriptRepository<Varia
     }
 
 
-    protected override AffectedTranscript Convert(Models.Variants.AffectedTranscriptModel model)
+    protected override AffectedTranscript Convert(
+        Models.Variants.AffectedTranscriptModel model,
+        IEnumerable<Variant> variantsCache = null,
+        IEnumerable<Transcript> transcriptsCache = null)
     {
-        var entity = base.Convert(model);
+        var entity = base.Convert(model, variantsCache, transcriptsCache);
 
         entity.CDNAStart = model.CDNAStart;
         entity.CDNAEnd = model.CDNAEnd;

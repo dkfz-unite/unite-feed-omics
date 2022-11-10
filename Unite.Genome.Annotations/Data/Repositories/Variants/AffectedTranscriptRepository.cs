@@ -52,9 +52,12 @@ internal abstract class AffectedTranscriptRepository<TVariant, TAffectedTranscri
         return entity;
     }
 
-    public TAffectedTranscript Create(AffectedTranscriptModel model)
+    public TAffectedTranscript Create(
+        AffectedTranscriptModel model,
+        IEnumerable<TVariant> variantsCache = null,
+        IEnumerable<Transcript> transcriptsCache = null)
     {
-        var entity = Convert(model);
+        var entity = Convert(model, variantsCache, transcriptsCache);
 
         _dbContext.Add(entity);
         _dbContext.SaveChanges();
@@ -62,7 +65,10 @@ internal abstract class AffectedTranscriptRepository<TVariant, TAffectedTranscri
         return entity;
     }
 
-    public IEnumerable<TAffectedTranscript> CreateMissing(IEnumerable<AffectedTranscriptModel> models)
+    public IEnumerable<TAffectedTranscript> CreateMissing(
+        IEnumerable<AffectedTranscriptModel> models,
+        IEnumerable<TVariant> variantsCache = null,
+        IEnumerable<Transcript> transcriptsCache = null)
     {
         var entitiesToAdd = new List<TAffectedTranscript>();
 
@@ -72,7 +78,7 @@ internal abstract class AffectedTranscriptRepository<TVariant, TAffectedTranscri
 
             if (entity == null)
             {
-                entity = Convert(model);
+                entity = Convert(model, variantsCache, transcriptsCache);
 
                 entitiesToAdd.Add(entity);
             }
@@ -87,10 +93,13 @@ internal abstract class AffectedTranscriptRepository<TVariant, TAffectedTranscri
         return entitiesToAdd;
     }
 
-    protected virtual TAffectedTranscript Convert(AffectedTranscriptModel model)
+    protected virtual TAffectedTranscript Convert(
+        AffectedTranscriptModel model,
+        IEnumerable<TVariant> variantsCache = null,
+        IEnumerable<Transcript> transcriptsCache = null)
     {
-        var variant = _variantRepository.Find(model.Variant);
-        var feature = _transcriptRepository.FindOrCreate(model.Transcript);
+        var variant = _variantRepository.Find(model.Variant, variantsCache);
+        var feature = _transcriptRepository.FindOrCreate(model.Transcript, transcriptsCache);
         var consequences = model.Consequences.Select(type => new Consequence(type)).ToArray();
 
         var entity = Activator.CreateInstance<TAffectedTranscript>();

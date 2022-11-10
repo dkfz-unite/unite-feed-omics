@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using System.Linq.Expressions;
+using Unite.Data.Entities.Genome;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Data.Models;
 
@@ -19,24 +20,33 @@ public class TranscriptRepository
     }
 
 
-    public Transcript FindOrCreate(TranscriptModel model)
+    public Transcript FindOrCreate(
+        TranscriptModel model,
+        IEnumerable<Transcript> transcriptsCache = null,
+        IEnumerable<Gene> genesCache = null,
+        IEnumerable<Protein> proteinsCache = null)
     {
-        return Find(model) ?? Create(model);
+        return Find(model, transcriptsCache) ?? Create(model, genesCache, proteinsCache);
     }
 
-    public Transcript Find(TranscriptModel model)
+    public Transcript Find(
+        TranscriptModel model,
+        IEnumerable<Transcript> cache = null)
     {
-        var entity = _dbContext.Set<Transcript>()
-            .FirstOrDefault(entity =>
-                entity.Info.EnsemblId == model.EnsemblId
-            );
+        Expression<Func<Transcript, bool>> predicate = (entity) =>
+            entity.Info.EnsemblId == model.EnsemblId;
+
+        var entity = cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<Transcript>().FirstOrDefault(predicate);
 
         return entity;
     }
 
-    public Transcript Create(TranscriptModel model)
+    public Transcript Create(
+        TranscriptModel model,
+        IEnumerable<Gene> genesCache = null,
+        IEnumerable<Protein> proteinsCache = null)
     {
-        var entity = Convert(model);
+        var entity = Convert(model, genesCache, proteinsCache);
 
         _dbContext.Add(entity);
         _dbContext.SaveChanges();
@@ -44,7 +54,10 @@ public class TranscriptRepository
         return entity;
     }
 
-    public IEnumerable<Transcript> CreateMissing(IEnumerable<TranscriptModel> models)
+    public IEnumerable<Transcript> CreateMissing(
+        IEnumerable<TranscriptModel> models,
+        IEnumerable<Gene> genesCache = null,
+        IEnumerable<Protein> proteinsCache = null)
     {
         var entitiesToAdd = new List<Transcript>();
 
@@ -54,7 +67,7 @@ public class TranscriptRepository
 
             if (entity == null)
             {
-                entity = Convert(model);
+                entity = Convert(model, genesCache, proteinsCache);
 
                 entitiesToAdd.Add(entity);
             }
@@ -70,7 +83,10 @@ public class TranscriptRepository
     }
 
 
-    private Transcript Convert(TranscriptModel model)
+    private Transcript Convert(
+        TranscriptModel model,
+        IEnumerable<Gene> genesCache = null,
+        IEnumerable<Protein> proteinsCache = null)
     {
         var entity = new Transcript
         {
@@ -89,12 +105,12 @@ public class TranscriptRepository
 
         if (model.Gene != null)
         {
-            entity.GeneId = _geneRepository.FindOrCreate(model.Gene).Id;
+            entity.GeneId = _geneRepository.FindOrCreate(model.Gene, genesCache).Id;
         }
 
         if (model.Protein != null)
         {
-            entity.ProteinId = _proteinRepository.FindOrCreate(model.Protein).Id;
+            entity.ProteinId = _proteinRepository.FindOrCreate(model.Protein, proteinsCache).Id;
         }
 
         return entity;

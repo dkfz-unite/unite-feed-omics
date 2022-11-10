@@ -44,6 +44,12 @@ internal class AnnotationsDataLoader
                 AffectedTranscripts = group
                     .Where(annotation => annotation.AffectedTranscripts != null)
                     .SelectMany(annotation => annotation.AffectedTranscripts)
+                    .GroupBy(affectedFeature => affectedFeature.GeneId)
+                    .SelectMany(allFeatures =>
+                    {
+                        var canonicalFeatures = allFeatures.Where(feature => feature.Canonical == 1);
+                        return canonicalFeatures.Any() ? canonicalFeatures : allFeatures;
+                    })
                     .ToArray()
             })
             .ToArray();

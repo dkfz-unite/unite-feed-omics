@@ -6,6 +6,8 @@ namespace Unite.Genome.Annotations.Clients.Ensembl;
 
 public class EnsemblApiClient
 {
+    private const int _bucketSize = 200;
+
     private const string _lookupOneUrl = @"/lookup/id/{0}";
     private const string _lookupManyUrl = @"/lookup/id";
     private const string _xrefsOneUrl = @"/xrefs/id/{0}";
@@ -62,11 +64,32 @@ public class EnsemblApiClient
 
         var acceptJson = (name: "Accept", value: "application/json");
 
-        var body = new LookupRequestData(ensemblIds);
+        var queue = new Queue<string>(ensemblIds);
 
-        var resources = await httpClient.PostAsync<Dictionary<string, T>, LookupRequestData>(url, body, acceptJson);
+        var results = new List<T>();
 
-        return resources.Select(resource => resource.Value).ToArray();
+        while (queue.Any())
+        {
+            var tasks = new List<Task<Dictionary<string, T>>>();
+
+            for (var i = 0; i < 5 && queue.Any(); i++)
+            {
+                var chunk = queue.Dequeue(_bucketSize);
+                var body = new LookupRequestData(chunk);
+                var task = httpClient.PostAsync<Dictionary<string, T>, LookupRequestData>(url, body, acceptJson);
+
+                tasks.Add(task);
+            }
+
+            var responses = await Task.WhenAll(tasks);
+
+            foreach (var response in responses)
+            {
+                results.AddRange(response.Select(resource => resource.Value));
+            }
+        }
+
+        return results.ToArray();
     }
 
     /// <summary>
@@ -92,5 +115,16 @@ public class EnsemblApiClient
         var resource = await httpClient.GetAsync<ReferenceResource[]>(url, acceptJson);
 
         return resource;
+    }
+}
+
+internal static class IEnumerableEstensions
+{
+    public static IEnumerable<T> Dequeue<T>(this Queue<T> queue, int chunkSize)
+    {
+        for (int i = 0; i < chunkSize && queue.Count > 0; i++)
+        {
+            yield return queue.Dequeue();
+        }
     }
 }

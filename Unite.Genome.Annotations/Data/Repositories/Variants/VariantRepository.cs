@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome.Variants;
+﻿using System.Linq.Expressions;
+using Unite.Data.Entities.Genome.Variants;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Data.Models.Variants;
 
@@ -15,13 +16,24 @@ internal class VariantRepository<TVariant> where TVariant : Variant
     }
 
 
-    public TVariant Find(VariantModel model)
+    public TVariant Find(VariantModel model, IEnumerable<TVariant> cache = null)
     {
-        var entity = _dbContext.Set<TVariant>()
-            .FirstOrDefault(entity =>
-                entity.Id == model.Id
-            );
+        Expression<Func<TVariant, bool>> predicate = (entity) =>
+            entity.Id == model.Id;
+
+        var entity = cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<TVariant>().FirstOrDefault(predicate);
 
         return entity;
+    }
+
+    public TVariant[] Find(IEnumerable<VariantModel> models)
+    {
+        var variantIds = models.Select(model => model.Id);
+
+        var entities = _dbContext.Set<TVariant>()
+            .Where(entity => variantIds.Contains(entity.Id))
+            .ToArray();
+
+        return entities;
     }
 }
