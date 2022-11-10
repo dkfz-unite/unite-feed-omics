@@ -49,7 +49,9 @@ public class GenesIndexingHandler
 
             stopwatch.Restart();
 
-            var indices = tasks.Select(task =>
+            var grouped = tasks.DistinctBy(task => task.Target);
+
+            var indices = grouped.Select(task =>
             {
                 var id = int.Parse(task.Target);
 
