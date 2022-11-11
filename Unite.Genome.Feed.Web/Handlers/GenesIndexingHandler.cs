@@ -43,6 +43,13 @@ public class GenesIndexingHandler
     {
         var stopwatch = new Stopwatch();
 
+        var shouldWait = _taskProcessingService.HasAnnotationTasks();
+
+        if (shouldWait)
+        {
+            return;
+        }
+
         _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} genes");

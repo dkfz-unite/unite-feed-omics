@@ -42,13 +42,22 @@ public class StructuralVariantsIndexingHandler
     {
         var stopwatch = new Stopwatch();
 
+        var shouldWait = _taskProcessingService.HasAnnotationTasks();
+
+        if (shouldWait)
+        {
+            return;
+        }
+
         _taskProcessingService.Process(IndexingTaskType.SV, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} structural variants");
 
             stopwatch.Restart();
 
-            var indices = tasks.Select(task =>
+            var grouped = tasks.DistinctBy(task => task.Target);
+
+            var indices = grouped.Select(task =>
             {
                 var id = long.Parse(task.Target);
 

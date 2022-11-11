@@ -40,13 +40,22 @@ public class MutationsIndexingHandler
     {
         var stopwatch = new Stopwatch();
 
+        var shouldWait = _taskProcessingService.HasAnnotationTasks();
+
+        if (shouldWait)
+        {
+            return;
+        }
+
         _taskProcessingService.Process(IndexingTaskType.SSM, bucketSize, (tasks) =>
         {
             _logger.LogInformation($"Indexing {tasks.Length} mutations");
 
             stopwatch.Restart();
 
-            var indices = tasks.Select(task =>
+            var grouped = tasks.DistinctBy(task => task.Target);
+
+            var indices = grouped.Select(task =>
             {
                 var id = long.Parse(task.Target);
 
