@@ -10,7 +10,7 @@ public class SequencingDataModelConverter : SequencingDataModelConverterBase<Var
 
     public SequencingDataModelConverter() : base()
     {
-        _variantsModelMapper = new Mappers.VariantModelMapper();
+        _variantsModelMapper = new VariantModelMapper();
     }
 
 
@@ -20,7 +20,7 @@ public class SequencingDataModelConverter : SequencingDataModelConverterBase<Var
         {
             var variantModel = new Data.Models.Variants.CNV.VariantModel();
 
-            _variantsModelMapper.Map(variant, variantModel, source.Ploidy ?? 2);
+            _variantsModelMapper.Map(variant, variantModel, source.Ploidy);
 
             return variantModel;
 

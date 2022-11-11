@@ -1,7 +1,6 @@
 ﻿using Unite.Genome.Feed.Web.Models.Base.Mappers;
 
 using DataModels = Unite.Genome.Feed.Data.Models;
-using WebModels = Unite.Genome.Feed.Web.Models;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.Base.Converters;
 
@@ -18,7 +17,7 @@ public abstract class SequencingDataModelConverterBase<TModel> where TModel : cl
     }
 
 
-    public virtual DataModels.AnalysisModel Convert(WebModels.Variants.SequencingDataModel<TModel> source)
+    public virtual DataModels.AnalysisModel Convert(SequencingDataModel<TModel> source)
     {
         var target = new DataModels.AnalysisModel();
 
@@ -67,5 +66,5 @@ public abstract class SequencingDataModelConverterBase<TModel> where TModel : cl
     /// Maps required variants data to analysed sample model
     /// </summary>
     /// <param name="analysedSampleModel"></param>
-    protected abstract void MapVariants(WebModels.Variants.AnalysedSampleModel<TModel> source, DataModels.AnalysedSampleModel target);
+    protected abstract void MapVariants(AnalysedSampleModel<TModel> source, DataModels.AnalysedSampleModel target);
 }

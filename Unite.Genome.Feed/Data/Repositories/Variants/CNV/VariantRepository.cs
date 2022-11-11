@@ -47,6 +47,7 @@ internal class VariantRepository : VariantRepository<Variant, VariantModel>
         entity.C1 = model.C1;
         entity.C2 = model.C2;
         entity.Tcn = model.Tcn;
+        entity.TcnRatio = model.TcnRatio;
         entity.DhMax = model.DhMax;
     }
 }

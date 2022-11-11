@@ -68,5 +68,6 @@ internal abstract class VariantRepository<TEntity, TModel>
         entity.ChromosomeId = model.Chromosome;
         entity.Start = model.Start;
         entity.End = model.End;
+        entity.Length = model.Length;
     }
 }

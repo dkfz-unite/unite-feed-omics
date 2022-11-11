@@ -10,8 +10,8 @@ public class VariantModelMapper
         target.Chromosome = source.Chromosome.Value;
         target.Start = PositionParser.Parse(source.Position).Start;
         target.End = PositionParser.Parse(source.Position).End;
+        target.Length = target.End - target.Start;
         target.ReferenceBase = source.Ref;
         target.AlternateBase = source.Alt;
-
     }
 }
