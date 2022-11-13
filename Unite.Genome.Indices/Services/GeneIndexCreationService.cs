@@ -321,7 +321,18 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var variants = _dbContext.Set<SSM.Variant>()
-            .IncludeAffectedTranscripts()
+            //.IncludeAffectedTranscripts()
+            .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+                .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+                    .ThenInclude(transcript => transcript.Info)
+            //.Include(variant => variant.AffectedTranscripts)
+            //    .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+            //        .ThenInclude(transcript => transcript.Gene)
+            //            .ThenInclude(gene => gene.Info)
+            .Include(variant => variant.AffectedTranscripts)
+                .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+                    .ThenInclude(transcript => transcript.Protein)
+                        .ThenInclude(protein => protein.Info)
             .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
 
@@ -345,7 +356,18 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var variants = _dbContext.Set<CNV.Variant>()
-            .IncludeAffectedTranscripts()
+            //.IncludeAffectedTranscripts()
+            .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+                .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+                    .ThenInclude(transcript => transcript.Info)
+            //.Include(variant => variant.AffectedTranscripts)
+            //    .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+            //        .ThenInclude(transcript => transcript.Gene)
+            //            .ThenInclude(gene => gene.Info)
+            .Include(variant => variant.AffectedTranscripts)
+                .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+                    .ThenInclude(transcript => transcript.Protein)
+                        .ThenInclude(protein => protein.Info)
             .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
 
@@ -369,7 +391,18 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var variants = _dbContext.Set<SV.Variant>()
-            .IncludeAffectedTranscripts()
+            //.IncludeAffectedTranscripts()
+            .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+                .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+                    .ThenInclude(transcript => transcript.Info)
+            //.Include(variant => variant.AffectedTranscripts)
+            //    .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+            //        .ThenInclude(transcript => transcript.Gene)
+            //            .ThenInclude(gene => gene.Info)
+            .Include(variant => variant.AffectedTranscripts)
+                .ThenInclude(affectedTranscript => affectedTranscript.Feature)
+                    .ThenInclude(transcript => transcript.Protein)
+                        .ThenInclude(protein => protein.Info)
             .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
 
