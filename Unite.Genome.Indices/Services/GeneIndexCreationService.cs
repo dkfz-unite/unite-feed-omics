@@ -281,7 +281,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         var index = new VariantIndex();
 
-        _variantIndexMapper.Map(variant, index, false);
+        _variantIndexMapper.Map(variant, index);
 
         return index;
     }
@@ -290,7 +290,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         var index = new VariantIndex();
 
-        _variantIndexMapper.Map(variant, index, false);
+        _variantIndexMapper.Map(variant, index);
 
         return index;
     }
@@ -299,7 +299,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         var index = new VariantIndex();
 
-        _variantIndexMapper.Map(variant, index, false);
+        _variantIndexMapper.Map(variant, index);
 
         return index;
     }
