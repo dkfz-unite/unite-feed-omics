@@ -107,11 +107,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         index.Donor = CreateDonorIndex(specimen.Id, out var donor);
 
-        index.Images = CreateImageIndices(specimen.Id, donor?.ClinicalData.DiagnosisDate);
+        index.Images = CreateImageIndices(specimen.Id, donor?.ClinicalData?.DiagnosisDate);
 
         index.Variants = CreateVariantIndices(specimen.Id, geneId);
 
-        _specimenIndexMapper.Map(specimen, index, donor?.ClinicalData.DiagnosisDate);
+        _specimenIndexMapper.Map(specimen, index, donor?.ClinicalData?.DiagnosisDate);
 
         return index;
     }
