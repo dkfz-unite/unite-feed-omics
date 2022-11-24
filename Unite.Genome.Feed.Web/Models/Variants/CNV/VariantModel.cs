@@ -91,29 +91,6 @@ public class VariantModel
     public double? DhMax { get => _dhMax; set => _dhMax = value; }
 
 
-    public VariantModel()
-    {
-
-    }
-
-    public VariantModel(VariantAceSeqModel aceSeqModel)
-    {
-        Chromosome = aceSeqModel.Chromosome;
-        Start = aceSeqModel.Start;
-        End = aceSeqModel.End;
-        SvType = aceSeqModel.GetSvType();
-        CnaType = aceSeqModel.GetCnaType();
-        Loh = aceSeqModel.GetLoh();
-        HomoDel = aceSeqModel.GetHomoDel();
-        C1Mean = aceSeqModel.C1Mean;
-        C2Mean = aceSeqModel.C2Mean;
-        TcnMean = aceSeqModel.TcnMean;
-        C1 = aceSeqModel.GetC1();
-        C2 = aceSeqModel.GetC2();
-        Tcn = aceSeqModel.GetTcn();
-        DhMax = aceSeqModel.DhMax;
-    }
-
 
     private static bool? GetHomoDel(int? c1, int? c2)
     {

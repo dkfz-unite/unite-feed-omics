@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Globalization;
+using System.Text.Json.Serialization;
 using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Entities.Genome.Variants.CNV.Enums;
 
@@ -11,13 +12,13 @@ public class VariantAceSeqModel
     private int? _end;
     private string _svType;
     private string _cnaType;
-    private double? _c1Mean;
-    private double? _c2Mean;
-    private double? _tcnMean;
+    private string _c1Mean;
+    private string _c2Mean;
+    private string _tcnMean;
     private string _c1;
     private string _c2;
     private string _tcn;
-    private double? _dhMax;
+    private string _dhMax;
 
     /// <summary>
     /// Chromosome
@@ -53,19 +54,19 @@ public class VariantAceSeqModel
     /// Mean number of copies in minor allele
     /// </summary>
     [JsonPropertyName("c1Mean")]
-    public double? C1Mean { get => _c1Mean; set => _c1Mean = value; }
+    public string C1Mean { get => _c1Mean; set => _c1Mean = value; }
 
     /// <summary>
     /// Mean number of copies in major allele
     /// </summary>
     [JsonPropertyName("c2Mean")]
-    public double? C2Mean { get => _c2Mean; set => _c2Mean = value; }
+    public string C2Mean { get => _c2Mean; set => _c2Mean = value; }
 
     /// <summary>
     /// Mean total number of copies (C1Mean + C2Mean)
     /// </summary>
     [JsonPropertyName("tcnMean")]
-    public double? TcnMean { get => _tcnMean; set => _tcnMean = value; }
+    public string TcnMean { get => _tcnMean; set => _tcnMean = value; }
 
     /// <summary>
     /// Rounded number of copies in minor allele (-1 for subclonal values if values is 0.3+ far from closest integer)
@@ -89,17 +90,24 @@ public class VariantAceSeqModel
     /// Estimated maximum decrease of heterozygosity
     /// </summary>
     [JsonPropertyName("dhMax")]
-    public double? DhMax { get => _dhMax; set => _dhMax = value; }
+    public string DhMax { get => _dhMax; set => _dhMax = value; }
+
 
 
     public SvType? GetSvType()
     {
-        return Enum.TryParse<SvType>(SvType, out var value) ? value : null;
+        var svTypeString = GetString(SvType);
+
+        var valueString = svTypeString;
+
+        return Enum.TryParse<SvType>(valueString, out var value) ? value : null;
     }
 
     public CnaType? GetCnaType()
     {
-        var valueString = CnaType?
+        var cnvTypeString = GetString(CnaType);
+
+        var valueString = cnvTypeString?
             .Split(";", StringSplitOptions.RemoveEmptyEntries)?
             .Select(value => value.Trim())?
             .FirstOrDefault();
@@ -109,32 +117,69 @@ public class VariantAceSeqModel
 
     public bool? GetLoh()
     {
-        return CnaType?.Contains("LOH") == true ? true : false;
+        var cnvTypeString = GetString(CnaType);
+
+        return cnvTypeString?.Contains("LOH") == true ? true : false;
     }
 
     public bool? GetHomoDel()
     {
-        return CnaType?.Contains("HomoDel") == true ? true : false;
+        var cnvTypeString = GetString(CnaType);
+
+        return cnvTypeString?.Contains("HomoDel") == true ? true : false;
+    }
+
+    public double? GetC1Mean()
+    {
+        return GetDouble(C1Mean);
+    }
+
+    public double? GetC2Mean()
+    {
+        return GetDouble(C2Mean);
+    }
+
+    public double? GetTcnMean()
+    {
+        return GetDouble(TcnMean);
+    }
+
+    public double? GetDhMax()
+    {
+        return GetDouble(DhMax);
     }
 
     public int? GetC1()
     {
-        return string.Equals(C1, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
-             : int.TryParse(C1, out var value) ? value
-             : null;
+        return GetInteger(C1);
     }
 
     public int? GetC2()
     {
-        return string.Equals(C2, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
-             : int.TryParse(C2, out var value) ? value
-             : null;
+        return GetInteger(C2);
     }
 
     public int? GetTcn()
     {
-        return string.Equals(Tcn, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
-             : int.TryParse(Tcn, out var value) ? value
-             : null;
+        return GetInteger(Tcn);
+    }
+
+
+    private static string GetString(string value)
+    {
+        return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null : value;
+    }
+
+    private static double? GetDouble(string value)
+    {
+        return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null
+            : double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number : null;
+    }
+
+    private static int? GetInteger(string value)
+    {
+        return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null
+             : string.Equals(value, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
+             : int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number : null;
     }
 }

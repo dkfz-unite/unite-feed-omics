@@ -26,38 +26,39 @@ public class VariantAceSeqModelValidator : AbstractValidator<VariantAceSeqModel>
             .NotEmpty()
             .WithMessage("Should not be empty");
 
-        RuleFor(model => model.C1Mean)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(value => value > 0).WithMessage("Should be greater than 0");
+        RuleFor(model => model.GetC1Mean())
+            .Must(value => value >= 0)
+            .When(model => model.GetC1Mean().HasValue)
+            .WithMessage("Should be greater than or equal to 0");
 
-        RuleFor(model => model.C2Mean)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(value => value > 0).WithMessage("Should be greater than 0");
+        RuleFor(model => model.GetC2Mean())
+           .Must(value => value >= 0)
+           .When(model => model.GetC2Mean().HasValue)
+           .WithMessage("Should be greater than or equal to 0");
 
-        RuleFor(model => model.TcnMean)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(value => value > 0).WithMessage("Should be greater than 0");
+        RuleFor(model => model.GetTcnMean())
+           .Must(value => value >= 0)
+           .When(model => model.GetTcnMean().HasValue)
+           .WithMessage("Should be greater than or equal to 0");
 
-        RuleFor(model => model.C1)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(IsIntegerOrSub).WithMessage("Should be greater than or equal to 0 or 'sub'");
+        RuleFor(model => model.GetC1())
+            .Must(value => value >= -1)
+            .When(model => model.GetC1().HasValue)
+            .WithMessage("Should be greater than or equal to 0 or 'sub'");
 
-        RuleFor(model => model.C2)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(IsIntegerOrSub).WithMessage("Should be greater than or equal to 0 or 'sub'");
+        RuleFor(model => model.GetC2())
+            .Must(value => value >= -1)
+            .When(model => model.GetC2().HasValue)
+            .WithMessage("Should be greater than or equal to 0 or 'sub'");
 
-        RuleFor(model => model.Tcn)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(IsIntegerOrSub).WithMessage("Should be greater than or equal to 0 or 'sub'");
+        RuleFor(model => model.GetTcn())
+            .Must(value => value >= -1)
+            .When(model => model.GetTcn().HasValue)
+            .WithMessage("Should be greater than or equal to 0 or 'sub'");
 
-        RuleFor(model => model.DhMax)
-            .NotEmpty().WithMessage("Should not be empty")
-            .Must(value => value > 0).WithMessage("Should be greater than 0");
-    }
-
-
-    private static bool IsIntegerOrSub(string value)
-    {
-        return string.Equals(value, "sub", StringComparison.InvariantCultureIgnoreCase) || int.TryParse(value, out _);
+        RuleFor(model => model.GetDhMax())
+           .Must(value => value >= 0)
+           .When(model => model.GetDhMax().HasValue)
+           .WithMessage("Should be greater than or equal to 0");
     }
 }
