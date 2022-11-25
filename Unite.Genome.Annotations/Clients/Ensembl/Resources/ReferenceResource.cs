@@ -2,7 +2,7 @@
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
-public class ReferenceResource
+public record ReferenceResource
 {
     [JsonPropertyName("primary_id")]
     public string Id { get; set; }

@@ -30,7 +30,7 @@ public class MutationsAnnotationService
         _variantRepository = new VariantRepository<Variant>(dbContext);
         _affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext);
         _dataWriter = new ConsequencesDataWriter<Variant, AffectedTranscript>(dbContext, _variantRepository, _affectedTranscriptRepository);
-        _dataLoader = new AnnotationsDataLoader(ensemblOptions, ensemblVepOptions);
+        _dataLoader = new AnnotationsDataLoader(ensemblOptions, ensemblVepOptions, dbContext);
     }
 
 

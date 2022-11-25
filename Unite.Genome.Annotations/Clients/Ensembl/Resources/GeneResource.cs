@@ -3,7 +3,7 @@ using Unite.Data.Entities.Genome.Enums;
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
-public class GeneResource : LookupResource
+public record GeneResource : LookupResource
 {
     [JsonPropertyName("display_name")]
     public string Symbol { get; set; }

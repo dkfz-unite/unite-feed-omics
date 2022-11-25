@@ -1,9 +1,12 @@
 ﻿using System.Text.Json.Serialization;
+using Unite.Data.Entities.Genome.Variants;
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
 
-internal class AffectedTranscriptResource
+internal record AffectedTranscriptResource
 {
+    private string[] _consequences;
+
     [JsonPropertyName("gene_id")]
     public string GeneId { get; set; }
 
@@ -49,5 +52,16 @@ internal class AffectedTranscriptResource
 
 
     [JsonPropertyName("consequence_terms")]
-    public string[] Consequences { get; set; }
+    public string[] Consequences
+    {
+        get => GetConsequences(_consequences);
+        set => _consequences = value;
+    }
+
+
+    private static string[] GetConsequences(string[] values)
+    {
+        var filtered = values?.Where(value => value != "intergenic_variant");
+        return filtered?.Any() == true ? filtered.ToArray() : null;
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
-public class ProteinResource : LookupResource
+public record ProteinResource : LookupResource
 {
     [JsonPropertyName("start")]
     public int Start { get; set; }

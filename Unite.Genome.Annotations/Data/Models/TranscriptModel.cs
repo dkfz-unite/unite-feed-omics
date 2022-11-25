@@ -12,6 +12,7 @@ public class TranscriptModel
     public int Start { get; set; }
     public int End { get; set; }
     public bool Strand { get; set; }
+    public bool IsAnnotated { get; set; }
 
     public GeneModel Gene { get; set; }
     public ProteinModel Protein { get; set; }

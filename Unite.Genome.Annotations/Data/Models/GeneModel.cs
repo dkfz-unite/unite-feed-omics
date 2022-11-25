@@ -12,4 +12,5 @@ public class GeneModel
     public int Start { get; set; }
     public int End { get; set; }
     public bool Strand { get; set; }
+    public bool IsAnnotated { get; set; }
 }

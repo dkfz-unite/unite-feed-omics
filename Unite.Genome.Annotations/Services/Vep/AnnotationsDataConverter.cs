@@ -101,6 +101,7 @@ internal class AnnotationsDataConverter
         model.Start = resource.Start;
         model.End = resource.End;
         model.Strand = resource.Strand == 1;
+        model.IsAnnotated = true;
     }
 
     private static void Map(TranscriptResource resource, TranscriptModel model)
@@ -112,6 +113,7 @@ internal class AnnotationsDataConverter
         model.Start = resource.Start;
         model.End = resource.End;
         model.Strand = resource.Strand == 1;
+        model.IsAnnotated = true;
 
         if (resource.Protein != null)
         {
@@ -127,5 +129,6 @@ internal class AnnotationsDataConverter
         model.Start = resource.Start;
         model.End = resource.End;
         model.Length = resource.Length;
+        model.IsAnnotated = true;
     }
 }

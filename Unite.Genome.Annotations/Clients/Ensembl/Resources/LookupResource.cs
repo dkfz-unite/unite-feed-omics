@@ -2,7 +2,7 @@
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
-public abstract class LookupResource
+public abstract record LookupResource
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }
