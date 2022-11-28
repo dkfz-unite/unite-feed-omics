@@ -1,4 +1,5 @@
 ﻿using Unite.Data.Entities.Genome;
+using Unite.Data.Entities.Images.Features;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -43,7 +44,7 @@ internal class AnnotationsDataLoader
     {
         var annotations = await _ensemblVepApiClient.LoadAnnotations(vepCodes);
 
-        return Filter(annotations).ToArray();
+        return Filter(annotations)?.ToArray();
     }
 
     private async Task<GeneResource[]> AnnotateGenes(AnnotatedVariantResource[] variants)
@@ -101,17 +102,27 @@ internal class AnnotationsDataLoader
 
     private static IEnumerable<AnnotatedVariantResource> Filter(IEnumerable<AnnotatedVariantResource> variants)
     {
+        if (variants == null)
+        {
+            yield break;
+        }
+
         foreach (var variant in variants)
         {
             yield return variant with
             {
-                AffectedTranscripts = Filter(variant.AffectedTranscripts).ToArray()
+                AffectedTranscripts = Filter(variant.AffectedTranscripts)?.ToArray()
             };
         }
     }
 
     private static IEnumerable<AffectedTranscriptResource> Filter(IEnumerable<AffectedTranscriptResource> features)
     {
+        if (features == null)
+        {
+            yield break;
+        }
+
         var collectionHasCanonicalFeature = features.Any(feature => feature.Canonical == 1);
 
         foreach (var feature in features)
