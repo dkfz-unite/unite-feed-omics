@@ -43,25 +43,7 @@ internal class AnnotationsDataLoader
     {
         var annotations = await _ensemblVepApiClient.LoadAnnotations(vepCodes);
 
-        //var variants = annotations
-        //    .GroupBy(annotation => annotation.VariantId)
-        //    .Select(group => new AnnotatedVariantResource()
-        //    {
-        //        Id = group.Key.ToString(),
-        //        AffectedTranscripts = group
-        //            .Where(annotation => annotation.AffectedTranscripts != null)
-        //            .SelectMany(annotation => annotation.AffectedTranscripts)
-        //            .GroupBy(affectedFeature => affectedFeature.GeneId)
-        //            .SelectMany(allFeatures =>
-        //            {
-        //                var canonicalFeatures = allFeatures.Where(feature => feature.Canonical == 1);
-        //                return canonicalFeatures.Any() ? canonicalFeatures : allFeatures;
-        //            })
-        //            .ToArray()
-        //    })
-        //    .ToArray();
-
-        return annotations;
+        return Filter(annotations).ToArray();
     }
 
     private async Task<GeneResource[]> AnnotateGenes(AnnotatedVariantResource[] variants)
@@ -114,5 +96,78 @@ internal class AnnotationsDataLoader
         var newResources = await _ensemblApiClient.Lookup<TranscriptResource>(newIdentifiers, expand: true);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
+    }
+
+
+    private static IEnumerable<AnnotatedVariantResource> Filter(IEnumerable<AnnotatedVariantResource> variants)
+    {
+        foreach (var variant in variants)
+        {
+            yield return variant with
+            {
+                AffectedTranscripts = Filter(variant.AffectedTranscripts).ToArray()
+            };
+        }
+    }
+
+    private static IEnumerable<AffectedTranscriptResource> Filter(IEnumerable<AffectedTranscriptResource> features)
+    {
+        var collectionHasCanonicalFeature = features.Any(feature => feature.Canonical == 1);
+
+        foreach (var feature in features)
+        {
+            if (feature.OverlapPercentage == null && feature.Distance == null)
+            {
+                // SSM - return feature
+                yield return feature;
+            }
+            else if (feature.OverlapPercentage != null && feature.Distance == null)
+            {
+                // CNV or SV
+                if (feature.OverlapPercentage != 100)
+                {
+                    // Overlapped partly - return feature
+                    yield return feature;
+                }
+                else
+                {
+                    // Overlapped fully
+                    if (feature.IsIntergenic)
+                    {
+                        // Intergenic - ignore
+                        continue;
+                    }
+                    else if (collectionHasCanonicalFeature)
+                    {
+                        // Return only canonical feature
+                        if (feature.IsCanonical)
+                        {
+                            yield return feature;
+                        }
+                    }
+                    else
+                    {
+                        // Return all features
+                        yield return feature;
+                    }
+                }
+            }
+            else if (feature.OverlapPercentage == null && feature.Distance != null)
+            {
+                if (collectionHasCanonicalFeature)
+                {
+                    // Return only canonical feature
+                    if (feature.IsCanonical)
+                    {
+                        yield return feature;
+                    }
+                }
+                else
+                {
+                    // Return all features
+                    yield return feature;
+                }
+            }
+        }
     }
 }

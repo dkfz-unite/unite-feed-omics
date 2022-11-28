@@ -5,8 +5,6 @@ namespace Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
 
 internal record AffectedTranscriptResource
 {
-    private string[] _consequences;
-
     [JsonPropertyName("gene_id")]
     public string GeneId { get; set; }
 
@@ -50,18 +48,19 @@ internal record AffectedTranscriptResource
     [JsonPropertyName("distance")]
     public int? Distance { get; set; }
 
-
     [JsonPropertyName("consequence_terms")]
-    public string[] Consequences
+    public string[] Consequences { get; set; }
+
+
+    public bool IsCanonical
     {
-        get => GetConsequences(_consequences);
-        set => _consequences = value;
+        get => Canonical == 1;
     }
 
-
-    private static string[] GetConsequences(string[] values)
+    public bool IsIntergenic
     {
-        var filtered = values?.Where(value => value != "intergenic_variant");
-        return filtered?.Any() == true ? filtered.ToArray() : null;
+        get => OverlapPercentage == 100
+            && Consequences.Length == 1
+            && Consequences.Contains("intergenic_variant");
     }
 }
