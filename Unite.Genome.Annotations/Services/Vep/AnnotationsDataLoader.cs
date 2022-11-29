@@ -1,5 +1,4 @@
 ﻿using Unite.Data.Entities.Genome;
-using Unite.Data.Entities.Images.Features;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -123,32 +122,53 @@ internal class AnnotationsDataLoader
             yield break;
         }
 
-        var collectionHasCanonicalFeature = features.Any(feature => feature.Canonical == 1);
+        var groups = features.GroupBy(feature => feature.GeneId);
 
-        foreach (var feature in features)
+        foreach (var group in groups)
         {
-            if (feature.OverlapPercentage == null && feature.Distance == null)
+            var groupHasCanonicalFeature = group.Any(feature => feature.Canonical == 1);
+
+            foreach (var feature in features)
             {
-                // SSM - return feature
-                yield return feature;
-            }
-            else if (feature.OverlapPercentage != null && feature.Distance == null)
-            {
-                // CNV or SV
-                if (feature.OverlapPercentage != 100)
+                if (feature.OverlapPercentage == null && feature.Distance == null)
                 {
-                    // Overlapped partly - return feature
+                    // SSM - return feature
                     yield return feature;
                 }
-                else
+                else if (feature.OverlapPercentage != null && feature.Distance == null)
                 {
-                    // Overlapped fully
-                    if (feature.IsIntergenic)
+                    // CNV or SV
+                    if (feature.OverlapPercentage != 100)
                     {
-                        // Intergenic - ignore
-                        continue;
+                        // Overlapped partly - return feature
+                        yield return feature;
                     }
-                    else if (collectionHasCanonicalFeature)
+                    else
+                    {
+                        // Overlapped fully
+                        if (feature.IsIntergenic)
+                        {
+                            // Intergenic - ignore
+                            continue;
+                        }
+                        else if (groupHasCanonicalFeature)
+                        {
+                            // Return only canonical feature
+                            if (feature.IsCanonical)
+                            {
+                                yield return feature;
+                            }
+                        }
+                        else
+                        {
+                            // Return all features
+                            yield return feature;
+                        }
+                    }
+                }
+                else if (feature.OverlapPercentage == null && feature.Distance != null)
+                {
+                    if (groupHasCanonicalFeature)
                     {
                         // Return only canonical feature
                         if (feature.IsCanonical)
@@ -161,22 +181,6 @@ internal class AnnotationsDataLoader
                         // Return all features
                         yield return feature;
                     }
-                }
-            }
-            else if (feature.OverlapPercentage == null && feature.Distance != null)
-            {
-                if (collectionHasCanonicalFeature)
-                {
-                    // Return only canonical feature
-                    if (feature.IsCanonical)
-                    {
-                        yield return feature;
-                    }
-                }
-                else
-                {
-                    // Return all features
-                    yield return feature;
                 }
             }
         }
