@@ -72,7 +72,7 @@ internal class AnnotationsDataConverter
 
     private static void Map(AnnotatedVariantResource resource, VariantModel model)
     {
-        model.Id = long.Parse(resource.Id);
+        model.Id = resource.VariantId;
     }
 
     private static void Map(AffectedTranscriptResource resource, AffectedTranscriptModel model)

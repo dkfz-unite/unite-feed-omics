@@ -65,7 +65,7 @@ public class StructuralVariantsAnnotationService
         var start2 = variant.OtherStart;
         var end2 = variant.OtherEnd;
 
-        if (variant.TypeId == SvType.ITX && variant.TypeId == SvType.CTX)
+        if (variant.TypeId == SvType.ITX || variant.TypeId == SvType.CTX)
         {
             var mate1s = $"{variant.Id}.1S";
             var mate1e = $"{variant.Id}.1E";

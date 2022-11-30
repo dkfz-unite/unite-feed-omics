@@ -106,11 +106,25 @@ internal class AnnotationsDataLoader
             yield break;
         }
 
-        foreach (var variant in variants)
+        var groups = variants.GroupBy(variant => variant.VariantId);
+
+        foreach (var group in groups)
         {
-            yield return variant with
+            var id = group.First().VariantId.ToString();
+
+            var input = string.Join(Environment.NewLine, group.Select(variant => variant.Input));
+
+            var affectedTranscripts = group
+                .Where(variant => variant.AffectedTranscripts != null)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .DistinctBy(affectedTranscript => affectedTranscript.TranscriptId)
+                .ToArray();
+
+            yield return group.First() with
             {
-                AffectedTranscripts = Filter(variant.AffectedTranscripts)?.ToArray()
+                Id = id,
+                Input = input,
+                AffectedTranscripts = Filter(affectedTranscripts).ToArray()
             };
         }
     }
@@ -128,45 +142,9 @@ internal class AnnotationsDataLoader
         {
             var groupHasCanonicalFeature = group.Any(feature => feature.Canonical == 1);
 
-            foreach (var feature in features)
+            foreach (var feature in group)
             {
-                if (feature.OverlapPercentage == null && feature.Distance == null)
-                {
-                    // SSM - return feature
-                    yield return feature;
-                }
-                else if (feature.OverlapPercentage != null && feature.Distance == null)
-                {
-                    // CNV or SV
-                    if (feature.OverlapPercentage != 100)
-                    {
-                        // Overlapped partly - return feature
-                        yield return feature;
-                    }
-                    else
-                    {
-                        // Overlapped fully
-                        if (feature.IsIntergenic)
-                        {
-                            // Intergenic - ignore
-                            continue;
-                        }
-                        else if (groupHasCanonicalFeature)
-                        {
-                            // Return only canonical feature
-                            if (feature.IsCanonical)
-                            {
-                                yield return feature;
-                            }
-                        }
-                        else
-                        {
-                            // Return all features
-                            yield return feature;
-                        }
-                    }
-                }
-                else if (feature.OverlapPercentage == null && feature.Distance != null)
+                if (feature.OverlapPercentage == 100 || feature.Distance > 0)
                 {
                     if (groupHasCanonicalFeature)
                     {
@@ -181,6 +159,10 @@ internal class AnnotationsDataLoader
                         // Return all features
                         yield return feature;
                     }
+                }
+                else
+                {
+                    yield return feature;
                 }
             }
         }

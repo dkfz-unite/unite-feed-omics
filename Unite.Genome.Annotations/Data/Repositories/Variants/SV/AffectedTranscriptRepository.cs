@@ -22,6 +22,13 @@ internal class AffectedTranscriptRepository : AffectedTranscriptRepository<Varia
         entity.OverlapPercentage = model.OverlapPercentage;
         entity.Distance = model.Distance;
 
+        entity.CDNAStart = model.CDNAStart;
+        entity.CDNAEnd = model.CDNAEnd;
+        entity.CDSStart = model.CDSStart;
+        entity.CDSEnd = model.CDSEnd;
+        entity.ProteinStart = model.ProteinStart;
+        entity.ProteinEnd = model.ProteinEnd;
+
         return entity;
     }
 }
