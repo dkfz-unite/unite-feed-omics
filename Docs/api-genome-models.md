@@ -53,7 +53,7 @@ Analysed sample data.
 - Limitations: Should match single sample identifier from samples array
 - Example: `"SA14"`
 
-**`Mutations`** - Mutations found in sample during the analysis.
+**`Variants`** - Mutations found in sample during the analysis.
 - Type: _Array_
 - Element type: _Object([Mutation](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome-models.md#mutation))_
 - Limitations: If set, should contain at leas one element
@@ -64,7 +64,7 @@ Mutation data.
 
 **`Chromosome`*** - Chromosome.
 - Type: _String_
-- Possible values: `"1"`, ..., `"23"`, `"X"`, `"Y"`
+- Possible values: `"1"`, ..., `"22"`, `"X"`, `"Y"`
 - Example: `"7"`
 
 **`Position`*** - Position.
@@ -80,7 +80,7 @@ Mutation data.
 - Example (MNV): `"CTAGTTGA"`
 - Example (null): `null` - e.g. in case of insertions
 
-**`Ref`** - Alternate base.
+**`Alt`** - Alternate base.
 - Type: _String_
 - Limitations: Should be set if 'Ref' is empty, can contain only 'A', 'C', 'G' or 'T' characters
 - Example (SNV): `"G"`
