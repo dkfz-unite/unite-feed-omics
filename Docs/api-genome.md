@@ -32,7 +32,7 @@ Request implements **UPSERT** logic:
                 "SpecimenId": "TI2",
                 "SpecimenType": "Tissue",
                 "MatchedSampleId": null,
-                "Mutations": null
+                "Variants": null
             },
             {
                 "Id": "SA5",
@@ -40,7 +40,7 @@ Request implements **UPSERT** logic:
                 "SpecimenId": "TI1",
                 "SpecimenType": "Tissue",
                 "MatchedSampleId": "SA14",
-                "Mutations": [
+                "Variants": [
                     {
                         "Chromosome": "7",
                         "Position": "141365018",
