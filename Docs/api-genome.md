@@ -10,7 +10,7 @@ Health check.
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
-## POST: [api/mutations](http://localhost:5106/api/mutations)
+## POST: [api/ssm](http://localhost:5106/api/ssm)
 
 Submit mutations (SSM) data (including sequencing analysis data).
 
