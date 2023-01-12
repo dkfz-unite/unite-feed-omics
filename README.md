@@ -2,7 +2,7 @@
 
 ## General
 Genome data feed service provides the following functionality:
-- [Genome data feed web API](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome.md) - REST API for uploading sequencing data to the portal (including input data validation).
+- [Genome data feed web API](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api.md) - REST API for uploading sequencing data to the portal (including input data validation).
 - Genes data indexing service - background service responsible for gene-centric data index creation.
 - Mutations data annotation service (_requires internet access_) - background service responsible for annotation of mutations, genes and transcripts.
   - Mutations are annotated with local installation of Ensembl VEP, as they might be treated as personal information.
