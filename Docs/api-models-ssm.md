@@ -1,4 +1,4 @@
-# Genome Data Models
+# Simple Somatic Mutations (SSM) Data Models
 
 ## Sequencing Data
 Includes information about the analysis, samples and sequencing data.
@@ -55,7 +55,7 @@ Analysed sample data.
 
 **`Variants`** - Mutations found in sample during the analysis.
 - Type: _Array_
-- Element type: _Object([Mutation](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome-models.md#mutation))_
+- Element type: _Object([Mutation](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#mutation))_
 - Limitations: If set, should contain at leas one element
 - Example: `[{...}, {...}]`
 
