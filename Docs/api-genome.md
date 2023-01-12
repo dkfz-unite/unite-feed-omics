@@ -74,7 +74,7 @@ Fields description can be found [here](https://github.com/dkfz-unite/unite-genom
 
 ## POST: [api/cnv](http://localhost:5106/api/cnv)
 
-Submit Copy Number Variants (CNV) data (including sequencing analysis data).
+Submit Copy Number Variants (CNV) data (including sequencing analysis data) in default format.
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
@@ -102,26 +102,55 @@ Request implements **UPSERT** logic:
                 "SpecimenId": "TI1",
                 "SpecimenType": "Tissue",
                 "MatchedSampleId": "SA14",
+                "Ploidy": 2,
+                "Purity": null,
                 "Variants": [
                     {
                         "Chromosome": "4",
                         "Start": 164362032,
                         "End": 164458144,
-                        "CnaType": "Gain"
+                        "CnaType": "Gain",
+                        "Loh": false,
+                        "HomoDel": false,
+                        "C1Mean": 1.2465,
+                        "C2Mean": 2.8643,
+                        "TcnMean": 4.1108,
+                        "C1": 1,
+                        "C2": 3,
+                        "Tcn": 4,
+                        "DhMax": null
                     },
                     {
-                        "Chromosome": "4",
-                        "Start": 124098068,
-                        "End": 124191394,
-                        "CnaType": "Gain"
+                        "Chromosome": "5",
+                        "Start": 65498712,
+                        "End": 65608792,
+                        "CnaType": "Loss",
+                        "Loh": true,
+                        "HomoDel": false,
+                        "C1Mean": 1.1265,
+                        "C2Mean": 0.0378,
+                        "TcnMean": 1.1643,
+                        "C1": 1,
+                        "C2": 0,
+                        "Tcn": 1,
+                        "DhMax": null
                     },
                     {
-                        "Chromosome": "14",
-                        "Start": 22803240,
-                        "End": 22833959,
-                        "CnaType": "Gain"
+                        "Chromosome": "6",
+                        "Start": 84236917,
+                        "End": 84337937,
+                        "CnaType": "Loss",
+                        "Loh": false,
+                        "HomoDel": true,
+                        "C1Mean": 0.1247,
+                        "C2Mean": 0.0129,
+                        "TcnMean": 0.1376,
+                        "C1": 0,
+                        "C2": 0,
+                        "Tcn": 0,
+                        "DhMax": null
                     }
-                ]
+]
             }
         ]
     }
