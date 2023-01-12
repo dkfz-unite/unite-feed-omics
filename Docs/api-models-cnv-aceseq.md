@@ -78,14 +78,14 @@ Copy number variant (CNV) data in ACESeq format.
 - Example: `"5"`
 
 **`start`*** - Start position.
-- Type: _Integer_
+- Type: _String_
 - Limitations: Greater than 0
-- Example: `65498712`
+- Example: `"65498712"`
 
 **`end`*** - End position.
-- Type: _Integer_
+- Type: _String_
 - Limitations: Greater than `Start`
-- Example: `65608792`
+- Example: `"65608792"`
 
 **`SV.type`** - Supporting structural variant type.
 - Type: _String_
@@ -98,39 +98,39 @@ Copy number variant (CNV) data in ACESeq format.
 - Example: `"DEL;LOH"`
 
 **`c1Mean`** - Estimated mean number of copies at **major** allele (calculated from number of reads and sample ploidy). 
-- Type: _Double_
+- Type: _String_
 - Limitations: Greater or equal to 0 or `"NA"` if not available
-- Example: `1.1265`
+- Example: `"1.1265"`
 
 **`c2Mean`** - Estimated mean number of copies at **minor** allele (calculated from number of reads and sample ploidy). 
-- Type: _Double_
+- Type: _String_
 - Limitations: Greater or equal to 0 or `"NA"` if not available
-- Example: `0.0378`
+- Example: `"0.0378"`
 
 **`tcnMean`** - Estimated mean total number of copies (`c1Mean` + `c2Mean`). 
-- Type: _Double_
+- Type: _String_
 - Limitations: Greater or equal to 0 or `"NA"` if not available
-- Example: `1.1643`
+- Example: `"1.1643"`
 
 **`A`** - Rounded number of copies at **major** allele (Rounded `c1Mean`).
-- Limitations: Greater or equal to `0` or `NA` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
-- Type: _Integer_
-- Example: `1`
+- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
+- Type: _String_
+- Example: `"1"`
 
 **`B`** - Rounded number of copies at **minor** allele (Rounded `c2Mean`).
-- Limitations: Greater or equal to `0` or `NA` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
-- Type: _Integer_
-- Example: `0`
+- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
+- Type: _String_
+- Example: `"0"`
 
 **`TCN`** - Rounded total number of copies (`A` + `B`).
-- Limitations: Greater or equal to `0` or `NA` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
-- Type: _Integer_
-- Example: `1`
+- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
+- Type: _String_
+- Example: `"1"`
 
 **`dhMax`** - Estimated decrease of heterozygosity (calculated from number of reads and sample ploidy).
 - Limitations: Greater or equal to 0 or `"NA"` if not available
-- Type: _Double_
-- Example: `null`
+- Type: _String_
+- Example: `"NA"`
 
 #### SvType
 sv.Type values are:
@@ -150,7 +150,7 @@ cna.Type values are:
 
 #### Threshold Rule
 To round double value to integer there is `0.3` certancy threshold applied:
-if the value is more than `0.3` far from the nearest integer, it is considered as not precise enought and rounding operation results to `NA`.
+if the value is more than `0.3` far from the nearest integer, it is considered as not precise enought and rounding operation results to `"NA"`.
 
 ##
 **`*`** - Required fields
