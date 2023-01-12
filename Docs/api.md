@@ -156,7 +156,95 @@ Request implements **UPSERT** logic:
     }
 ]
 ```
-Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome-models.md).
+Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md).
+
+**Response**
+- `200` - request was processed successfully
+- `400` - request data didn't pass validation
+
+
+## POST: [api/cnv/aceseq](http://localhost:5106/api/cnv/aceseq)
+
+Submit Copy Number Variants (CNV) data (including sequencing analysis data) in ACESeq format.
+
+Request implements **UPSERT** logic:
+- Missing data will be populated
+- Existing data will be updated
+
+**Boby** (_application/json_)
+```json
+[
+    {
+        "Analysis": {
+            "Type": "WGS"
+        },
+        "Samples": [
+            {
+                "Id": "SA14",
+                "DonorId": "DO1",
+                "SpecimenId": "TI2",
+                "SpecimenType": "Tissue",
+                "MatchedSampleId": null,
+                "Variants": null
+            },
+            {
+                "Id": "SA5",
+                "DonorId": "DO1",
+                "SpecimenId": "TI1",
+                "SpecimenType": "Tissue",
+                "MatchedSampleId": "SA14",
+                "Ploidy": 2,
+                "Purity": null,
+                "Variants": [
+                    {
+                        "chromosome": "4",
+                        "start": "164362032",
+                        "end": "164458144",
+                        "sv.Type": "DUP",
+                        "cna.Type": "DUP",
+                        "c1Mean": "1.2465",
+                        "c2Mean": "2.8643",
+                        "tcnMean": "4.1108",
+                        "A": "1",
+                        "B": "3",
+                        "TCN": "4",
+                        "dhMax": "NA"
+                    },
+                    {
+                        "chromosome": "5",
+                        "start": "65498712",
+                        "end": "65608792",
+                        "sv.Type": "NA",
+                        "cna.Type": "DEL;LOH",
+                        "c1Mean": "1.1265",
+                        "c2Mean": "0.0378",
+                        "tcnMean": "1.1643",
+                        "A": "1",
+                        "B": "0",
+                        "TCN": "1",
+                        "dhMax": "NA"
+                    },
+                    {
+                        "chromosome": "6",
+                        "start": "84236917",
+                        "end": "84337937",
+                        "sv.Type": "DEL",
+                        "cna.Type": "DEL;HomoDEL",
+                        "c1Mean": "0.1247",
+                        "c2Mean": "0.0129",
+                        "tcnMean": "0.1376",
+                        "A": "0",
+                        "B": "0",
+                        "TCN": "0",
+                        "dhMax": "NA"
+                    }
+]
+            }
+        ]
+    }
+]
+```
+Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md).
 
 **Response**
 - `200` - request was processed successfully
