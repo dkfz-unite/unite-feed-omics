@@ -4,12 +4,12 @@
 Includes information about the analysis, samples and sequencing data.
 
 **`Analysis`** - Sequencing analysis data.
-- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome-models.md#analysis))_
+- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#analysis))_
 - Example: `{...}`
 
 **`Samples`*** - Which samples were analysed.
 - Type: _Array_
-- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome-models.md#sample))_
+- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#sample))_
 - Example: `[{...}, {...}]`
 
 ## Analysis
