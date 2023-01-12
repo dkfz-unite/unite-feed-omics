@@ -4,12 +4,12 @@
 Includes information about the analysis, samples and sequencing data.
 
 **`Analysis`** - Sequencing analysis data.
-- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#analysis))_
+- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#analysis))_
 - Example: `{...}`
 
 **`Samples`*** - Which samples were analysed.
 - Type: _Array_
-- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#sample))_
+- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#sample))_
 - Example: `[{...}, {...}]`
 
 ## Analysis
@@ -120,20 +120,20 @@ Copy number variant (CNV) data.
 - Example: `1.1643`
 
 **`C1`** - Rounded number of copies at **major** allele (Rounded `C1Mean`).
-- Note: If not set, the api will try to calculate the value from `C1Mean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold).
-- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold))
+- Note: If not set, the api will try to calculate the value from `C1Mean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule).
+- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `1`
 
 **`C2`** - Rounded number of copies at **minor** allele (Rounded `C2Mean`).
-- Note: If not set, the api will try to calculate the value from `C2Mean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold).
-- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold))
+- Note: If not set, the api will try to calculate the value from `C2Mean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule).
+- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `0`
 
 **`TCN`** - Rounded total number of copies (`C1` + `C2`).
-- Note: If not set, the api will try to calculate the value from `C1` and `C2` or `TcnMean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold).
-- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold))
+- Note: If not set, the api will try to calculate the value from `C1` and `C2` or `TcnMean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule).
+- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `1`
 
