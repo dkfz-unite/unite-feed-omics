@@ -2,7 +2,7 @@
 
 ## General
 Genome data feed service provides the following functionality:
-- [Genome data feed web API](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-genome.md) - REST API for uploading sequencing data to the portal (including input data validation).
+- [Genome data feed web API](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api.md) - REST API for uploading sequencing data to the portal (including input data validation).
 - Genes data indexing service - background service responsible for gene-centric data index creation.
 - Mutations data annotation service (_requires internet access_) - background service responsible for annotation of mutations, genes and transcripts.
   - Mutations are annotated with local installation of Ensembl VEP, as they might be treated as personal information.
@@ -36,12 +36,14 @@ UNITE_ELASTIC_USER|ES service user||
 UNITE_ELASTIC_PASSWORD|ES service password||
 UNITE_VEP_HOST|Local Ensembl VEP host|http://localhost:5200|ensembl.unite.net|
 UNITE_ENSEMBL_HOST|Public Ensembl host|https://grch37.rest.ensembl.org|...|
-UNITE_GENES_INDEXING_INTERVAL|Genes indexing interval (seconds)|10|
-UNITE_GENES_INDEXING_BUCKET_SIZE|Genes indexing bucket size|300|
-UNITE_MUTATIONS_ANNOTATION_INTERVAL|Mutations annotation interval (seconds)|10|
-UNITE_MUTATIONS_ANNOTATION_BUCKET_SIZE|Mutations annotation bucket size|100|
-UNITE_MUTATIONS_INDEXING_INTERVAL|Mutations indexing interval (seconds)|10|
-UNITE_MUTATIONS_INDEXING_BUCKET_SIZE|Mutations indexing bucket size|300|
+UNITE_GENES_INDEXING_BUCKET_SIZE|Genes indexing bucket size|100|
+UNITE_SSM_ANNOTATION_BUCKET_SIZE|SSM annotation bucket size|100|
+UNITE_SSM_INDEXING_BUCKET_SIZE|SSM indexing bucket size|300|
+UNITE_CNV_ANNOTATION_BUCKET_SIZE|CNV annotation bucket size|10|
+UNITE_CNV_INDEXING_BUCKET_SIZE|CNV indexing bucket size|100|
+UNITE_SV_ANNOTATION_BUCKET_SIZE|SV annotation bucket size|10|
+UNITE_SV_INDEXING_BUCKET_SIZE|SV indexing bucket size|100|
+
 
 ## Installation
 
@@ -70,7 +72,7 @@ docker run \
 --restart unless-stopped \
 --net unite \
 --net-alias feed.genome.unite.net \
--p 127.0.0.1:5100:80 \
+-p 127.0.0.1:5106:80 \
 -e ASPNETCORE_ENVIRONMENT=Release \
 -e UNITE_ELASTIC_HOST=http://es.unite.net:9200 \
 -e UNITE_ELASTIC_USER=[elasticsearch_user] \
@@ -81,12 +83,13 @@ docker run \
 -e UNITE_SQL_PASSWORD=[sql_password] \
 -e UNITE_VEP_HOST=ensembl.unite.net \
 -e UNITE_ENSEMBL_HOST=https://grch37.rest.ensembl.org \
--e UNITE_GENES_INDEXING_INTERVAL=10 \
--e UNITE_GENES_INDEXING_BUCKET_SIZE=300 \
--e UNITE_MUTATIONS_ANNOTATION_INTERVAL=10 \
--e UNITE_MUTATIONS_ANNOTATION_BUCKET_SIZE=100 \
--e UNITE_MUTATIONS_INDEXING_INTERVAL=10 \
--e UNITE_MUTATIONS_INDEXING_BUCKET_SIZE=300 \
+-e UNITE_GENES_INDEXING_BUCKET_SIZE=100 \
+-e UNITE_SSM_ANNOTATION_BUCKET_SIZE=100 \
+-e UNITE_SSM_INDEXING_BUCKET_SIZE=300 \
+-e UNITE_CNV_ANNOTATION_BUCKET_SIZE=10 \
+-e UNITE_CNV_INDEXING_BUCKET_SIZE=100 \
+-e UNITE_SV_ANNOTATION_BUCKET_SIZE=10 \
+-e UNITE_SV_INDEXING_BUCKET_SIZE=100 \
 -d \
 unite.genome.feed:latest
 ```
