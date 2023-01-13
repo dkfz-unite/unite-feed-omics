@@ -150,7 +150,7 @@ Request implements **UPSERT** logic:
                         "Tcn": 0,
                         "DhMax": null
                     }
-]
+                ]
             }
         ]
     }
@@ -238,13 +238,93 @@ Request implements **UPSERT** logic:
                         "TCN": "0",
                         "dhMax": "NA"
                     }
-]
+                ]
             }
         ]
     }
 ]
 ```
 Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md).
+
+**Response**
+- `200` - request was processed successfully
+- `400` - request data didn't pass validation
+
+
+## POST: [api/sv](http://localhost:5106/api/sv)
+
+Submit Structural Variants (SV) data (including sequencing analysis data).
+
+Request implements **UPSERT** logic:
+- Missing data will be populated
+- Existing data will be updated
+
+**Boby** (_application/json_)
+```json
+[
+    {
+        "Analysis": {
+            "Type": "WGS"
+        },
+        "Samples": [
+            {
+                "Id": "SA14",
+                "DonorId": "DO1",
+                "SpecimenId": "TI2",
+                "SpecimenType": "Tissue",
+                "MatchedSampleId": null,
+                "Variants": null
+            },
+            {
+                "Id": "SA5",
+                "DonorId": "DO1",
+                "SpecimenId": "TI1",
+                "SpecimenType": "Tissue",
+                "MatchedSampleId": "SA14",
+                "Variants": [
+                    {
+                        "Chromosome1": "6",
+                        "Start1": 84236917,
+                        "End1": 84236918,
+                        "Chromosome2": "6",
+                        "Start2": 84337937,
+                        "End2": 84337938,
+                        "Type": "DUP",
+                        "Inverted": false,
+                        "FlankingSequence1": null,
+                        "FlankingSequence2": null
+                    },
+                    {
+                        "Chromosome1": "8",
+                        "Start1": 65498712,
+                        "End1": 65498713,
+                        "Chromosome2": "8",
+                        "Start2": 65608792,
+                        "End2": 65608793,
+                        "Type": "DEL",
+                        "Inverted": false,
+                        "FlankingSequence1": null,
+                        "FlankingSequence2": null
+                    },
+                    {
+                        "Chromosome1": "8",
+                        "Start1": 93246857,
+                        "End1": 93246858,
+                        "Chromosome2": "8",
+                        "Start2": 93347877,
+                        "End2": 93347878,
+                        "Type": "INV",
+                        "Inverted": true,
+                        "FlankingSequence1": null,
+                        "FlankingSequence2": null
+                    }
+                ]
+            }
+        ]
+    }
+]
+```
+Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sv.md).
 
 **Response**
 - `200` - request was processed successfully
