@@ -72,7 +72,7 @@ docker run \
 --restart unless-stopped \
 --net unite \
 --net-alias feed.genome.unite.net \
--p 127.0.0.1:5100:80 \
+-p 127.0.0.1:5106:80 \
 -e ASPNETCORE_ENVIRONMENT=Release \
 -e UNITE_ELASTIC_HOST=http://es.unite.net:9200 \
 -e UNITE_ELASTIC_USER=[elasticsearch_user] \
