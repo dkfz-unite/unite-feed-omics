@@ -102,7 +102,7 @@ internal class VariantIndexMapper
         index.Start = entity.Start;
         index.End = entity.End;
         index.Length = entity.Length.Value;
-        index.CnaType = entity.TypeId?.ToDefinitionString();
+        index.Type = entity.TypeId?.ToDefinitionString();
         index.Loh = entity.Loh;
         index.HomoDel = entity.HomoDel;
         index.C1Mean = entity.C1Mean;
