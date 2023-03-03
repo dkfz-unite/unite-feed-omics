@@ -15,11 +15,10 @@
 		<Folder Include="HostedServices\" />
 		<Folder Include="Models\Variants\" />
 		<Folder Include="Models\Variants\SSM\" />
-		<Folder Include="Models\Transcriptome\" />
 		<Folder Include="Models\Base\" />
 		<Folder Include="Models\Base\Validators\" />
-		<Folder Include="Models\Transcriptome\Validators\" />
-		<Folder Include="Models\Transcriptome\Converters\" />
+		<Folder Include="Models\Transcriptomics\Validators\" />
+		<Folder Include="Models\Transcriptomics\Converters\" />
 		<Folder Include="Models\Variants\Validators\" />
 		<Folder Include="Models\Variants\SSM\Validators\" />
 		<Folder Include="Models\Variants\CNV\" />
@@ -35,16 +34,26 @@
 		<Folder Include="Models\Variants\SV\Converters\" />
 		<Folder Include="Models\Variants\Base\Converters\" />
 		<Folder Include="Controllers\Variants\" />
+		<Folder Include="Submissions\" />
+		<Folder Include="Submissions\Repositories\" />
+		<Folder Include="Submissions\Repositories\Transcriptomics\" />
+		<Folder Include="Submissions\Repositories\Variants\" />
+		<Folder Include="Handlers\Annotation\" />
+		<Folder Include="Handlers\Indexing\" />
+		<Folder Include="Services\Annotation\" />
+		<Folder Include="Services\Indexing\" />
+		<Folder Include="Controllers\Transcriptomics\" />
+		<Folder Include="Handlers\Annotation\Converters\" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Macross.Json.Extensions" Version="3.0.0" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
+		<PackageReference Include="Unite.Cache" Version="1.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="FluentValidation.AspNetCore" />
 		<None Remove="Models\Variants\" />
 		<None Remove="Models\Variants\SSM\" />
-		<None Remove="Models\Transcriptome\" />
 		<None Remove="Models\Base\" />
 		<None Remove="Models\Base\Validators\" />
 		<None Remove="Models\Transcriptome\Validators\" />
@@ -64,6 +73,17 @@
 		<None Remove="Models\Variants\SV\Converters\" />
 		<None Remove="Models\Variants\Base\Converters\" />
 		<None Remove="Controllers\Variants\" />
+		<None Remove="Submissions\" />
+		<None Remove="Submissions\Repositories\" />
+		<None Remove="Submissions\Repositories\Transcriptomics\" />
+		<None Remove="Submissions\Repositories\Variants\" />
+		<None Remove="Handlers\Submission\" />
+		<None Remove="Handlers\Annotation\" />
+		<None Remove="Handlers\Indexing\" />
+		<None Remove="Services\Annotation\" />
+		<None Remove="Services\Indexing\" />
+		<None Remove="Controllers\Transcriptomics\" />
+		<None Remove="Handlers\Annotation\Converters\" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Unite.Genome.Feed\Unite.Genome.Feed.csproj">

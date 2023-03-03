@@ -6,7 +6,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Macross.Json.Extensions" Version="3.0.0" />
-		<PackageReference Include="Unite.Data" Version="4.2.0" />
+		<PackageReference Include="Unite.Data" Version="4.5.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Clients\Ensembl\" />
@@ -14,23 +14,15 @@
 		<Folder Include="Clients\Ensembl\Configuration\" />
 		<Folder Include="Clients\Ensembl\Models\" />
 		<Folder Include="Clients\Ensembl\Resources\" />
-		<Folder Include="Data\" />
-		<Folder Include="Data\Models\" />
 		<Folder Include="Clients\Uniprot\" />
 		<Folder Include="Clients\Uniprot\Configuration\" />
 		<Folder Include="Clients\Uniprot\Configuration\Options\" />
 		<Folder Include="Clients\Uniprot\Resources\" />
 		<Folder Include="Clients\Ensembl\Models\Constants\" />
-		<Folder Include="Data\Repositories\" />
 		<Folder Include="Services\" />
-		<Folder Include="Data\Repositories\Variants\" />
-		<Folder Include="Data\Repositories\Variants\SSM\" />
-		<Folder Include="Data\Models\Variants\" />
-		<Folder Include="Data\Repositories\Variants\CNV\" />
-		<Folder Include="Data\Repositories\Variants\SV\" />
-		<Folder Include="Data\Audit\" />
 		<Folder Include="Services\Vep\" />
 		<Folder Include="Clients\Ensembl\Resources\Vep\" />
+		<Folder Include="Services\Models\" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Remove="Unite.Data" />
@@ -40,22 +32,15 @@
 		<None Remove="Clients\Ensembl\Configuration\" />
 		<None Remove="Clients\Ensembl\Models\" />
 		<None Remove="Clients\Ensembl\Resources\" />
-		<None Remove="Data\" />
-		<None Remove="Data\Models\" />
 		<None Remove="Clients\Uniprot\" />
 		<None Remove="Clients\Uniprot\Configuration\" />
 		<None Remove="Clients\Uniprot\Configuration\Options\" />
 		<None Remove="Clients\Uniprot\Resources\" />
 		<None Remove="Clients\Ensembl\Models\Constants\" />
-		<None Remove="Data\Repositories\" />
 		<None Remove="Services\" />
-		<None Remove="Data\Repositories\Variants\" />
-		<None Remove="Data\Repositories\Variants\SSM\" />
-		<None Remove="Data\Models\Variants\" />
-		<None Remove="Data\Repositories\Variants\CNV\" />
-		<None Remove="Data\Repositories\Variants\SV\" />
-		<None Remove="Data\Audit\" />
 		<None Remove="Services\Vep\" />
 		<None Remove="Clients\Ensembl\Resources\Vep\" />
+		<None Remove="Ensembl.Data" />
+		<None Remove="Services\Models\" />
 	</ItemGroup>
 </Project>

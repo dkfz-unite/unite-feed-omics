@@ -4,8 +4,7 @@ namespace Unite.Genome.Feed.Data.Models.Variants.CNV;
 
 public class VariantModel : Variants.VariantModel
 {
-    public SvType? SvType { get; set; }
-    public CnaType? CnaType { get; set; }
+    public CnvType? Type { get; set; }
     public bool? Loh { get; set; }
     public bool? HomoDel { get; set; }
     public double? C1Mean { get; set; }

@@ -10,8 +10,7 @@ public class VariantAceSeqModel
     private Chromosome? _chromosome;
     private int? _start;
     private int? _end;
-    private string _svType;
-    private string _cnaType;
+    private string _type;
     private string _c1Mean;
     private string _c2Mean;
     private string _tcnMean;
@@ -39,16 +38,10 @@ public class VariantAceSeqModel
     public int? End { get => _end; set => _end = value; }
 
     /// <summary>
-    /// Structural variant type (SV.Type)
-    /// </summary>
-    [JsonPropertyName("SV.type")]
-    public string SvType { get => _svType?.Trim(); set => _svType = value; }
-
-    /// <summary>
     /// Copy number alteration type (CNA.Type)
     /// </summary>
     [JsonPropertyName("CNA.type")]
-    public string CnaType { get => _cnaType?.Trim(); set => _cnaType = value; }
+    public string Type { get => _type?.Trim(); set => _type = value; }
 
     /// <summary>
     /// Mean number of copies in minor allele
@@ -94,37 +87,28 @@ public class VariantAceSeqModel
 
 
 
-    public SvType? GetSvType()
+    public CnvType? GetCnvType()
     {
-        var svTypeString = GetString(SvType);
-
-        var valueString = svTypeString;
-
-        return Enum.TryParse<SvType>(valueString, out var value) ? value : null;
-    }
-
-    public CnaType? GetCnaType()
-    {
-        var cnvTypeString = GetString(CnaType);
+        var cnvTypeString = GetString(Type);
 
         var valueString = cnvTypeString?
             .Split(";", StringSplitOptions.RemoveEmptyEntries)?
             .Select(value => value.Trim())?
             .FirstOrDefault();
 
-        return Enum.TryParse<CnaType>(valueString, out var value) ? value : null;
+        return Enum.TryParse<CnvType>(valueString, out var value) ? value : null;
     }
 
     public bool? GetLoh()
     {
-        var cnvTypeString = GetString(CnaType);
+        var cnvTypeString = GetString(Type);
 
         return cnvTypeString?.Contains("LOH") == true ? true : false;
     }
 
     public bool? GetHomoDel()
     {
-        var cnvTypeString = GetString(CnaType);
+        var cnvTypeString = GetString(Type);
 
         return cnvTypeString?.Contains("HomoDel") == true ? true : false;
     }

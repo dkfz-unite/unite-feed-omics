@@ -1,5 +1,5 @@
 ﻿using Unite.Genome.Feed.Web.Configuration.Options;
-using Unite.Genome.Feed.Web.Handlers;
+using Unite.Genome.Feed.Web.Handlers.Annotation;
 
 namespace Unite.Genome.Feed.Web.HostedServices;
 
@@ -72,7 +72,7 @@ public class VariantsAnnotationHostedService : BackgroundService
 
         if (exception.InnerException != null)
         {
-            _logger.LogError(exception.InnerException.Message);
+            LogError(exception.InnerException);
         }
     }
 }

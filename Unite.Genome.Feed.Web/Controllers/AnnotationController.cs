@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Unite.Genome.Feed.Web.Services;
+using Unite.Genome.Feed.Web.Services.Annotation;
 
 namespace Unite.Genome.Feed.Web.Controllers;
 

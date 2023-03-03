@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Unite.Genome.Feed.Data;
+using Unite.Data.Entities.Tasks.Enums;
+using Unite.Data.Services.Tasks;
 using Unite.Genome.Feed.Web.Models.Variants;
-using Unite.Genome.Feed.Web.Models.Variants.SV.Converters;
-using Unite.Genome.Feed.Web.Services;
+using Unite.Genome.Feed.Web.Models.Variants.SV;
+using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
@@ -10,34 +11,28 @@ namespace Unite.Genome.Feed.Web.Controllers.Variants;
 [ApiController]
 public class StructuralVariantsController : Controller
 {
-    private readonly SequencingDataWriter _dataWriter;
-    private readonly StructuralVariantAnnotationTaskService _annotationTaskService;
-    private readonly ILogger _logger;
-
-    private readonly SequencingDataModelConverter _converter;
+    private readonly VariantsSubmissionService _submissionService;
+    private readonly SubmissionTaskService _submissionTaskService;
 
     public StructuralVariantsController(
-        SequencingDataWriter dataWriter,
-        StructuralVariantAnnotationTaskService annotationTaskService,
-        ILogger<MutationsController> logger)
+        VariantsSubmissionService submissionService,
+        SubmissionTaskService submissionTaskService)
     {
-        _dataWriter = dataWriter;
-        _annotationTaskService = annotationTaskService;
-        _logger = logger;
-
-        _converter = new SequencingDataModelConverter();
+        _submissionService = submissionService;
+        _submissionTaskService = submissionTaskService;
     }
 
     [HttpPost("")]
-    public IActionResult Post([FromBody] SequencingDataModel<Models.Variants.SV.VariantModel>[] models)
+    public IActionResult Post([FromBody] SequencingDataModel<VariantModel>[] models)
     {
-        var dataModels = models.Select(model => _converter.Convert(model));
+        foreach (var model in models)
+        {
+            var submissionId = _submissionService.AddSvSubmission(model);
 
-        _dataWriter.SaveData(dataModels, out var audit);
+            var submissionData = new SubmissionData(SubmissionType.Default);
 
-        _logger.LogInformation(audit.ToString());
-
-        _annotationTaskService.PopulateTasks(audit.StructuralVariants);
+            _submissionTaskService.CreateTask(SubmissionTaskType.SV, submissionId, submissionData);
+        }
 
         return Ok();
     }

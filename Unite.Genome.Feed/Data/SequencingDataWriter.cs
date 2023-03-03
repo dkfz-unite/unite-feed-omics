@@ -64,7 +64,9 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
             audit.MutationsCreated++;
         }
 
-        var variantOccurrences = _ssmOccurrenceRepository.CreateMissing(analysedSampleId, variantModels);
+        _ssmOccurrenceRepository.RemoveAll(analysedSampleId);
+
+        var variantOccurrences = _ssmOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
 
         foreach (var variantOccurrence in variantOccurrences)
         {
@@ -83,7 +85,9 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
             audit.CopyNumberVariantsCreated++;
         }
 
-        var variantOccurrences = _cnvOccurrenceRepository.CreateMissing(analysedSampleId, variantModels);
+        _cnvOccurrenceRepository.RemoveAll(analysedSampleId);
+
+        var variantOccurrences = _cnvOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
 
         foreach (var variantOccurrence in variantOccurrences)
         {
@@ -102,7 +106,9 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
             audit.StructuralVariantsCreated++;
         }
 
-        var variantOccurrences = _svOccurrenceRepository.CreateMissing(analysedSampleId, variantModels);
+        _svOccurrenceRepository.RemoveAll(analysedSampleId);
+
+        var variantOccurrences = _svOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
 
         foreach (var variantOccurrence in variantOccurrences)
         {

@@ -20,8 +20,7 @@ public class VariantModelMapper : VariantModelBaseMapper
 
         target.DhMax = source.DhMax;
 
-        target.SvType = source.SvType;
-        target.CnaType = source.CnaType ?? GetCnaType(target.Tcn, target.TcnMean, ploidy);
+        target.Type = source.Type ?? GetCnvType(target.Tcn, target.TcnMean, ploidy);
         target.Loh = target.Loh;
         target.HomoDel = target.HomoDel;
     }

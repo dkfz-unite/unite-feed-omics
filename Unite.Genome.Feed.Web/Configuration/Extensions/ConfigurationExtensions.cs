@@ -1,16 +1,24 @@
 ﻿using FluentValidation;
+using Unite.Cache.Configuration.Options;
 using Unite.Data.Services;
 using Unite.Data.Services.Configuration.Options;
 using Unite.Data.Services.Tasks;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
+using Unite.Genome.Annotations.Services.Transcriptomics;
 using Unite.Genome.Annotations.Services.Vep;
 using Unite.Genome.Feed.Data;
 using Unite.Genome.Feed.Web.Configuration.Options;
-using Unite.Genome.Feed.Web.Handlers;
+using Unite.Genome.Feed.Web.Handlers.Annotation;
+using Unite.Genome.Feed.Web.Handlers.Indexing;
+using Unite.Genome.Feed.Web.Handlers.Submission;
 using Unite.Genome.Feed.Web.HostedServices;
+using Unite.Genome.Feed.Web.Models.Transcriptomics;
+using Unite.Genome.Feed.Web.Models.Transcriptomics.Validators;
 using Unite.Genome.Feed.Web.Models.Variants;
 using Unite.Genome.Feed.Web.Models.Variants.Validators;
-using Unite.Genome.Feed.Web.Services;
+using Unite.Genome.Feed.Web.Services.Annotation;
+using Unite.Genome.Feed.Web.Services.Indexing;
+using Unite.Genome.Feed.Web.Submissions;
 using Unite.Genome.Indices.Services;
 using Unite.Indices.Services.Configuration.Options;
 
@@ -24,6 +32,7 @@ public static class ConfigurationExtensions
     public static void Configure(this IServiceCollection services)
     {
         services.AddTransient<ISqlOptions, SqlOptions>();
+        services.AddTransient<IMongoOptions, MongoOptions>();
         services.AddTransient<IElasticOptions, ElasticOptions>();
         services.AddTransient<IEnsemblVepOptions, EnsemblVepOptions>();
         services.AddTransient<IEnsemblOptions, EnsemblOptions>();
@@ -32,19 +41,27 @@ public static class ConfigurationExtensions
         services.AddTransient<IValidator<SequencingDataModel<VariantModels.CNV.VariantModel>[]>, SequencingDataModelsValidator<VariantModels.CNV.VariantModel, VariantModels.CNV.Validators.VariantModelValidator>>();
         services.AddTransient<IValidator<SequencingDataModel<VariantModels.CNV.VariantAceSeqModel>[]>, SequencingDataModelsValidator<VariantModels.CNV.VariantAceSeqModel, VariantModels.CNV.Validators.VariantAceSeqModelValidator>>();
         services.AddTransient<IValidator<SequencingDataModel<VariantModels.SV.VariantModel>[]>, SequencingDataModelsValidator<VariantModels.SV.VariantModel, VariantModels.SV.Validators.VariantModelValidator>>();
+        services.AddTransient<IValidator<TranscriptomicsDataModel>, TranscriptomicsDataModelValidator>();
 
         services.AddTransient<DomainDbContext>();
         services.AddTransient<SequencingDataWriter>();
+        services.AddTransient<TranscriptomicsDataWriter>();
+
+        // Submission services
+        services.AddTransient<VariantsSubmissionService>();
+        services.AddTransient<TranscriptomicsSubmissionService>();
 
         // Annotation services
         services.AddTransient<MutationsAnnotationService>();
         services.AddTransient<CopyNumberVariantsAnnotationService>();
         services.AddTransient<StructuralVariantsAnnotationService>();
+        services.AddTransient<TranscriptomicsAnnotationService>();
 
         // Task processing services
         services.AddTransient<TasksProcessingService>();
 
         // Task creation services
+        services.AddTransient<SubmissionTaskService>();
         services.AddTransient<GeneIndexingTaskService>();
         services.AddTransient<MutationAnnotationTaskService>();
         services.AddTransient<MutationIndexingTaskService>();
@@ -52,6 +69,14 @@ public static class ConfigurationExtensions
         services.AddTransient<CopyNumberVariantIndexingTaskService>();
         services.AddTransient<StructuralVariantAnnotationTaskService>();
         services.AddTransient<StructuralVariantIndexingTaskService>();
+
+        // Submissions hosted services
+        services.AddHostedService<SubmissionsHostedService>();
+        services.AddTransient<TranscriptomicsSubmissionHandler>();
+        services.AddTransient<MutationsSubmissionHandler>();
+        services.AddTransient<CopyNumberVariantsSubmissionHandler>();
+        services.AddTransient<StructuralVariantsSubmissionHandler>();
+
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationHostedService>();

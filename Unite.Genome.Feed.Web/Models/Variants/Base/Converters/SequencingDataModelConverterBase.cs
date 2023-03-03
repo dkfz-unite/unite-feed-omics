@@ -1,4 +1,5 @@
-﻿using Unite.Genome.Feed.Web.Models.Base.Mappers;
+﻿using Unite.Genome.Feed.Web.Models.Base;
+using Unite.Genome.Feed.Web.Models.Base.Mappers;
 
 using DataModels = Unite.Genome.Feed.Data.Models;
 
@@ -17,54 +18,56 @@ public abstract class SequencingDataModelConverterBase<TModel> where TModel : cl
     }
 
 
-    public virtual DataModels.AnalysisModel Convert(SequencingDataModel<TModel> source)
+    public virtual DataModels.AnalysisModel Convert(SequencingDataModel<TModel> sequencingDataModel)
     {
-        var target = new DataModels.AnalysisModel();
+        var analysis = Convert(sequencingDataModel.Analysis);
 
-        if (source.Analysis != null)
+        analysis.AnalysedSamples = sequencingDataModel.Samples.Select(analysedSampleModel =>
         {
-            // Mapping analysis data
-            _analysisModelMapper.Map(source.Analysis, target);
-        }
+            var analysedSample = new DataModels.AnalysedSampleModel();
 
-        target.AnalysedSamples = source.Samples.Select(analysedSample =>
-        {
-            // Mapping analysed sample data
-            var analysedSampleModel = new DataModels.AnalysedSampleModel();
+            analysedSample.AnalysedSample = Convert(analysedSampleModel);
 
-            analysedSampleModel.AnalysedSample = new DataModels.SampleModel();
-
-            _sampleModelMapper.Map(analysedSample, analysedSampleModel.AnalysedSample);
-
-            if (!string.IsNullOrWhiteSpace(analysedSample.MatchedSampleId))
+            if (!string.IsNullOrEmpty(analysedSampleModel.MatchedSampleId))
             {
-                // Mapping matched sample data
-                var matchedSampleId = analysedSample.MatchedSampleId;
+                var matchedAnalysedSampleModel = sequencingDataModel.FindSample(analysedSampleModel.MatchedSampleId);
 
-                var matchedAnalysedSample = source.Samples.Single(analysedSample => analysedSample.Id == matchedSampleId);
-
-                analysedSampleModel.MatchedSample = new DataModels.SampleModel();
-
-                _sampleModelMapper.Map(matchedAnalysedSample, analysedSampleModel.MatchedSample);
+                analysedSample.MatchedSample = Convert(matchedAnalysedSampleModel);
             }
 
-            if (analysedSample.Variants != null)
+            if (analysedSampleModel.Variants != null)
             {
-                //Mapping variants data
-                MapVariants(analysedSample, analysedSampleModel);
+                MapVariants(analysedSampleModel, analysedSample);
             }
 
-            return analysedSampleModel;
+            return analysedSample;
 
         }).ToArray();
 
-        return target;
+        return analysis;
     }
 
 
-    /// <summary>
-    /// Maps required variants data to analysed sample model
-    /// </summary>
-    /// <param name="analysedSampleModel"></param>
-    protected abstract void MapVariants(AnalysedSampleModel<TModel> source, DataModels.AnalysedSampleModel target);
+    private DataModels.AnalysisModel Convert(AnalysisModel analysisModel)
+    {
+        var analysis = new DataModels.AnalysisModel();
+
+        if (analysisModel != null)
+        {
+            _analysisModelMapper.Map(analysisModel, analysis);
+        }
+
+        return analysis;
+    }
+
+    private DataModels.SampleModel Convert(AnalysedSampleModel<TModel> analysedSampleModel)
+    {
+        var sample = new DataModels.SampleModel();
+
+        _sampleModelMapper.Map(analysedSampleModel, sample);
+
+        return sample;
+    }
+
+    protected abstract void MapVariants(AnalysedSampleModel<TModel> analysedSampleModel, DataModels.AnalysedSampleModel analysedSample);
 }

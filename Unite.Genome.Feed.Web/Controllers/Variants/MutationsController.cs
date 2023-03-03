@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Unite.Genome.Feed.Data;
+using Unite.Data.Entities.Tasks.Enums;
+using Unite.Data.Services.Tasks;
 using Unite.Genome.Feed.Web.Models.Variants;
-using Unite.Genome.Feed.Web.Models.Variants.SSM.Converters;
-using Unite.Genome.Feed.Web.Services;
+using Unite.Genome.Feed.Web.Models.Variants.SSM;
+using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
@@ -10,34 +11,28 @@ namespace Unite.Genome.Feed.Web.Controllers.Variants;
 [ApiController]
 public class MutationsController : Controller
 {
-    private readonly SequencingDataWriter _dataWriter;
-    private readonly MutationAnnotationTaskService _annotationTaskService;
-    private readonly ILogger _logger;
-
-    private readonly SequencingDataModelConverter _converter;
+    private readonly VariantsSubmissionService _submissionService;
+    private readonly SubmissionTaskService _submissionTaskService;
 
     public MutationsController(
-        SequencingDataWriter dataWriter,
-        MutationAnnotationTaskService annotationTaskService,
-        ILogger<MutationsController> logger)
+        VariantsSubmissionService submissionService,
+        SubmissionTaskService submissionTaskService)
     {
-        _dataWriter = dataWriter;
-        _annotationTaskService = annotationTaskService;
-        _logger = logger;
-
-        _converter = new SequencingDataModelConverter();
+        _submissionService = submissionService;
+        _submissionTaskService = submissionTaskService;
     }
 
     [HttpPost("")]
-    public IActionResult Post([FromBody] SequencingDataModel<Models.Variants.SSM.VariantModel>[] models)
+    public IActionResult Post([FromBody] SequencingDataModel<VariantModel>[] models)
     {
-        var dataModels = models.Select(model => _converter.Convert(model));
+        foreach (var model in models)
+        {
+            var submissionId = _submissionService.AddSsmSubmission(model);
 
-        _dataWriter.SaveData(dataModels, out var audit);
+            var submissionData = new SubmissionData(SubmissionType.Default);
 
-        _logger.LogInformation(audit.ToString());
-
-        _annotationTaskService.PopulateTasks(audit.Mutations);
+            _submissionTaskService.CreateTask(SubmissionTaskType.SSM, submissionId, submissionData);
+        }
 
         return Ok();
     }

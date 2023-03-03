@@ -4,6 +4,9 @@ namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
 public record ProteinResource : LookupResource
 {
+    [JsonPropertyName("transcriptId")]
+    public string TranscriptId { get; set; }
+
     [JsonPropertyName("start")]
     public int Start { get; set; }
 
@@ -12,4 +15,11 @@ public record ProteinResource : LookupResource
 
     [JsonPropertyName("length")]
     public int Length { get; set; }
+
+    [JsonPropertyName("isCanonical")]
+    public bool IsCanonical { get; set; }
+
+
+    [JsonPropertyName("features")]
+    public ProteinFeatureResource[] Features { get; set; }
 }

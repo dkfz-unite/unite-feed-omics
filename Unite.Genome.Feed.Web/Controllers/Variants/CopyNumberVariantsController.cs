@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Unite.Genome.Feed.Data;
+using Unite.Data.Entities.Tasks.Enums;
+using Unite.Data.Services.Tasks;
 using Unite.Genome.Feed.Web.Models.Variants;
-using Unite.Genome.Feed.Web.Models.Variants.CNV.Converters;
-using Unite.Genome.Feed.Web.Services;
+using Unite.Genome.Feed.Web.Models.Variants.CNV;
+using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
@@ -10,50 +11,43 @@ namespace Unite.Genome.Feed.Web.Controllers.Variants;
 [ApiController]
 public class CopyNumberVariantsController : Controller
 {
-    private readonly SequencingDataWriter _dataWriter;
-    private readonly CopyNumberVariantAnnotationTaskService _annotationTaskService;
-    private readonly ILogger _logger;
-
-    private readonly SequencingDataModelConverter _standardConverter;
-    private readonly SequencingDataAceSeqModelConverter _aceSeqConverter;
+    private readonly VariantsSubmissionService _submissionService;
+    private readonly SubmissionTaskService _submissionTaskService;
 
     public CopyNumberVariantsController(
-        SequencingDataWriter dataWriter,
-        CopyNumberVariantAnnotationTaskService annotationTaskService,
-        ILogger<MutationsController> logger)
+        VariantsSubmissionService submissionService,
+        SubmissionTaskService submissionTaskService)
     {
-        _dataWriter = dataWriter;
-        _annotationTaskService = annotationTaskService;
-        _logger = logger;
-
-        _standardConverter = new SequencingDataModelConverter();
-        _aceSeqConverter = new SequencingDataAceSeqModelConverter();
+        _submissionService = submissionService;
+        _submissionTaskService = submissionTaskService;
     }
 
     [HttpPost("")]
-    public IActionResult Post([FromBody] SequencingDataModel<Models.Variants.CNV.VariantModel>[] models)
+    public IActionResult Post([FromBody] SequencingDataModel<VariantModel>[] models)
     {
-        var dataModels = models.Select(model => _standardConverter.Convert(model));
+        foreach (var model in models)
+        {
+            var submissionId = _submissionService.AddCnvSubmission(model);
 
-        _dataWriter.SaveData(dataModels, out var audit);
+            var submissionData = new SubmissionData(SubmissionType.Default);
 
-        _logger.LogInformation(audit.ToString());
-
-        _annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
+            _submissionTaskService.CreateTask(SubmissionTaskType.CNV, submissionId, submissionData);
+        }
 
         return Ok();
     }
 
     [HttpPost("aceseq")]
-    public IActionResult Post([FromBody] SequencingDataModel<Models.Variants.CNV.VariantAceSeqModel>[] models)
+    public IActionResult Post([FromBody] SequencingDataModel<VariantAceSeqModel>[] models)
     {
-        var dataModels = models.Select(model => _aceSeqConverter.Convert(model));
+        foreach (var model in models)
+        {
+            var submissionId = _submissionService.AddCnvAceSeqSubmission(model);
 
-        _dataWriter.SaveData(dataModels, out var audit);
+            var submissionData = new SubmissionData(SubmissionType.AceSeq);
 
-        _logger.LogInformation(audit.ToString());
-
-        _annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
+            _submissionTaskService.CreateTask(SubmissionTaskType.CNV, submissionId, submissionData);
+        }
 
         return Ok();
     }

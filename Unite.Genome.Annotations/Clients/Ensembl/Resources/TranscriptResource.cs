@@ -5,16 +5,12 @@ namespace Unite.Genome.Annotations.Clients.Ensembl.Resources;
 
 public record TranscriptResource : LookupResource
 {
-    [JsonPropertyName("Parent")]
+    //[JsonPropertyName("Parent")]
+    [JsonPropertyName("geneId")]
     public string GeneId { get; set; }
 
-    [JsonPropertyName("display_name")]
-    public string Symbol { get; set; }
-
-    [JsonPropertyName("biotype")]
-    public string Biotype { get; set; }
-
-    [JsonPropertyName("seq_region_name")]
+    //[JsonPropertyName("seq_region_name")]
+    [JsonPropertyName("chromosome")]
     [JsonConverter(typeof(JsonStringEnumMemberConverter))]
     public Chromosome Chromosome { get; set; }
 
@@ -24,10 +20,29 @@ public record TranscriptResource : LookupResource
     [JsonPropertyName("end")]
     public int End { get; set; }
 
+    [JsonPropertyName("length")]
+    public int Length { get; set; }
+
+    [JsonPropertyName("exonicLength")]
+    public int? ExonicLength { get; set; }
+
     [JsonPropertyName("strand")]
-    public int? Strand { get; set; }
+    public bool Strand { get; set; }
+
+    [JsonPropertyName("biotype")]
+    public string Biotype { get; set; }
+
+    //[JsonPropertyName("display_name")]
+    [JsonPropertyName("symbol")]
+    public string Symbol { get; set; }
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; }
+
+    [JsonPropertyName("isCanonical")]
+    public bool IsCanonical { get; set; }
 
 
-    [JsonPropertyName("Translation")]
+    [JsonPropertyName("protein")]
     public ProteinResource Protein { get; set; }
 }

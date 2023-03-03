@@ -9,13 +9,14 @@ public class GeneIndexMapper
     public void Map(in Gene gene, GeneIndex index)
     {
         index.Id = gene.Id;
+        index.StableId = gene.StableId;
         index.Symbol = gene.Symbol;
+        index.Description = gene.Description;
         index.Biotype = gene.Biotype;
         index.Chromosome = gene.ChromosomeId.ToDefinitionString();
         index.Start = gene.Start;
         index.End = gene.End;
         index.Strand = gene.Strand;
-
-        index.EnsemblId = gene.Info?.EnsemblId;
+        index.ExonicLength = gene.ExonicLength;
     }
 }

@@ -18,11 +18,7 @@ public class VariantAceSeqModelValidator : AbstractValidator<VariantAceSeqModel>
             .NotEmpty().WithMessage("Should not be empty")
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
-        RuleFor(model => model.SvType)
-            .NotEmpty()
-            .WithMessage("Should not be empty");
-
-        RuleFor(model => model.CnaType)
+        RuleFor(model => model.Type)
             .NotEmpty()
             .WithMessage("Should not be empty");
 

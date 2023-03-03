@@ -1,12 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
+using Unite.Data.Entities.Genome.Transcriptomics;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Tissues.Enums;
 using Unite.Data.Services;
 using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
+using Unite.Indices.Entities.Basic.Genome.Transcriptomics;
 using Unite.Indices.Entities.Genes;
 using Unite.Indices.Services;
 
@@ -20,6 +22,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 {
     private readonly DomainDbContext _dbContext;
     private readonly GeneIndexMapper _geneIndexMapper;
+    private readonly GeneExpressionIndexMapper _geneExpressionIndexMapper;
     private readonly VariantIndexMapper _variantIndexMapper;
     private readonly DonorIndexMapper _donorIndexMapper;
     private readonly ImageIndexMapper _imageIndexMapper;
@@ -30,6 +33,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         _dbContext = dbContext;
         _geneIndexMapper = new GeneIndexMapper();
+        _geneExpressionIndexMapper = new GeneExpressionIndexMapper();
         _variantIndexMapper = new VariantIndexMapper();
         _donorIndexMapper = new DonorIndexMapper();
         _imageIndexMapper = new ImageIndexMapper();
@@ -78,7 +82,6 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private Gene LoadGene(int geneId)
     {
         var gene = _dbContext.Set<Gene>()
-            .Include(gene => gene.Info)
             .FirstOrDefault(gene => gene.Id == geneId);
 
         return gene;
@@ -110,6 +113,8 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         index.Images = CreateImageIndices(specimen.Id, donor?.ClinicalData?.DiagnosisDate);
 
         index.Variants = CreateVariantIndices(specimen.Id, geneId);
+
+        index.Expression = CreateExpressionIndex(specimen.Id, geneId);
 
         _specimenIndexMapper.Map(specimen, index, donor?.ClinicalData?.DiagnosisDate);
 
@@ -374,5 +379,39 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         return variants;
+    }
+
+
+    private GeneExpressionIndex CreateExpressionIndex(int specimenId, int geneId)
+    {
+        var expression = LoadExpression(specimenId, geneId);
+
+        if (expression == null)
+        {
+            return null;
+        }
+
+        var index = CreateExpressionIndex(expression);
+
+        return index;
+    }
+
+    private GeneExpressionIndex CreateExpressionIndex(GeneExpression expression)
+    {
+        var index = new GeneExpressionIndex();
+
+        _geneExpressionIndexMapper.Map(expression, index);
+
+        return index;
+    }
+
+    private GeneExpression LoadExpression(int specimenId, int geneId)
+    {
+        var expression = _dbContext.Set<GeneExpression>().FirstOrDefault(expression =>
+            expression.AnalysedSample.Sample.SpecimenId == specimenId &&
+            expression.GeneId == geneId
+        );
+
+        return expression;
     }
 }

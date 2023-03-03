@@ -1,5 +1,5 @@
 ﻿using Unite.Genome.Feed.Web.Configuration.Options;
-using Unite.Genome.Feed.Web.Handlers;
+using Unite.Genome.Feed.Web.Handlers.Indexing;
 
 namespace Unite.Genome.Feed.Web.HostedServices;
 
@@ -62,7 +62,7 @@ public class GenesIndexingHostedService : BackgroundService
 
         if (exception.InnerException != null)
         {
-            _logger.LogError(exception.InnerException.Message);
+            LogError(exception.InnerException);
         }
     }
 }

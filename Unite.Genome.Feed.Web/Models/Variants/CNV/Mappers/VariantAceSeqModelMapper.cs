@@ -20,8 +20,7 @@ public class VariantAceSeqModelMapper : VariantModelBaseMapper
 
         target.DhMax = source.GetDhMax();
 
-        target.SvType = source.GetSvType();
-        target.CnaType = source.GetCnaType() ?? GetCnaType(target.Tcn, target.TcnMean, ploidy);
+        target.Type = source.GetCnvType() ?? GetCnvType(target.Tcn, target.TcnMean, ploidy);
         target.Loh = source.GetLoh();
         target.HomoDel = source.GetHomoDel();
     }

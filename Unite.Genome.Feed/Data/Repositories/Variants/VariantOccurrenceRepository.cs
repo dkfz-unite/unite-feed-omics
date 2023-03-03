@@ -4,7 +4,7 @@ using Unite.Genome.Feed.Data.Models.Variants;
 
 namespace Unite.Genome.Feed.Data.Repositories.Variants;
 
-internal abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVariantEntity, TVariantModel>
+public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVariantEntity, TVariantModel>
     where TVariantOccurrenceEntity : VariantOccurrence<TVariantEntity>
     where TVariantEntity : Variant
     where TVariantModel : VariantModel
@@ -22,14 +22,20 @@ internal abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TV
     }
 
 
-    public TVariantOccurrenceEntity FindOrCreate(int analysedSampleId, TVariantModel model)
+    public TVariantOccurrenceEntity FindOrCreate(
+        int analysedSampleId,
+        TVariantModel model,
+        IEnumerable<TVariantEntity> cache = null)
     {
-        return Find(analysedSampleId, model) ?? Create(analysedSampleId, model);
+        return Find(analysedSampleId, model, cache) ?? Create(analysedSampleId, model);
     }
 
-    public TVariantOccurrenceEntity Find(int analysedSampleId, TVariantModel model)
+    public TVariantOccurrenceEntity Find(
+        int analysedSampleId,
+        TVariantModel model,
+        IEnumerable<TVariantEntity> cache = null)
     {
-        var variant = _variantRepository.Find(model);
+        var variant = _variantRepository.Find(model, cache);
 
         if (variant != null)
         {
@@ -39,38 +45,30 @@ internal abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TV
         return null;
     }
 
-    public TVariantOccurrenceEntity Create(int analysedSampleId, TVariantModel model)
+    public TVariantOccurrenceEntity Create(
+        int analysedSampleId,
+        TVariantModel model,
+        IEnumerable<TVariantEntity> cache = null)
     {
-        var variant = _variantRepository.FindOrCreate(model);
+        var variant = _variantRepository.FindOrCreate(model, cache);
 
         return Create(analysedSampleId, variant.Id);
     }
 
-    public IEnumerable<TVariantOccurrenceEntity> CreateOrUpdate(int analysedSampleId, IEnumerable<TVariantModel> models)
-    {
-        RemoveRedundant(analysedSampleId, models);
-
-        var created = CreateMissing(analysedSampleId, models);
-
-        return created;
-    }
-
-    public IEnumerable<TVariantOccurrenceEntity> CreateMissing(int analysedSampleId, IEnumerable<TVariantModel> models)
+    public IEnumerable<TVariantOccurrenceEntity> CreateAll(
+        int analysedSampleId,
+        IEnumerable<TVariantModel> models,
+        IEnumerable<TVariantEntity> cache = null)
     {
         var entitiesToAdd = new List<TVariantOccurrenceEntity>();
 
         foreach (var model in models)
         {
-            var variant = _variantRepository.FindOrCreate(model);
+            var gene = _variantRepository.FindOrCreate(model, cache);
 
-            var entity = Find(analysedSampleId, variant.Id);
+            var entity = Convert(analysedSampleId, gene.Id);
 
-            if (entity == null)
-            {
-                entity = Convert(analysedSampleId, variant.Id);
-
-                entitiesToAdd.Add(entity);
-            }
+            entitiesToAdd.Add(entity);
         }
 
         if (entitiesToAdd.Any())
@@ -82,29 +80,10 @@ internal abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TV
         return entitiesToAdd;
     }
 
-    public void RemoveRedundant(int analysedSampleId, IEnumerable<TVariantModel> models)
+    public void RemoveAll(int analysedSampleId)
     {
-        var entitiesToKeep = new List<long>();
-
-        foreach (var model in models)
-        {
-            var variant = _variantRepository.Find(model);
-
-            if (variant == null)
-            {
-                continue;
-            }
-
-            var entity = Find(analysedSampleId, variant.Id);
-
-            if (entity != null)
-            {
-                entitiesToKeep.Add(entity.VariantId);
-            }
-        }
-
         var entitiesToRemove = _dbContext.Set<TVariantOccurrenceEntity>()
-            .Where(entity => entity.AnalysedSampleId == analysedSampleId && !entitiesToKeep.Contains(entity.VariantId))
+            .Where(entity => entity.AnalysedSampleId == analysedSampleId)
             .ToArray();
 
         if (entitiesToRemove.Any())
@@ -139,6 +118,7 @@ internal abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TV
     private TVariantOccurrenceEntity Convert(int analysedSampleId, long variantId)
     {
         var entity = Activator.CreateInstance<TVariantOccurrenceEntity>();
+
         entity.AnalysedSampleId = analysedSampleId;
         entity.VariantId = variantId;
 

@@ -1,72 +1,78 @@
 ﻿using Unite.Genome.Annotations.Clients.Ensembl.Resources;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
-using Unite.Genome.Annotations.Data.Models;
-using Unite.Genome.Annotations.Data.Models.Variants;
+using Unite.Genome.Annotations.Services.Models;
+using Unite.Genome.Annotations.Services.Models.Variants;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
 
-internal class AnnotationsDataConverter
+internal static class AnnotationsDataConverter
 {
     /// <summary>
     /// Converts annotated variant resources to consequences data models.
     /// </summary>
-    /// <param name="variants">Annotated variants to convert</param>
-    /// <param name="genes">Annotated genes cache</param>
-    /// <param name="transcripts">Annotated transcripts cache</param>
+    /// <param name="variantResources">Annotated variants to convert</param>
+    /// <param name="geneResources">Annotated genes cache</param>
+    /// <param name="transcriptResources">Annotated transcripts cache</param>
     /// <returns>List of variant consequences data models.</returns>
-    public ConsequencesDataModel[] Convert(
-        AnnotatedVariantResource[] variants,
-        GeneResource[] genes,
-        TranscriptResource[] transcripts
-        )
+    public static ConsequencesDataModel[] Convert(AnnotatedVariantResource[] variantResources, GeneResource[] geneResources, TranscriptResource[] transcriptResources)
     {
-        var consequencesDataModels = variants.Select(variant =>
+        var consequencesDataModels = new List<ConsequencesDataModel>();
+
+        foreach (var variantResource in variantResources)
         {
             var consequencesDataModel = new ConsequencesDataModel();
 
             consequencesDataModel.Variant = new VariantModel();
 
-            Map(variant, consequencesDataModel.Variant);
+            Map(variantResource, consequencesDataModel.Variant);
 
-            if (variant.AffectedTranscripts != null)
+            consequencesDataModel.AffectedTranscripts = variantResource.AffectedTranscripts?.Select(affectedTranscript =>
             {
-                consequencesDataModel.AffectedTranscripts = variant.AffectedTranscripts.Select(affectedTranscript =>
+                var affectedTranscriptModel = new AffectedTranscriptModel();
+
+                Map(affectedTranscript, affectedTranscriptModel);
+
+                affectedTranscriptModel.Variant = consequencesDataModel.Variant;
+
+                if (!string.IsNullOrWhiteSpace(affectedTranscript.GeneId))
                 {
-                    var affectedTranscriptModel = new AffectedTranscriptModel();
+                    var geneResource = geneResources.First(gene => gene.Id == affectedTranscript.GeneId);
 
-                    Map(affectedTranscript, affectedTranscriptModel);
+                    affectedTranscriptModel.Gene = new GeneModel();
 
-                    affectedTranscriptModel.Variant = consequencesDataModel.Variant;
+                    Map(geneResource, affectedTranscriptModel.Gene);
+                }
 
-                    if (!string.IsNullOrWhiteSpace(affectedTranscript.TranscriptId))
+                if (!string.IsNullOrWhiteSpace(affectedTranscript.TranscriptId))
+                {
+                    var transcriptResource = transcriptResources.First(transcript => transcript.Id == affectedTranscript.TranscriptId);
+
+                    affectedTranscriptModel.Transcript = new TranscriptModel();
+
+                    Map(transcriptResource, affectedTranscriptModel.Transcript);
+
+                    affectedTranscriptModel.Transcript.Gene = affectedTranscriptModel.Gene;
+
+
+                    if (transcriptResource.Protein != null)
                     {
-                        var transcript = transcripts.First(transcript => transcript.Id == affectedTranscript.TranscriptId);
+                        affectedTranscriptModel.Protein = new ProteinModel();
 
-                        affectedTranscriptModel.Transcript = new TranscriptModel();
+                        Map(transcriptResource.Protein, affectedTranscriptModel.Protein);
 
-                        Map(transcript, affectedTranscriptModel.Transcript);
-
-                        if (!string.IsNullOrWhiteSpace(affectedTranscript.GeneId))
-                        {
-                            var gene = genes.First(gene => gene.Id == affectedTranscript.GeneId);
-
-                            affectedTranscriptModel.Transcript.Gene = new GeneModel();
-
-                            Map(gene, affectedTranscriptModel.Transcript.Gene);
-                        }
+                        affectedTranscriptModel.Protein.Transcript = affectedTranscriptModel.Transcript;
                     }
+                }
 
-                    return affectedTranscriptModel;
+                return affectedTranscriptModel;
 
-                }).ToArray();
-            }
+            }).ToArray();
 
-            return consequencesDataModel;
+            consequencesDataModels.Add(consequencesDataModel);
+        }
 
-        }).ToArray();
-
-        return consequencesDataModels;
+        return consequencesDataModels.ToArray();
     }
 
 
@@ -94,41 +100,37 @@ internal class AnnotationsDataConverter
 
     private static void Map(GeneResource resource, GeneModel model)
     {
-        model.EnsemblId = resource.Id;
+        model.Id = resource.Id;
         model.Symbol = resource.Symbol;
+        model.Description = resource.Description;
         model.Biotype = resource.Biotype;
         model.Chromosome = resource.Chromosome;
         model.Start = resource.Start;
         model.End = resource.End;
-        model.Strand = resource.Strand == 1;
-        model.IsAnnotated = true;
+        model.Strand = resource.Strand;
+        model.ExonicLength = resource.ExonicLength;
     }
 
     private static void Map(TranscriptResource resource, TranscriptModel model)
     {
-        model.EnsemblId = resource.Id;
+        model.Id = resource.Id;
         model.Symbol = resource.Symbol;
+        model.Description = resource.Description;
         model.Biotype = resource.Biotype;
+        model.IsCanonical = resource.IsCanonical;
         model.Chromosome = resource.Chromosome;
         model.Start = resource.Start;
         model.End = resource.End;
-        model.Strand = resource.Strand == 1;
-        model.IsAnnotated = true;
-
-        if (resource.Protein != null)
-        {
-            model.Protein = new ProteinModel();
-
-            Map(resource.Protein, model.Protein);
-        }
+        model.Strand = resource.Strand;
+        model.ExonicLength = resource.ExonicLength;
     }
 
     private static void Map(ProteinResource resource, ProteinModel model)
     {
-        model.EnsemblId = resource.Id;
+        model.Id = resource.Id;
         model.Start = resource.Start;
         model.End = resource.End;
         model.Length = resource.Length;
-        model.IsAnnotated = true;
+        model.IsCanonical = resource.IsCanonical;
     }
 }

@@ -8,8 +8,7 @@ public class VariantModel
     private Chromosome? _chromosome;
     private int? _start;
     private int? _end;
-    private SvType? _svType;
-    private CnaType? _cnaType;
+    private CnvType? _type;
     private bool? _loh;
     private bool? _homoDel;
     private double? _c1Mean;
@@ -36,14 +35,9 @@ public class VariantModel
     public int? End { get => _end; set => _end = value; }
 
     /// <summary>
-    /// Structural variant type (SV.Type)
-    /// </summary>
-    public SvType? SvType { get => _svType; set => _svType = value; }
-
-    /// <summary>
     /// Copy number alteration type (CNA.Type)
     /// </summary>
-    public CnaType? CnaType { get => _cnaType; set => _cnaType = value; }
+    public CnvType? Type { get => _type; set => _type = value; }
 
     /// <summary>
     /// Loss of heterozygosity (either C1 or C2 are 0)

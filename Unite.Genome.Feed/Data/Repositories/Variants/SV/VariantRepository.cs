@@ -1,32 +1,29 @@
-﻿using Unite.Data.Entities.Genome.Variants.SV;
+﻿using System.Linq.Expressions;
+using Unite.Data.Entities.Genome.Variants.SV;
 using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Models.Variants.SV;
 
 namespace Unite.Genome.Feed.Data.Repositories.Variants.SV;
 
-internal class VariantRepository : VariantRepository<Variant, VariantModel>
+public class VariantRepository : VariantRepository<Variant, VariantModel>
 {
     public VariantRepository(DomainDbContext dbContext) : base(dbContext)
     {
     }
 
-    public override Variant Find(VariantModel model)
+    protected override Expression<Func<Variant, bool>> GetModelPredicate(VariantModel model)
     {
-        var entity = _dbContext.Set<Variant>()
-            .FirstOrDefault(entity =>
-                entity.ChromosomeId == model.Chromosome &&
-                entity.Start == model.Start &&
-                entity.End == model.End &&
-                entity.OtherChromosomeId == model.OtherChromosome &&
-                entity.OtherStart == model.OtherStart &&
-                entity.OtherEnd == model.OtherEnd &&
-                entity.TypeId == model.Type &&
-                entity.Inverted == model.Inverted &&
-                entity.FlankingSequenceFrom == model.FlankingSequenceFrom &&
-                entity.FlankingSequenceTo == model.FlankingSequenceTo
-            );
-
-        return entity;
+        return (entity) =>
+            entity.ChromosomeId == model.Chromosome &&
+            entity.Start == model.Start &&
+            entity.End == model.End &&
+            entity.OtherChromosomeId == model.OtherChromosome &&
+            entity.OtherStart == model.OtherStart &&
+            entity.OtherEnd == model.OtherEnd &&
+            entity.TypeId == model.Type &&
+            entity.Inverted == model.Inverted &&
+            entity.FlankingSequenceFrom == model.FlankingSequenceFrom &&
+            entity.FlankingSequenceTo == model.FlankingSequenceTo;
     }
 
     protected override void Map(in VariantModel model, ref Variant entity)

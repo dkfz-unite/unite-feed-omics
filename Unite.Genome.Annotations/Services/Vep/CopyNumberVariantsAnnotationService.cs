@@ -2,10 +2,7 @@
 using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Genome.Annotations.Data;
-using Unite.Genome.Annotations.Data.Models;
-using Unite.Genome.Annotations.Data.Repositories;
-using Unite.Genome.Annotations.Data.Repositories.Variants.CNV;
+using Unite.Genome.Annotations.Services.Models.Variants;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
@@ -13,9 +10,6 @@ namespace Unite.Genome.Annotations.Services.Vep;
 public class CopyNumberVariantsAnnotationService
 {
     private readonly DomainDbContext _dbContext;
-    private readonly VariantRepository<Variant> _variantRepository;
-    private readonly AffectedTranscriptRepository<Variant, AffectedTranscript> _affectedTranscriptRepository;
-    private readonly ConsequencesDataWriter<Variant, AffectedTranscript> _dataWriter;
     private readonly AnnotationsDataLoader _dataLoader;
 
 
@@ -26,14 +20,11 @@ public class CopyNumberVariantsAnnotationService
         )
     {
         _dbContext = dbContext;
-        _variantRepository = new VariantRepository<Variant>(dbContext);
-        _affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext);
-        _dataWriter = new ConsequencesDataWriter<Variant, AffectedTranscript>(dbContext, _variantRepository, _affectedTranscriptRepository);
         _dataLoader = new AnnotationsDataLoader(ensemblOptions, ensemblVepOptions, dbContext);
     }
 
 
-    public void Annotate(long[] variantIds, out ConsequencesDataUploadAudit audit)
+    public ConsequencesDataModel[] Annotate(long[] variantIds)
     {
         var variants = LoadVariants(variantIds).ToArray();
 
@@ -41,7 +32,7 @@ public class CopyNumberVariantsAnnotationService
 
         var annotations = _dataLoader.LoadData(codes).Result;
 
-        _dataWriter.SaveData(annotations, out audit);
+        return annotations;
     }
 
 
@@ -49,7 +40,7 @@ public class CopyNumberVariantsAnnotationService
     {
         return _dbContext.Set<Variant>()
             .Where(entity => variantIds.Contains(entity.Id))
-            .Where(entity => entity.CnaTypeId != null)
+            .Where(entity => entity.TypeId != null)
             .OrderBy(entity => entity.ChromosomeId)
             .ThenBy(entity => entity.Start);
     }

@@ -11,11 +11,11 @@ public abstract class VariantModelBaseMapper
     /// <param name="tcnMean">TCN mean.</param>
     /// <param name="ploidy">Sample ploidy.</param>
     /// <returns>CNA.Type based on TCN or TCN mean and sample ploidy.</returns>
-    protected static CnaType? GetCnaType(int? tcn, double? tcnMean, double? ploidy)
+    protected static CnvType? GetCnvType(int? tcn, double? tcnMean, double? ploidy)
     {
         if (tcn != null && tcn != -1 && ploidy != null)
         {
-            return tcn == ploidy ? CnaType.Neutral : tcn < ploidy ? CnaType.Loss : CnaType.Gain;
+            return tcn == ploidy ? CnvType.Neutral : tcn < ploidy ? CnvType.Loss : CnvType.Gain;
         }
         else if (tcnMean != null && ploidy != null)
         {
@@ -23,11 +23,11 @@ public abstract class VariantModelBaseMapper
 
             if (Math.Abs(delta) < 0.3)
             {
-                return CnaType.Neutral;
+                return CnvType.Neutral;
             }
             else if (Math.Abs(delta) > 0.7)
             {
-                return delta > 0 ? CnaType.Gain : CnaType.Loss;
+                return delta > 0 ? CnvType.Gain : CnvType.Loss;
             }
             else
             {

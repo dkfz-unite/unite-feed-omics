@@ -4,18 +4,16 @@ using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
-using Unite.Genome.Annotations.Data.Models.Variants;
+using Unite.Genome.Annotations.Services.Models.Variants;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
 
 internal class AnnotationsDataLoader
 {
-    private readonly EnsemblApiClient _ensemblApiClient;
+    private readonly EnsemblApiClient1 _ensemblApiClient;
     private readonly EnsemblVepApiClient _ensemblVepApiClient;
     private readonly DomainDbContext _dbContext;
-
-    private readonly AnnotationsDataConverter _converter;
 
 
     public AnnotationsDataLoader(
@@ -23,11 +21,11 @@ internal class AnnotationsDataLoader
         IEnsemblVepOptions vepOptions,
         DomainDbContext dbContext)
     {
-        _ensemblApiClient = new EnsemblApiClient(ensemblOptions);
+        _ensemblApiClient = new EnsemblApiClient1(ensemblOptions);
         _ensemblVepApiClient = new EnsemblVepApiClient(vepOptions);
         _dbContext = dbContext;
-        _converter = new AnnotationsDataConverter();
     }
+
 
     public async Task<ConsequencesDataModel[]> LoadData(string[] vepCodes)
     {
@@ -35,7 +33,7 @@ internal class AnnotationsDataLoader
         var genes = await AnnotateGenes(variants);
         var transcripts = await AnnotateTranscripts(variants);
 
-        return _converter.Convert(variants, genes, transcripts);
+        return AnnotationsDataConverter.Convert(variants, genes, transcripts);
     }
 
 
@@ -55,19 +53,21 @@ internal class AnnotationsDataLoader
             .Distinct()
             .ToArray();
 
+        //return await _ensemblApiClient.Find<GeneResource>(allIdentifiers, expand: false);
+
         var existingIdentifiers = allIdentifiers
-            .Where(ensemblId => _dbContext.Set<Gene>().Any(entity => entity.Info.EnsemblId == ensemblId))
+            .Where(id => _dbContext.Set<Gene>().Any(entity => entity.StableId == id))
             .ToArray();
 
         var newIdentifiers = allIdentifiers
-            .Where(ensemblId => !existingIdentifiers.Contains(ensemblId))
+            .Where(id => !existingIdentifiers.Contains(id))
             .ToArray();
 
         var existingResources = existingIdentifiers
-            .Select(ensemblId => new GeneResource { Id = ensemblId })
+            .Select(id => new GeneResource { Id = id })
             .ToArray();
 
-        var newResources = await _ensemblApiClient.Lookup<GeneResource>(newIdentifiers, expand: false);
+        var newResources = await _ensemblApiClient.Find<GeneResource>(newIdentifiers, length: true);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
     }
@@ -81,19 +81,21 @@ internal class AnnotationsDataLoader
             .Distinct()
             .ToArray();
 
+        //return await _ensemblApiClient.Find<TranscriptResource>(allIdentifiers, expand: true);
+
         var existingIdentifiers = allIdentifiers
-            .Where(ensemblId => _dbContext.Set<Transcript>().Any(entity => entity.Info.EnsemblId == ensemblId))
+            .Where(id => _dbContext.Set<Transcript>().Any(entity => entity.StableId == id))
             .ToArray();
 
         var newIdentifiers = allIdentifiers
-            .Where(ensemblId => !existingIdentifiers.Contains(ensemblId))
+            .Where(id => !existingIdentifiers.Contains(id))
             .ToArray();
 
         var existingResources = existingIdentifiers
-            .Select(ensemblId => new TranscriptResource { Id = ensemblId })
+            .Select(id => new TranscriptResource { Id = id })
             .ToArray();
 
-        var newResources = await _ensemblApiClient.Lookup<TranscriptResource>(newIdentifiers, expand: true);
+        var newResources = await _ensemblApiClient.Find<TranscriptResource>(newIdentifiers, length: true, expand: true);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
     }

@@ -30,15 +30,15 @@ public class SequencingDataUploadAudit
 
     public override string ToString()
     {
-        var message = new StringBuilder();
+        var messages = new List<string>();
 
-        message.AppendLine($"{MutationsCreated} mutations created");
-        message.AppendLine($"{MutationsAssociated} mutations associations created");
-        message.AppendLine($"{CopyNumberVariantsCreated} copy number variants created");
-        message.AppendLine($"{CopyNumberVariantsAssociated} copy number variants associations created");
-        message.AppendLine($"{StructuralVariantsCreated} structural variants created");
-        message.Append($"{StructuralVariantsAssociated} structural variants associations created");
+        messages.Add($"{MutationsCreated} mutations created");
+        messages.Add($"{MutationsAssociated} mutations associations created");
+        messages.Add($"{CopyNumberVariantsCreated} copy number variants created");
+        messages.Add($"{CopyNumberVariantsAssociated} copy number variants associations created");
+        messages.Add($"{StructuralVariantsCreated} structural variants created");
+        messages.Add($"{StructuralVariantsAssociated} structural variants associations created");
 
-        return message.ToString();
+        return string.Join(Environment.NewLine, messages);
     }
 }

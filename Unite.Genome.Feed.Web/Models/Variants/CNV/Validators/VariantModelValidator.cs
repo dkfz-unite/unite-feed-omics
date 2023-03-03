@@ -17,7 +17,7 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
             .NotEmpty().WithMessage("Should not be empty")
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
-        RuleFor(model => model.CnaType)
+        RuleFor(model => model.Type)
             .NotEmpty()
             .When(model => model.Tcn == null)
             .WithMessage("Should not be empty");
@@ -39,7 +39,7 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
 
         RuleFor(model => model.Tcn)
             .NotEmpty()
-            .When(model => model.CnaType == null)
+            .When(model => model.Type == null)
             .WithMessage("Should not be empty");
 
         RuleFor(model => model.DhMax)
