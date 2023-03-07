@@ -8,7 +8,7 @@
 		<PackageReference Include="Macross.Json.Extensions" Version="3.0.0" />
 		<PackageReference Include="Unite.Data" Version="4.5.0" />
 	</ItemGroup>
-	<ItemGroup>
+	<!-- <ItemGroup>
 		<Folder Include="Clients\Ensembl\" />
 		<Folder Include="Clients\" />
 		<Folder Include="Clients\Ensembl\Configuration\" />
@@ -23,8 +23,8 @@
 		<Folder Include="Services\Vep\" />
 		<Folder Include="Clients\Ensembl\Resources\Vep\" />
 		<Folder Include="Services\Models\" />
-	</ItemGroup>
-	<ItemGroup>
+	</ItemGroup> -->
+	<!-- <ItemGroup>
 		<None Remove="Unite.Data" />
 		<None Remove="Ensembl\Client\Resources\" />
 		<None Remove="Ensembl\Client\Models\" />
@@ -42,5 +42,5 @@
 		<None Remove="Clients\Ensembl\Resources\Vep\" />
 		<None Remove="Ensembl.Data" />
 		<None Remove="Services\Models\" />
-	</ItemGroup>
+	</ItemGroup> -->
 </Project>

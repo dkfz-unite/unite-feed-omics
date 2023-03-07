@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
-	<ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <!-- <ItemGroup>
 		<Folder Include="Data\" />
 		<Folder Include="Data\Audit\" />
 		<Folder Include="Data\Models\" />
@@ -32,8 +31,8 @@
 		<None Remove="Cache\Repositories\Submissions\Variants\SSM\" />
 		<None Remove="Cache\Repositories\Submissions\Variants\CNV\" />
 		<None Remove="Cache\Repositories\Submissions\Variants\SV\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <PackageReference Include="Unite.Data" Version="4.5.0" />
-	</ItemGroup>
+	</ItemGroup> -->
+  <ItemGroup>
+    <PackageReference Include="Unite.Data" Version="4.5.0" />
+  </ItemGroup>
 </Project>

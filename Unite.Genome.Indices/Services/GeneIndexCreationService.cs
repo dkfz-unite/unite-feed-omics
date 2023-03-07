@@ -146,7 +146,13 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .Distinct()
             .ToArray();
 
-        var specimenIds = ssmAffectedSpecimenIds.Union(cnvAffectedSpecimenIds).Union(svAffectedSpecimenIds).ToArray();
+        var exAffectedSpecimenIds = _dbContext.Set<GeneExpression>()
+            .Where(expression => expression.GeneId == geneId)
+            .Select(expression => expression.AnalysedSample.Sample.SpecimenId)
+            .Distinct()
+            .ToArray();
+
+        var specimenIds = ssmAffectedSpecimenIds.Union(cnvAffectedSpecimenIds).Union(svAffectedSpecimenIds).Union(exAffectedSpecimenIds).ToArray();
 
         var specimens = _dbContext.Set<Specimen>()
             .IncludeTissue()

@@ -14,7 +14,7 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 	</ItemGroup>
-	<ItemGroup>
+	<!-- <ItemGroup>
 		<None Remove="Integration\" />
 		<None Remove="Integration\Data\" />
 		<None Remove="Integration\Client\" />
@@ -23,7 +23,7 @@
 		<Folder Include="Integration\" />
 		<Folder Include="Integration\Services\" />
 		<Folder Include="Integration\Clients\" />
-	</ItemGroup>
+	</ItemGroup> -->
 	<ItemGroup>
 		<ProjectReference Include="..\Unite.Genome.Annotations\Unite.Genome.Annotations.csproj" />
 	</ItemGroup>

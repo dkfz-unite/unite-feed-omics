@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
-	<ItemGroup>
+	<!-- <ItemGroup>
 		<Folder Include="Configuration\" />
 		<Folder Include="Configuration\Options\" />
 		<Folder Include="Configuration\Filters\" />
@@ -44,13 +44,13 @@
 		<Folder Include="Services\Indexing\" />
 		<Folder Include="Controllers\Transcriptomics\" />
 		<Folder Include="Handlers\Annotation\Converters\" />
-	</ItemGroup>
+	</ItemGroup> -->
 	<ItemGroup>
 		<PackageReference Include="Macross.Json.Extensions" Version="3.0.0" />
 		<PackageReference Include="FluentValidation.AspNetCore" Version="11.1.2" />
 		<PackageReference Include="Unite.Cache" Version="1.0.0" />
 	</ItemGroup>
-	<ItemGroup>
+	<!-- <ItemGroup>
 		<None Remove="FluentValidation.AspNetCore" />
 		<None Remove="Models\Variants\" />
 		<None Remove="Models\Variants\SSM\" />
@@ -84,19 +84,10 @@
 		<None Remove="Services\Indexing\" />
 		<None Remove="Controllers\Transcriptomics\" />
 		<None Remove="Handlers\Annotation\Converters\" />
-	</ItemGroup>
+	</ItemGroup> -->
 	<ItemGroup>
-		<ProjectReference Include="..\Unite.Genome.Feed\Unite.Genome.Feed.csproj">
-			<GlobalPropertiesToRemove>
-			</GlobalPropertiesToRemove>
-		</ProjectReference>
-		<ProjectReference Include="..\Unite.Genome.Indices\Unite.Genome.Indices.csproj">
-			<GlobalPropertiesToRemove>
-			</GlobalPropertiesToRemove>
-		</ProjectReference>
-		<ProjectReference Include="..\Unite.Genome.Annotations\Unite.Genome.Annotations.csproj">
-			<GlobalPropertiesToRemove>
-			</GlobalPropertiesToRemove>
-		</ProjectReference>
+		<ProjectReference Include="..\Unite.Genome.Feed\Unite.Genome.Feed.csproj" />
+		<ProjectReference Include="..\Unite.Genome.Indices\Unite.Genome.Indices.csproj" />
+		<ProjectReference Include="..\Unite.Genome.Annotations\Unite.Genome.Annotations.csproj" />
 	</ItemGroup>
 </Project>
