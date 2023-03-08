@@ -77,4 +77,46 @@ public class VariantModel
     /// </summary>
     [JsonPropertyName("FlankingSequence2")]
     public string FlankingSequenceTo { get => _flankingSequenceTo; set => _flankingSequenceTo = value; }
+
+
+    #region Equality
+    public override bool Equals(object obj)
+    {
+        var other = obj as VariantModel;
+
+        if (other == null) return false;
+
+        return Chromosome == other.Chromosome
+            && Start == other.Start
+            && End == other.End
+            && OtherChromosome == other.OtherChromosome
+            && OtherStart == other.OtherStart
+            && OtherEnd == other.OtherEnd
+            && Type == other.Type
+            && Inverted == other.Inverted
+            && FlankingSequenceFrom == other.FlankingSequenceFrom
+            && FlankingSequenceTo == other.FlankingSequenceTo;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 36613;
+
+            hash = hash * 37724 + Chromosome.GetHashCode();
+            hash = hash * 37724 + Start.GetHashCode();
+            hash = hash * 37724 + End.GetHashCode();
+            hash = hash * 37724 + OtherChromosome.GetHashCode();
+            hash = hash * 37724 + OtherStart.GetHashCode();
+            hash = hash * 37724 + OtherEnd.GetHashCode();
+            hash = hash * 37724 + Type.GetHashCode();
+            hash = hash * 37724 + Inverted.GetHashCode();
+            hash = hash * 37724 + FlankingSequenceFrom.GetHashCode();
+            hash = hash * 37724 + FlankingSequenceTo.GetHashCode();
+
+            return hash;
+        }
+    }
+    #endregion
 }

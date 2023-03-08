@@ -36,4 +36,34 @@ public class VariantModel
     {
         return HGVsCodeGenerator.Generate(Chromosome.Value, Position, Ref, Alt);
     }
+
+
+    #region Equality
+    public override bool Equals(object obj)
+    {
+        var other = obj as VariantModel;
+
+        if (other == null) return false;
+
+        return Chromosome == other.Chromosome
+            && Position == other.Position
+            && Ref == other.Ref
+            && Alt == other.Alt;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 36613;
+
+            hash = hash * 37724 + Chromosome.GetHashCode();
+            hash = hash * 37724 + Position.GetHashCode();
+            hash = hash * 37724 + Ref.GetHashCode();
+            hash = hash * 37724 + Alt.GetHashCode();
+            
+            return hash;
+        }
+    }
+    #endregion
 }

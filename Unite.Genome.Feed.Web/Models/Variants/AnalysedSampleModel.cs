@@ -9,6 +9,7 @@ namespace Unite.Genome.Feed.Web.Models.Variants;
 public class AnalysedSampleModel<TModel> : SampleModel where TModel : class, new()
 {
     private string _matchedSampleId;
+    private TModel[] _variants;
 
 
     /// <summary>
@@ -19,5 +20,5 @@ public class AnalysedSampleModel<TModel> : SampleModel where TModel : class, new
     /// <summary>
     /// List of variants appeared in the sample after analysis
     /// </summary>
-    public TModel[] Variants { get; set; }
+    public TModel[] Variants { get => _variants?.Distinct().ToArray(); set => _variants = value; }
 }

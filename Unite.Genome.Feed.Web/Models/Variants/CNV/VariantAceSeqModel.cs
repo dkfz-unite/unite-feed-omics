@@ -166,4 +166,48 @@ public class VariantAceSeqModel
              : string.Equals(value, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
              : int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number : null;
     }
+
+
+    #region Equality
+    public override bool Equals(object obj)
+    {
+        var other = obj as VariantAceSeqModel;
+
+        if (other == null) return false;
+
+        return Chromosome == other.Chromosome
+            && Start == other.Start
+            && End == other.End
+            && Type == other.Type
+            && C1Mean == other.C1Mean
+            && C2Mean == other.C2Mean
+            && TcnMean == other.TcnMean
+            && C1 == other.C1
+            && C2 == other.C2
+            && Tcn == other.Tcn
+            && DhMax == other.DhMax;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 36613;
+
+            hash = hash * 37724 + Chromosome.GetHashCode();
+            hash = hash * 37724 + Start.GetHashCode();
+            hash = hash * 37724 + End.GetHashCode();
+            hash = hash * 37724 + Type.GetHashCode();
+            hash = hash * 37724 + C1Mean.GetHashCode();
+            hash = hash * 37724 + C2Mean.GetHashCode();
+            hash = hash * 37724 + TcnMean.GetHashCode();
+            hash = hash * 37724 + C1.GetHashCode();
+            hash = hash * 37724 + C2.GetHashCode();
+            hash = hash * 37724 + Tcn.GetHashCode();
+            hash = hash * 37724 + DhMax.GetHashCode();
+
+            return hash;
+        }
+    }
+    #endregion
 }

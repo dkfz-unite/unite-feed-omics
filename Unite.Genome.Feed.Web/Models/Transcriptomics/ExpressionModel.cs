@@ -4,20 +4,20 @@ namespace Unite.Genome.Feed.Web.Models.Transcriptomics;
 
 public class ExpressionModel
 {
+    private string _source = "Ensembl";
     private string _geneId;
     private string _geneSymbol;
     private string _transcriptId;
     private string _transcriptSymbol;
-    private string _source = "Ensembl";
     private int? _exonicLength;
     private int? _reads;
 
 
+    public string Source { get => _source?.Trim(); set => _source = value; }
     public string GeneId { get => ParseId(_geneId)?.Trim(); set => _geneId = value; }
     public string GeneSymbol { get => _geneSymbol?.Trim(); set => _geneSymbol = value; }
     public string TranscriptId { get => ParseId(_transcriptId)?.Trim(); set => _transcriptId = value; }
     public string TranscriptSymbol { get => _transcriptSymbol?.Trim(); set => _transcriptSymbol = value; }
-    public string Source { get => _source?.Trim(); set => _source = value; }
     public int? ExonicLength { get => _exonicLength; set => _exonicLength = value; }
     public int? Reads { get => _reads; set => _reads = value; }
 
@@ -57,4 +57,39 @@ public class ExpressionModel
     {
         return id?.Split('.')[0];
     }
+
+    #region Equality
+    public override bool Equals(object obj)
+    {
+        var other = obj as ExpressionModel;
+
+        if (other == null) return false;
+
+        return Source == other.Source
+            && GeneId == other.GeneId
+            && GeneSymbol == other.GeneSymbol
+            && TranscriptId == other.TranscriptId
+            && TranscriptSymbol == other.TranscriptSymbol
+            && ExonicLength == other.ExonicLength
+            && Reads == other.Reads;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 36613;
+
+            hash = hash * 37724 + Source.GetHashCode();
+            hash = hash * 37724 + GeneId.GetHashCode();
+            hash = hash * 37724 + GeneSymbol.GetHashCode();
+            hash = hash * 37724 + TranscriptId.GetHashCode();
+            hash = hash * 37724 + TranscriptSymbol.GetHashCode();
+            hash = hash * 37724 + ExonicLength.GetHashCode();
+            hash = hash * 37724 + Reads.GetHashCode();
+            
+            return hash;
+        }
+    }
+    #endregion
 }
