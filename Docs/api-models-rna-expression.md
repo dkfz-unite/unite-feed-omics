@@ -8,7 +8,7 @@ Includes information about the analysis, sample and expression data.
 - Example: `{...}`
 
 **`Sample`*** - Which sample was analysed.
-- Type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expresson.md#sample))_
+- Type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expression.md#sample))_
 - Element type: 
 - Example: `{...}`
 
