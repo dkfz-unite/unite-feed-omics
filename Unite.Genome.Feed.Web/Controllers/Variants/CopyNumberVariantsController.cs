@@ -7,7 +7,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
-[Route("api/cnv")]
+[Route("api/dna/variants/cnvs")]
 [ApiController]
 public class CopyNumberVariantsController : Controller
 {

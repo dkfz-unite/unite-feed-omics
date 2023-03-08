@@ -7,7 +7,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
-[Route("api/ssm")]
+[Route("api/dna/variants/ssms")]
 [ApiController]
 public class MutationsController : Controller
 {

@@ -6,7 +6,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Transcriptomics;
 
-[Route("api/transcriptomics")]
+[Route("api/rna/expressions")]
 [ApiController]
 public class TranscriptomicsController : Controller
 {
