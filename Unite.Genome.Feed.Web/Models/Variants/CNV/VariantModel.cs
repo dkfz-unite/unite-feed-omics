@@ -149,19 +149,19 @@ public class VariantModel
         {
             int hash = 36613;
 
-            hash = hash * 37724 + Chromosome.GetHashCode();
-            hash = hash * 37724 + Start.GetHashCode();
-            hash = hash * 37724 + End.GetHashCode();
-            hash = hash * 37724 + Type.GetHashCode();
-            hash = hash * 37724 + Loh.GetHashCode();
-            hash = hash * 37724 + HomoDel.GetHashCode();
-            hash = hash * 37724 + C1Mean.GetHashCode();
-            hash = hash * 37724 + C2Mean.GetHashCode();
-            hash = hash * 37724 + TcnMean.GetHashCode();
-            hash = hash * 37724 + C1.GetHashCode();
-            hash = hash * 37724 + C2.GetHashCode();
-            hash = hash * 37724 + Tcn.GetHashCode();
-            hash = hash * 37724 + DhMax.GetHashCode();
+            hash = hash * 37724 + Chromosome?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Start?.GetHashCode() ?? 0;
+            hash = hash * 37724 + End?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Type?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Loh?.GetHashCode() ?? 0;
+            hash = hash * 37724 + HomoDel?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C1Mean?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C2Mean?.GetHashCode() ?? 0;
+            hash = hash * 37724 + TcnMean?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C1?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C2?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Tcn?.GetHashCode() ?? 0;
+            hash = hash * 37724 + DhMax?.GetHashCode() ?? 0;
 
             return hash;
         }

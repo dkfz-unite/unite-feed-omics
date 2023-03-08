@@ -104,16 +104,16 @@ public class VariantModel
         {
             int hash = 36613;
 
-            hash = hash * 37724 + Chromosome.GetHashCode();
-            hash = hash * 37724 + Start.GetHashCode();
-            hash = hash * 37724 + End.GetHashCode();
-            hash = hash * 37724 + OtherChromosome.GetHashCode();
-            hash = hash * 37724 + OtherStart.GetHashCode();
-            hash = hash * 37724 + OtherEnd.GetHashCode();
-            hash = hash * 37724 + Type.GetHashCode();
-            hash = hash * 37724 + Inverted.GetHashCode();
-            hash = hash * 37724 + FlankingSequenceFrom.GetHashCode();
-            hash = hash * 37724 + FlankingSequenceTo.GetHashCode();
+            hash = hash * 37724 + Chromosome?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Start?.GetHashCode() ?? 0;
+            hash = hash * 37724 + End?.GetHashCode() ?? 0;
+            hash = hash * 37724 + OtherChromosome?.GetHashCode() ?? 0;
+            hash = hash * 37724 + OtherStart?.GetHashCode() ?? 0;
+            hash = hash * 37724 + OtherEnd?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Type?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Inverted?.GetHashCode() ?? 0;
+            hash = hash * 37724 + FlankingSequenceFrom?.GetHashCode() ?? 0;
+            hash = hash * 37724 + FlankingSequenceTo?.GetHashCode() ?? 0;
 
             return hash;
         }

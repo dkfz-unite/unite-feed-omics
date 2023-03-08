@@ -80,13 +80,13 @@ public class ExpressionModel
         {
             int hash = 36613;
 
-            hash = hash * 37724 + Source.GetHashCode();
-            hash = hash * 37724 + GeneId.GetHashCode();
-            hash = hash * 37724 + GeneSymbol.GetHashCode();
-            hash = hash * 37724 + TranscriptId.GetHashCode();
-            hash = hash * 37724 + TranscriptSymbol.GetHashCode();
-            hash = hash * 37724 + ExonicLength.GetHashCode();
-            hash = hash * 37724 + Reads.GetHashCode();
+            hash = hash * 37724 + Source?.GetHashCode() ?? 0;
+            hash = hash * 37724 + GeneId?.GetHashCode() ?? 0;
+            hash = hash * 37724 + GeneSymbol?.GetHashCode() ?? 0;
+            hash = hash * 37724 + TranscriptId?.GetHashCode() ?? 0;
+            hash = hash * 37724 + TranscriptSymbol?.GetHashCode() ?? 0;
+            hash = hash * 37724 + ExonicLength?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Reads?.GetHashCode() ?? 0;
             
             return hash;
         }

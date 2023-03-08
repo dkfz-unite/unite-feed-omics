@@ -57,10 +57,10 @@ public class VariantModel
         {
             int hash = 36613;
 
-            hash = hash * 37724 + Chromosome.GetHashCode();
-            hash = hash * 37724 + Position.GetHashCode();
-            hash = hash * 37724 + Ref.GetHashCode();
-            hash = hash * 37724 + Alt.GetHashCode();
+            hash = hash * 37724 + Chromosome?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Position?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Ref?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Alt?.GetHashCode() ?? 0;
             
             return hash;
         }
