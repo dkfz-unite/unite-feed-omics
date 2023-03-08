@@ -8,19 +8,27 @@ public class ExpressionModelValidator : AbstractValidator<ExpressionModel>
     {
         RuleFor(model => model.GetDataType())
             .Must(value => value != 0)
-            .WithMessage("Either gene, transcript or location information has to be specified");
+            .WithMessage("Either 'GeneId', 'GeneSymbol', 'TranscriptId' or 'TranscriptSymbol' has to be specified");
 
         RuleFor(model => model.GeneId)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
+
+        RuleFor(model => model.GeneSymbol)
             .MaximumLength(100)
             .WithMessage("Maximum length is 100");
 
         RuleFor(model => model.TranscriptId)
             .MaximumLength(100)
             .WithMessage("Maximum length is 100");
+        
+        RuleFor(model => model.TranscriptSymbol)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
 
         RuleFor(model => model.Source)
-            .NotEmpty()
-            .WithMessage("Should not be empty");
+            .NotEmpty().WithMessage("Should not be empty")
+            .MaximumLength(100).WithMessage("Maximum length is 100");
 
         RuleFor(model => model.ExonicLength)
             .Must(value => value > 0)

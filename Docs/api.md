@@ -10,7 +10,7 @@ Health check.
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
-## POST: [api/ssm](http://localhost:5106/api/ssm)
+## POST: [api/dna/variants/ssms](http://localhost:5106/api/dna/variants/ssms)
 
 Submit mutations (SSM) data (including sequencing analysis data).
 
@@ -72,7 +72,7 @@ Fields description can be found [here](https://github.com/dkfz-unite/unite-genom
 - `400` - request data didn't pass validation
 
 
-## POST: [api/cnv](http://localhost:5106/api/cnv)
+## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs)
 
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in default format.
 
@@ -109,7 +109,7 @@ Request implements **UPSERT** logic:
                         "Chromosome": "4",
                         "Start": 164362032,
                         "End": 164458144,
-                        "CnaType": "Gain",
+                        "Type": "Gain",
                         "Loh": false,
                         "HomoDel": false,
                         "C1Mean": 1.2465,
@@ -124,7 +124,7 @@ Request implements **UPSERT** logic:
                         "Chromosome": "5",
                         "Start": 65498712,
                         "End": 65608792,
-                        "CnaType": "Loss",
+                        "Type": "Loss",
                         "Loh": true,
                         "HomoDel": false,
                         "C1Mean": 1.1265,
@@ -139,7 +139,7 @@ Request implements **UPSERT** logic:
                         "Chromosome": "6",
                         "Start": 84236917,
                         "End": 84337937,
-                        "CnaType": "Loss",
+                        "Type": "Loss",
                         "Loh": false,
                         "HomoDel": true,
                         "C1Mean": 0.1247,
@@ -163,7 +163,7 @@ Fields description can be found [here](https://github.com/dkfz-unite/unite-genom
 - `400` - request data didn't pass validation
 
 
-## POST: [api/cnv/aceseq](http://localhost:5106/api/cnv/aceseq)
+## POST: [api/dna/variants/cnvs/aceseq](http://localhost:5106/api/dna/variants/cnvs/aceseq)
 
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in ACESeq format.
 
@@ -251,7 +251,7 @@ Fields description can be found [here](https://github.com/dkfz-unite/unite-genom
 - `400` - request data didn't pass validation
 
 
-## POST: [api/sv](http://localhost:5106/api/sv)
+## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs)
 
 Submit Structural Variants (SV) data (including sequencing analysis data).
 
@@ -325,6 +325,50 @@ Request implements **UPSERT** logic:
 ]
 ```
 Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sv.md).
+
+**Response**
+- `200` - request was processed successfully
+- `400` - request data didn't pass validation
+
+
+## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions)
+
+Submit Gene Expression (Transcriptomics) data (including sequencing analysis data).
+
+Request implements **OVERRIDE** logic:
+- Data will be overriden if existed
+
+**Boby** (_application/json_)
+```json
+[
+    {
+        "Analysis": {
+            "Type": "RNA-Seq"
+        },
+        "Sample": {
+            "Id": "SA5",
+            "DonorId": "DO1",
+            "SpecimenId": "TI2",
+            "SpecimenType": "Tissue",
+        },
+        "Expressions": [
+            {
+                "GeneId": "ENSG00000223972",
+                "Reads": 238
+            },
+            {
+                "GeneId": "ENSG00000243485",
+                "Reads": 0
+            },
+            {
+                "GeneId": "ENSG00000274890",
+                "Reads": 0
+            }
+        ]
+    }
+]
+```
+Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expression.md).
 
 **Response**
 - `200` - request was processed successfully

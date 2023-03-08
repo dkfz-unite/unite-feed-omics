@@ -54,7 +54,7 @@ Analysed sample data.
 - Example: `"SA14"`
 
 **`Ploidy`** - Sample ploidy.
-- Note: If ploidy is not set, calculation of variant properties like `CnaType`, `Loh` or `HomoDel` (if they were not set explicitly) won't be possible.
+- Note: If ploidy is not set, calculation of variant properties like `Type`, `Loh` or `HomoDel` (if they were not set explicitly) won't be possible.
 - Type: _Double_
 - Limitations: Should be greater than 0
 - Example: `2`
@@ -88,7 +88,7 @@ Copy number variant (CNV) data.
 - Limitations: Greater than `Start`
 - Example: `65608792`
 
-**`CnaType`** - Copy number alteration type.
+**`Type`** - Copy number alteration type.
 - Note: If not set, the api will try to calculate the value from `Tcn` and sample `Ploidy`.
 - Type: _String_
 - Possible values: `"Gain"`, `"Loss"`, `"Neutral"`
@@ -142,8 +142,8 @@ Copy number variant (CNV) data.
 - Type: _Integer_
 - Example: `1`
 
-#### CnaType
-CnaType values are:
+#### Type
+Type values are:
 - `"Gain"` - total number of copies is certainly higher than sample ploidy
 - `"Loss"` - total number of copies is certainly lower than sample ploidy
 - `"Neutral"` - total number of copies is certainly similar to sample ploidy

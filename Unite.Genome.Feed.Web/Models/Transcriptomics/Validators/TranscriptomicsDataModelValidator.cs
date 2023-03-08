@@ -31,8 +31,19 @@ public class TranscriptomicsDataModelValidator : AbstractValidator<Transcriptomi
             .NotEmpty()
             .WithMessage("Should not be empty");
 
+        RuleFor(model => model.Expressions)
+            .Must(HaveSingleDataType)
+            .WithMessage("'GeneId', 'GeneSymbol', 'TranscriptId' or 'TranscriptSymbol' should be provided for all entries");
+
         RuleForEach(model => model.Expressions)
             .SetValidator(_expressionModelValidator);
+    }
+
+    private static bool HaveSingleDataType(ExpressionModel[] models)
+    {
+        var type = models.FirstOrDefault().GetDataType();
+
+        return models.All(model => model.GetDataType() == type);
     }
 }
 
