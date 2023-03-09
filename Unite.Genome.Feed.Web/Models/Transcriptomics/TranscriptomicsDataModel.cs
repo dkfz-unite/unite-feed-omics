@@ -20,5 +20,5 @@ public class TranscriptomicsDataModel
     /// <summary>
     /// Expression data
     /// </summary>
-    public ExpressionModel[] Expressions { get => _expressions?.DistinctBy(e => e.GetContract()).ToArray(); set => _expressions = value; }
+    public ExpressionModel[] Expressions { get => _expressions?.Distinct().ToArray(); set => _expressions = value; }
 }

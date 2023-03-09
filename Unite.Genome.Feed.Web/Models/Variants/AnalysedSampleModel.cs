@@ -6,7 +6,7 @@ namespace Unite.Genome.Feed.Web.Models.Variants;
 /// Variant type specific analysed sample model
 /// </summary>
 /// <typeparam name="TModel">Variant model type</typeparam>
-public class AnalysedSampleModel<TModel> : SampleModel where TModel : class, IDistinctable, new()
+public class AnalysedSampleModel<TModel> : SampleModel where TModel : class, new()
 {
     private string _matchedSampleId;
     private TModel[] _variants;
@@ -20,5 +20,5 @@ public class AnalysedSampleModel<TModel> : SampleModel where TModel : class, IDi
     /// <summary>
     /// List of variants appeared in the sample after analysis
     /// </summary>
-    public TModel[] Variants { get => _variants?.DistinctBy(v => v.GetContract()).ToArray(); set => _variants = value; }
+    public TModel[] Variants { get => _variants?.Distinct().ToArray(); set => _variants = value; }
 }

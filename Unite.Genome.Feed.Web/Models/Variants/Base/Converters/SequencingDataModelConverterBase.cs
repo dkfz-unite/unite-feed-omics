@@ -5,7 +5,7 @@ using DataModels = Unite.Genome.Feed.Data.Models;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.Base.Converters;
 
-public abstract class SequencingDataModelConverterBase<TModel> where TModel : class, IDistinctable, new()
+public abstract class SequencingDataModelConverterBase<TModel> where TModel : class, new()
 {
     protected readonly AnalysisModelMapper _analysisModelMapper;
     protected readonly SampleModelMapper _sampleModelMapper;

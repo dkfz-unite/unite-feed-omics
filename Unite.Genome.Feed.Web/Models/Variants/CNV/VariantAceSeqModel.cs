@@ -2,11 +2,10 @@
 using System.Text.Json.Serialization;
 using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Entities.Genome.Variants.CNV.Enums;
-using Unite.Genome.Feed.Web.Models.Base;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.CNV;
 
-public class VariantAceSeqModel : IDistinctable
+public class VariantAceSeqModel
 {
     private Chromosome? _chromosome;
     private int? _start;
@@ -149,17 +148,6 @@ public class VariantAceSeqModel : IDistinctable
         return GetInteger(Tcn);
     }
 
-    public dynamic GetContract()
-    {
-        return new
-        {
-            Chromosome, Start, End, Type,
-            C1Mean, C2Mean, TcnMean,
-            C1, C2, Tcn,
-            DhMax
-        };
-    }
-
 
     private static string GetString(string value)
     {
@@ -178,4 +166,48 @@ public class VariantAceSeqModel : IDistinctable
              : string.Equals(value, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
              : int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number : null;
     }
+
+
+    #region Equality
+    public override bool Equals(object obj)
+    {
+        var other = obj as VariantAceSeqModel;
+
+        if (other == null) return false;
+
+        return Chromosome == other.Chromosome
+            && Start == other.Start
+            && End == other.End
+            && Type == other.Type
+            && C1Mean == other.C1Mean
+            && C2Mean == other.C2Mean
+            && TcnMean == other.TcnMean
+            && C1 == other.C1
+            && C2 == other.C2
+            && Tcn == other.Tcn
+            && DhMax == other.DhMax;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 36613;
+
+            hash = hash * 37724 + Chromosome?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Start?.GetHashCode() ?? 0;
+            hash = hash * 37724 + End?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Type?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C1Mean?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C2Mean?.GetHashCode() ?? 0;
+            hash = hash * 37724 + TcnMean?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C1?.GetHashCode() ?? 0;
+            hash = hash * 37724 + C2?.GetHashCode() ?? 0;
+            hash = hash * 37724 + Tcn?.GetHashCode() ?? 0;
+            hash = hash * 37724 + DhMax?.GetHashCode() ?? 0;
+
+            return hash;
+        }
+    }
+    #endregion
 }
