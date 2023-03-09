@@ -1,8 +1,8 @@
-﻿using Unite.Genome.Feed.Data.Models.Enums;
+﻿using Unite.Genome.Feed.Web.Models.Base;
 
 namespace Unite.Genome.Feed.Web.Models.Transcriptomics;
 
-public class ExpressionModel
+public class ExpressionModel : IDistinctable
 {
     private string _source = "Ensembl";
     private string _geneId;
@@ -58,38 +58,17 @@ public class ExpressionModel
         return id?.Split('.')[0];
     }
 
-    #region Equality
-    public override bool Equals(object obj)
+    public dynamic GetContract()
     {
-        var other = obj as ExpressionModel;
-
-        if (other == null) return false;
-
-        return Source == other.Source
-            && GeneId == other.GeneId
-            && GeneSymbol == other.GeneSymbol
-            && TranscriptId == other.TranscriptId
-            && TranscriptSymbol == other.TranscriptSymbol
-            && ExonicLength == other.ExonicLength
-            && Reads == other.Reads;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
+        return new
         {
-            int hash = 36613;
-
-            hash = hash * 37724 + Source?.GetHashCode() ?? 0;
-            hash = hash * 37724 + GeneId?.GetHashCode() ?? 0;
-            hash = hash * 37724 + GeneSymbol?.GetHashCode() ?? 0;
-            hash = hash * 37724 + TranscriptId?.GetHashCode() ?? 0;
-            hash = hash * 37724 + TranscriptSymbol?.GetHashCode() ?? 0;
-            hash = hash * 37724 + ExonicLength?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Reads?.GetHashCode() ?? 0;
-            
-            return hash;
-        }
+            Source,
+            GeneId,
+            GeneSymbol,
+            TranscriptId,
+            TranscriptSymbol,
+            ExonicLength,
+            Reads 
+        };
     }
-    #endregion
 }
