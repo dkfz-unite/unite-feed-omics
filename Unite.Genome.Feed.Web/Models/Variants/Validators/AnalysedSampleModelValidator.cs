@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Unite.Genome.Feed.Web.Models.Base;
 using Unite.Genome.Feed.Web.Models.Base.Validators;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.Validators;
@@ -9,7 +10,7 @@ namespace Unite.Genome.Feed.Web.Models.Variants.Validators;
 /// <typeparam name="TModel">Variant model type</typeparam>
 /// <typeparam name="TModelValidator">Variant model validator validator</typeparam>
 public class AnalysedSampleModelValidator<TModel, TModelValidator> : SampleModelValidator<AnalysedSampleModel<TModel>>
-    where TModel : class, new()
+    where TModel : class, IDistinctable, new()
     where TModelValidator : IValidator<TModel>, new()
 {
     private readonly IValidator<TModel> _variantModelValidator;

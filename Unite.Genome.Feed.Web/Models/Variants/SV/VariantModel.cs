@@ -1,10 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Entities.Genome.Variants.SV.Enums;
+using Unite.Genome.Feed.Web.Models.Base;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SV;
 
-public class VariantModel
+public class VariantModel : IDistinctable
 {
     private Chromosome? _chromosome;
     private int? _start;
@@ -78,45 +79,14 @@ public class VariantModel
     [JsonPropertyName("FlankingSequence2")]
     public string FlankingSequenceTo { get => _flankingSequenceTo; set => _flankingSequenceTo = value; }
 
-
-    #region Equality
-    public override bool Equals(object obj)
+    public dynamic GetContract()
     {
-        var other = obj as VariantModel;
-
-        if (other == null) return false;
-
-        return Chromosome == other.Chromosome
-            && Start == other.Start
-            && End == other.End
-            && OtherChromosome == other.OtherChromosome
-            && OtherStart == other.OtherStart
-            && OtherEnd == other.OtherEnd
-            && Type == other.Type
-            && Inverted == other.Inverted
-            && FlankingSequenceFrom == other.FlankingSequenceFrom
-            && FlankingSequenceTo == other.FlankingSequenceTo;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
+        return new
         {
-            int hash = 36613;
-
-            hash = hash * 37724 + Chromosome?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Start?.GetHashCode() ?? 0;
-            hash = hash * 37724 + End?.GetHashCode() ?? 0;
-            hash = hash * 37724 + OtherChromosome?.GetHashCode() ?? 0;
-            hash = hash * 37724 + OtherStart?.GetHashCode() ?? 0;
-            hash = hash * 37724 + OtherEnd?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Type?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Inverted?.GetHashCode() ?? 0;
-            hash = hash * 37724 + FlankingSequenceFrom?.GetHashCode() ?? 0;
-            hash = hash * 37724 + FlankingSequenceTo?.GetHashCode() ?? 0;
-
-            return hash;
-        }
+            Chromosome, Start, End,
+            OtherChromosome, OtherStart, OtherEnd,
+            FlankingSequenceFrom, FlankingSequenceTo,
+            Type, Inverted,
+        };
     }
-    #endregion
 }

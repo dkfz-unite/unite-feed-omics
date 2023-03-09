@@ -9,7 +9,7 @@ namespace Unite.Genome.Feed.Web.Models.Variants.Validators;
 /// <typeparam name="TModel">Variant model type</typeparam>
 /// <typeparam name="TModelValidator">Variant model validator type</typeparam>
 public class SequencingDataModelValidator<TModel, TModelValidator> : AbstractValidator<SequencingDataModel<TModel>>
-    where TModel : class, new()
+    where TModel : class, IDistinctable, new()
     where TModelValidator : IValidator<TModel>, new()
 {
     private readonly IValidator<AnalysisModel> _analysisModelValidator;

@@ -6,7 +6,7 @@ namespace Unite.Genome.Feed.Web.Models.Variants;
 /// Variant type specific sequencing data model
 /// </summary>
 /// <typeparam name="TModel">Variant model type</typeparam>
-public class SequencingDataModel<TModel> where TModel : class, new()
+public class SequencingDataModel<TModel> where TModel : class, IDistinctable, new()
 {
     /// <summary>
     /// Analysis data

@@ -1,9 +1,10 @@
 ﻿using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Utilities.Mutations;
+using Unite.Genome.Feed.Web.Models.Base;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SSM;
 
-public class VariantModel
+public class VariantModel: IDistinctable
 {
     private Chromosome? _chromosome;
     private string _position;
@@ -37,33 +38,12 @@ public class VariantModel
         return HGVsCodeGenerator.Generate(Chromosome.Value, Position, Ref, Alt);
     }
 
-
-    #region Equality
-    public override bool Equals(object obj)
+    public dynamic GetContract()
     {
-        var other = obj as VariantModel;
-
-        if (other == null) return false;
-
-        return Chromosome == other.Chromosome
-            && Position == other.Position
-            && Ref == other.Ref
-            && Alt == other.Alt;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
+        return new
         {
-            int hash = 36613;
-
-            hash = hash * 37724 + Chromosome?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Position?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Ref?.GetHashCode() ?? 0;
-            hash = hash * 37724 + Alt?.GetHashCode() ?? 0;
-            
-            return hash;
-        }
+            Chromosome, Position, 
+            Ref, Alt
+        };
     }
-    #endregion
 }
