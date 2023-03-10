@@ -48,10 +48,10 @@ public class MutationsAnnotationService
     {
         var id = variant.Id.ToString();
         var chromosome = variant.ChromosomeId.ToDefinitionString();
-        var start = variant.ReferenceBase != null ? variant.Start : variant.End + 1;
+        var start = variant.Ref != null ? variant.Start : variant.End + 1;
         var end = variant.End;
-        var referenceBase = variant.ReferenceBase ?? "-";
-        var alternateBase = variant.AlternateBase ?? "-";
+        var referenceBase = variant.Ref ?? "-";
+        var alternateBase = variant.Alt ?? "-";
 
         return $"{chromosome} {start} {end} {referenceBase}/{alternateBase} + {id}";
     }

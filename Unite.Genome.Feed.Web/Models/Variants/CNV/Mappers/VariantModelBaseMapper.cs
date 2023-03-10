@@ -11,7 +11,7 @@ public abstract class VariantModelBaseMapper
     /// <param name="tcnMean">TCN mean.</param>
     /// <param name="ploidy">Sample ploidy.</param>
     /// <returns>CNA.Type based on TCN or TCN mean and sample ploidy.</returns>
-    protected static CnvType? GetCnvType(int? tcn, double? tcnMean, double? ploidy)
+    protected static CnvType GetCnvType(int? tcn, double? tcnMean, double? ploidy)
     {
         if (ploidy != null && tcn != null && tcn != -1)
         {
@@ -31,12 +31,12 @@ public abstract class VariantModelBaseMapper
             }
             else
             {
-                return null;
+                return CnvType.Undetermined;
             }
         }
         else
         {
-            return null;
+            return CnvType.Undetermined;
         }
     }
 

@@ -17,8 +17,8 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
             entity.ChromosomeId == model.Chromosome &&
             entity.Start == model.Start &&
             entity.End == model.End &&
-            entity.ReferenceBase == model.ReferenceBase &&
-            entity.AlternateBase == model.AlternateBase;
+            entity.Ref == model.Ref &&
+            entity.Alt == model.Alt;
     }
 
     protected override void Map(in VariantModel model, ref Variant entity)
@@ -26,7 +26,7 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
         base.Map(model, ref entity);
 
         entity.TypeId = model.Type;
-        entity.ReferenceBase = model.ReferenceBase;
-        entity.AlternateBase = model.AlternateBase;
+        entity.Ref = model.Ref;
+        entity.Alt = model.Alt;
     }
 }

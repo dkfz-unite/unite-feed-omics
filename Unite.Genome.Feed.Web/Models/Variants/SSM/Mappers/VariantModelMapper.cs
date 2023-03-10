@@ -11,7 +11,7 @@ public class VariantModelMapper
         target.Start = PositionParser.Parse(source.Position).Start;
         target.End = PositionParser.Parse(source.Position).End;
         target.Length = target.End - target.Start + 1;
-        target.ReferenceBase = source.Ref;
-        target.AlternateBase = source.Alt;
+        target.Ref = source.Ref;
+        target.Alt = source.Alt;
     }
 }

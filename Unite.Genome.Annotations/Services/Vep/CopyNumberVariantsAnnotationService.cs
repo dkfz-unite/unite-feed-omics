@@ -40,7 +40,6 @@ public class CopyNumberVariantsAnnotationService
     {
         return _dbContext.Set<Variant>()
             .Where(entity => variantIds.Contains(entity.Id))
-            .Where(entity => entity.TypeId != null)
             .OrderBy(entity => entity.ChromosomeId)
             .ThenBy(entity => entity.Start);
     }
