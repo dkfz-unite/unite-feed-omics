@@ -41,4 +41,9 @@ public class SampleModel
     /// Sample purity (TCC)
     /// </summary>
     public double? Purity { get => _purity; set => _purity = value; }
+
+    /// <summary>
+    /// Default sample ploidy
+    /// </summary>
+    public double DefaultPloidy => 2;
 }
