@@ -19,20 +19,11 @@ public abstract class VariantModelBaseMapper
         }
         else if (ploidy != null && tcnMean != null)
         {
-            var delta = tcnMean.Value - ploidy.Value;
+            var delta = tcnMean > ploidy ? tcnMean.Value - ploidy.Value : ploidy.Value - tcnMean.Value;
 
-            if (Math.Abs(delta) < 0.3)
-            {
-                return CnvType.Neutral;
-            }
-            else if (Math.Abs(delta) > 0.7)
-            {
-                return delta > 0 ? CnvType.Gain : CnvType.Loss;
-            }
-            else
-            {
-                return CnvType.Undetermined;
-            }
+            return delta < 0.3 ? CnvType.Neutral
+                 : delta > 0.7 ? tcnMean > ploidy ? CnvType.Gain : CnvType.Loss
+                 : CnvType.Undetermined;
         }
         else
         {
