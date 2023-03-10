@@ -99,12 +99,12 @@ public class VariantModel : IDistinctable
 
     private static bool? GetHomoDel(int? c1, int? c2)
     {
-        return (c1 == -1 || c2 == -1) ? null : (c1 == 0 && c2 == 2);
+        return (c1 == -1 || c2 == -1) ? null : (c1 == 0 && c2 == 0);
     }
 
     private static bool? GetLoh(int? c1, int? c2)
     {
-        return (c1 == -1 && c2 == -1) ? null : (c1 == 0 && c2 != 0) || (c2 == 0 && c1 != 0);
+        return (c1 == -1 && c2 == -1) ? null : (c1 == 0 && c2 != 0) || (c1 != 0 && c2 == 0);
     }
 
     private static int? GetTcn(int? c1, int? c2)
@@ -113,21 +113,25 @@ public class VariantModel : IDistinctable
     }
 
     /// <summary>
-    /// Rounds value based on maximum distance to nearest integer
+    /// Rounds value with 0.3 threshold to nearest integer.
     /// </summary>
     /// <param name="value">Value</param>
-    /// <param name="maxDistance">Maximum distance to nearest integer</param>
     /// <returns>Rounded value if it is close enough to nearest integer, otherwise -1.</returns>
-    private static int? RoundToInteger(in double? value, double maxDistance = 0.3)
+    private static int? RoundToInteger(double? value)
     {
-        if (value != null)
-        {
-            return value - Math.Truncate(value.Value) > maxDistance ? (int)Math.Round(value.Value) : -1;
-        }
-        else
-        {
-            return null;
-        }
+        return value != null ? IsSubclonal(value.Value) ? -1 : (int)Math.Round(value.Value) : null;
+    }
 
+    /// <summary>
+    /// Checks if value is 0.3 far from nearest integer.
+    /// </summary>
+    /// <param name="value">Value</param>
+    /// <returns>True if value is 0.3 far from nearest integer, False otherwise.</returns>
+    private static bool IsSubclonal(double value)
+    {
+        var integerPart = Math.Truncate(value);
+        var decimalPart = value - integerPart;
+
+        return decimalPart < 0.3 || decimalPart > 0.7;
     }
 }

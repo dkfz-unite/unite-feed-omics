@@ -12,7 +12,6 @@ public class VariantModelMapper : VariantModelBaseMapper
         target.C1Mean = source.C1Mean;
         target.C2Mean = source.C2Mean;
         target.TcnMean = source.TcnMean;
-
         target.C1 = source.C1;
         target.C2 = source.C2;
         target.Tcn = source.Tcn;
@@ -21,7 +20,7 @@ public class VariantModelMapper : VariantModelBaseMapper
         target.DhMax = source.DhMax;
 
         target.Type = source.Type ?? GetCnvType(target.Tcn, target.TcnMean, ploidy);
-        target.Loh = target.Loh;
-        target.HomoDel = target.HomoDel;
+        target.Loh = source.Loh;
+        target.HomoDel = source.HomoDel;
     }
 }
