@@ -132,6 +132,6 @@ public class VariantModel : IDistinctable
         var integerPart = Math.Truncate(value);
         var decimalPart = value - integerPart;
 
-        return decimalPart < 0.3 || decimalPart > 0.7;
+        return decimalPart >= 0.3 && decimalPart <= 0.7;
     }
 }
