@@ -73,6 +73,37 @@ public abstract class AffectedTranscriptRepository<TAffectedTranscriptEntity, TV
         return entity;
     }
 
+    public IEnumerable<TAffectedTranscriptEntity> CreateAll(
+        IEnumerable<AffectedTranscriptModel> models,
+        IEnumerable<TVariantEntity> variantsCache = null,
+        IEnumerable<Transcript> transcriptsCache = null)
+    {
+        var entitiesToAdd = models
+            .Select(model => Convert(model, variantsCache, transcriptsCache))
+            .ToArray();
+
+        if (entitiesToAdd.Any())
+        {
+            _dbContext.AddRange(entitiesToAdd);
+            _dbContext.SaveChanges();
+        }
+
+        return entitiesToAdd;
+    }
+
+    public void RemoveAll(IEnumerable<long> variantIds)
+    {
+        var entitiesToRemove = _dbContext.Set<TAffectedTranscriptEntity>()
+            .Where(entity => variantIds.Contains(entity.VariantId))
+            .ToArray();
+
+        if (entitiesToRemove.Any())
+        {
+            _dbContext.RemoveRange(entitiesToRemove);
+            _dbContext.SaveChanges();
+        }
+    }
+
     public IEnumerable<TAffectedTranscriptEntity> CreateMissing(
         IEnumerable<AffectedTranscriptModel> models,
         IEnumerable<TVariantEntity> variantsCache = null,
@@ -107,7 +138,7 @@ public abstract class AffectedTranscriptRepository<TAffectedTranscriptEntity, TV
         IEnumerable<Transcript> transcriptsCache = null)
     {
         var variant = _variantRepository.Find(model.Variant, variantsCache);
-        var feature = _transcriptRepository.FindOrCreate(model.Transcript, transcriptsCache);
+        var feature = _transcriptRepository.Find(model.Transcript, transcriptsCache);
         var consequences = model.Consequences.Select(type => new Consequence(type)).ToArray();
 
         var entity = Activator.CreateInstance<TAffectedTranscriptEntity>();

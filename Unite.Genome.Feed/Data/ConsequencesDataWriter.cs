@@ -37,6 +37,7 @@ public class ConsequencesDataWriter<TAffectedTranscriptEntity, TVariantEntity, T
     protected override void ProcessModel(ConsequencesDataModel consequencesDataModel, ref ConsequencesDataUploadAudit audit)
     {
         var variant = _variantRepository.Find(consequencesDataModel.Variant);
+        var variants = new [] { variant };
 
         audit.Variants.Add(variant.Id);
 
@@ -60,11 +61,20 @@ public class ConsequencesDataWriter<TAffectedTranscriptEntity, TVariantEntity, T
 
         if (consequencesDataModel.AffectedTranscripts != null)
         {
+            var variantIds = variants.Select(variant => variant.Id).ToArray();
+            _affectedTranscriptRepository.RemoveAll(variantIds);
+
             var affectedTranscriptModels = consequencesDataModel.AffectedTranscripts;
-            var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels, transcriptsCache: transcripts);
+            var affectedTranscripts = _affectedTranscriptRepository.CreateAll(affectedTranscriptModels, variants, transcripts);
             var affectedTranscriptsCreated = affectedTranscripts.Count();
 
             audit.AffectedTranscriptsCreated += affectedTranscriptsCreated;
+
+            // var affectedTranscriptModels = consequencesDataModel.AffectedTranscripts;
+            // var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels, transcriptsCache: transcripts);
+            // var affectedTranscriptsCreated = affectedTranscripts.Count();
+
+            // audit.AffectedTranscriptsCreated += affectedTranscriptsCreated;
         }
     }
 
@@ -99,15 +109,25 @@ public class ConsequencesDataWriter<TAffectedTranscriptEntity, TVariantEntity, T
 
         if (consequencesDataModels.Any(consequencesDataModel => consequencesDataModel.AffectedTranscripts != null))
         {
+            var variantIds = variants.Select(variant => variant.Id).ToArray();
+            _affectedTranscriptRepository.RemoveAll(variantIds);
+
             var affectedTranscriptModels = consequencesDataModels
                 .Where(annotationsModel => annotationsModel.AffectedTranscripts != null)
-                .SelectMany(annotationsModel => annotationsModel.AffectedTranscripts);
+                .SelectMany(annotationsModel => annotationsModel.AffectedTranscripts)
+                .ToArray();
 
-            var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels, variants, transcripts);
+            var affectedTranscripts = _affectedTranscriptRepository.CreateAll(affectedTranscriptModels, variants, transcripts);
 
             var affectedTranscriptsCreated = affectedTranscripts.Count();
 
             audit.AffectedTranscriptsCreated += affectedTranscriptsCreated;
+
+            // var affectedTranscripts = _affectedTranscriptRepository.CreateMissing(affectedTranscriptModels, variants, transcripts);
+
+            // var affectedTranscriptsCreated = affectedTranscripts.Count();
+
+            // audit.AffectedTranscriptsCreated += affectedTranscriptsCreated;
         }
     }
 
