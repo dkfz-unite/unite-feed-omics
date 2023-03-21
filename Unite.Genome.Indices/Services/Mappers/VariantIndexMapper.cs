@@ -111,7 +111,6 @@ internal class VariantIndexMapper
         index.C1 = entity.C1;
         index.C2 = entity.C2;
         index.Tcn = entity.Tcn;
-        index.DhMax = entity.DhMax;
 
         index.AffectedFeatures = CreateFrom(entity.AffectedTranscripts);
 
@@ -137,8 +136,6 @@ internal class VariantIndexMapper
         index.Length = entity.Length;
         index.Type = entity.TypeId.ToDefinitionString();
         index.Inverted = entity.Inverted;
-        index.FlankingSequenceFrom = entity.FlankingSequenceFrom;
-        index.FlankingSequenceTo = entity.FlankingSequenceTo;
 
         index.AffectedFeatures = CreateFrom(entity.AffectedTranscripts);
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
+using Unite.Data.Entities.Genome.Analysis;
 using Unite.Data.Entities.Genome.Transcriptomics;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
@@ -8,7 +9,6 @@ using Unite.Data.Entities.Specimens.Tissues.Enums;
 using Unite.Data.Services;
 using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
-using Unite.Indices.Entities.Basic.Genome.Transcriptomics;
 using Unite.Indices.Entities.Genes;
 using Unite.Indices.Services;
 
@@ -24,9 +24,10 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private readonly GeneIndexMapper _geneIndexMapper;
     private readonly GeneExpressionIndexMapper _geneExpressionIndexMapper;
     private readonly VariantIndexMapper _variantIndexMapper;
+    private readonly SampleIndexMapper _sampleIndexMapper;
     private readonly DonorIndexMapper _donorIndexMapper;
-    private readonly ImageIndexMapper _imageIndexMapper;
     private readonly SpecimenIndexMapper _specimenIndexMapper;
+    private readonly ImageIndexMapper _imageIndexMapper;
 
 
     public GeneIndexCreationService(DomainDbContext dbContext)
@@ -35,9 +36,10 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         _geneIndexMapper = new GeneIndexMapper();
         _geneExpressionIndexMapper = new GeneExpressionIndexMapper();
         _variantIndexMapper = new VariantIndexMapper();
+        _sampleIndexMapper = new SampleIndexMapper();
         _donorIndexMapper = new DonorIndexMapper();
-        _imageIndexMapper = new ImageIndexMapper();
         _specimenIndexMapper = new SpecimenIndexMapper();
+        _imageIndexMapper = new ImageIndexMapper();
     }
 
 
@@ -69,16 +71,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         _geneIndexMapper.Map(gene, index);
 
-        index.Specimens = CreateSpecimenIndices(gene.Id);
+        index.Samples = CreateSampleIndices(gene.Id);
 
         return index;
     }
 
-    /// <summary>
-    /// Loads specified gene.
-    /// </summary>
-    /// <param name="geneId">Gene identifier.</param>
-    /// <returns>Gene.</returns>
     private Gene LoadGene(int geneId)
     {
         var gene = _dbContext.Set<Gene>()
@@ -88,83 +85,86 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(int geneId)
+    private SampleIndex[] CreateSampleIndices(int geneId)
     {
-        var specimens = LoadSpecimens(geneId);
+        var samples = LoadSamples(geneId);
 
-        if (specimens == null)
+        if (samples == null)
         {
             return null;
         }
 
-        var indices = specimens
-            .Select(specimen => CreateSpecimenIndex(specimen, geneId))
+        var indices = samples
+            .Select(sample => CreateSampleIndex(sample.Sample, sample.Analyses, geneId))
             .ToArray();
 
         return indices;
     }
 
-    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, int geneId)
+    private SampleIndex CreateSampleIndex(Sample sample, Analysis[] analyses, int geneId)
     {
-        var index = new SpecimenIndex();
+        var index = new SampleIndex();
 
-        index.Donor = CreateDonorIndex(specimen.Id, out var donor);
+        index.Donor = CreateDonorIndex(sample.SpecimenId, out var donor);
 
-        index.Images = CreateImageIndices(specimen.Id, donor?.ClinicalData?.DiagnosisDate);
+        index.Specimen = CreateSpecimenIndex(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
 
-        index.Variants = CreateVariantIndices(specimen.Id, geneId);
+        index.Images = CreateImageIndices(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
 
-        index.Expression = CreateExpressionIndex(specimen.Id, geneId);
+        index.Variants = CreateVariantIndices(sample.Id, geneId);
 
-        _specimenIndexMapper.Map(specimen, index, donor?.ClinicalData?.DiagnosisDate);
+        index.Expression = CreateExpressionIndex(sample.Id, geneId);
+
+        _sampleIndexMapper.Map(sample, analyses, index, donor.ClinicalData?.DiagnosisDate);
 
         return index;
     }
 
-    /// <summary>
-    /// Loads specimens having variants affecting specified gene.
-    /// </summary>
-    /// <param name="geneId">Gene identifier.</param>
-    /// <returns>Array of specimens.</returns>
-    private Specimen[] LoadSpecimens(int geneId)
+    private (Sample Sample, Analysis[] Analyses)[] LoadSamples(int geneId)
     {
-        var ssmAffectedSpecimenIds = _dbContext.Set<SSM.VariantOccurrence>()
+        var ssmAffectedSampleIds = _dbContext.Set<SSM.VariantOccurrence>()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
+            .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
-        var cnvAffectedSpecimenIds = _dbContext.Set<CNV.VariantOccurrence>()
+        var cnvAffectedSampleIds = _dbContext.Set<CNV.VariantOccurrence>()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
+            .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
-        var svAffectedSpecimenIds = _dbContext.Set<SV.VariantOccurrence>()
+        var svAffectedSampleIds = _dbContext.Set<SV.VariantOccurrence>()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
+            .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
-        var exAffectedSpecimenIds = _dbContext.Set<GeneExpression>()
+        var exAffectedSampleIds = _dbContext.Set<GeneExpression>()
             .Where(expression => expression.GeneId == geneId)
-            .Select(expression => expression.AnalysedSample.Sample.SpecimenId)
+            .Select(expression => expression.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
-        var specimenIds = ssmAffectedSpecimenIds.Union(cnvAffectedSpecimenIds).Union(svAffectedSpecimenIds).Union(exAffectedSpecimenIds).ToArray();
-
-        var specimens = _dbContext.Set<Specimen>()
-            .IncludeTissue()
-            .IncludeCellLine()
-            .IncludeOrganoid()
-            .IncludeXenograft()
-            .IncludeMolecularData()
-            .IncludeDrugScreeningData()
-            .Where(specimen => specimenIds.Contains(specimen.Id))
+        var analysedSampleIds = Enumerable.Empty<int>()
+            .Union(ssmAffectedSampleIds)
+            .Union(cnvAffectedSampleIds)
+            .Union(svAffectedSampleIds)
+            .Union(exAffectedSampleIds)
             .ToArray();
 
-        return specimens;
+        var analysedSampleGroups = _dbContext.Set<AnalysedSample>()
+            .Include(analysedSample => analysedSample.Sample)
+            .Include(analysedSample => analysedSample.Analysis)
+            .Where(analysedSample => analysedSampleIds.Contains(analysedSample.Id))
+            .GroupBy(analysedSample => analysedSample.SampleId)
+            .ToArray();
+
+        var samples = analysedSampleGroups
+            .Select(group => (group.First().Sample, group.Select(sample => sample.Analysis).ToArray()))
+            .ToArray();
+
+        return samples;
     }
 
 
@@ -191,11 +191,6 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    /// <summary>
-    /// Loads the donor of the specified specimen.
-    /// </summary>
-    /// <param name="specimenId">Specimen identifier.</param>
-    /// <returns>Donor.</returns>
     private Donor LoadDonor(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
@@ -212,6 +207,44 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .FirstOrDefault();
 
         return donor;
+    }
+
+
+    private SpecimenIndex CreateSpecimenIndex(int specimenId, DateOnly? diagnosisDate)
+    {
+        var specimen = LoadSpecimen(specimenId);
+
+        if (specimen == null)
+        {
+            return null;
+        }
+
+        var indices = CreateSpecimenIndex(specimen, diagnosisDate);
+
+        return indices;
+    }
+
+    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, DateOnly? diagnosisDate)
+    {
+        var index = new SpecimenIndex();
+
+        _specimenIndexMapper.Map(specimen, index, diagnosisDate);
+
+        return index;
+    }
+
+    private Specimen LoadSpecimen(int specimenId)
+    {
+        var specimen = _dbContext.Set<Specimen>()
+            .IncludeTissue()
+            .IncludeCellLine()
+            .IncludeOrganoid()
+            .IncludeXenograft()
+            .IncludeMolecularData()
+            .IncludeDrugScreeningData()
+            .FirstOrDefault(specimen => specimen.Id == specimenId);
+
+        return specimen;
     }
 
 
@@ -240,11 +273,6 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    /// <summary>
-    /// Loads images of the specified specimen donor if the specimen is donor derived (e.g. tissue).
-    /// </summary>
-    /// <param name="specimenId">Specimen identifier.</param>
-    /// <returns>Array of images.</returns>
     private Image[] LoadImages(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
@@ -262,11 +290,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private VariantIndex[] CreateVariantIndices(int specimenId, int geneId)
+    private VariantIndex[] CreateVariantIndices(int sampleId, int geneId)
     {
-        var mutations = LoadMutations(specimenId, geneId);
-        var copyNumberVariants = LoadCopyNumberVariants(specimenId, geneId);
-        var structuralVariants = LoadStructuralVariants(specimenId, geneId);
+        var mutations = LoadMutations(sampleId, geneId);
+        var copyNumberVariants = LoadCopyNumberVariants(sampleId, geneId);
+        var structuralVariants = LoadStructuralVariants(sampleId, geneId);
 
         var indices = new List<VariantIndex>();
 
@@ -315,17 +343,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    /// <summary>
-    /// Loads all mutations affecting specified gene in specified specimen.
-    /// </summary>
-    /// <param name="specimenId">Specimen identifier.</param>
-    /// <param name="geneId">Gene identifier.</param>
-    /// <returns>Array of mutations.</returns>
-    private SSM.Variant[] LoadMutations(int specimenId, int geneId)
+    private SSM.Variant[] LoadMutations(int sampleId, int geneId)
     {
         // Variants should be filtered by the gene the're affecting.
         var variantIds = _dbContext.Set<SSM.VariantOccurrence>()
-            .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
+            .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .GroupBy(occurrence => occurrence.VariantId)
             .Select(group => group.First().VariantId)
@@ -339,17 +361,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return variants;
     }
 
-    /// <summary>
-    /// Loads all copy number variants affecting specified gene in specified specimen.
-    /// </summary>
-    /// <param name="specimenId">Specimen identifier.</param>
-    /// <param name="geneId">Gene identifier.</param>
-    /// <returns>Array of copy number variants.</returns>
-    private CNV.Variant[] LoadCopyNumberVariants(int specimenId, int geneId)
+    private CNV.Variant[] LoadCopyNumberVariants(int sampleId, int geneId)
     {
         // Variants should be filtered by the gene the're affecting.
         var variantIds = _dbContext.Set<CNV.VariantOccurrence>()
-            .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
+            .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .GroupBy(occurrence => occurrence.VariantId)
             .Select(group => group.First().VariantId)
@@ -363,17 +379,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return variants;
     }
 
-    /// <summary>
-    /// Loads all structural variants affecting specified gene in specified specimen.
-    /// </summary>
-    /// <param name="specimenId">Specimen identifier.</param>
-    /// <param name="geneId">Gene identifier.</param>
-    /// <returns>Array of structural variants.</returns>
-    private SV.Variant[] LoadStructuralVariants(int specimenId, int geneId)
+    private SV.Variant[] LoadStructuralVariants(int sampleId, int geneId)
     {
         // Variants should be filtered by the gene the're affecting.
         var variantIds = _dbContext.Set<SV.VariantOccurrence>()
-            .Where(occurrence => occurrence.AnalysedSample.Sample.SpecimenId == specimenId)
+            .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .GroupBy(occurrence => occurrence.VariantId)
             .Select(group => group.First().VariantId)
@@ -388,9 +398,9 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private GeneExpressionIndex CreateExpressionIndex(int specimenId, int geneId)
+    private GeneExpressionIndex CreateExpressionIndex(int sampleId, int geneId)
     {
-        var expression = LoadExpression(specimenId, geneId);
+        var expression = LoadExpression(sampleId, geneId);
 
         if (expression == null)
         {

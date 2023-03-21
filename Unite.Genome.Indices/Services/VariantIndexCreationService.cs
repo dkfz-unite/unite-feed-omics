@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
+using Unite.Data.Entities.Genome.Analysis;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Tissues.Enums;
@@ -20,6 +21,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private readonly DonorIndexMapper _donorIndexMapper;
     private readonly ImageIndexMapper _imageIndexMapper;
     private readonly SpecimenIndexMapper _specimenIndexMapper;
+    private readonly SampleIndexMapper _sampleIndexMapper;
 
 
     public VariantIndexCreationService(DomainDbContext dbContext)
@@ -29,6 +31,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
         _donorIndexMapper = new DonorIndexMapper();
         _imageIndexMapper = new ImageIndexMapper();
         _specimenIndexMapper = new SpecimenIndexMapper();
+        _sampleIndexMapper = new SampleIndexMapper();
     }
 
 
@@ -60,7 +63,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
         _variantIndexMapper.Map(variant, index);
 
-        index.Specimens = CreateSpecimenIndices(variant.Id);
+        index.Samples = CreateSampleIndices(variant.Id);
 
         return index;
     }
@@ -75,54 +78,95 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(long variantId)
+    private SampleIndex[] CreateSampleIndices(long variantId)
     {
-        var specimens = LoadSpecimens(variantId);
+        var samples = LoadSamples(variantId);
 
-        if (specimens == null)
+        if (samples == null)
         {
             return null;
         }
 
-        var indices = specimens
-            .Select(specimen => CreateSpecimenIndex(specimen))
+        var indices = samples
+            .Select(sample => CreateSampleIndex(sample.Sample, sample.Analyses))
             .ToArray();
-
+        
         return indices;
     }
 
-    private SpecimenIndex CreateSpecimenIndex(Specimen specimen)
+    private SampleIndex CreateSampleIndex(Sample sample, Analysis[] analyses)
     {
-        var index = new SpecimenIndex();
+        var index = new SampleIndex();
 
-        index.Donor = CreateDonorIndex(specimen.Id, out var donor);
+        index.Donor = CreateDonorIndex(sample.SpecimenId, out var donor);
 
-        index.Images = CreateImageIndices(specimen.Id, donor.ClinicalData?.DiagnosisDate);
+        index.Specimen = CreateSpecimenIndex(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
 
-        _specimenIndexMapper.Map(specimen, index, donor.ClinicalData?.DiagnosisDate);
+        index.Images = CreateImageIndices(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
+
+        _sampleIndexMapper.Map(sample, analyses, index, donor.ClinicalData?.DiagnosisDate);
 
         return index;
     }
 
-    private Specimen[] LoadSpecimens(long variantId)
+    private (Sample Sample, Analysis[] Analyses)[] LoadSamples(long variantId)
     {
-        var specimenIds = _dbContext.Set<TVariantOccurrence>()
+        var analysedSampleIds = _dbContext.Set<TVariantOccurrence>()
             .Where(occurrence => occurrence.VariantId == variantId)
-            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
+            .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
-        var specimens = _dbContext.Set<Specimen>()
+        var analysedSampleGroups = _dbContext.Set<AnalysedSample>()
+            .Include(analysedSample => analysedSample.Sample)
+            .Include(analysedSample => analysedSample.Analysis)
+            .Where(analysedSample => analysedSampleIds.Contains(analysedSample.Id))
+            .GroupBy(analysedSample => analysedSample.SampleId)
+            .ToArray();
+
+        var samples = analysedSampleGroups
+            .Select(group => (group.First().Sample, group.Select(sample => sample.Analysis).ToArray()))
+            .ToArray();
+
+        return samples;
+    }
+
+
+    private SpecimenIndex CreateSpecimenIndex(int specimenId, DateOnly? diagnosisDate)
+    {
+        var specimen = LoadSpecimen(specimenId);
+
+        if (specimen == null)
+        {
+            return null;
+        }
+
+        var index = CreateSpecimenIndex(specimen, diagnosisDate);
+
+        return index;
+    }
+
+    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, DateOnly? diagnosisDate)
+    {
+        var index = new SpecimenIndex();
+
+        _specimenIndexMapper.Map(specimen, index, diagnosisDate);
+
+        return index;
+    }
+
+    private Specimen LoadSpecimen(int specimenId)
+    {
+        var specimen = _dbContext.Set<Specimen>()
             .IncludeTissue()
             .IncludeCellLine()
             .IncludeOrganoid()
             .IncludeXenograft()
             .IncludeMolecularData()
             .IncludeDrugScreeningData()
-            .Where(specimen => specimenIds.Contains(specimen.Id))
-            .ToArray();
+            .FirstOrDefault(specimen => specimen.Id == specimenId);
 
-        return specimens;
+        return specimen;
     }
 
 
