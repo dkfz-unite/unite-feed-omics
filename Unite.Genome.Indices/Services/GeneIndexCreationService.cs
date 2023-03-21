@@ -153,14 +153,14 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .Union(exAffectedSampleIds)
             .ToArray();
 
-        var analysedSampleGroups = _dbContext.Set<AnalysedSample>()
+        var analysedSamples = _dbContext.Set<AnalysedSample>()
             .Include(analysedSample => analysedSample.Sample)
             .Include(analysedSample => analysedSample.Analysis)
             .Where(analysedSample => analysedSampleIds.Contains(analysedSample.Id))
-            .GroupBy(analysedSample => analysedSample.SampleId)
             .ToArray();
 
-        var samples = analysedSampleGroups
+        var samples = analysedSamples
+            .GroupBy(analysedSample => analysedSample.SampleId)
             .Select(group => (group.First().Sample, group.Select(sample => sample.Analysis).ToArray()))
             .ToArray();
 
