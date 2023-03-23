@@ -421,10 +421,10 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private GeneExpression LoadExpression(int specimenId, int geneId)
+    private GeneExpression LoadExpression(int sampleId, int geneId)
     {
         var expression = _dbContext.Set<GeneExpression>().FirstOrDefault(expression =>
-            expression.AnalysedSample.Sample.SpecimenId == specimenId &&
+            expression.AnalysedSample.SampleId == sampleId &&
             expression.GeneId == geneId
         );
 
