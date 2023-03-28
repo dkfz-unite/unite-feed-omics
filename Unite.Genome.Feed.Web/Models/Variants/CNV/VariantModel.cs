@@ -53,17 +53,17 @@ public class VariantModel : IDistinctable
     /// <summary>
     /// Mean number of copies in minor allele
     /// </summary>
-    public double? C1Mean { get => _c1Mean; set => _c1Mean = value; }
+    public double? C1Mean { get => GetDouble(_c1Mean); set => _c1Mean = value; }
 
     /// <summary>
     /// Mean number of copies in major allele
     /// </summary>
-    public double? C2Mean { get => _c2Mean; set => _c2Mean = value; }
+    public double? C2Mean { get => GetDouble(_c2Mean); set => _c2Mean = value; }
 
     /// <summary>
     /// Mean total number of copies (C1Mean + C2Mean)
     /// </summary>
-    public double? TcnMean { get => _tcnMean ?? C1Mean + C2Mean; set => _tcnMean = value; }
+    public double? TcnMean { get => GetDouble(_tcnMean) ?? C1Mean + C2Mean; set => _tcnMean = value; }
 
     /// <summary>
     /// Rounded number of copies in minor allele (-1 for subclonal values if values is 0.3+ far from closest integer)
@@ -83,7 +83,7 @@ public class VariantModel : IDistinctable
     /// <summary>
     /// Estimated maximum decrease of heterozygosity
     /// </summary>
-    public double? DhMax { get => _dhMax; set => _dhMax = value; }
+    public double? DhMax { get => GetDouble(_dhMax); set => _dhMax = value; }
 
     public dynamic GetContract()
     {
@@ -110,6 +110,11 @@ public class VariantModel : IDistinctable
     private static int? GetTcn(int? c1, int? c2)
     {
         return (c1 == -1 || c2 == -1) ? -1 : c1 + c2;
+    }
+
+    private static double? GetDouble(double? value)
+    {
+        return value != null ? value >= 0 ? value : 0 : null;
     }
 
     /// <summary>

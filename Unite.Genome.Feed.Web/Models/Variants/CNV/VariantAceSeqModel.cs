@@ -169,7 +169,7 @@ public class VariantAceSeqModel : IDistinctable
     private static double? GetDouble(string value)
     {
         return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null
-            : double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number : null;
+            : double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number >= 0 ? number : 0 : null;
     }
 
     private static int? GetInteger(string value)
