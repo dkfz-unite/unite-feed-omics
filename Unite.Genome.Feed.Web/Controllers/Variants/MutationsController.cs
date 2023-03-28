@@ -23,6 +23,7 @@ public class MutationsController : Controller
     }
 
     [HttpPost("")]
+    [RequestSizeLimit(100_000_000)]
     public IActionResult Post([FromBody] SequencingDataModel<VariantModel>[] models)
     {
         foreach (var model in models)

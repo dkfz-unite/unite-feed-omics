@@ -23,6 +23,7 @@ public class CopyNumberVariantsController : Controller
     }
 
     [HttpPost("")]
+    [RequestSizeLimit(100_000_000)]
     public IActionResult Post([FromBody] SequencingDataModel<VariantModel>[] models)
     {
         foreach (var model in models)
@@ -38,6 +39,7 @@ public class CopyNumberVariantsController : Controller
     }
 
     [HttpPost("aceseq")]
+    [RequestSizeLimit(100_000_000)]
     public IActionResult Post([FromBody] SequencingDataModel<VariantAceSeqModel>[] models)
     {
         foreach (var model in models)

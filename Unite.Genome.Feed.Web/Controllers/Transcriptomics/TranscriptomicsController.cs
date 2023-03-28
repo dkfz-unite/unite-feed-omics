@@ -22,6 +22,7 @@ public class TranscriptomicsController : Controller
     }
 
     [HttpPost("")]
+    [RequestSizeLimit(100_000_000)]
     public IActionResult Post([FromBody] TranscriptomicsDataModel model)
 	{
 		var submissionId = _submissionService.AddSubmission(model);
