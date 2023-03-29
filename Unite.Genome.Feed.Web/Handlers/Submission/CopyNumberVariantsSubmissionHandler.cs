@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
+using Unite.Cache.Configuration.Options;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Data.Services;
+using Unite.Data.Services.Configuration.Options;
 using Unite.Data.Services.Tasks;
 using Unite.Genome.Feed.Data;
 using Unite.Genome.Feed.Web.Models.Variants.CNV;
@@ -11,10 +14,9 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 
 public class CopyNumberVariantsSubmissionHandler
 {
+    private readonly ISqlOptions _sqlOptions;
+    private readonly IMongoOptions _mongoOptions;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantsSubmissionService _submissionService;
-    private readonly SequencingDataWriter _dataWriter;
-    private readonly CopyNumberVariantAnnotationTaskService _annotationTaskService;
     private readonly ILogger _logger;
 
     private readonly Models.Variants.CNV.Converters.SequencingDataModelConverter _dataModelConverter;
@@ -22,16 +24,14 @@ public class CopyNumberVariantsSubmissionHandler
 
 
     public CopyNumberVariantsSubmissionHandler(
+        ISqlOptions sqlOptions,
+        IMongoOptions mongoOptions,
         TasksProcessingService tasksProcessingService,
-        VariantsSubmissionService submissionService,
-        SequencingDataWriter dataWriter,
-        CopyNumberVariantAnnotationTaskService annotationTaskService,
         ILogger<CopyNumberVariantsSubmissionHandler> logger)
     {
+        _sqlOptions = sqlOptions;
+        _mongoOptions = mongoOptions;
         _taskProcessingService = tasksProcessingService;
-        _submissionService = submissionService;
-        _dataWriter = dataWriter;
-        _annotationTaskService = annotationTaskService;
         _logger = logger;
 
         _dataModelConverter = new Models.Variants.CNV.Converters.SequencingDataModelConverter();
@@ -90,30 +90,36 @@ public class CopyNumberVariantsSubmissionHandler
 
     private void ProcessDefaultModelSubmission(string submissionId)
     {
-        var sequencingData = _submissionService.FindCnvSubmission(submissionId);
+        using var dbContext = new DomainDbContext(_sqlOptions);
 
+        var dataWriter = new SequencingDataWriter(dbContext);
+        var annotationTaskService = new CopyNumberVariantAnnotationTaskService(dbContext);
+        var submissionService = new VariantsSubmissionService(_mongoOptions);
+
+        var sequencingData = submissionService.FindCnvSubmission(submissionId);
         var analysisData = _dataModelConverter.Convert(sequencingData);
 
-        _dataWriter.SaveData(analysisData, out var audit);
-
-        _annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
-
-        _submissionService.DeleteCnvSubmission(submissionId);
+        dataWriter.SaveData(analysisData, out var audit);
+        annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
+        submissionService.DeleteCnvSubmission(submissionId);
 
         _logger.LogInformation(audit.ToString());
     }
 
     private void ProcessAceSeqModelSubmission(string submissionId)
     {
-        var sequencingData = _submissionService.FindCnvAceSeqSubmission(submissionId);
+        using var dbContext = new DomainDbContext(_sqlOptions);
 
+        var dataWriter = new SequencingDataWriter(dbContext);
+        var annotationTaskService = new CopyNumberVariantAnnotationTaskService(dbContext);
+        var submissionService = new VariantsSubmissionService(_mongoOptions);
+
+        var sequencingData = submissionService.FindCnvAceSeqSubmission(submissionId);
         var analysisData = _dataAceSeqModelConverter.Convert(sequencingData);
 
-        _dataWriter.SaveData(analysisData, out var audit);
-
-        _annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
-
-        _submissionService.DeleteCnvAceSeqSubmission(submissionId);
+        dataWriter.SaveData(analysisData, out var audit);
+        annotationTaskService.PopulateTasks(audit.CopyNumberVariants);
+        submissionService.DeleteCnvAceSeqSubmission(submissionId);
 
         _logger.LogInformation(audit.ToString());
     }

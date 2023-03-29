@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome.Variants.SV;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Entities.Genome.Variants.SV;
 using Unite.Data.Entities.Genome.Variants.SV.Enums;
 using Unite.Data.Extensions;
 using Unite.Data.Services;
@@ -40,6 +41,7 @@ public class StructuralVariantsAnnotationService
     private IQueryable<Variant> LoadVariants(long[] variantIds)
     {
         return _dbContext.Set<Variant>()
+            .AsNoTracking()
             .Where(entity => variantIds.Contains(entity.Id))
             .Where(entity => entity.TypeId != SvType.COM)
             .OrderBy(entity => entity.ChromosomeId)

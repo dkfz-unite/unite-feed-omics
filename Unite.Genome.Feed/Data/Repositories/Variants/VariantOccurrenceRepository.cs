@@ -64,16 +64,16 @@ public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVar
 
         foreach (var model in models)
         {
-            var gene = _variantRepository.FindOrCreate(model, cache);
+            var variant = _variantRepository.FindOrCreate(model, cache);
 
-            var entity = Convert(analysedSampleId, gene.Id);
+            var entity = Convert(analysedSampleId, variant.Id);
 
             entitiesToAdd.Add(entity);
         }
 
         if (entitiesToAdd.Any())
         {
-            _dbContext.AddRange(entitiesToAdd);
+            _dbContext.Set<TVariantOccurrenceEntity>().AddRange(entitiesToAdd);
             _dbContext.SaveChanges();
         }
 
@@ -88,7 +88,7 @@ public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVar
 
         if (entitiesToRemove.Any())
         {
-            _dbContext.RemoveRange(entitiesToRemove);
+            _dbContext.Set<TVariantOccurrenceEntity>().RemoveRange(entitiesToRemove);
             _dbContext.SaveChanges();
         }
     }
@@ -109,7 +109,7 @@ public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVar
     {
         var entity = Convert(analysedSampleId, variantId);
 
-        _dbContext.Add(entity);
+        _dbContext.Set<TVariantOccurrenceEntity>().Add(entity);
         _dbContext.SaveChanges();
 
         return entity;

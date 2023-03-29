@@ -71,6 +71,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private TVariant LoadVariant(long variantId)
     {
         var variant = _dbContext.Set<TVariant>()
+            .AsNoTracking()
             .IncludeAffectedTranscripts()
             .FirstOrDefault(variant => variant.Id == variantId);
 
@@ -112,12 +113,14 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private (Sample Sample, Analysis[] Analyses)[] LoadSamples(long variantId)
     {
         var analysedSampleIds = _dbContext.Set<TVariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.VariantId == variantId)
             .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
         var analysedSamples = _dbContext.Set<AnalysedSample>()
+            .AsNoTracking()
             .Include(analysedSample => analysedSample.Sample)
             .Include(analysedSample => analysedSample.Analysis)
             .Where(analysedSample => analysedSampleIds.Contains(analysedSample.Id))
@@ -158,6 +161,7 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private Specimen LoadSpecimen(int specimenId)
     {
         var specimen = _dbContext.Set<Specimen>()
+            .AsNoTracking()
             .IncludeTissue()
             .IncludeCellLine()
             .IncludeOrganoid()
@@ -196,11 +200,13 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private Donor LoadDonor(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
+            .AsNoTracking()
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();
 
         var donor = _dbContext.Set<Donor>()
+            .AsNoTracking()
             .IncludeClinicalData()
             .IncludeTreatments()
             .IncludeProjects()
@@ -240,12 +246,14 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private Image[] LoadImages(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
+            .AsNoTracking()
             .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();
 
         var images = _dbContext.Set<Image>()
+            .AsNoTracking()
             .Include(image => image.MriImage)
             .Where(image => image.DonorId == donorId)
             .ToArray();

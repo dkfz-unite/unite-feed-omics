@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Entities.Genome;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -56,7 +57,7 @@ internal class AnnotationsDataLoader
         //return await _ensemblApiClient.Find<GeneResource>(allIdentifiers, expand: false);
 
         var existingIdentifiers = allIdentifiers
-            .Where(id => _dbContext.Set<Gene>().Any(entity => entity.StableId == id))
+            .Where(id => _dbContext.Set<Gene>().AsNoTracking().Any(entity => entity.StableId == id))
             .ToArray();
 
         var newIdentifiers = allIdentifiers
@@ -84,7 +85,7 @@ internal class AnnotationsDataLoader
         //return await _ensemblApiClient.Find<TranscriptResource>(allIdentifiers, expand: true);
 
         var existingIdentifiers = allIdentifiers
-            .Where(id => _dbContext.Set<Transcript>().Any(entity => entity.StableId == id))
+            .Where(id => _dbContext.Set<Transcript>().AsNoTracking().Any(entity => entity.StableId == id))
             .ToArray();
 
         var newIdentifiers = allIdentifiers

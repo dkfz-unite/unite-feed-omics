@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
+using Unite.Cache.Configuration.Options;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Data.Services;
+using Unite.Data.Services.Configuration.Options;
 using Unite.Data.Services.Tasks;
 using Unite.Genome.Feed.Data;
 using Unite.Genome.Feed.Web.Services.Annotation;
@@ -9,26 +12,23 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 
 public class MutationsSubmissionHandler
 {
+    private readonly ISqlOptions _sqlOptions;
+    private readonly IMongoOptions _mongoOptions;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantsSubmissionService _submissionService;
-    private readonly SequencingDataWriter _dataWriter;
-    private readonly MutationAnnotationTaskService _annotationTaskService;
     private readonly ILogger _logger;
 
     private readonly Models.Variants.SSM.Converters.SequencingDataModelConverter _dataConverter;
 
 
     public MutationsSubmissionHandler(
+        ISqlOptions sqlOptions,
+        IMongoOptions mongoOptions,
         TasksProcessingService tasksProcessingService,
-        VariantsSubmissionService submissionService,
-        SequencingDataWriter dataWriter,
-        MutationAnnotationTaskService annotationTaskService,
         ILogger<MutationsSubmissionHandler> logger)
     {
+        _sqlOptions = sqlOptions;
+        _mongoOptions = mongoOptions;
         _taskProcessingService = tasksProcessingService;
-        _submissionService = submissionService;
-        _dataWriter = dataWriter;
-        _annotationTaskService = annotationTaskService;
         _logger = logger;
 
         _dataConverter = new Models.Variants.SSM.Converters.SequencingDataModelConverter();
@@ -63,15 +63,18 @@ public class MutationsSubmissionHandler
 
     private void ProcessDefaultModelSubmission(string submissionId)
     {
-        var sequencingData = _submissionService.FindSsmSubmission(submissionId);
+        using var dbContext = new DomainDbContext(_sqlOptions);
 
+        var dataWriter = new SequencingDataWriter(dbContext);
+        var annotationTaskService = new MutationAnnotationTaskService(dbContext);
+        var submissionService = new VariantsSubmissionService(_mongoOptions);
+
+        var sequencingData = submissionService.FindSsmSubmission(submissionId);
         var analysisData = _dataConverter.Convert(sequencingData);
 
-        _dataWriter.SaveData(analysisData, out var audit);
-
-        _annotationTaskService.PopulateTasks(audit.Mutations);
-
-        _submissionService.DeleteSsmSubmission(submissionId);
+        dataWriter.SaveData(analysisData, out var audit);
+        annotationTaskService.PopulateTasks(audit.Mutations);
+        submissionService.DeleteSsmSubmission(submissionId);
 
         _logger.LogInformation(audit.ToString());
     }

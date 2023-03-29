@@ -79,6 +79,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private Gene LoadGene(int geneId)
     {
         var gene = _dbContext.Set<Gene>()
+            .AsNoTracking()
             .FirstOrDefault(gene => gene.Id == geneId);
 
         return gene;
@@ -123,24 +124,28 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private (Sample Sample, Analysis[] Analyses)[] LoadSamples(int geneId)
     {
         var ssmAffectedSampleIds = _dbContext.Set<SSM.VariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
         var cnvAffectedSampleIds = _dbContext.Set<CNV.VariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
         var svAffectedSampleIds = _dbContext.Set<SV.VariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Select(occurrence => occurrence.AnalysedSampleId)
             .Distinct()
             .ToArray();
 
         var exAffectedSampleIds = _dbContext.Set<GeneExpression>()
+            .AsNoTracking()
             .Where(expression => expression.GeneId == geneId)
             .Select(expression => expression.AnalysedSampleId)
             .Distinct()
@@ -154,6 +159,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var analysedSamples = _dbContext.Set<AnalysedSample>()
+            .AsNoTracking()
             .Include(analysedSample => analysedSample.Sample)
             .Include(analysedSample => analysedSample.Analysis)
             .Where(analysedSample => analysedSampleIds.Contains(analysedSample.Id))
@@ -194,11 +200,13 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private Donor LoadDonor(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
+            .AsNoTracking()
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();
 
         var donor = _dbContext.Set<Donor>()
+            .AsNoTracking()
             .IncludeClinicalData()
             .IncludeTreatments()
             .IncludeProjects()
@@ -236,6 +244,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private Specimen LoadSpecimen(int specimenId)
     {
         var specimen = _dbContext.Set<Specimen>()
+            .AsNoTracking()
             .IncludeTissue()
             .IncludeCellLine()
             .IncludeOrganoid()
@@ -276,12 +285,14 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private Image[] LoadImages(int specimenId)
     {
         var donorId = _dbContext.Set<Specimen>()
+            .AsNoTracking()
             .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
             .Where(specimen => specimen.Id == specimenId)
             .Select(specimen => specimen.DonorId)
             .FirstOrDefault();
 
         var images = _dbContext.Set<Image>()
+            .AsNoTracking()
             .Include(image => image.MriImage)
             .Where(image => image.DonorId == donorId)
             .ToArray();
@@ -347,6 +358,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         // Variants should be filtered by the gene the're affecting.
         var variantIds = _dbContext.Set<SSM.VariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .GroupBy(occurrence => occurrence.VariantId)
@@ -354,6 +366,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var variants = _dbContext.Set<SSM.Variant>()
+            .AsNoTracking()
             .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
@@ -365,6 +378,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         // Variants should be filtered by the gene the're affecting.
         var variantIds = _dbContext.Set<CNV.VariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .GroupBy(occurrence => occurrence.VariantId)
@@ -372,6 +386,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var variants = _dbContext.Set<CNV.Variant>()
+            .AsNoTracking()
             .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
@@ -383,6 +398,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         // Variants should be filtered by the gene the're affecting.
         var variantIds = _dbContext.Set<SV.VariantOccurrence>()
+            .AsNoTracking()
             .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
             .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .GroupBy(occurrence => occurrence.VariantId)
@@ -390,6 +406,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray();
 
         var variants = _dbContext.Set<SV.Variant>()
+            .AsNoTracking()
             .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
             .Where(variant => variantIds.Contains(variant.Id))
             .ToArray();
@@ -423,7 +440,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private GeneExpression LoadExpression(int sampleId, int geneId)
     {
-        var expression = _dbContext.Set<GeneExpression>().FirstOrDefault(expression =>
+        var expression = _dbContext.Set<GeneExpression>().AsNoTracking().FirstOrDefault(expression =>
             expression.AnalysedSample.SampleId == sampleId &&
             expression.GeneId == geneId
         );

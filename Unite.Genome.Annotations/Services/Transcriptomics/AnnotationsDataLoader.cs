@@ -1,4 +1,5 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Entities.Genome;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -72,7 +73,7 @@ public class AnnotationsDataLoader
 
     private async Task<GeneResource[]> LoadGenesById(string[] identifiers)
     {
-        var existingGenes = _dbContext.Set<Gene>().Where(gene => identifiers.Contains(gene.StableId)).Select(Convert).ToArray();
+        var existingGenes = _dbContext.Set<Gene>().AsNoTracking().Where(gene => identifiers.Contains(gene.StableId)).Select(Convert).ToArray();
 
         var existingIdentifiers = existingGenes.Select(gene => gene.Id).ToArray();
 
@@ -85,7 +86,7 @@ public class AnnotationsDataLoader
 
     private async Task<GeneResource[]> LoadGenesByName(string[] symbols)
     {
-        var existingGenes = _dbContext.Set<Gene>().Where(gene => symbols.Contains(gene.Symbol)).Select(Convert).ToArray();
+        var existingGenes = _dbContext.Set<Gene>().AsNoTracking().Where(gene => symbols.Contains(gene.Symbol)).Select(Convert).ToArray();
 
         var existingSymbols = existingGenes.Select(gene => gene.Symbol).ToArray();
 
@@ -98,7 +99,7 @@ public class AnnotationsDataLoader
 
     private async Task<TranscriptResource[]> LoadTranscriptsById(string[] identifiers)
     {
-        var existingTranscripts = _dbContext.Set<Transcript>().Where(transcript => identifiers.Contains(transcript.StableId)).Select(Convert).ToArray();
+        var existingTranscripts = _dbContext.Set<Transcript>().AsNoTracking().Where(transcript => identifiers.Contains(transcript.StableId)).Select(Convert).ToArray();
 
         var existingIdentifiers = existingTranscripts.Select(transcript => transcript.Id).ToArray();
 
@@ -111,7 +112,7 @@ public class AnnotationsDataLoader
 
     private async Task<TranscriptResource[]> LoadTranscriptsByName(string[] symbols)
     {
-        var existingTranscripts = _dbContext.Set<Transcript>().Where(transcript => symbols.Contains(transcript.Symbol)).Select(Convert).ToArray();
+        var existingTranscripts = _dbContext.Set<Transcript>().AsNoTracking().Where(transcript => symbols.Contains(transcript.Symbol)).Select(Convert).ToArray();
 
         var existingSymbols = existingTranscripts.Select(transcript => transcript.Symbol).ToArray();
 

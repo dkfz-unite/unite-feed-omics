@@ -2,7 +2,9 @@
 using Unite.Data.Entities.Genome.Variants.CNV;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services;
+using Unite.Data.Services.Configuration.Options;
 using Unite.Data.Services.Tasks;
+using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Services.Vep;
 using Unite.Genome.Feed.Data;
 using Unite.Genome.Feed.Data.Models.Variants.CNV;
@@ -14,28 +16,26 @@ namespace Unite.Genome.Feed.Web.Handlers.Annotation;
 
 public class CopyNumberVariantsAnnotationHandler
 {
+    private readonly ISqlOptions _sqlOptions;
+    private readonly IEnsemblOptions _ensemblDataOptions;
+    private readonly IEnsemblVepOptions _ensemblVepOptions;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly CopyNumberVariantsAnnotationService _annotationService;
-    private readonly CopyNumberVariantIndexingTaskService _indexingTaskService;
-    private readonly ConsequencesDataWriter<AffectedTranscript, Variant, VariantModel> _dataWriter;
     private readonly ILogger _logger;
 
 
     public CopyNumberVariantsAnnotationHandler(
+        ISqlOptions sqlOptions,
+        IEnsemblOptions ensemblDataOptions,
+        IEnsemblVepOptions ensemblVepOptions,
         DomainDbContext dbContext,
         TasksProcessingService taskProcessingService,
-        CopyNumberVariantsAnnotationService annotationService,
-        CopyNumberVariantIndexingTaskService indexingTaskService,
         ILogger<CopyNumberVariantsAnnotationHandler> logger)
     {
+        _sqlOptions = sqlOptions;
+        _ensemblDataOptions = ensemblDataOptions;
+        _ensemblVepOptions = ensemblVepOptions;
         _taskProcessingService = taskProcessingService;
-        _annotationService = annotationService;
-        _indexingTaskService = indexingTaskService;
         _logger = logger;
-
-        var variantRepository = new VariantRepository(dbContext);
-        var affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext, variantRepository);
-        _dataWriter = new ConsequencesDataWriter<AffectedTranscript, Variant, VariantModel>(dbContext, variantRepository, affectedTranscriptRepository);
     }
 
 
@@ -65,17 +65,7 @@ public class CopyNumberVariantsAnnotationHandler
 
             stopwatch.Restart();
 
-            var variantIds = tasks.Select(task => long.Parse(task.Target)).ToArray();
-
-            var annotations =  _annotationService.Annotate(variantIds);
-
-            var consequences = ConsequencesDataConverter.Convert(annotations);
-
-            _dataWriter.SaveData(consequences, out var audit);
-
-            _indexingTaskService.PopulateTasks(audit.Variants);
-
-            _logger.LogInformation(audit.ToString());
+            ProcessAnnotationTasks(tasks);
 
             stopwatch.Stop();
 
@@ -83,5 +73,26 @@ public class CopyNumberVariantsAnnotationHandler
 
             return true;
         });
+    }
+
+    private void ProcessAnnotationTasks(Unite.Data.Entities.Tasks.Task[] tasks)
+    {
+        // Database context needs to be disposed, otherwise write speed degrades.
+        using var dbContext = new DomainDbContext(_sqlOptions);
+
+        var annotationService = new CopyNumberVariantsAnnotationService(dbContext, _ensemblDataOptions, _ensemblVepOptions);
+        var variantRepository = new VariantRepository(dbContext);
+        var affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext, variantRepository);
+        var consequencesDataWriter = new ConsequencesDataWriter<AffectedTranscript, Variant, VariantModel>(dbContext, variantRepository, affectedTranscriptRepository);
+        var indexingTaskService = new CopyNumberVariantIndexingTaskService(dbContext);
+
+        var variants = tasks.Select(task => long.Parse(task.Target)).ToArray();
+        var annotations = annotationService.Annotate(variants);
+        var consequences = ConsequencesDataConverter.Convert(annotations);
+
+        consequencesDataWriter.SaveData(consequences, out var audit);
+        indexingTaskService.PopulateTasks(audit.Variants);
+
+        _logger.LogInformation(audit.ToString());
     }
 }
