@@ -144,18 +144,18 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .Distinct()
             .ToArray();
 
-        var exAffectedSampleIds = _dbContext.Set<GeneExpression>()
-            .AsNoTracking()
-            .Where(expression => expression.GeneId == geneId)
-            .Select(expression => expression.AnalysedSampleId)
-            .Distinct()
-            .ToArray();
+        // var exAffectedSampleIds = _dbContext.Set<GeneExpression>()
+        //     .AsNoTracking()
+        //     .Where(expression => expression.GeneId == geneId)
+        //     .Select(expression => expression.AnalysedSampleId)
+        //     .Distinct()
+        //     .ToArray();
 
         var analysedSampleIds = Enumerable.Empty<int>()
             .Union(ssmAffectedSampleIds)
             .Union(cnvAffectedSampleIds)
             .Union(svAffectedSampleIds)
-            .Union(exAffectedSampleIds)
+            // .Union(exAffectedSampleIds)
             .ToArray();
 
         var analysedSamples = _dbContext.Set<AnalysedSample>()
