@@ -1,5 +1,6 @@
 ﻿using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Audit;
+using Unite.Genome.Feed.Data.Extensions;
 using Unite.Genome.Feed.Data.Models;
 
 namespace Unite.Genome.Feed.Data;
@@ -37,17 +38,17 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
         {
             var analysedSample = _analysedSampleRepository.FindOrCreate(analysis.Id, analysedSampleModel);
 
-            if (analysedSampleModel.Mutations != null)
+            if (analysedSampleModel.Mutations?.Any() == true)
             {
                 WriteMutations(analysedSample.Id, analysedSampleModel.Mutations, ref audit);
             }
 
-            if (analysedSampleModel.CopyNumberVariants != null)
+            if (analysedSampleModel.CopyNumberVariants?.Any() == true)
             {
                 WriteCopyNumberVariants(analysedSample.Id, analysedSampleModel.CopyNumberVariants, ref audit);
             }
 
-            if (analysedSampleModel.StructuralVariants != null)
+            if (analysedSampleModel.StructuralVariants?.Any() == true)
             {
                 WriteStructuralVariants(analysedSample.Id, analysedSampleModel.StructuralVariants, ref audit);
             }
@@ -57,63 +58,39 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
     private void WriteMutations(int analysedSampleId, IEnumerable<Models.Variants.SSM.VariantModel> variantModels, ref SequencingDataUploadAudit audit)
     {
         var variants = _ssmRepository.CreateMissing(variantModels);
-
-        foreach (var variant in variants)
-        {
-            audit.Mutations.Add(variant.Id);
-            audit.MutationsCreated++;
-        }
+        audit.Mutations.AddRange(variants.Select(variant => variant.Id));
+        audit.MutationsCreated += variants.Count();
 
         _ssmOccurrenceRepository.RemoveAll(analysedSampleId);
 
         var variantOccurrences = _ssmOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
-
-        foreach (var variantOccurrence in variantOccurrences)
-        {
-            audit.MutationOccurrences.Add(variantOccurrence.VariantId);
-            audit.MutationsAssociated++;
-        }
+        audit.MutationOccurrences.AddRange(variantOccurrences.Select(occurrence => occurrence.VariantId));
+        audit.MutationsAssociated += variantOccurrences.Count();
     }
 
     private void WriteCopyNumberVariants(int analysedSampleId, IEnumerable<Models.Variants.CNV.VariantModel> variantModels, ref SequencingDataUploadAudit audit)
     {
         var variants = _cnvRepository.CreateMissing(variantModels);
-
-        foreach (var variant in variants)
-        {
-            audit.CopyNumberVariants.Add(variant.Id);
-            audit.CopyNumberVariantsCreated++;
-        }
+        audit.CopyNumberVariants.AddRange(variants.Select(variant => variant.Id));
+        audit.CopyNumberVariantsCreated += variants.Count();
 
         _cnvOccurrenceRepository.RemoveAll(analysedSampleId);
 
         var variantOccurrences = _cnvOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
-
-        foreach (var variantOccurrence in variantOccurrences)
-        {
-            audit.CopyNumberVariantOccurrences.Add(variantOccurrence.VariantId);
-            audit.CopyNumberVariantsAssociated++;
-        }
+        audit.CopyNumberVariantOccurrences.AddRange(variantOccurrences.Select(occurrence => occurrence.VariantId));
+        audit.CopyNumberVariantsAssociated += variantOccurrences.Count();
     }
 
     private void WriteStructuralVariants(int analysedSampleId, IEnumerable<Models.Variants.SV.VariantModel> variantModels, ref SequencingDataUploadAudit audit)
     {
         var variants = _svRepository.CreateMissing(variantModels);
-
-        foreach (var variant in variants)
-        {
-            audit.StructuralVariants.Add(variant.Id);
-            audit.StructuralVariantsCreated++;
-        }
+        audit.StructuralVariants.AddRange(variants.Select(variant => variant.Id));
+        audit.StructuralVariantsCreated += variants.Count();
 
         _svOccurrenceRepository.RemoveAll(analysedSampleId);
 
         var variantOccurrences = _svOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
-
-        foreach (var variantOccurrence in variantOccurrences)
-        {
-            audit.StructuralVariantOccurrences.Add(variantOccurrence.VariantId);
-            audit.StructuralVariantsAssociated++;
-        }
+        audit.StructuralVariantOccurrences.AddRange(variantOccurrences.Select(occurrence => occurrence.VariantId));
+        audit.StructuralVariantsAssociated += variantOccurrences.Count();
     }
 }

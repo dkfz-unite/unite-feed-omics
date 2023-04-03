@@ -23,9 +23,7 @@ internal static class AnnotationsDataConverter
         {
             var consequencesDataModel = new ConsequencesDataModel();
 
-            consequencesDataModel.Variant = new VariantModel();
-
-            Map(variantResource, consequencesDataModel.Variant);
+            consequencesDataModel.VariantId = variantResource.VariantId;
 
             consequencesDataModel.AffectedTranscripts = variantResource.AffectedTranscripts?.Select(affectedTranscript =>
             {
@@ -33,7 +31,7 @@ internal static class AnnotationsDataConverter
 
                 Map(affectedTranscript, affectedTranscriptModel);
 
-                affectedTranscriptModel.Variant = consequencesDataModel.Variant;
+                affectedTranscriptModel.VariantId = variantResource.VariantId;
 
                 if (!string.IsNullOrWhiteSpace(affectedTranscript.GeneId))
                 {

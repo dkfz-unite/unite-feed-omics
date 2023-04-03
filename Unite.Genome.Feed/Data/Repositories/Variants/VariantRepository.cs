@@ -20,23 +20,21 @@ public abstract class VariantRepository<TEntity, TModel>
 
     public virtual TEntity Find(TModel model, IEnumerable<TEntity> cache = null)
     {
-        var predicate = model.Id != null ? GetIdPredicate(model.Id.Value) : GetModelPredicate(model);
-
-        return cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<TEntity>().FirstOrDefault(predicate);
-    }
-
-    public virtual TEntity Find(VariantModel model, IEnumerable<TEntity> cache = null)
-    {
         var predicate = GetModelPredicate(model);
 
         return cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<TEntity>().FirstOrDefault(predicate);
     }
 
-    public virtual TEntity[] Find(IEnumerable<VariantModel> models)
+    public virtual TEntity Find(long id, IEnumerable<TEntity> cache = null)
     {
-        var predicate = GetModelsPredicate(models);
+        var predicate = GetIdPredicate(id);
 
-        return _dbContext.Set<TEntity>().Where(predicate).ToArray();
+        return cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<TEntity>().FirstOrDefault(predicate);
+    }
+
+    public virtual TEntity[] Find(IEnumerable<long> ids)
+    {
+        return _dbContext.Set<TEntity>().Where(entity => ids.Contains(entity.Id)).ToArray();
     }
 
     public virtual TEntity Create(TModel model)
@@ -85,18 +83,6 @@ public abstract class VariantRepository<TEntity, TModel>
 
 
     protected abstract Expression<Func<TEntity, bool>> GetModelPredicate(TModel model);
-
-    protected virtual Expression<Func<TEntity, bool>> GetModelPredicate(VariantModel model)
-    {
-        return (entity) => entity.Id == model.Id;
-    }
-
-    protected virtual Expression<Func<TEntity, bool>> GetModelsPredicate(IEnumerable<VariantModel> models)
-    {
-        var ids = models.Select(model => model.Id);
-
-        return (entity) => ids.Contains(entity.Id);
-    }
 
     protected virtual Expression<Func<TEntity, bool>> GetIdPredicate(long id)
     {

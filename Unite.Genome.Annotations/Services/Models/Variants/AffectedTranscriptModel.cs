@@ -2,6 +2,8 @@
 
 public class AffectedTranscriptModel
 {
+    public long VariantId;
+
     public int? CDNAStart;
     public int? CDNAEnd;
     public int? CDSStart;
@@ -15,7 +17,6 @@ public class AffectedTranscriptModel
     public int? Distance;
     public string[] Consequences;
 
-    public VariantModel Variant;
     public GeneModel Gene;
     public TranscriptModel Transcript;
     public ProteinModel Protein;

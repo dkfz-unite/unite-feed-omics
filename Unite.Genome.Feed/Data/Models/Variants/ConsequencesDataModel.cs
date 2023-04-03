@@ -2,7 +2,7 @@
 
 public class ConsequencesDataModel
 {
-    public VariantModel Variant;
+    public long VariantId;
 
     public AffectedTranscriptModel[] AffectedTranscripts;
 }

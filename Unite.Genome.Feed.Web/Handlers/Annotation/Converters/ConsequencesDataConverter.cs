@@ -13,9 +13,7 @@ public static class ConsequencesDataConverter
         {
             var consequenceModel = new DataModels.Variants.ConsequencesDataModel();
 
-            consequenceModel.Variant = new DataModels.Variants.VariantModel();
-
-            Map(consequenceResource.Variant, consequenceModel.Variant);
+            consequenceModel.VariantId = consequenceResource.VariantId;
 
             consequenceModel.AffectedTranscripts = consequenceResource.AffectedTranscripts?.Select(affectedTranscriptResource =>
             {
@@ -23,7 +21,7 @@ public static class ConsequencesDataConverter
 
                 Map(affectedTranscriptResource, affectedTranscriptModel);
 
-                affectedTranscriptModel.Variant = consequenceModel.Variant;
+                affectedTranscriptModel.VariantId = consequenceModel.VariantId;
 
                 affectedTranscriptModel.Gene = new DataModels.GeneModel();
 

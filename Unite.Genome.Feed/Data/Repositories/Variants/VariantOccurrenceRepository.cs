@@ -73,7 +73,7 @@ public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVar
 
         if (entitiesToAdd.Any())
         {
-            _dbContext.Set<TVariantOccurrenceEntity>().AddRange(entitiesToAdd);
+            _dbContext.AddRange(entitiesToAdd);
             _dbContext.SaveChanges();
         }
 
@@ -88,7 +88,7 @@ public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVar
 
         if (entitiesToRemove.Any())
         {
-            _dbContext.Set<TVariantOccurrenceEntity>().RemoveRange(entitiesToRemove);
+            _dbContext.RemoveRange(entitiesToRemove);
             _dbContext.SaveChanges();
         }
     }

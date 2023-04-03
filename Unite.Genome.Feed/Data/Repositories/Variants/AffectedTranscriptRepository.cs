@@ -37,7 +37,7 @@ public abstract class AffectedTranscriptRepository<TAffectedTranscriptEntity, TV
         IEnumerable<TVariantEntity> variantsCache = null,
         IEnumerable<Transcript> transcriptsCache = null)
     {
-        var variant = _variantRepository.Find(model.Variant, variantsCache);
+        var variant = _variantRepository.Find(model.VariantId, variantsCache);
 
         if (variant == null)
         {
@@ -137,7 +137,7 @@ public abstract class AffectedTranscriptRepository<TAffectedTranscriptEntity, TV
         IEnumerable<TVariantEntity> variantsCache = null,
         IEnumerable<Transcript> transcriptsCache = null)
     {
-        var variant = _variantRepository.Find(model.Variant, variantsCache);
+        var variant = _variantRepository.Find(model.VariantId, variantsCache);
         var feature = _transcriptRepository.Find(model.Transcript, transcriptsCache);
         var consequences = model.Consequences.Select(type => new Consequence(type)).ToArray();
 
