@@ -117,11 +117,13 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private IDictionary<int, GeneExpression> LoadExpressions(int geneId)
     {
         var expressons = _dbContext.Set<GeneExpression>().AsNoTracking()
+            .Include(expression => expression.AnalysedSample)
             .Where(expresson => expresson.GeneId == geneId)
-            .GroupBy(expression => expression.AnalysedSample.SampleId)
             .ToArray();
 
-        var expressionsCache = expressons.ToDictionary(group => group.Key, group => group.FirstOrDefault());
+        var expressionsCache = expressons
+            .GroupBy(expression => expression.AnalysedSample.SampleId)
+            .ToDictionary(group => group.Key, group => group.FirstOrDefault());
 
         return expressionsCache;
     }
