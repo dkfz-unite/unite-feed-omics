@@ -3,6 +3,7 @@ using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Analysis;
 using Unite.Data.Entities.Genome.Transcriptomics;
+using Unite.Data.Entities.Genome.Variants;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Tissues.Enums;
@@ -29,6 +30,15 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private readonly SpecimenIndexMapper _specimenIndexMapper;
     private readonly ImageIndexMapper _imageIndexMapper;
 
+    private record Context
+    (
+        Gene Gene,
+        IDictionary<long, SSM.AffectedTranscript[]> SsmAffectedTranscriptsCache,
+        IDictionary<long, CNV.AffectedTranscript[]> CnvAffectedTranscriptsCache,
+        IDictionary<long, SV.AffectedTranscript[]> SvAffectedTranscriptsCache,
+        IDictionary<int, GeneExpression> ExpressionsCache
+    );
+
 
     public GeneIndexCreationService(DomainDbContext dbContext)
     {
@@ -53,42 +63,73 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private GeneIndex CreateGeneIndex(int geneId)
     {
-        var gene = LoadGene(geneId);
+        var context = LoadContext(geneId);
 
-        if (gene == null)
+        if (context.Gene == null)
         {
             return null;
         }
 
-        var index = CreateGeneIndex(gene);
+        var index = CreateGeneIndex(context);
 
         return index;
     }
 
-    private GeneIndex CreateGeneIndex(Gene gene)
+    private GeneIndex CreateGeneIndex(Context context)
     {
         var index = new GeneIndex();
 
-        _geneIndexMapper.Map(gene, index);
+        _geneIndexMapper.Map(context.Gene, index);
 
-        index.Samples = CreateSampleIndices(gene.Id);
+        index.Samples = CreateSampleIndices(context);
 
         return index;
     }
 
-    private Gene LoadGene(int geneId)
+    private Context LoadContext(int geneId)
     {
-        var gene = _dbContext.Set<Gene>()
-            .AsNoTracking()
-            .FirstOrDefault(gene => gene.Id == geneId);
+        var gene = _dbContext.Set<Gene>().AsNoTracking().FirstOrDefault(gene => gene.Id == geneId);
+        var ssmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(geneId);
+        var cnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(geneId);
+        var svAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(geneId);
+        var expressionsCache = LoadExpressions(geneId);
 
-        return gene;
+        return new (gene, ssmAffectedTranscriptsCache, cnvAffectedTranscriptsCache, svAffectedTranscriptsCache, expressionsCache);
+    }
+
+    private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(int geneId)
+        where TVariant : Variant
+        where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
+    {
+        var affectedTranscripts = _dbContext.Set<TAffectedTranscript>()
+            .AsNoTracking()
+            .Include(affectedTranscript => affectedTranscript.Feature)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId)
+            .ToArray();
+
+        var affectedTranscriptsCache = affectedTranscripts
+            .GroupBy(affectedTranscript => affectedTranscript.VariantId)
+            .ToDictionary(group => group.Key, group => group.ToArray());
+
+        return affectedTranscriptsCache;
+    }
+
+    private IDictionary<int, GeneExpression> LoadExpressions(int geneId)
+    {
+        var expressons = _dbContext.Set<GeneExpression>().AsNoTracking()
+            .Where(expresson => expresson.GeneId == geneId)
+            .GroupBy(expression => expression.AnalysedSample.SampleId)
+            .ToArray();
+
+        var expressionsCache = expressons.ToDictionary(group => group.Key, group => group.FirstOrDefault());
+
+        return expressionsCache;
     }
 
 
-    private SampleIndex[] CreateSampleIndices(int geneId)
+    private SampleIndex[] CreateSampleIndices(Context context)
     {
-        var samples = LoadSamples(geneId);
+        var samples = LoadSamples(context);
 
         if (samples == null)
         {
@@ -96,13 +137,13 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         }
 
         var indices = samples
-            .Select(sample => CreateSampleIndex(sample.Sample, sample.Analyses, geneId))
+            .Select(sample => CreateSampleIndex(context, sample.Sample, sample.Analyses, sample.expression))
             .ToArray();
 
         return indices;
     }
 
-    private SampleIndex CreateSampleIndex(Sample sample, Analysis[] analyses, int geneId)
+    private SampleIndex CreateSampleIndex(Context context, Sample sample, Analysis[] analyses, GeneExpression expression)
     {
         var index = new SampleIndex();
 
@@ -112,50 +153,25 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         index.Images = CreateImageIndices(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
 
-        index.Variants = CreateVariantIndices(sample.Id, geneId);
+        index.Variants = CreateVariantIndices(context, sample.Id);
 
-        index.Expression = CreateExpressionIndex(sample.Id, geneId);
+        index.Expression = CreateExpressionIndex(context, sample.Id);
 
         _sampleIndexMapper.Map(sample, analyses, index, donor.ClinicalData?.DiagnosisDate);
 
         return index;
     }
 
-    private (Sample Sample, Analysis[] Analyses)[] LoadSamples(int geneId)
+    private (Sample Sample, Analysis[] Analyses, GeneExpression expression)[] LoadSamples(Context context)
     {
-        var ssmAffectedSampleIds = _dbContext.Set<SSM.VariantOccurrence>()
-            .AsNoTracking()
-            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Select(occurrence => occurrence.AnalysedSampleId)
-            .Distinct()
-            .ToArray();
-
-        var cnvAffectedSampleIds = _dbContext.Set<CNV.VariantOccurrence>()
-            .AsNoTracking()
-            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Select(occurrence => occurrence.AnalysedSampleId)
-            .Distinct()
-            .ToArray();
-
-        var svAffectedSampleIds = _dbContext.Set<SV.VariantOccurrence>()
-            .AsNoTracking()
-            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Select(occurrence => occurrence.AnalysedSampleId)
-            .Distinct()
-            .ToArray();
-
-        // var exAffectedSampleIds = _dbContext.Set<GeneExpression>()
-        //     .AsNoTracking()
-        //     .Where(expression => expression.GeneId == geneId)
-        //     .Select(expression => expression.AnalysedSampleId)
-        //     .Distinct()
-        //     .ToArray();
+        var ssmAffectedSampleIds = LoadAnalysedSampleIds<SSM.Variant, SSM.VariantOccurrence, SSM.AffectedTranscript>(context.SsmAffectedTranscriptsCache);
+        var cnvAffectedSampleIds = LoadAnalysedSampleIds<CNV.Variant, CNV.VariantOccurrence, CNV.AffectedTranscript>(context.CnvAffectedTranscriptsCache);
+        var svAffectedSampleIds = LoadAnalysedSampleIds<SV.Variant, SV.VariantOccurrence, SV.AffectedTranscript>(context.SvAffectedTranscriptsCache);
 
         var analysedSampleIds = Enumerable.Empty<int>()
             .Union(ssmAffectedSampleIds)
             .Union(cnvAffectedSampleIds)
             .Union(svAffectedSampleIds)
-            // .Union(exAffectedSampleIds)
             .ToArray();
 
         var analysedSamples = _dbContext.Set<AnalysedSample>()
@@ -167,10 +183,36 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         var samples = analysedSamples
             .GroupBy(analysedSample => analysedSample.SampleId)
-            .Select(group => (group.First().Sample, group.Select(sample => sample.Analysis).ToArray()))
+            .Select(group => {
+                var sample = group.First().Sample;
+                var analyses = group.Select(sample => sample.Analysis).ToArray();
+                var expression = context.ExpressionsCache.ContainsKey(group.Key) ? context.ExpressionsCache[group.Key] : null;
+                return (sample, analyses, expression);
+            })
             .ToArray();
 
         return samples;
+    }
+
+    private int[] LoadAnalysedSampleIds<TVariant, TVariantOccurrence, TAffectedTranscript>(IDictionary<long, TAffectedTranscript[]> affectedTranscriptsCache)
+        where TVariant : Variant
+        where TVariantOccurrence : VariantOccurrence<TVariant>
+        where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
+    {
+        if (affectedTranscriptsCache?.Any() == true)
+        {
+            var analysedSampleIds = _dbContext.Set<TVariantOccurrence>().AsNoTracking()
+                .Where(occurrence => affectedTranscriptsCache.Keys.Contains(occurrence.VariantId))
+                .Select(occurrence => occurrence.AnalysedSampleId)
+                .Distinct()
+                .ToArray();
+            
+            return analysedSampleIds;
+        }
+        else
+        {
+            return Array.Empty<int>();
+        }
     }
 
 
@@ -301,11 +343,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     }
 
 
-    private VariantIndex[] CreateVariantIndices(int sampleId, int geneId)
+    private VariantIndex[] CreateVariantIndices(Context context, int sampleId)
     {
-        var mutations = LoadMutations(sampleId, geneId);
-        var copyNumberVariants = LoadCopyNumberVariants(sampleId, geneId);
-        var structuralVariants = LoadStructuralVariants(sampleId, geneId);
+        var mutations = LoadMutations(context, sampleId);
+        var copyNumberVariants = LoadCopyNumberVariants(context, sampleId);
+        var structuralVariants = LoadStructuralVariants(context, sampleId);
 
         var indices = new List<VariantIndex>();
 
@@ -354,70 +396,64 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private SSM.Variant[] LoadMutations(int sampleId, int geneId)
+    private SSM.Variant[] LoadMutations(Context context, int sampleId)
     {
-        // Variants should be filtered by the gene the're affecting.
-        var variantIds = _dbContext.Set<SSM.VariantOccurrence>()
-            .AsNoTracking()
+        var variants = _dbContext.Set<SSM.VariantOccurrence>().AsNoTracking()
+            .Include(occurrence => occurrence.Variant)
             .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
-            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .Where(occurrence => context.SsmAffectedTranscriptsCache.Keys.Contains(occurrence.VariantId))
             .GroupBy(occurrence => occurrence.VariantId)
-            .Select(group => group.First().VariantId)
+            .Select(group => group.First().Variant)
             .ToArray();
 
-        var variants = _dbContext.Set<SSM.Variant>()
-            .AsNoTracking()
-            .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Where(variant => variantIds.Contains(variant.Id))
-            .ToArray();
+        foreach (var variant in variants)
+        {
+            variant.AffectedTranscripts = context.SsmAffectedTranscriptsCache.ContainsKey(variant.Id) ? context.SsmAffectedTranscriptsCache[variant.Id] : null;
+        }
 
         return variants;
     }
 
-    private CNV.Variant[] LoadCopyNumberVariants(int sampleId, int geneId)
+    private CNV.Variant[] LoadCopyNumberVariants(Context context, int sampleId)
     {
-        // Variants should be filtered by the gene the're affecting.
-        var variantIds = _dbContext.Set<CNV.VariantOccurrence>()
-            .AsNoTracking()
+        var variants = _dbContext.Set<CNV.VariantOccurrence>().AsNoTracking()
+            .Include(occurrence => occurrence.Variant)
             .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
-            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .Where(occurrence => context.CnvAffectedTranscriptsCache.Keys.Contains(occurrence.VariantId))
             .GroupBy(occurrence => occurrence.VariantId)
-            .Select(group => group.First().VariantId)
+            .Select(group => group.First().Variant)
             .ToArray();
 
-        var variants = _dbContext.Set<CNV.Variant>()
-            .AsNoTracking()
-            .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Where(variant => variantIds.Contains(variant.Id))
-            .ToArray();
+        foreach (var variant in variants)
+        {
+            variant.AffectedTranscripts = context.CnvAffectedTranscriptsCache.ContainsKey(variant.Id) ? context.CnvAffectedTranscriptsCache[variant.Id] : null;
+        }
 
         return variants;
     }
 
-    private SV.Variant[] LoadStructuralVariants(int sampleId, int geneId)
+    private SV.Variant[] LoadStructuralVariants(Context context, int sampleId)
     {
-        // Variants should be filtered by the gene the're affecting.
-        var variantIds = _dbContext.Set<SV.VariantOccurrence>()
-            .AsNoTracking()
+        var variants = _dbContext.Set<SV.VariantOccurrence>().AsNoTracking()
+            .Include(occurrence => occurrence.Variant)
             .Where(occurrence => occurrence.AnalysedSample.SampleId == sampleId)
-            .Where(occurrence => occurrence.Variant.AffectedTranscripts.Any(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
+            .Where(occurrence => context.SvAffectedTranscriptsCache.Keys.Contains(occurrence.VariantId))
             .GroupBy(occurrence => occurrence.VariantId)
-            .Select(group => group.First().VariantId)
+            .Select(group => group.First().Variant)
             .ToArray();
 
-        var variants = _dbContext.Set<SV.Variant>()
-            .AsNoTracking()
-            .Include(variant => variant.AffectedTranscripts.Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId))
-            .Where(variant => variantIds.Contains(variant.Id))
-            .ToArray();
+        foreach (var variant in variants)
+        {
+            variant.AffectedTranscripts = context.SvAffectedTranscriptsCache.ContainsKey(variant.Id) ? context.SvAffectedTranscriptsCache[variant.Id] : null;
+        }
 
         return variants;
     }
 
 
-    private GeneExpressionIndex CreateExpressionIndex(int sampleId, int geneId)
+    private GeneExpressionIndex CreateExpressionIndex(Context context, int sampleId)
     {
-        var expression = LoadExpression(sampleId, geneId);
+        var expression = LoadExpression(context, sampleId);
 
         if (expression == null)
         {
@@ -438,12 +474,9 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private GeneExpression LoadExpression(int sampleId, int geneId)
+    private GeneExpression LoadExpression(Context context, int sampleId)
     {
-        var expression = _dbContext.Set<GeneExpression>().AsNoTracking().FirstOrDefault(expression =>
-            expression.AnalysedSample.SampleId == sampleId &&
-            expression.GeneId == geneId
-        );
+        var expression = context.ExpressionsCache.ContainsKey(sampleId) ? context.ExpressionsCache[sampleId] : null;
 
         return expression;
     }
