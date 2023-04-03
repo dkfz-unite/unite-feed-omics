@@ -60,12 +60,18 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
         var variants = _ssmRepository.CreateMissing(variantModels);
         audit.Mutations.AddRange(variants.Select(variant => variant.Id));
         audit.MutationsCreated += variants.Count();
+        Console.WriteLine($"Created {audit.MutationsCreated} new variants of {variantModels.Count()} models");
 
+        var existing = _dbContext.Set<Unite.Data.Entities.Genome.Variants.SSM.VariantOccurrence>().Count(o => o.AnalysedSampleId == analysedSampleId);
+        Console.WriteLine($"Removing {existing} variant occurrences from {analysedSampleId}");
         _ssmOccurrenceRepository.RemoveAll(analysedSampleId);
 
         var variantOccurrences = _ssmOccurrenceRepository.CreateAll(analysedSampleId, variantModels, variants);
         audit.MutationOccurrences.AddRange(variantOccurrences.Select(occurrence => occurrence.VariantId));
         audit.MutationsAssociated += variantOccurrences.Count();
+        Console.WriteLine($"Associated {audit.MutationsAssociated} variants");
+        var created = _dbContext.Set<Unite.Data.Entities.Genome.Variants.SSM.VariantOccurrence>().Count(o => o.AnalysedSampleId == analysedSampleId);
+        Console.WriteLine($"Finally {created} variant occurrences created for {analysedSampleId}");
     }
 
     private void WriteCopyNumberVariants(int analysedSampleId, IEnumerable<Models.Variants.CNV.VariantModel> variantModels, ref SequencingDataUploadAudit audit)
