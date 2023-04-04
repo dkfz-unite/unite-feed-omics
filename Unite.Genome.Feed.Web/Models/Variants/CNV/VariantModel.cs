@@ -114,7 +114,8 @@ public class VariantModel : IDistinctable
 
     private static double? GetDouble(double? value)
     {
-        return value != null ? value >= 0 ? value : 0 : null;
+        return value == null ? null
+             : value >= 0 ? value : 0;
     }
 
     /// <summary>

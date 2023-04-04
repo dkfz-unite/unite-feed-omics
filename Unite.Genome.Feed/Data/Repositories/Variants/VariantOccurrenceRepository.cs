@@ -55,6 +55,35 @@ public abstract class VariantOccurrenceRepository<TVariantOccurrenceEntity, TVar
         return Create(analysedSampleId, variant.Id);
     }
 
+    public IEnumerable<TVariantOccurrenceEntity> CreateMissing(
+        int analysedSampleId,
+        IEnumerable<TVariantModel> models,
+        IEnumerable<TVariantEntity> cache = null)
+    {
+        var entitiesToAdd = new List<TVariantOccurrenceEntity>();
+
+        foreach (var model in models)
+        {
+            var variant = _variantRepository.FindOrCreate(model, cache);
+
+            var entity = Find(analysedSampleId, variant.Id);
+
+            if (entity == null)
+            {
+                entity = Convert(analysedSampleId, variant.Id);
+                entitiesToAdd.Add(entity);
+            }
+        }
+
+        if (entitiesToAdd.Any())
+        {
+            _dbContext.AddRange(entitiesToAdd);
+            _dbContext.SaveChanges();
+        }
+
+        return entitiesToAdd;
+    }
+
     public IEnumerable<TVariantOccurrenceEntity> CreateAll(
         int analysedSampleId,
         IEnumerable<TVariantModel> models,

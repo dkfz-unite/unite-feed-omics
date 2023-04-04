@@ -19,11 +19,6 @@ public abstract class VariantModelBaseMapper
         }
         else if (ploidy != null && tcnMean != null)
         {
-            if (tcnMean > ploidy)
-            {
-                
-            }
-
             var delta = tcnMean > ploidy ? tcnMean.Value - ploidy.Value : ploidy.Value - tcnMean.Value;
 
             return delta < 0.3 ? CnvType.Neutral
