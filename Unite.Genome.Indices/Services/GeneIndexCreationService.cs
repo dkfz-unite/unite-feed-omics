@@ -30,14 +30,48 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private readonly SpecimenIndexMapper _specimenIndexMapper;
     private readonly ImageIndexMapper _imageIndexMapper;
 
-    private record Context
-    (
-        Gene Gene,
-        IDictionary<long, SSM.AffectedTranscript[]> SsmAffectedTranscriptsCache,
-        IDictionary<long, CNV.AffectedTranscript[]> CnvAffectedTranscriptsCache,
-        IDictionary<long, SV.AffectedTranscript[]> SvAffectedTranscriptsCache,
-        IDictionary<int, GeneExpression> ExpressionsCache
-    );
+    private class Context
+    {
+        /// <summary>
+        /// Gene
+        /// </summary>
+        public Gene Gene;
+
+        /// <summary>
+        /// Map of variant id to affected transcripts
+        /// </summary>
+        public IDictionary<long, SSM.AffectedTranscript[]> SsmAffectedTranscriptsCache;
+
+        /// <summary>
+        /// Map of variant id to affected transcripts
+        /// </summary>
+        public IDictionary<long, CNV.AffectedTranscript[]> CnvAffectedTranscriptsCache;
+
+        /// <summary>
+        /// Map of variant id to affected transcripts
+        /// </summary>
+        public IDictionary<long, SV.AffectedTranscript[]> SvAffectedTranscriptsCache;
+
+        /// <summary>
+        /// Map of sample id to gene expression
+        /// </summary>
+        public IDictionary<int, GeneExpression> ExpressionsCache;
+
+        /// <summary>
+        /// Map of specimen id to donor
+        /// </summary>
+        public IDictionary<int, Donor> DonorsCache;
+
+        /// <summary>
+        /// Map of specimen id to images
+        /// </summary>
+        public IDictionary<int, Image[]> ImagesCache;
+
+        /// <summary>
+        /// Map of specimen id to specimen
+        /// </summary>
+        public IDictionary<int, Specimen> SpecimensCache;
+    }
 
 
     public GeneIndexCreationService(DomainDbContext dbContext)
@@ -88,13 +122,16 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Context LoadContext(int geneId)
     {
-        var gene = _dbContext.Set<Gene>().AsNoTracking().FirstOrDefault(gene => gene.Id == geneId);
-        var ssmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(geneId);
-        var cnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(geneId);
-        var svAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(geneId);
-        var expressionsCache = LoadExpressions(geneId);
+        var context = new Context
+        {
+            Gene = _dbContext.Set<Gene>().AsNoTracking().FirstOrDefault(gene => gene.Id == geneId),
+            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(geneId),
+            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(geneId),
+            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(geneId),
+            ExpressionsCache = LoadExpressions(geneId)
+        };
 
-        return new (gene, ssmAffectedTranscriptsCache, cnvAffectedTranscriptsCache, svAffectedTranscriptsCache, expressionsCache);
+        return context;
     }
 
     private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(int geneId)
@@ -132,6 +169,9 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     private SampleIndex[] CreateSampleIndices(Context context)
     {
         var samples = LoadSamples(context);
+        context.DonorsCache = LoadDonorsCache(samples.Select(sample => sample.Sample.SpecimenId));
+        context.ImagesCache = LoadImagesCache(samples.Select(sample => sample.Sample.SpecimenId));
+        context.SpecimensCache = LoadSpecimensCache(samples.Select(sample => sample.Sample.SpecimenId));
 
         if (samples == null)
         {
@@ -149,11 +189,11 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         var index = new SampleIndex();
 
-        index.Donor = CreateDonorIndex(sample.SpecimenId, out var donor);
+        index.Donor = CreateDonorIndex(context, sample.SpecimenId, out var donor);
 
-        index.Specimen = CreateSpecimenIndex(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
+        index.Specimen = CreateSpecimenIndex(context, sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
 
-        index.Images = CreateImageIndices(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
+        index.Images = CreateImageIndices(context, sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
 
         index.Variants = CreateVariantIndices(context, sample.Id);
 
@@ -169,6 +209,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         var ssmAffectedSampleIds = LoadAnalysedSampleIds<SSM.Variant, SSM.VariantOccurrence, SSM.AffectedTranscript>(context.SsmAffectedTranscriptsCache);
         var cnvAffectedSampleIds = LoadAnalysedSampleIds<CNV.Variant, CNV.VariantOccurrence, CNV.AffectedTranscript>(context.CnvAffectedTranscriptsCache);
         var svAffectedSampleIds = LoadAnalysedSampleIds<SV.Variant, SV.VariantOccurrence, SV.AffectedTranscript>(context.SvAffectedTranscriptsCache);
+        
 
         var analysedSampleIds = Enumerable.Empty<int>()
             .Union(ssmAffectedSampleIds)
@@ -217,10 +258,60 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         }
     }
 
-
-    private DonorIndex CreateDonorIndex(int specimenId, out Donor donor)
+    private IDictionary<int, Donor> LoadDonorsCache(IEnumerable<int> specimenIds)
     {
-        donor = LoadDonor(specimenId);
+        var specimensMap = _dbContext.Set<Specimen>().AsNoTracking()
+            .Where(specimen => specimenIds.Contains(specimen.Id))
+            .Select(specimen => new { specimen.Id, specimen.DonorId }).ToArray()
+            .ToDictionary(specimen => specimen.Id, specimen => specimen.DonorId);
+
+        var donors = _dbContext.Set<Donor>().AsNoTracking()
+            .IncludeClinicalData()
+            .IncludeTreatments()
+            .IncludeStudies()
+            .IncludeProjects()
+            .Where(donor => specimensMap.Values.Distinct().Contains(donor.Id))
+            .ToArray().ToDictionary(donor => donor.Id, donor => donor);
+
+        return specimensMap.ToDictionary(map => map.Key, map => donors[map.Value]);
+    }
+
+    private IDictionary<int, Specimen> LoadSpecimensCache(IEnumerable<int> specimenids)
+    {
+        var specimens = _dbContext.Set<Specimen>().AsNoTracking()
+            .IncludeTissue()
+            .IncludeCellLine()
+            .IncludeOrganoid()
+            .IncludeXenograft()
+            .IncludeMolecularData()
+            .IncludeDrugScreeningData()
+            .Where(specimen => specimenids.Contains(specimen.Id))
+            .ToArray().ToDictionary(specimen => specimen.Id, specimen => specimen);
+
+        return specimens;
+    }
+
+    private IDictionary<int, Image[]> LoadImagesCache(IEnumerable<int> specimenIds)
+    {
+        var specimensMap = _dbContext.Set<Specimen>().AsNoTracking()
+            .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
+            .Where(specimen => specimenIds.Contains(specimen.Id))
+            .Select(specimen => new { specimen.Id, specimen.DonorId }).ToArray()
+            .ToDictionary(specimen => specimen.Id, specimen => specimen.DonorId);
+
+        var images = _dbContext.Set<Image>().AsNoTracking()
+            .Include(image => image.MriImage)
+            .Where(image => specimensMap.Values.Distinct().Contains(image.DonorId))
+            .ToArray().GroupBy(image => image.DonorId)
+            .ToDictionary(group => group.Key, group => group.ToArray());
+
+        return specimensMap.ToDictionary(map => map.Key, map => images[map.Value]);
+    }
+
+
+    private DonorIndex CreateDonorIndex(Context context, int specimenId, out Donor donor)
+    {
+        donor = LoadDonor(context, specimenId);
 
         if (donor == null)
         {
@@ -241,30 +332,15 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Donor LoadDonor(int specimenId)
+    private Donor LoadDonor(Context context, int specimenId)
     {
-        var donorId = _dbContext.Set<Specimen>()
-            .AsNoTracking()
-            .Where(specimen => specimen.Id == specimenId)
-            .Select(specimen => specimen.DonorId)
-            .FirstOrDefault();
-
-        var donor = _dbContext.Set<Donor>()
-            .AsNoTracking()
-            .IncludeClinicalData()
-            .IncludeTreatments()
-            .IncludeProjects()
-            .IncludeStudies()
-            .Where(donor => donor.Id == donorId)
-            .FirstOrDefault();
-
-        return donor;
+        return context.DonorsCache[specimenId];
     }
 
 
-    private SpecimenIndex CreateSpecimenIndex(int specimenId, DateOnly? diagnosisDate)
+    private SpecimenIndex CreateSpecimenIndex(Context context, int specimenId, DateOnly? diagnosisDate)
     {
-        var specimen = LoadSpecimen(specimenId);
+        var specimen = LoadSpecimen(context, specimenId);
 
         if (specimen == null)
         {
@@ -285,25 +361,15 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Specimen LoadSpecimen(int specimenId)
+    private Specimen LoadSpecimen(Context context, int specimenId)
     {
-        var specimen = _dbContext.Set<Specimen>()
-            .AsNoTracking()
-            .IncludeTissue()
-            .IncludeCellLine()
-            .IncludeOrganoid()
-            .IncludeXenograft()
-            .IncludeMolecularData()
-            .IncludeDrugScreeningData()
-            .FirstOrDefault(specimen => specimen.Id == specimenId);
-
-        return specimen;
+        return context.SpecimensCache[specimenId];
     }
 
 
-    private ImageIndex[] CreateImageIndices(int specimenId, DateOnly? diagnosisDate)
+    private ImageIndex[] CreateImageIndices(Context context, int specimenId, DateOnly? diagnosisDate)
     {
-        var images = LoadImages(specimenId);
+        var images = LoadImages(context, specimenId);
 
         if (images == null)
         {
@@ -326,22 +392,9 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Image[] LoadImages(int specimenId)
+    private Image[] LoadImages(Context context, int specimenId)
     {
-        var donorId = _dbContext.Set<Specimen>()
-            .AsNoTracking()
-            .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
-            .Where(specimen => specimen.Id == specimenId)
-            .Select(specimen => specimen.DonorId)
-            .FirstOrDefault();
-
-        var images = _dbContext.Set<Image>()
-            .AsNoTracking()
-            .Include(image => image.MriImage)
-            .Where(image => image.DonorId == donorId)
-            .ToArray();
-
-        return images;
+        return context.ImagesCache[specimenId];
     }
 
 
