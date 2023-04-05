@@ -428,7 +428,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
     {
         try
         {
-            return context.ImagesCache[specimenId];
+            return context.ImagesCache.ContainsKey(specimenId) ? context.ImagesCache[specimenId] : null;
         }
         catch
         {
