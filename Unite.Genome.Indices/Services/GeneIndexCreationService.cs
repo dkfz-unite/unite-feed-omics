@@ -229,7 +229,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .Select(group => {
                 var sample = group.First().Sample;
                 var analyses = group.Select(sample => sample.Analysis).ToArray();
-                var expression = context.ExpressionsCache.ContainsKey(group.Key) ? context.ExpressionsCache[group.Key] : null;
+                var expression = context.ExpressionsCache.TryGetValue(group.Key, out var value) ? value : null;
                 return (sample, analyses, expression);
             })
             .ToArray();
@@ -273,15 +273,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .Where(donor => specimensToDonorsMap.Values.Distinct().Contains(donor.Id))
             .ToArray().ToDictionary(donor => donor.Id, donor => donor);
 
-        try
-        {
-            return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsMap[map.Value]);
-        }
-        catch
-        {
-            Console.WriteLine("Donors map does not have id from specimens to donors map");
-            throw;
-        }
+        return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsMap.TryGetValue(map.Value, out var value) ? value : null);
     }
 
     private IDictionary<int, Specimen> LoadSpecimensCache(IEnumerable<int> specimenids)
@@ -313,15 +305,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray().GroupBy(image => image.DonorId)
             .ToDictionary(group => group.Key, group => group.ToArray());
 
-        try
-        {
-            return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsToImagesMap.ContainsKey(map.Value) ? donorsToImagesMap[map.Value] : null);
-        }
-        catch
-        {
-            Console.WriteLine("Donors to images map does not have id from specimens to donors map");
-            throw;
-        }
+        return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsToImagesMap.TryGetValue(map.Value, out var value) ? value : null);
     }
 
 
@@ -350,15 +334,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Donor LoadDonor(Context context, int specimenId)
     {
-        try
-        {
-            return context.DonorsCache[specimenId];
-        }
-        catch
-        {
-            Console.WriteLine("Donors cache does not have specimen id");
-            throw;
-        }
+        return context.DonorsCache.TryGetValue(specimenId, out var value) ? value : null;
     }
 
 
@@ -387,15 +363,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Specimen LoadSpecimen(Context context, int specimenId)
     {
-        try
-        {
-            return context.SpecimensCache[specimenId];
-        }
-        catch
-        {
-            Console.WriteLine("Specimens cache does not have specimen id");
-            throw;
-        }
+        return context.SpecimensCache.TryGetValue(specimenId, out var value) ? value : null;
     }
 
 
@@ -426,15 +394,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Image[] LoadImages(Context context, int specimenId)
     {
-        try
-        {
-            return context.ImagesCache.ContainsKey(specimenId) ? context.ImagesCache[specimenId] : null;
-        }
-        catch
-        {
-            Console.WriteLine("Images cache does not have specimen id");
-            throw;
-        }
+        return context.ImagesCache.TryGetValue(specimenId, out var value) ? value : null;
     }
 
 
@@ -503,7 +463,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         foreach (var variant in variants)
         {
-            variant.AffectedTranscripts = context.SsmAffectedTranscriptsCache.ContainsKey(variant.Id) ? context.SsmAffectedTranscriptsCache[variant.Id] : null;
+            variant.AffectedTranscripts = context.SsmAffectedTranscriptsCache.TryGetValue(variant.Id, out var value) ? value : null;
         }
 
         return variants;
@@ -521,7 +481,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         foreach (var variant in variants)
         {
-            variant.AffectedTranscripts = context.CnvAffectedTranscriptsCache.ContainsKey(variant.Id) ? context.CnvAffectedTranscriptsCache[variant.Id] : null;
+            variant.AffectedTranscripts = context.CnvAffectedTranscriptsCache.TryGetValue(variant.Id, out var value) ? value : null;
         }
 
         return variants;
@@ -539,7 +499,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
         foreach (var variant in variants)
         {
-            variant.AffectedTranscripts = context.SvAffectedTranscriptsCache.ContainsKey(variant.Id) ? context.SvAffectedTranscriptsCache[variant.Id] : null;
+            variant.AffectedTranscripts = context.SvAffectedTranscriptsCache.TryGetValue(variant.Id, out var value) ? value : null;
         }
 
         return variants;
@@ -571,8 +531,6 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private GeneExpression LoadExpression(Context context, int sampleId)
     {
-        var expression = context.ExpressionsCache.ContainsKey(sampleId) ? context.ExpressionsCache[sampleId] : null;
-
-        return expression;
+        return context.ExpressionsCache.TryGetValue(sampleId, out var value) ? value : null;
     }
 }
