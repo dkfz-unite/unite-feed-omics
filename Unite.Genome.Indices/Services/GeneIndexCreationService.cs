@@ -260,25 +260,33 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private IDictionary<int, Donor> LoadDonorsCache(IEnumerable<int> specimenIds)
     {
-        var specimensMap = _dbContext.Set<Specimen>().AsNoTracking()
+        var specimensToDonorsMap = _dbContext.Set<Specimen>().AsNoTracking()
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .Select(specimen => new { specimen.Id, specimen.DonorId }).ToArray()
-            .ToDictionary(specimen => specimen.Id, specimen => specimen.DonorId);
+            .ToDictionary(entry => entry.Id, entry => entry.DonorId);
 
-        var donors = _dbContext.Set<Donor>().AsNoTracking()
+        var donorsMap = _dbContext.Set<Donor>().AsNoTracking()
             .IncludeClinicalData()
             .IncludeTreatments()
             .IncludeStudies()
             .IncludeProjects()
-            .Where(donor => specimensMap.Values.Distinct().Contains(donor.Id))
+            .Where(donor => specimensToDonorsMap.Values.Distinct().Contains(donor.Id))
             .ToArray().ToDictionary(donor => donor.Id, donor => donor);
 
-        return specimensMap.ToDictionary(map => map.Key, map => donors[map.Value]);
+        try
+        {
+            return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsMap[map.Value]);
+        }
+        catch
+        {
+            Console.WriteLine("Donors map does not have id from specimens to donors map");
+            throw;
+        }
     }
 
     private IDictionary<int, Specimen> LoadSpecimensCache(IEnumerable<int> specimenids)
     {
-        var specimens = _dbContext.Set<Specimen>().AsNoTracking()
+        var specimensMap = _dbContext.Set<Specimen>().AsNoTracking()
             .IncludeTissue()
             .IncludeCellLine()
             .IncludeOrganoid()
@@ -288,24 +296,32 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .Where(specimen => specimenids.Contains(specimen.Id))
             .ToArray().ToDictionary(specimen => specimen.Id, specimen => specimen);
 
-        return specimens;
+        return specimensMap;
     }
 
     private IDictionary<int, Image[]> LoadImagesCache(IEnumerable<int> specimenIds)
     {
-        var specimensMap = _dbContext.Set<Specimen>().AsNoTracking()
+        var specimensToDonorsMap = _dbContext.Set<Specimen>().AsNoTracking()
             .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .Select(specimen => new { specimen.Id, specimen.DonorId }).ToArray()
-            .ToDictionary(specimen => specimen.Id, specimen => specimen.DonorId);
+            .ToDictionary(entry => entry.Id, entry => entry.DonorId);
 
-        var images = _dbContext.Set<Image>().AsNoTracking()
+        var donorsToImagesMap = _dbContext.Set<Image>().AsNoTracking()
             .Include(image => image.MriImage)
-            .Where(image => specimensMap.Values.Distinct().Contains(image.DonorId))
+            .Where(image => specimensToDonorsMap.Values.Distinct().Contains(image.DonorId))
             .ToArray().GroupBy(image => image.DonorId)
             .ToDictionary(group => group.Key, group => group.ToArray());
 
-        return specimensMap.ToDictionary(map => map.Key, map => images.ContainsKey(map.Value) ? images[map.Value] : null);
+        try
+        {
+            return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsToImagesMap.ContainsKey(map.Value) ? donorsToImagesMap[map.Value] : null);
+        }
+        catch
+        {
+            Console.WriteLine("Donors to images map does not have id from specimens to donors map");
+            throw;
+        }
     }
 
 
@@ -334,7 +350,15 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Donor LoadDonor(Context context, int specimenId)
     {
-        return context.DonorsCache[specimenId];
+        try
+        {
+            return context.DonorsCache[specimenId];
+        }
+        catch
+        {
+            Console.WriteLine("Donors cache does not have specimen id");
+            throw;
+        }
     }
 
 
@@ -363,7 +387,15 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Specimen LoadSpecimen(Context context, int specimenId)
     {
-        return context.SpecimensCache[specimenId];
+        try
+        {
+            return context.SpecimensCache[specimenId];
+        }
+        catch
+        {
+            Console.WriteLine("Specimens cache does not have specimen id");
+            throw;
+        }
     }
 
 
@@ -394,7 +426,15 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Image[] LoadImages(Context context, int specimenId)
     {
-        return context.ImagesCache[specimenId];
+        try
+        {
+            return context.ImagesCache[specimenId];
+        }
+        catch
+        {
+            Console.WriteLine("Images cache does not have specimen id");
+            throw;
+        }
     }
 
 
