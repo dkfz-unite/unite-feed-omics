@@ -305,7 +305,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
             .ToArray().GroupBy(image => image.DonorId)
             .ToDictionary(group => group.Key, group => group.ToArray());
 
-        return specimensMap.ToDictionary(map => map.Key, map => images[map.Value]);
+        return specimensMap.ToDictionary(map => map.Key, map => images.ContainsKey(map.Value) ? images[map.Value] : null);
     }
 
 
