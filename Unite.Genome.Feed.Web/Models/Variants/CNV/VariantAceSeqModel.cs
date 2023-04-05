@@ -88,30 +88,32 @@ public class VariantAceSeqModel : IDistinctable
 
 
 
-    public CnvType? GetCnvType()
+    public CnvType GetCnvType()
     {
-        var cnvTypeString = GetString(Type);
+        var value = Type?.Split(";", StringSplitOptions.RemoveEmptyEntries).Select(value => value.Trim()).FirstOrDefault();
 
-        var valueString = cnvTypeString?
-            .Split(";", StringSplitOptions.RemoveEmptyEntries)?
-            .Select(value => value.Trim())?
-            .FirstOrDefault();
-
-        return Enum.TryParse<CnvType>(valueString, out var value) ? value : null;
+        if (string.Equals(value, "AMP", StringComparison.InvariantCultureIgnoreCase))
+            return CnvType.Gain;
+        else if (string.Equals(value, "DUP", StringComparison.InvariantCultureIgnoreCase))
+            return CnvType.Gain;
+        else if (string.Equals(value, "TCNneutral", StringComparison.CurrentCultureIgnoreCase))
+            return CnvType.Neutral;
+        else if (string.Equals(value, "DEL", StringComparison.InvariantCultureIgnoreCase))
+            return CnvType.Loss;
+        else if (string.Equals(value, "HomoDel", StringComparison.InvariantCultureIgnoreCase))
+            return CnvType.Loss;
+        else
+            return CnvType.Undetermined;
     }
 
-    public bool? GetLoh()
+    public bool GetLoh()
     {
-        var cnvTypeString = GetString(Type);
-
-        return cnvTypeString?.Contains("LOH") == true ? true : false;
+        return Type?.Contains("LOH", StringComparison.InvariantCultureIgnoreCase) == true ? true : false;
     }
 
-    public bool? GetHomoDel()
+    public bool GetHomoDel()
     {
-        var cnvTypeString = GetString(Type);
-
-        return cnvTypeString?.Contains("HomoDel") == true ? true : false;
+        return Type?.Contains("HomoDel", StringComparison.InvariantCultureIgnoreCase) == true ? true : false;
     }
 
     public double? GetC1Mean()
@@ -160,22 +162,25 @@ public class VariantAceSeqModel : IDistinctable
         };
     }
 
-
-    private static string GetString(string value)
-    {
-        return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null : value;
-    }
-
     private static double? GetDouble(string value)
     {
-        return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null
-            : double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number >= 0 ? number : 0 : null;
+        if (string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase))
+            return null;
+        else if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
+            return number >= 0 ? number : 0;
+        else
+            return null;
     }
 
     private static int? GetInteger(string value)
     {
-        return string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase) ? null
-             : string.Equals(value, "sub", StringComparison.InvariantCultureIgnoreCase) ? -1
-             : int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number) ? number : null;
+        if (string.Equals(value, "NA", StringComparison.InvariantCultureIgnoreCase))
+            return null;
+        else if (string.Equals(value, "sub", StringComparison.InvariantCultureIgnoreCase))
+            return -1;
+        else if (int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
+            return number >= 0 ? number : 0;
+        else
+            return null;
     }
 }

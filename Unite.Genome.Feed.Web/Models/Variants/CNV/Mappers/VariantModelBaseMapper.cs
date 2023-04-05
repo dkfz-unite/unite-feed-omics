@@ -5,33 +5,6 @@ namespace Unite.Genome.Feed.Web.Models.Variants.CNV.Mappers;
 public abstract class VariantModelBaseMapper
 {
     /// <summary>
-    /// Retrieves CNA.Type based on TCN or TCN mean and sample ploidy.
-    /// </summary>
-    /// <param name="tcn">TCN.</param>
-    /// <param name="tcnMean">TCN mean.</param>
-    /// <param name="ploidy">Sample ploidy.</param>
-    /// <returns>CNA.Type based on TCN or TCN mean and sample ploidy.</returns>
-    protected static CnvType GetCnvType(int? tcn, double? tcnMean, double? ploidy)
-    {
-        if (ploidy != null && tcn != null && tcn != -1)
-        {
-            return tcn == ploidy ? CnvType.Neutral : tcn < ploidy ? CnvType.Loss : CnvType.Gain;
-        }
-        else if (ploidy != null && tcnMean != null)
-        {
-            var delta = tcnMean > ploidy ? tcnMean.Value - ploidy.Value : ploidy.Value - tcnMean.Value;
-
-            return delta < 0.3 ? CnvType.Neutral
-                 : delta > 0.7 ? tcnMean > ploidy ? CnvType.Gain : CnvType.Loss
-                 : CnvType.Undetermined;
-        }
-        else
-        {
-            return CnvType.Undetermined;
-        }
-    }
-
-    /// <summary>
     /// Retrieves TCN to ploidy ratio.
     /// </summary>
     /// <param name="tcn">TCN rouded value.</param>
