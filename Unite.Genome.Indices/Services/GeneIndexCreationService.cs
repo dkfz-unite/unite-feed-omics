@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Analysis;
@@ -125,23 +126,23 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         var context = new Context
         {
             Gene = _dbContext.Set<Gene>().AsNoTracking().FirstOrDefault(gene => gene.Id == geneId),
-            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(geneId),
-            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(geneId),
-            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(geneId),
+            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(affectedTranscript => affectedTranscript.Feature.GeneId == geneId),
+            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(affectedTranscript => affectedTranscript.Feature.GeneId == geneId && affectedTranscript.Variant.TypeId != CNV.Enums.CnvType.Neutral),
+            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(affectedTranscript => affectedTranscript.Feature.GeneId == geneId),
             ExpressionsCache = LoadExpressions(geneId)
         };
 
         return context;
     }
 
-    private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(int geneId)
+    private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(Expression<Func<TAffectedTranscript, bool>> predicate)
         where TVariant : Variant
         where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
     {
         var affectedTranscripts = _dbContext.Set<TAffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature)
-            .Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId)
+            .Where(predicate)
             .ToArray();
 
         var affectedTranscriptsCache = affectedTranscripts

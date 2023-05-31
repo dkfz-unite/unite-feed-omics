@@ -32,6 +32,9 @@ internal class VariantIndexMapper
         {
             Map(structuralVariant, index);
         }
+
+        // index,Id - resolved by property getter
+        // index.Type - resolved by property getter
     }
 
     internal void Map(in SSM.Variant entity, VariantIndex index)
@@ -41,7 +44,7 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.Mutation = CreateFrom(entity);
+        index.SSM = CreateFrom(entity);
     }
 
     internal void Map(in CNV.Variant entity, VariantIndex index)
@@ -51,7 +54,7 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.CopyNumberVariant = CreateFrom(entity);
+        index.CNV = CreateFrom(entity);
     }
 
     internal void Map(in SV.Variant entity, VariantIndex index)
@@ -61,7 +64,7 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.StructuralVariant = CreateFrom(entity);
+        index.SV = CreateFrom(entity);
     }
 
 

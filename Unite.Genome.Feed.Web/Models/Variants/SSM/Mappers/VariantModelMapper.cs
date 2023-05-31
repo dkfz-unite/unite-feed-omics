@@ -1,4 +1,5 @@
-﻿using Unite.Data.Utilities.Mutations;
+﻿using Unite.Data.Entities.Genome.Variants.SSM.Enums;
+using Unite.Data.Utilities.Mutations;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SSM.Mappers;
 
@@ -10,8 +11,20 @@ public class VariantModelMapper
         target.Chromosome = source.Chromosome.Value;
         target.Start = PositionParser.Parse(source.Position).Start;
         target.End = PositionParser.Parse(source.Position).End;
-        target.Length = target.End - target.Start + 1;
         target.Ref = source.Ref;
         target.Alt = source.Alt;
+
+        if (target.Type == SsmType.INS)
+        {
+            target.Length = target.Alt.Length;
+        }
+        else if (target.Type == SsmType.DEL)
+        {
+            target.Length = target.Ref.Length;
+        }
+        else
+        {
+            target.Length = target.End - target.Start + 1;
+        }
     }
 }
