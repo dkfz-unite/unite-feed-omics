@@ -44,7 +44,7 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.SSM = CreateFrom(entity);
+        index.Ssm = CreateFrom(entity);
     }
 
     internal void Map(in CNV.Variant entity, VariantIndex index)
@@ -54,7 +54,7 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.CNV = CreateFrom(entity);
+        index.Cnv = CreateFrom(entity);
     }
 
     internal void Map(in SV.Variant entity, VariantIndex index)
@@ -64,7 +64,7 @@ internal class VariantIndexMapper
             return;
         }
 
-        index.SV = CreateFrom(entity);
+        index.Sv = CreateFrom(entity);
     }
 
 

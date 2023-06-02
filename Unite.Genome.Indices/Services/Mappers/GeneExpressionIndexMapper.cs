@@ -8,7 +8,7 @@ public class GeneExpressionIndexMapper
     public void Map(in GeneExpression entity, GeneExpressionIndex index)
     {
         index.Reads = entity.Reads;
-        index.TPM = entity.TPM;
-        index.FPKM = entity.FPKM;
+        index.Tpm = entity.TPM;
+        index.Fpkm = entity.FPKM;
     }
 }
