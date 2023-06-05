@@ -210,12 +210,13 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         var ssmAffectedSampleIds = LoadAnalysedSampleIds<SSM.Variant, SSM.VariantOccurrence, SSM.AffectedTranscript>(context.SsmAffectedTranscriptsCache);
         var cnvAffectedSampleIds = LoadAnalysedSampleIds<CNV.Variant, CNV.VariantOccurrence, CNV.AffectedTranscript>(context.CnvAffectedTranscriptsCache);
         var svAffectedSampleIds = LoadAnalysedSampleIds<SV.Variant, SV.VariantOccurrence, SV.AffectedTranscript>(context.SvAffectedTranscriptsCache);
-        
+        var expressionSampleIds = context.ExpressionsCache.Keys.ToArray();
 
         var analysedSampleIds = Enumerable.Empty<int>()
             .Union(ssmAffectedSampleIds)
             .Union(cnvAffectedSampleIds)
             .Union(svAffectedSampleIds)
+            .Union(expressionSampleIds)
             .ToArray();
 
         var analysedSamples = _dbContext.Set<AnalysedSample>()
