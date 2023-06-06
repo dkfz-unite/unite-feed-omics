@@ -89,7 +89,7 @@ public class StructuralVariantsAnnotationService
             var start = positions.Min();
             var end = positions.Max();
             var chr = variant.ChromosomeId.ToDefinitionString();
-            var type = variant.TypeId == SvType.TDUP ? "DUP:TANDEM" : variant.TypeId.ToDefinitionString();
+            var type = variant.TypeId.ToDefinitionString();
 
             yield return string.Join('\t', chr, start, id, ".", $"<{type}>", ".", ".", $"SVTYPE={type};END={end}", ".");
         }
