@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome.Analysis;
+using Unite.Data.Entities.Genome.Enums;
+using Unite.Data.Entities.Genome.Transcriptomics;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Tissues.Enums;
@@ -9,6 +11,11 @@ using Unite.Data.Services.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
 using Unite.Indices.Entities.Variants;
 using Unite.Indices.Services;
+
+using SSM = Unite.Data.Entities.Genome.Variants.SSM;
+using CNV = Unite.Data.Entities.Genome.Variants.CNV;
+using SV = Unite.Data.Entities.Genome.Variants.SV;
+using Unite.Data.Extensions;
 
 namespace Unite.Genome.Indices.Services;
 
@@ -64,8 +71,21 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
         _variantIndexMapper.Map(variant, index);
 
         index.Samples = CreateSampleIndices(variant.Id);
+        index.Data = CreateDataIndex(index);
 
         return index;
+    }
+
+    private DataIndex CreateDataIndex(VariantIndex index)
+    {
+        var dataIndex = index.Data;
+
+        dataIndex.Ssms = HasSsmIntersections(index);
+        dataIndex.Cnvs = HasCnvIntersections(index);
+        dataIndex.Svs = HasSvIntersections(index);
+        dataIndex.GeneExp = HasGeneExpressions(index);
+
+        return dataIndex;
     }
 
     private TVariant LoadVariant(long variantId)
@@ -76,6 +96,116 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
             .FirstOrDefault(variant => variant.Id == variantId);
 
         return variant;
+    }
+
+    private bool HasSsmIntersections(VariantIndex index)
+    {
+        if (index.Ssm != null)
+        {
+            return true;
+        }
+        else if (index.Cnv != null)
+        {
+            return HasSsmIntersections(Enum.Parse<Chromosome>("Chr" + index.Cnv.Chromosome), index.Cnv.Start, index.Cnv.End);
+        }
+        else if (index.Sv != null)
+        {
+            var ingoreTypes = new string[] { SV.Enums.SvType.ITX.ToDefinitionString(), SV.Enums.SvType.CTX.ToDefinitionString(), SV.Enums.SvType.COM.ToDefinitionString() };
+
+            if (!ingoreTypes.Contains(index.Sv.Type))
+            {
+                return HasSsmIntersections(Enum.Parse<Chromosome>("Chr" + index.Sv.Chromosome), index.Sv.Start, index.Sv.OtherStart);
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasSsmIntersections(Chromosome chromosomeId, int start, int end)
+    {
+        return _dbContext.Set<SSM.Variant>().AsNoTracking()
+            .Any(variant => variant.ChromosomeId == chromosomeId && (
+                (variant.End >= start && variant.End <= end) ||
+                (variant.Start >= start && variant.Start <= end) ||
+                (variant.Start >= start && variant.End <= end) ||
+                (variant.Start <= start && variant.End >= end)
+            ));
+    }
+
+    private bool HasCnvIntersections(VariantIndex index)
+    {
+        if (index.Cnv != null)
+        {
+            return true;
+        }
+        else if (index.Ssm != null)
+        {
+            return HasCnvIntersections(Enum.Parse<Chromosome>("Chr" + index.Ssm.Chromosome), index.Ssm.Start, index.Ssm.End);
+        }
+        else if (index.Sv != null)
+        {
+            var ingoreTypes = new string[] { SV.Enums.SvType.ITX.ToDefinitionString(), SV.Enums.SvType.CTX.ToDefinitionString(), SV.Enums.SvType.COM.ToDefinitionString() };
+
+            if (!ingoreTypes.Contains(index.Sv.Type))
+            {
+                return HasCnvIntersections(Enum.Parse<Chromosome>("Chr" + index.Sv.Chromosome), index.Sv.Start, index.Sv.OtherStart);
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasCnvIntersections(Chromosome chromosomeId, int start, int end)
+    {
+        return _dbContext.Set<CNV.Variant>().AsNoTracking()
+            .Any(variant => variant.ChromosomeId == chromosomeId && (
+                (variant.End >= start && variant.End <= end) ||
+                (variant.Start >= start && variant.Start <= end) ||
+                (variant.Start >= start && variant.End <= end) ||
+                (variant.Start <= start && variant.End >= end)
+            ));
+    }
+
+    private bool HasSvIntersections(VariantIndex index)
+    {
+        if (index.Sv != null)
+        {
+            return true;
+        }
+        else if (index.Ssm != null)
+        {
+            return HasSvIntersections(Enum.Parse<Chromosome>("Chr" + index.Ssm.Chromosome), index.Ssm.Start, index.Ssm.End);
+        }
+        else if (index.Cnv != null)
+        {
+            return HasSvIntersections(Enum.Parse<Chromosome>("Chr" + index.Cnv.Chromosome), index.Cnv.Start, index.Cnv.End);
+        }
+
+        return false;
+    }
+
+    private bool HasSvIntersections(Chromosome chromosomeId, int start, int end)
+    {
+        return _dbContext.Set<SV.Variant>().AsNoTracking()
+            .Any(variant => variant.ChromosomeId == chromosomeId && (
+                (variant.OtherStart >= start && variant.OtherStart <= end) ||
+                (variant.Start >= start && variant.Start <= end) ||
+                (variant.Start >= start && variant.OtherStart <= end) ||
+                (variant.Start <= start && variant.OtherStart >= end)
+            ));
+    }
+
+    private bool HasGeneExpressions(VariantIndex index)
+    {
+        var genes = index.GetAffectedFeatures()?
+            .Where(affectedFeature => affectedFeature.Gene != null)
+            .Select(affectedFeature => affectedFeature.Gene.Id)
+            .Distinct()
+            .ToArray();
+
+        return genes != null && _dbContext.Set<GeneExpression>()
+            .AsNoTracking()
+            .Any(expression => genes.Contains(expression.GeneId));
     }
 
 
