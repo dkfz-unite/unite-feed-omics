@@ -158,6 +158,9 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     private bool HasCnvIntersections(Chromosome chromosomeId, int start, int end)
     {
         return _dbContext.Set<CNV.Variant>().AsNoTracking()
+            .Where(variant => variant.TypeId != CNV.Enums.CnvType.Neutral)
+            .Where(variant => variant.Loh != true)
+            .Where(variant => variant.HomoDel != true)
             .Any(variant => variant.ChromosomeId == chromosomeId && (
                 (variant.End >= start && variant.End <= end) ||
                 (variant.Start >= start && variant.Start <= end) ||

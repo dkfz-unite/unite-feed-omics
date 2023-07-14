@@ -123,12 +123,24 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Context LoadContext(int geneId)
     {
+        Expression<Func<SSM.AffectedTranscript, bool>> ssmsPredicate = (affectedTranscript) => 
+            affectedTranscript.Feature.GeneId == geneId;
+
+        Expression<Func<CNV.AffectedTranscript, bool>> cnvsPredicate = (affectedTranscript) =>
+            affectedTranscript.Feature.GeneId == geneId && 
+            affectedTranscript.Variant.TypeId != CNV.Enums.CnvType.Neutral &&
+            affectedTranscript.Variant.Loh != true &&
+            affectedTranscript.Variant.HomoDel != true;
+
+        Expression<Func<SV.AffectedTranscript, bool>> svsPredicate = (affectedTranscript) =>
+            affectedTranscript.Feature.GeneId == geneId;
+
         var context = new Context
         {
             Gene = _dbContext.Set<Gene>().AsNoTracking().FirstOrDefault(gene => gene.Id == geneId),
-            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(affectedTranscript => affectedTranscript.Feature.GeneId == geneId),
-            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(affectedTranscript => affectedTranscript.Feature.GeneId == geneId && affectedTranscript.Variant.TypeId != CNV.Enums.CnvType.Neutral),
-            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(affectedTranscript => affectedTranscript.Feature.GeneId == geneId),
+            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(ssmsPredicate),
+            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(cnvsPredicate),
+            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(svsPredicate),
             ExpressionsCache = LoadExpressions(geneId)
         };
 
