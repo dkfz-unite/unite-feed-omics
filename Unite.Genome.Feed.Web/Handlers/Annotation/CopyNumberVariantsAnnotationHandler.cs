@@ -27,7 +27,6 @@ public class CopyNumberVariantsAnnotationHandler
         ISqlOptions sqlOptions,
         IEnsemblOptions ensemblDataOptions,
         IEnsemblVepOptions ensemblVepOptions,
-        DomainDbContext dbContext,
         TasksProcessingService taskProcessingService,
         ILogger<CopyNumberVariantsAnnotationHandler> logger)
     {
@@ -61,7 +60,7 @@ public class CopyNumberVariantsAnnotationHandler
                 return false;
             }
 
-            _logger.LogInformation($"Annotating {tasks.Length} copy number variants");
+            _logger.LogInformation("Annotating {number} copy number variants", tasks.Length);
 
             stopwatch.Restart();
 
@@ -69,7 +68,7 @@ public class CopyNumberVariantsAnnotationHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Annotation of {tasks.Length} copy number variants completed in {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)}s");
+            _logger.LogInformation("Annotation of {number} copy number variants completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
@@ -93,6 +92,6 @@ public class CopyNumberVariantsAnnotationHandler
         consequencesDataWriter.SaveData(consequences, out var audit);
         indexingTaskService.PopulateTasks(audit.Variants);
 
-        _logger.LogInformation(audit.ToString());
+        _logger.LogInformation("{audit}", audit.ToString());
     }
 }

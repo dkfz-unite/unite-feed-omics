@@ -205,13 +205,13 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         }
 
         var indices = samples
-            .Select(sample => CreateSampleIndex(context, sample.Sample, sample.Analyses, sample.expression))
+            .Select(sample => CreateSampleIndex(context, sample.Sample, sample.Analyses))
             .ToArray();
 
         return indices;
     }
 
-    private SampleIndex CreateSampleIndex(Context context, Sample sample, Analysis[] analyses, GeneExpression expression)
+    private SampleIndex CreateSampleIndex(Context context, Sample sample, Analysis[] analyses)
     {
         var index = new SampleIndex();
 
@@ -359,7 +359,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Donor LoadDonor(Context context, int specimenId)
+    private static Donor LoadDonor(Context context, int specimenId)
     {
         return context.DonorsCache.TryGetValue(specimenId, out var value) ? value : null;
     }
@@ -388,7 +388,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Specimen LoadSpecimen(Context context, int specimenId)
+    private static Specimen LoadSpecimen(Context context, int specimenId)
     {
         return context.SpecimensCache.TryGetValue(specimenId, out var value) ? value : null;
     }
@@ -419,7 +419,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private Image[] LoadImages(Context context, int specimenId)
+    private static Image[] LoadImages(Context context, int specimenId)
     {
         return context.ImagesCache.TryGetValue(specimenId, out var value) ? value : null;
     }
@@ -556,7 +556,7 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
         return index;
     }
 
-    private GeneExpression LoadExpression(Context context, int sampleId)
+    private static GeneExpression LoadExpression(Context context, int sampleId)
     {
         return context.ExpressionsCache.TryGetValue(sampleId, out var value) ? value : null;
     }
