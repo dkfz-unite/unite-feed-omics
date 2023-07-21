@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Analysis;
@@ -123,38 +122,52 @@ public class GeneIndexCreationService : IIndexCreationService<GeneIndex>
 
     private Context LoadContext(int geneId)
     {
-        Expression<Func<SSM.AffectedTranscript, bool>> ssmsPredicate = (affectedTranscript) => 
-            affectedTranscript.Feature.GeneId == geneId;
+        // Expression<Func<SSM.AffectedTranscript, bool>> ssmsPredicate = (affectedTranscript) => 
+        //     affectedTranscript.Feature.GeneId == geneId;
 
-        Expression<Func<CNV.AffectedTranscript, bool>> cnvsPredicate = (affectedTranscript) =>
-            affectedTranscript.Feature.GeneId == geneId && 
-            affectedTranscript.Variant.TypeId != CNV.Enums.CnvType.Neutral &&
-            affectedTranscript.Variant.Loh != true &&
-            affectedTranscript.Variant.HomoDel != true;
+        // Expression<Func<CNV.AffectedTranscript, bool>> cnvsPredicate = (affectedTranscript) =>
+        //     affectedTranscript.Feature.GeneId == geneId;
 
-        Expression<Func<SV.AffectedTranscript, bool>> svsPredicate = (affectedTranscript) =>
-            affectedTranscript.Feature.GeneId == geneId;
+        // Expression<Func<SV.AffectedTranscript, bool>> svsPredicate = (affectedTranscript) =>
+        //     affectedTranscript.Feature.GeneId == geneId;
 
         var context = new Context
         {
             Gene = _dbContext.Set<Gene>().AsNoTracking().FirstOrDefault(gene => gene.Id == geneId),
-            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(ssmsPredicate),
-            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(cnvsPredicate),
-            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(svsPredicate),
+            SsmAffectedTranscriptsCache = LoadAffectedTranscripts<SSM.Variant, SSM.AffectedTranscript>(geneId),
+            CnvAffectedTranscriptsCache = LoadAffectedTranscripts<CNV.Variant, CNV.AffectedTranscript>(geneId),
+            SvAffectedTranscriptsCache = LoadAffectedTranscripts<SV.Variant, SV.AffectedTranscript>(geneId),
             ExpressionsCache = LoadExpressions(geneId)
         };
 
         return context;
     }
 
-    private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(Expression<Func<TAffectedTranscript, bool>> predicate)
+    // private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(Expression<Func<TAffectedTranscript, bool>> predicate)
+    //     where TVariant : Variant
+    //     where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
+    // {
+    //     var affectedTranscripts = _dbContext.Set<TAffectedTranscript>()
+    //         .AsNoTracking()
+    //         .Include(affectedTranscript => affectedTranscript.Feature)
+    //         .Where(predicate)
+    //         .ToArray();
+
+    //     var affectedTranscriptsCache = affectedTranscripts
+    //         .GroupBy(affectedTranscript => affectedTranscript.VariantId)
+    //         .ToDictionary(group => group.Key, group => group.ToArray());
+
+    //     return affectedTranscriptsCache;
+    // }
+
+    private IDictionary<long, TAffectedTranscript[]> LoadAffectedTranscripts<TVariant, TAffectedTranscript>(int geneId)
         where TVariant : Variant
         where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
     {
         var affectedTranscripts = _dbContext.Set<TAffectedTranscript>()
             .AsNoTracking()
-            .Include(affectedTranscript => affectedTranscript.Feature)
-            .Where(predicate)
+            .Include(affectedTranscript => affectedTranscript.Feature.Protein)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId == geneId)
             .ToArray();
 
         var affectedTranscriptsCache = affectedTranscripts

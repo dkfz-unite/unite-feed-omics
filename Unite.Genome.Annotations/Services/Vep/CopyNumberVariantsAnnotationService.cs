@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Genome.Variants.CNV;
+using Unite.Data.Entities.Genome.Variants.CNV.Enums;
 using Unite.Data.Extensions;
 using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
@@ -42,6 +43,8 @@ public class CopyNumberVariantsAnnotationService
         return _dbContext.Set<Variant>()
             .AsNoTracking()
             .Where(entity => variantIds.Contains(entity.Id))
+            .Where(entity => entity.TypeId != CnvType.Neutral)
+            .Where(entity => entity.Loh == false)
             .OrderBy(entity => entity.ChromosomeId)
             .ThenBy(entity => entity.Start);
     }
