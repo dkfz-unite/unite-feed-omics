@@ -2,8 +2,6 @@
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
 using Unite.Genome.Indices.Services;
-using Unite.Indices.Entities.Genes;
-using Unite.Indices.Services;
 
 namespace Unite.Genome.Feed.Web.Handlers.Indexing;
 

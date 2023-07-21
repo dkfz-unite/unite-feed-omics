@@ -3,6 +3,8 @@ using Unite.Genome.Feed.Data.Audit;
 using Unite.Genome.Feed.Data.Extensions;
 using Unite.Genome.Feed.Data.Models;
 
+using CNV = Unite.Data.Entities.Genome.Variants.CNV;
+
 namespace Unite.Genome.Feed.Data;
 
 public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUploadAudit>
@@ -73,7 +75,8 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
     private void WriteCopyNumberVariants(int analysedSampleId, IEnumerable<Models.Variants.CNV.VariantModel> variantModels, ref SequencingDataUploadAudit audit)
     {
         var variants = _cnvRepository.CreateMissing(variantModels);
-        audit.CopyNumberVariants.AddRange(variants.Select(variant => variant.Id));
+        var predicate = GetCnvExcludePredicate();
+        audit.CopyNumberVariants.AddRange(variants.Where(predicate).Select(variant => variant.Id));
         audit.CopyNumberVariantsCreated += variants.Count();
 
         // _cnvOccurrenceRepository.RemoveAll(analysedSampleId);
@@ -94,5 +97,15 @@ public class SequencingDataWriter : DataWriter<AnalysisModel, SequencingDataUplo
         var variantOccurrences = _svOccurrenceRepository.CreateMissing(analysedSampleId, variantModels, variants);
         audit.StructuralVariantOccurrences.AddRange(variantOccurrences.Select(occurrence => occurrence.VariantId));
         audit.StructuralVariantsAssociated += variantOccurrences.Count();
+    }
+
+
+    /// <summary>
+    /// Returns a predicate that excludes CNVs that are neutral and not LOH.
+    /// </summary>
+    /// <returns>Predicate function.</returns>
+    private static Func<CNV.Variant, bool> GetCnvExcludePredicate()
+    {
+        return variant => !(variant.TypeId == CNV.Enums.CnvType.Neutral && variant.Loh == false);
     }
 }

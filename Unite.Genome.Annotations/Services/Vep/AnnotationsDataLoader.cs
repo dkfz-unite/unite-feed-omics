@@ -30,18 +30,11 @@ internal class AnnotationsDataLoader
 
     public async Task<ConsequencesDataModel[]> LoadData(string[] vepCodes)
     {
-        if (vepCodes.Any())
-        {
-            var variants = await AnnotateVariants(vepCodes);
-            var genes = await AnnotateGenes(variants);
-            var transcripts = await AnnotateTranscripts(variants);
+        var variants = await AnnotateVariants(vepCodes);
+        var genes = await AnnotateGenes(variants);
+        var transcripts = await AnnotateTranscripts(variants);
 
-            return AnnotationsDataConverter.Convert(variants, genes, transcripts);
-        }
-        else
-        {
-            return Array.Empty<ConsequencesDataModel>();
-        }
+        return AnnotationsDataConverter.Convert(variants, genes, transcripts);
     }
 
 
