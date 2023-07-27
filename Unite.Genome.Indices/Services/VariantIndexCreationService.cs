@@ -116,16 +116,11 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
         {
             var chromosome = GetChromosome(index.Sv.Chromosome);
 
-            var ingoreTypes = new string[] 
-            {
-                SV.Enums.SvType.ITX.ToDefinitionString(), 
-                SV.Enums.SvType.CTX.ToDefinitionString(), 
-                SV.Enums.SvType.COM.ToDefinitionString() 
-            };
+            var ingoreTypes = new string[] { SV.Enums.SvType.ITX.ToDefinitionString(), SV.Enums.SvType.CTX.ToDefinitionString() };
 
-            if (!ingoreTypes.Contains(index.Sv.Type))
+            if (!ingoreTypes.Contains(index.Sv.Type) && index.Sv.Chromosome == index.Sv.OtherChromosome)
             {
-                return HasSsmIntersections(specimenIds, chromosome, index.Sv.Start, index.Sv.OtherStart);
+                return HasSsmIntersections(specimenIds, chromosome, index.Sv.End, index.Sv.OtherStart);
             }
         }
 
@@ -134,14 +129,11 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private bool HasSsmIntersections(int[] specimenIds, Chromosome chromosomeId, int start, int end)
     {
-        return _dbContext.Set<SSM.VariantOccurrence>().AsNoTracking()
-            .Where(occurrence => specimenIds.Contains(occurrence.AnalysedSample.Sample.SpecimenId))
-            .Any(occurrence => occurrence.Variant.ChromosomeId == chromosomeId && (
-                (occurrence.Variant.End >= start && occurrence.Variant.End <= end) ||
-                (occurrence.Variant.Start >= start && occurrence.Variant.Start <= end) ||
-                (occurrence.Variant.Start >= start && occurrence.Variant.End <= end) ||
-                (occurrence.Variant.Start <= start && occurrence.Variant.End >= end)
-            ));
+        return _dbContext.Set<SSM.VariantOccurrence>()
+            .AsNoTracking()
+            .FilterBySpecimenIds(specimenIds)
+            .FilterByRange(chromosomeId, start, end)
+            .Any();
     }
 
     private bool HasCnvIntersections(VariantIndex index)
@@ -162,16 +154,11 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
         {
             var chromosome = GetChromosome(index.Sv.Chromosome);
 
-            var ingoreTypes = new string[] 
-            { 
-                SV.Enums.SvType.ITX.ToDefinitionString(), 
-                SV.Enums.SvType.CTX.ToDefinitionString(), 
-                SV.Enums.SvType.COM.ToDefinitionString() 
-            };
+            var ingoreTypes = new string[] { SV.Enums.SvType.ITX.ToDefinitionString(), SV.Enums.SvType.CTX.ToDefinitionString() };
 
-            if (!ingoreTypes.Contains(index.Sv.Type))
+            if (!ingoreTypes.Contains(index.Sv.Type) && index.Sv.Chromosome == index.Sv.OtherChromosome)
             {
-                return HasCnvIntersections(specimenIds, chromosome, index.Sv.Start, index.Sv.OtherStart);
+                return HasCnvIntersections(specimenIds, chromosome, index.Sv.End, index.Sv.OtherStart);
             }
         }
 
@@ -180,14 +167,11 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private bool HasCnvIntersections(int[] specimenIds, Chromosome chromosomeId, int start, int end)
     {
-        return _dbContext.Set<CNV.VariantOccurrence>().AsNoTracking()
-            .Where(occurrence => specimenIds.Contains(occurrence.AnalysedSample.Sample.SpecimenId))
-            .Any(occurrence => occurrence.Variant.ChromosomeId == chromosomeId && (
-                (occurrence.Variant.End >= start && occurrence.Variant.End <= end) ||
-                (occurrence.Variant.Start >= start && occurrence.Variant.Start <= end) ||
-                (occurrence.Variant.Start >= start && occurrence.Variant.End <= end) ||
-                (occurrence.Variant.Start <= start && occurrence.Variant.End >= end)
-            ));
+        return _dbContext.Set<CNV.VariantOccurrence>()
+            .AsNoTracking()
+            .FilterBySpecimenIds(specimenIds)
+            .FilterByRange(chromosomeId, start, end)
+            .Any();
     }
 
     private bool HasSvIntersections(VariantIndex index)
@@ -216,14 +200,11 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private bool HasSvIntersections(int[] specimenIds, Chromosome chromosomeId, int start, int end)
     {
-        return _dbContext.Set<SV.VariantOccurrence>().AsNoTracking()
-            .Where(occurrence => specimenIds.Contains(occurrence.AnalysedSample.Sample.SpecimenId))
-            .Any(occurrence => occurrence.Variant.ChromosomeId == chromosomeId && (
-                (occurrence.Variant.OtherStart >= start && occurrence.Variant.OtherStart <= end) ||
-                (occurrence.Variant.Start >= start && occurrence.Variant.Start <= end) ||
-                (occurrence.Variant.Start >= start && occurrence.Variant.OtherStart <= end) ||
-                (occurrence.Variant.Start <= start && occurrence.Variant.OtherStart >= end)
-            ));
+        return _dbContext.Set<SV.VariantOccurrence>()
+            .AsNoTracking()
+            .FilterBySpecimenIds(specimenIds)
+            .FilterByRange(chromosomeId, start, end)
+            .Any();
     }
 
     private bool HasGeneExpressions(VariantIndex index)
