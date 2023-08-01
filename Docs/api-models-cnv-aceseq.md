@@ -4,21 +4,33 @@
 Includes information about the analysis, samples and sequencing data in ACESeq Format.
 
 **`Analysis`** - Sequencing analysis data.
-- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#analysis))_
+- Note: It's recomended to set analysis data (at least it's type), but it's not required.
+- Type: _Object([Analysis](api-models-cnv-aceseq.md#analysis))_
 - Example: `{...}`
 
 **`Samples`*** - Which samples were analysed.
 - Type: _Array_
-- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#sample))_
+- Element type: _Object([Sample](api-models-cnv-aceseq.md#sample))_
 - Example: `[{...}, {...}]`
 
 ## Analysis
 Sequencing analysis data.
 
+**`Id`** - Analysis identifier.
+- Note: If not set, analysis will be identified by it's type, date and analysed samples.
+- Type: _String_
+- Limitations: Maximum length 255
+- Example: `"AN1"`
+
 **`Type`*** - Analysis type.
 - Type: _String_
 - Possible values: `"WGS"`, `"WES"`
 - Example: `"WES"`
+
+**`Date`** - Date of the analysis.
+- Type: _String_
+- Format: "YYYY-MM-DDTHH:MM:SS"
+- Example: `"2021-01-01T00:00:00"`
 
 #### Analysis Type
 Analysis can be of the following types:
@@ -65,9 +77,16 @@ Analysed sample data.
 
 **`Variants`** - Copy number variants found in the sample during the analysis.
 - Type: _Array_
-- Element type: _Object([CNV](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#cnv))_
+- Element type: _Object([CNV](api-models-cnv-aceseq.md#cnv))_
 - Limitations: If set, should contain at leas one element
 - Example: `[{...}, {...}]`
+
+#### Specimen Type
+Specimen can be of the following types:
+- `"Tissue"` - all donor derived specimens
+- `"CellLine"` - cell lines
+- `"Organoid"` - organoids
+- `"Xenograft"` - xenografts
 
 ## CNV
 Copy number variant (CNV) data in ACESeq format.
@@ -113,17 +132,17 @@ Copy number variant (CNV) data in ACESeq format.
 - Example: `"1.1643"`
 
 **`A`** - Rounded number of copies at **major** allele (Rounded `c1Mean`).
-- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
+- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](api-models-cnv-aceseq.md#threshold-rule))
 - Type: _String_
 - Example: `"1"`
 
 **`B`** - Rounded number of copies at **minor** allele (Rounded `c2Mean`).
-- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
+- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](api-models-cnv-aceseq.md#threshold-rule))
 - Type: _String_
 - Example: `"0"`
 
 **`TCN`** - Rounded total number of copies (`A` + `B`).
-- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md#threshold-rule))
+- Limitations: Greater or equal to 0 or `"NA"` if not precise enough ([threshold rule](api-models-cnv-aceseq.md#threshold-rule))
 - Type: _String_
 - Example: `"1"`
 

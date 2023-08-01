@@ -4,27 +4,39 @@
 Includes information about the analysis, sample and expression data.
 
 **`Analysis`** - Sequencing analysis data.
-- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expression.md#analysis))_
+- Type: _Object([Analysis](api-models-rna-expression.md#analysis))_
 - Example: `{...}`
+- Note: It's recomended to set analysis data (at least it's type), but it's not required.
 
 **`Sample`*** - Which sample was analysed.
-- Type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expression.md#sample))_
+- Type: _Object([Sample](api-models-rna-expression.md#sample))_
 - Element type: 
 - Example: `{...}`
 
 **`Expressions`*** - Gene expressions found in the sample during the analysis.
 - Type: _Array_
-- Element type: _Object([Expression](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expression.md#expression))_
+- Element type: _Object([Expression](api-models-rna-expression.md#expression))_
 - Limitations: If set, should contain at leas one element
 - Example: `[{...}, {...}]`
 
 ## Analysis
 Sequencing analysis data.
 
+**`Id`** - Analysis identifier.
+- Note: If not set, analysis will be identified by it's type, date and analysed sample.
+- Type: _String_
+- Limitations: Maximum length 255
+- Example: `"AN1"`
+
 **`Type`*** - Analysis type.
 - Type: _String_
 - Possible values: `"RNA-Seq"`
 - Example: `"RNA-Seq"`
+
+**`Date`** - Date of the analysis.
+- Type: _String_
+- Format: "YYYY-MM-DDTHH:MM:SS"
+- Example: `"2021-01-01T00:00:00"`
 
 #### Analysis Type
 Analysis can be of the following types:
@@ -53,14 +65,22 @@ Analysed sample data.
 - Possible values: `"Tissue"`, `"CellLine"`, `"Organoid"`, `"Xenograft"`
 - Example: `"Tissue"`
 
+#### Specimen Type
+Specimen can be of the following types:
+- `"Tissue"` - all donor derived specimens
+- `"CellLine"` - cell lines
+- `"Organoid"` - organoids
+- `"Xenograft"` - xenografts
+
 ## Expression
 Gene expression data.
 
-The data can be submitted by only single of the following strategies:
+The data can be submitted by only one of the following strategies (one of this fields should be set):
 - `GeneId` - fastest
 - `GeneSymbol` - slower than by `GeneId`
 - `TranscriptId` - significantly slower than by `GeneId` or `GeneSymbol`
 - `TranscriptSymbol` - slower than by `TranscriptId`
+
 
 **`GeneId`** - Gene identifier. 
 - Type: _String_

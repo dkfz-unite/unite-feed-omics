@@ -65,7 +65,7 @@ Request implements **UPSERT** logic:
     }
 ]
 ```
-Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md).
+Fields description can be found [here](api-models-ssm.md).
 
 **Response**
 - `200` - request was processed successfully
@@ -156,7 +156,7 @@ Request implements **UPSERT** logic:
     }
 ]
 ```
-Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md).
+Fields description can be found [here](api-models-cnv.md).
 
 **Response**
 - `200` - request was processed successfully
@@ -244,7 +244,7 @@ Request implements **UPSERT** logic:
     }
 ]
 ```
-Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv-aceseq.md).
+Fields description can be found [here](api-models-cnv-aceseq.md).
 
 **Response**
 - `200` - request was processed successfully
@@ -324,7 +324,7 @@ Request implements **UPSERT** logic:
     }
 ]
 ```
-Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-sv.md).
+Fields description can be found [here](api-models-sv.md).
 
 **Response**
 - `200` - request was processed successfully
@@ -334,6 +334,7 @@ Fields description can be found [here](https://github.com/dkfz-unite/unite-genom
 ## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions)
 
 Submit Gene Expression (Transcriptomics) data (including sequencing analysis data).
+
 
 Request implements **OVERRIDE** logic:
 - Data will be overriden if existed
@@ -368,7 +369,7 @@ Request implements **OVERRIDE** logic:
     }
 ]
 ```
-Fields description can be found [here](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-rna-expression.md).
+Fields description can be found [here](api-models-rna-expression.md).
 
 **Response**
 - `200` - request was processed successfully

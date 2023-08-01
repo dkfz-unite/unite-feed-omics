@@ -1,24 +1,36 @@
 # Simple Somatic Mutations (SSM) Data Models
 
 ## Sequencing Data
-Includes information about the analysis, samples and sequencing data.
+Includes information about the analysis, analysed samples and sequencing data.
 
 **`Analysis`** - Sequencing analysis data.
-- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#analysis))_
+- Note: It's recomended to set analysis data (at least it's type), but it's not required.
+- Type: _Object([Analysis](api-models-ssm.md#analysis))_
 - Example: `{...}`
 
 **`Samples`*** - Which samples were analysed.
 - Type: _Array_
-- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#sample))_
+- Element type: _Object([Sample](api-models-ssm.md#sample))_
 - Example: `[{...}, {...}]`
 
 ## Analysis
 Sequencing analysis data.
 
+**`Id`** - Analysis identifier.
+- Note: If not set, analysis will be identified by it's type, date and analysed samples.
+- Type: _String_
+- Limitations: Maximum length 255
+- Example: `"AN1"`
+
 **`Type`*** - Analysis type.
 - Type: _String_
 - Possible values: `"WGS"`, `"WES"`
 - Example: `"WES"`
+
+**`Date`** - Date of the analysis.
+- Type: _String_
+- Format: "YYYY-MM-DDTHH:MM:SS"
+- Example: `"2021-01-01T00:00:00"`
 
 #### Analysis Type
 Analysis can be of the following types:
@@ -48,16 +60,23 @@ Analysed sample data.
 - Possible values: `"Tissue"`, `"CellLine"`, `"Organoid"`, `"Xenograft"`
 - Example: `"Tissue"`
 
-**`MatchedSampleId`** - Matched(control) sample identifier from samples array.
+**`MatchedSampleId`** - Matched sample identifier from samples array.
 - Type: _String_
 - Limitations: Should match single sample identifier from samples array
 - Example: `"SA14"`
 
 **`Variants`** - Mutations found in sample during the analysis.
 - Type: _Array_
-- Element type: _Object([Mutation](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-ssm.md#mutation))_
+- Element type: _Object([Mutation](api-models-ssm.md#mutation))_
 - Limitations: If set, should contain at leas one element
 - Example: `[{...}, {...}]`
+
+#### Specimen Type
+Specimen can be of the following types:
+- `"Tissue"` - all donor derived specimens
+- `"CellLine"` - cell lines
+- `"Organoid"` - organoids
+- `"Xenograft"` - xenografts
 
 ## Mutation
 Mutation data.

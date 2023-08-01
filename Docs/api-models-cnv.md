@@ -4,21 +4,33 @@
 Includes information about the analysis, samples and sequencing data.
 
 **`Analysis`** - Sequencing analysis data.
-- Type: _Object([Analysis](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#analysis))_
+- Note: It's recomended to set analysis data (at least it's type), but it's not required.
+- Type: _Object([Analysis](api-models-cnv.md#analysis))_
 - Example: `{...}`
 
 **`Samples`*** - Which samples were analysed.
 - Type: _Array_
-- Element type: _Object([Sample](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#sample))_
+- Element type: _Object([Sample](api-models-cnv.md#sample))_
 - Example: `[{...}, {...}]`
 
 ## Analysis
 Sequencing analysis data.
 
+**`Id`** - Analysis identifier.
+- Note: If not set, analysis will be identified by it's type, date and analysed samples.
+- Type: _String_
+- Limitations: Maximum length 255
+- Example: `"AN1"`
+
 **`Type`*** - Analysis type.
 - Type: _String_
 - Possible values: `"WGS"`, `"WES"`
 - Example: `"WES"`
+
+**`Date`** - Date of the analysis.
+- Type: _String_
+- Format: "YYYY-MM-DDTHH:MM:SS"
+- Example: `"2021-01-01T00:00:00"`
 
 #### Analysis Type
 Analysis can be of the following types:
@@ -66,9 +78,16 @@ Analysed sample data.
 
 **`Variants`** - Copy number variants found in the sample during the analysis.
 - Type: _Array_
-- Element type: _Object([CNV](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#cnv))_
+- Element type: _Object([CNV](api-models-cnv.md#cnv))_
 - Limitations: If set, should contain at leas one element
 - Example: `[{...}, {...}]`
+
+#### Specimen Type
+Specimen can be of the following types:
+- `"Tissue"` - all donor derived specimens
+- `"CellLine"` - cell lines
+- `"Organoid"` - organoids
+- `"Xenograft"` - xenografts
 
 ## CNV
 Copy number variant (CNV) data.
@@ -120,20 +139,20 @@ Copy number variant (CNV) data.
 - Example: `1.1643`
 
 **`C1`** - Rounded number of copies at **major** allele (Rounded `C1Mean`).
-- Note: If not set, the api will try to calculate the value from `C1Mean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule).
-- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule))
+- Note: If not set, the api will try to calculate the value from `C1Mean` with [threshold rule](api-models-cnv.md#threshold-rule).
+- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `1`
 
 **`C2`** - Rounded number of copies at **minor** allele (Rounded `C2Mean`).
-- Note: If not set, the api will try to calculate the value from `C2Mean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule).
-- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule))
+- Note: If not set, the api will try to calculate the value from `C2Mean` with [threshold rule](api-models-cnv.md#threshold-rule).
+- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `0`
 
 **`TCN`** - Rounded total number of copies (`C1` + `C2`).
-- Note: If not set, the api will try to calculate the value from `C1` and `C2` or `TcnMean` with [threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule).
-- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Docs/api-models-cnv.md#threshold-rule))
+- Note: If not set, the api will try to calculate the value from `C1` and `C2` or `TcnMean` with [threshold rule](api-models-cnv.md#threshold-rule).
+- Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `1`
 
