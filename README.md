@@ -14,7 +14,7 @@ Genome data feed service provides the following functionality:
 Genome data feed service is written in ASP.NET (.NET 6)
 
 ## Dependencies
-- [Postgresql](https://github.com/dkfz-unite/unite-environment/tree/main/programs/postgresql) - SQL server with domain data and user identity data.
+- [SQL](https://github.com/dkfz-unite/unite-environment/tree/main/programs/postgresql) - SQL server with domain data and user identity data.
 - [Elasticsearch](https://github.com/dkfz-unite/unite-environment/tree/main/programs/elasticsearch) - Elasticsearch server with indices of domain data.
 - [Ensembl Data](https://github.com/dkfz-unite/unite-environment/tree/main/applications/unite-ensembl-data) - Local installation of Ensembl Data service.
 - [Ensembl VEP](https://github.com/dkfz-unite/unite-environment/tree/main/applications/unite-ensembl-vep) - Local installation of Ensembl VEP service.
@@ -30,6 +30,7 @@ To configure the application, change environment variables in either docker or [
 Variable|Description|Default(Local)|Default(Docker)
 --------|-----------|--------------|---------------
 ASPNETCORE_ENVIRONMENT|ASP.NET environment|Debug|Release
+UNITE_API_KEY|Unite api key||
 UNITE_ELASTIC_HOST|ES service host|http://localhost:9200|es.unite.net:9200
 UNITE_ELASTIC_USER|ES service user||
 UNITE_ELASTIC_PASSWORD|ES service password||
@@ -81,6 +82,7 @@ docker run \
 --net-alias feed.genome.unite.net \
 -p 127.0.0.1:5106:80 \
 -e ASPNETCORE_ENVIRONMENT=Release \
+-e UNITE_API_KEY=[api_key] \
 -e UNITE_ELASTIC_HOST=http://es.unite.net:9200 \
 -e UNITE_ELASTIC_USER=[elasticsearch_user] \
 -e UNITE_ELASTIC_PASSWORD=[elasticsearch_password] \
