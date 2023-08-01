@@ -1,24 +1,20 @@
 # Genome Data Feed API
 
 ## GET: [api](http://localhost:5106/api)
-
 Health check.
 
-
-**Response**
-
+### Responses
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
 ## POST: [api/dna/variants/ssms](http://localhost:5106/api/dna/variants/ssms)
-
 Submit mutations (SSM) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-**Boby** (_application/json_)
+### Body - application/json
 ```json
 [
     {
@@ -67,20 +63,19 @@ Request implements **UPSERT** logic:
 ```
 Fields description can be found [here](api-models-ssm.md).
 
-**Response**
+### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
 
 
 ## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs)
-
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in default format.
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-**Boby** (_application/json_)
+### Body - application/json
 ```json
 [
     {
@@ -158,20 +153,19 @@ Request implements **UPSERT** logic:
 ```
 Fields description can be found [here](api-models-cnv.md).
 
-**Response**
+### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
 
 
 ## POST: [api/dna/variants/cnvs/aceseq](http://localhost:5106/api/dna/variants/cnvs/aceseq)
-
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in ACESeq format.
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-**Boby** (_application/json_)
+### Body - application/json
 ```json
 [
     {
@@ -246,20 +240,19 @@ Request implements **UPSERT** logic:
 ```
 Fields description can be found [here](api-models-cnv-aceseq.md).
 
-**Response**
+### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
 
 
 ## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs)
-
 Submit Structural Variants (SV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-**Boby** (_application/json_)
+### Body - application/json
 ```json
 [
     {
@@ -326,20 +319,18 @@ Request implements **UPSERT** logic:
 ```
 Fields description can be found [here](api-models-sv.md).
 
-**Response**
+### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
 
 
 ## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions)
-
 Submit Gene Expression (Transcriptomics) data (including sequencing analysis data).
-
 
 Request implements **OVERRIDE** logic:
 - Data will be overriden if existed
 
-**Boby** (_application/json_)
+### Body - application/json
 ```json
 [
     {
@@ -371,6 +362,6 @@ Request implements **OVERRIDE** logic:
 ```
 Fields description can be found [here](api-models-rna-expression.md).
 
-**Response**
+### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
