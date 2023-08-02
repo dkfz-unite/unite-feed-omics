@@ -31,6 +31,7 @@ public static class ConfigurationExtensions
 {
     public static void Configure(this IServiceCollection services)
     {
+        services.AddTransient<ApiOptions>();
         services.AddTransient<ISqlOptions, SqlOptions>();
         services.AddTransient<IMongoOptions, MongoOptions>();
         services.AddTransient<IElasticOptions, ElasticOptions>();

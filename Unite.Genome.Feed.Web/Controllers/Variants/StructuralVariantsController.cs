@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
 using Unite.Genome.Feed.Web.Models.Variants;
@@ -9,6 +10,7 @@ namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
 [Route("api/dna/variants/svs")]
 [ApiController]
+[Authorize]
 public class StructuralVariantsController : Controller
 {
     private readonly VariantsSubmissionService _submissionService;
