@@ -14,6 +14,9 @@ Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
+### Headers
+- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
+
 ### Body - application/json
 ```json
 [
@@ -66,6 +69,8 @@ Fields description can be found [here](api-models-ssm.md).
 ### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
 
 
 ## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs)
@@ -74,6 +79,9 @@ Submit Copy Number Variants (CNV) data (including sequencing analysis data) in d
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
+
+### Headers
+- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
 
 ### Body - application/json
 ```json
@@ -156,6 +164,8 @@ Fields description can be found [here](api-models-cnv.md).
 ### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
 
 
 ## POST: [api/dna/variants/cnvs/aceseq](http://localhost:5106/api/dna/variants/cnvs/aceseq)
@@ -164,6 +174,9 @@ Submit Copy Number Variants (CNV) data (including sequencing analysis data) in A
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
+
+### Headers
+- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
 
 ### Body - application/json
 ```json
@@ -243,6 +256,8 @@ Fields description can be found [here](api-models-cnv-aceseq.md).
 ### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
 
 
 ## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs)
@@ -251,6 +266,9 @@ Submit Structural Variants (SV) data (including sequencing analysis data).
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
+
+### Headers
+- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
 
 ### Body - application/json
 ```json
@@ -322,6 +340,8 @@ Fields description can be found [here](api-models-sv.md).
 ### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
 
 
 ## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions)
@@ -329,6 +349,9 @@ Submit Gene Expression (Transcriptomics) data (including sequencing analysis dat
 
 Request implements **OVERRIDE** logic:
 - Data will be overriden if existed
+
+### Headers
+- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
 
 ### Body - application/json
 ```json
@@ -365,3 +388,5 @@ Fields description can be found [here](api-models-rna-expression.md).
 ### Responses
 - `200` - request was processed successfully
 - `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
