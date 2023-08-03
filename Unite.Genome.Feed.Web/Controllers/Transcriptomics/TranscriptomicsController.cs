@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
+using Unite.Genome.Feed.Web.Configuration.Constants;
 using Unite.Genome.Feed.Web.Models.Transcriptomics;
 using Unite.Genome.Feed.Web.Submissions;
 
@@ -9,7 +10,7 @@ namespace Unite.Genome.Feed.Web.Controllers.Transcriptomics;
 
 [Route("api/rna/expressions")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = Policies.Data.Writer)]
 public class TranscriptomicsController : Controller
 {
     private readonly TranscriptomicsSubmissionService _submissionService;

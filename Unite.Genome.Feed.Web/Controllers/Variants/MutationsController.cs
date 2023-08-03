@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Data.Services.Tasks;
+using Unite.Genome.Feed.Web.Configuration.Constants;
 using Unite.Genome.Feed.Web.Models.Variants;
 using Unite.Genome.Feed.Web.Models.Variants.SSM;
 using Unite.Genome.Feed.Web.Submissions;
@@ -10,7 +11,7 @@ namespace Unite.Genome.Feed.Web.Controllers.Variants;
 
 [Route("api/dna/variants/ssms")]
 [ApiController]
-[Authorize]
+[Authorize(Policy = Policies.Data.Writer)]
 public class MutationsController : Controller
 {
     private readonly VariantsSubmissionService _submissionService;

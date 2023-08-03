@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Genome.Feed.Web.Configuration.Constants;
 using Unite.Genome.Feed.Web.Services.Annotation;
 
 namespace Unite.Genome.Feed.Web.Controllers;
 
 [Route("api/[controller]/[action]")]
-[Authorize]
+[Authorize(Roles = Roles.Admin)]
 public class AnnotationController : Controller
 {
     private readonly MutationAnnotationTaskService _mutationAnnotationTaskService;

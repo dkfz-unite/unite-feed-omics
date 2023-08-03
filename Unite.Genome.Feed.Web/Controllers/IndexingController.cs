@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Genome.Feed.Web.Configuration.Constants;
 using Unite.Genome.Feed.Web.Services.Indexing;
 
 namespace Unite.Genome.Feed.Web.Controllers;
 
 [Route("api/[controller]/[action]")]
-[Authorize]
+[Authorize(Roles = Roles.Admin)]
 public class IndexingController : Controller
 {
     private readonly GeneIndexingTaskService _geneIndexingTaskService;
