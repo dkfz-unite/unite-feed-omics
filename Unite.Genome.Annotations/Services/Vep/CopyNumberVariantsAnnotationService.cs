@@ -16,7 +16,7 @@ public class CopyNumberVariantsAnnotationService
 
     public CopyNumberVariantsAnnotationService(
         DomainDbContext dbContext,
-        IEnsemblOptions ensemblOptions,
+        IEnsemblDataOptions ensemblOptions,
         IEnsemblVepOptions ensemblVepOptions
         )
     {

@@ -10,7 +10,7 @@ public class TranscriptomicsAnnotationService
 	private readonly AnnotationsDataLoader _annotationsDataLoader;
 
 
-    public TranscriptomicsAnnotationService(IEnsemblOptions ensemblOptions, DomainDbContext dbContext)
+    public TranscriptomicsAnnotationService(IEnsemblDataOptions ensemblOptions, DomainDbContext dbContext)
     {
         _annotationsDataLoader = new AnnotationsDataLoader(ensemblOptions, dbContext);
     }

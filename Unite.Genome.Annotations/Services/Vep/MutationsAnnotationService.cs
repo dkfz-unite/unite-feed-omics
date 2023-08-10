@@ -16,7 +16,7 @@ public class MutationsAnnotationService
 
     public MutationsAnnotationService(
         DomainDbContext dbContext,
-        IEnsemblOptions ensemblOptions,
+        IEnsemblDataOptions ensemblOptions,
         IEnsemblVepOptions ensemblVepOptions
         )
     {

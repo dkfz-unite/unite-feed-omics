@@ -17,7 +17,7 @@ namespace Unite.Genome.Feed.Web.Handlers.Annotation;
 public class CopyNumberVariantsAnnotationHandler
 {
     private readonly ISqlOptions _sqlOptions;
-    private readonly IEnsemblOptions _ensemblDataOptions;
+    private readonly IEnsemblDataOptions _ensemblDataOptions;
     private readonly IEnsemblVepOptions _ensemblVepOptions;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -25,7 +25,7 @@ public class CopyNumberVariantsAnnotationHandler
 
     public CopyNumberVariantsAnnotationHandler(
         ISqlOptions sqlOptions,
-        IEnsemblOptions ensemblDataOptions,
+        IEnsemblDataOptions ensemblDataOptions,
         IEnsemblVepOptions ensemblVepOptions,
         TasksProcessingService taskProcessingService,
         ILogger<CopyNumberVariantsAnnotationHandler> logger)

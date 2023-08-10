@@ -18,7 +18,7 @@ internal class AnnotationsDataLoader
 
 
     public AnnotationsDataLoader(
-        IEnsemblOptions ensemblOptions,
+        IEnsemblDataOptions ensemblOptions,
         IEnsemblVepOptions vepOptions,
         DomainDbContext dbContext)
     {

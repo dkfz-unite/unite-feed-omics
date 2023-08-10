@@ -1,6 +1,6 @@
 ﻿namespace Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 
-public interface IEnsemblOptions
+public interface IEnsemblDataOptions
 {
     string Host { get; }
 }

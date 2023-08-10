@@ -36,7 +36,7 @@ public static class ConfigurationExtensions
         services.AddTransient<IMongoOptions, MongoOptions>();
         services.AddTransient<IElasticOptions, ElasticOptions>();
         services.AddTransient<IEnsemblVepOptions, EnsemblVepOptions>();
-        services.AddTransient<IEnsemblOptions, EnsemblOptions>();
+        services.AddTransient<IEnsemblDataOptions, EnsemblDataOptions>();
 
         services.AddTransient<IValidator<SequencingDataModel<VariantModels.SSM.VariantModel>[]>, SequencingDataModelsValidator<VariantModels.SSM.VariantModel, VariantModels.SSM.Validators.VariantModelValidator>>();
         services.AddTransient<IValidator<SequencingDataModel<VariantModels.CNV.VariantModel>[]>, SequencingDataModelsValidator<VariantModels.CNV.VariantModel, VariantModels.CNV.Validators.VariantModelValidator>>();

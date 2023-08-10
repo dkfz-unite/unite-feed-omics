@@ -4,5 +4,5 @@ namespace Unite.Genome.Feed.Web.Configuration.Options;
 
 public class EnsemblVepOptions : IEnsemblVepOptions
 {
-    public string Host => Environment.GetEnvironmentVariable("UNITE_VEP_HOST");
+    public string Host => Environment.GetEnvironmentVariable("UNITE_ENSEMBL_VEP_HOST");
 }

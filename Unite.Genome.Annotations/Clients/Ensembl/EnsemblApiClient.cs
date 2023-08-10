@@ -12,9 +12,9 @@ public class EnsemblApiClient
     private const string _lookupManyUrl = @"/lookup/id";
     private const string _xrefsOneUrl = @"/xrefs/id/{0}";
 
-    private readonly IEnsemblOptions _options;
+    private readonly IEnsemblDataOptions _options;
 
-    public EnsemblApiClient(IEnsemblOptions options)
+    public EnsemblApiClient(IEnsemblDataOptions options)
     {
         _options = options;
     }

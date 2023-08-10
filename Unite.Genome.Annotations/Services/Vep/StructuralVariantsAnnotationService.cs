@@ -17,7 +17,7 @@ public class StructuralVariantsAnnotationService
 
     public StructuralVariantsAnnotationService(
         DomainDbContext dbContext,
-        IEnsemblOptions ensemblOptions,
+        IEnsemblDataOptions ensemblOptions,
         IEnsemblVepOptions ensemblVepOptions
         )
     {

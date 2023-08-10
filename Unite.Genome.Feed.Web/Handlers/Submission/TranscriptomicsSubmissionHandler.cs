@@ -18,7 +18,7 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 public class TranscriptomicsSubmissionHandler
 {
     private readonly ISqlOptions _sqlOptions;
-    private readonly IEnsemblOptions _ensemblOptions;
+    private readonly IEnsemblDataOptions _ensemblOptions;
     private readonly IMongoOptions _mongoOptions;
     private readonly TranscriptomicsDataModelConverter _dataConverter;
     private readonly TasksProcessingService _taskProcessingService;
@@ -27,7 +27,7 @@ public class TranscriptomicsSubmissionHandler
 
 	public TranscriptomicsSubmissionHandler(
         ISqlOptions sqlOptions,
-        IEnsemblOptions ensemblOptions,
+        IEnsemblDataOptions ensemblOptions,
         IMongoOptions mongoOptions,
         TranscriptomicsSubmissionService submissionService,
         TranscriptomicsAnnotationService annotationService,

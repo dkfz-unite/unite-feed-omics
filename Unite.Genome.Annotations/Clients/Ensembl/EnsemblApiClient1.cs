@@ -12,10 +12,10 @@ public class EnsemblApiClient1
     private const string _transcriptsUrl = @"/api/transcripts";
     private const string _proteinsUrl = @"/api/proteins";
 
-    private readonly IEnsemblOptions _options;
+    private readonly IEnsemblDataOptions _options;
 
 
-    public EnsemblApiClient1(IEnsemblOptions options)
+    public EnsemblApiClient1(IEnsemblDataOptions options)
     {
         _options = options;
     }

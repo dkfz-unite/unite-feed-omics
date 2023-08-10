@@ -42,8 +42,8 @@ UNITE_MONGO_HOST|MongoDB server host|localhost|mongo.unite.net
 UNITE_MONGO_PORT|MongoDB server port|27017|27017
 UNITE_MONGO_USER|MongoDB server user||
 UNITE_MONGO_PASSWORD|MongoDB server password||
-UNITE_VEP_HOST|Local Ensembl VEP host|http://localhost:5200|vep.ensembl.unite.net|
-UNITE_ENSEMBL_HOST|Local Ensembl host|http://localhost:5202|data.ensembl.unite.net|
+UNITE_ENSEMBL_DATA_HOST|Local Ensembl Data host|http://localhost:5200|data.ensembl.unite.net|
+UNITE_ENSEMBL_VEP_HOST|Local Ensembl VEP host|http://localhost:5202|vep.ensembl.unite.net|
 UNITE_GENES_INDEXING_BUCKET_SIZE|Genes indexing bucket size|100|100
 UNITE_SSM_ANNOTATION_BUCKET_SIZE|SSM annotation bucket size|100|100
 UNITE_SSM_INDEXING_BUCKET_SIZE|SSM indexing bucket size|300|300
@@ -94,8 +94,8 @@ docker run \
 -e UNITE_MONGO_PORT=27017 \
 -e UNITE_MONGO_USER=[mongo_user] \
 -e UNITE_MONGO_PASSWORD=[mongo_password] \
--e UNITE_VEP_HOST=vep.ensembl.unite.net \
--e UNITE_ENSEMBL_HOST=data.ensembl.unite.net \
+-e UNITE_ENSEMBL_DATA_HOST=data.ensembl.unite.net \
+-e UNITE_ENSEMBL_VEP_HOST=vep.ensembl.unite.net \
 -e UNITE_GENES_INDEXING_BUCKET_SIZE=100 \
 -e UNITE_SSM_ANNOTATION_BUCKET_SIZE=100 \
 -e UNITE_SSM_INDEXING_BUCKET_SIZE=300 \

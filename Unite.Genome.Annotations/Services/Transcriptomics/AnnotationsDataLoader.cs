@@ -15,7 +15,7 @@ public class AnnotationsDataLoader
     private readonly EnsemblApiClient1 _ensemblApiClient;
 
 
-    public AnnotationsDataLoader(IEnsemblOptions ensemblOptions, DomainDbContext dbContext)
+    public AnnotationsDataLoader(IEnsemblDataOptions ensemblOptions, DomainDbContext dbContext)
     {
         _ensemblApiClient = new EnsemblApiClient1(ensemblOptions);
         _dbContext = dbContext;
