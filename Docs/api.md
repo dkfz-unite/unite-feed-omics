@@ -1,13 +1,13 @@
 # Genome Data Feed API
 
-## GET: [api](http://localhost:5106/api)
+## GET: [api](http://localhost:5106/api) - [api/genome-feed](http://localhost/api/genome-feed)
 Health check.
 
 ### Responses
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
-## POST: [api/dna/variants/ssms](http://localhost:5106/api/dna/variants/ssms)
+## POST: [api/dna/variants/ssms](http://localhost:5106/api/dna/variants/ssms) - [api/genome-feed/dna/variants/ssms](http://localhost/api/genome-feed/dna/variants/ssms)
 Submit mutations (SSM) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -73,7 +73,7 @@ Fields description can be found [here](api-models-ssm.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs)
+## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs) - [api/genome-feed/dna/variants/cnvs](http://localhost/api/genome-feed/dna/variants/cnvs)
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in default format.
 
 Request implements **UPSERT** logic:
@@ -168,7 +168,7 @@ Fields description can be found [here](api-models-cnv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/cnvs/aceseq](http://localhost:5106/api/dna/variants/cnvs/aceseq)
+## POST: [api/dna/variants/cnvs/aceseq](http://localhost:5106/api/dna/variants/cnvs/aceseq) - [api/genome-feed/dna/variants/cnvs/aceseq](http://localhost/api/genome-feed/dna/variants/cnvs/aceseq)
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in ACESeq format.
 
 Request implements **UPSERT** logic:
@@ -260,7 +260,7 @@ Fields description can be found [here](api-models-cnv-aceseq.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs)
+## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs) - [api/genome-feed/dna/variants/svs](http://localhost/api/genome-feed/dna/variants/svs)
 Submit Structural Variants (SV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -344,7 +344,7 @@ Fields description can be found [here](api-models-sv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions)
+## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions) - [api/genome-feed/rna/expressions](http://localhost/api/genome-feed/rna/expressions)
 Submit Gene Expression (Transcriptomics) data (including sequencing analysis data).
 
 Request implements **OVERRIDE** logic:
