@@ -1,6 +1,6 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using Unite.Data.Context;
+using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Variants;
-using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Models.Variants;
 using Unite.Genome.Feed.Data.Repositories.Variants;
 

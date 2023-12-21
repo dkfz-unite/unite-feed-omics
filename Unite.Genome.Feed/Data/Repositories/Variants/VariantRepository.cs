@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome.Variants;
-using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Models.Variants;
 
 namespace Unite.Genome.Feed.Data.Repositories.Variants;
@@ -12,7 +12,7 @@ public abstract class VariantRepository<TEntity, TModel>
     protected readonly DomainDbContext _dbContext;
 
 
-    protected VariantRepository(DomainDbContext dbContext)
+    public VariantRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
     }

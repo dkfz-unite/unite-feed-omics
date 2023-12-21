@@ -15,12 +15,12 @@ public class TranscriptomicsSubmissionService
 	}
 
 
-	public string AddSubmission(TranscriptomicsDataModel data)
+	public string AddSubmission(SequencingDataModel<BulkExpressionModel> data)
 	{
 		return _defaultRepository.Add(data);
 	}
 
-	public TranscriptomicsDataModel FindSubmission(string id)
+	public SequencingDataModel<BulkExpressionModel> FindSubmission(string id)
 	{
 		return _defaultRepository.Find(id)?.Document;
 	}

@@ -6,29 +6,29 @@ using Unite.Genome.Feed.Web.Services.Annotation;
 namespace Unite.Genome.Feed.Web.Controllers;
 
 [Route("api/[controller]/[action]")]
-[Authorize(Roles = Roles.Admin)]
+[Authorize(Policy = Policies.Data.Writer)]
 public class AnnotationController : Controller
 {
-    private readonly MutationAnnotationTaskService _mutationAnnotationTaskService;
-    private readonly CopyNumberVariantAnnotationTaskService _copyNumberVariantAnnotationTaskService;
-    private readonly StructuralVariantAnnotationTaskService _structuralVariantAnnotationTaskService;
+    private readonly SsmAnnotationTaskService _ssmAnnotationTaskService;
+    private readonly CnvAnnotationTaskService _cnvAnnotationTaskService;
+    private readonly SvAnnotationTaskService _svAnnotationTaskService;
 
 
     public AnnotationController(
-        MutationAnnotationTaskService mutationAnnotationTaskService,
-        CopyNumberVariantAnnotationTaskService copyNumberVariantAnnotationTaskService,
-        StructuralVariantAnnotationTaskService structuralVariantAnnotationTaskService)
+        SsmAnnotationTaskService ssmAnnotationTaskService,
+        CnvAnnotationTaskService cnvAnnotationTaskService,
+        SvAnnotationTaskService svAnnotationTaskService)
     {
-        _mutationAnnotationTaskService = mutationAnnotationTaskService;
-        _copyNumberVariantAnnotationTaskService = copyNumberVariantAnnotationTaskService;
-        _structuralVariantAnnotationTaskService = structuralVariantAnnotationTaskService;
+        _ssmAnnotationTaskService = ssmAnnotationTaskService;
+        _cnvAnnotationTaskService = cnvAnnotationTaskService;
+        _svAnnotationTaskService = svAnnotationTaskService;
     }
 
 
     [HttpPost]
     public IActionResult SSM()
     {
-        _mutationAnnotationTaskService.CreateTasks();
+        _ssmAnnotationTaskService.CreateTasks();
 
         return Ok();
     }
@@ -36,7 +36,7 @@ public class AnnotationController : Controller
     [HttpPost]
     public IActionResult CNV()
     {
-        _copyNumberVariantAnnotationTaskService.CreateTasks();
+        _cnvAnnotationTaskService.CreateTasks();
 
         return Ok();
     }
@@ -44,7 +44,7 @@ public class AnnotationController : Controller
     [HttpPost]
     public IActionResult SV()
     {
-        _structuralVariantAnnotationTaskService.CreateTasks();
+        _svAnnotationTaskService.CreateTasks();
 
         return Ok();
     }

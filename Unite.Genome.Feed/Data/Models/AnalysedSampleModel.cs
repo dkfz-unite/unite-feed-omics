@@ -1,12 +1,13 @@
 ﻿namespace Unite.Genome.Feed.Data.Models;
 
-public class AnalysedSampleModel
+public class AnalysedSampleModel : SampleModel
 {
-    public SampleModel AnalysedSample;
-    public SampleModel MatchedSample;
+    public AnalysisModel Analysis;
+    public SpecimenModel TargetSample;
+    public SpecimenModel MatchedSample;
 
-    public IEnumerable<Variants.SSM.VariantModel> Mutations;
-    public IEnumerable<Variants.CNV.VariantModel> CopyNumberVariants;
-    public IEnumerable<Variants.SV.VariantModel> StructuralVariants;
-    public IEnumerable<Transcriptomics.GeneExpressionModel> GeneExpressions;
+    public IEnumerable<Variants.SSM.VariantModel> Ssms;
+    public IEnumerable<Variants.CNV.VariantModel> Cnvs;
+    public IEnumerable<Variants.SV.VariantModel> Svs;
+    public IEnumerable<Transcriptomics.BulkExpressionModel> BulkExpressions;
 }

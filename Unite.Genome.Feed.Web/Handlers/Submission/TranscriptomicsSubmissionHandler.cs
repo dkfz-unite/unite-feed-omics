@@ -1,15 +1,8 @@
 ﻿using System.Diagnostics;
-using Unite.Cache.Configuration.Options;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Data.Services;
-using Unite.Data.Services.Configuration.Options;
-using Unite.Data.Services.Tasks;
-using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Genome.Annotations.Services.Models.Transcriptomics;
 using Unite.Genome.Annotations.Services.Transcriptomics;
-using Unite.Genome.Feed.Data;
-using Unite.Genome.Feed.Web.Models.Transcriptomics;
-using Unite.Genome.Feed.Web.Models.Transcriptomics.Converters;
+using Unite.Genome.Feed.Data.Writers.Transcriptomics;
 using Unite.Genome.Feed.Web.Services.Indexing;
 using Unite.Genome.Feed.Web.Submissions;
 
@@ -17,31 +10,32 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 
 public class TranscriptomicsSubmissionHandler
 {
-    private readonly ISqlOptions _sqlOptions;
-    private readonly IEnsemblDataOptions _ensemblOptions;
-    private readonly IMongoOptions _mongoOptions;
-    private readonly TranscriptomicsDataModelConverter _dataConverter;
+    private readonly BulkExpressionsDataWriter _dataWriter;
+    private readonly BulkExpressionsAnnotationService _annotationService;
+    private readonly TranscriptomicsSubmissionService _submissionService;
+    private readonly GeneIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
-    private ILogger _logger;
+    private readonly ILogger _logger;
+
+    private readonly Models.Transcriptomics.Converters.SequencingDataModelConverter _converter;
 
 
 	public TranscriptomicsSubmissionHandler(
-        ISqlOptions sqlOptions,
-        IEnsemblDataOptions ensemblOptions,
-        IMongoOptions mongoOptions,
+        BulkExpressionsDataWriter dataWriter,
+        BulkExpressionsAnnotationService annotationService,
         TranscriptomicsSubmissionService submissionService,
-        TranscriptomicsAnnotationService annotationService,
-        TranscriptomicsDataWriter dataWriter,
+        GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        GeneIndexingTaskService geneIndexingTaskService,
         ILogger<TranscriptomicsSubmissionHandler> logger)
 	{
-        _sqlOptions = sqlOptions;
-        _ensemblOptions = ensemblOptions;
-        _mongoOptions = mongoOptions;
-        _dataConverter = new TranscriptomicsDataModelConverter();
+        _dataWriter = dataWriter;
+        _annotationService = annotationService;
+        _submissionService = submissionService;
+        _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+
+        _converter = new Models.Transcriptomics.Converters.SequencingDataModelConverter();
 	}
 
 
@@ -57,43 +51,37 @@ public class TranscriptomicsSubmissionHandler
 
         _taskProcessingService.Process(SubmissionTaskType.TEX, 1, (tasks) =>
         {
-            _logger.LogInformation($"Processing transcriptomics data submission");
+            _logger.LogInformation($"Processing bulk transcriptomics data submission");
 
             stopwatch.Restart();
 
-            ProcessSubmissionTasks(tasks);
+            ProcessSubmission(tasks[0].Target);
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Processing of transcriptomics data submission completed in {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)}s");
+            _logger.LogInformation("Processing of bulk transcriptomics data submission completed in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
     }
 
-    private void ProcessSubmissionTasks(Unite.Data.Entities.Tasks.Task[] tasks)
+    private void ProcessSubmission(string submissionId)
     {
-        using var dbContext = new DomainDbContext(_sqlOptions);
+        var submitedSequencingData = _submissionService.FindSubmission(submissionId);
+        var annotatedExpressions = AnnotateExpressions(_annotationService, submitedSequencingData.Entries);
+        var convertedExpressions = Convert(annotatedExpressions).ToArray();
+        var convertedSequencingData = _converter.Convert(submitedSequencingData);
+        convertedSequencingData.BulkExpressions = convertedExpressions;
 
-        var submissionService = new TranscriptomicsSubmissionService(_mongoOptions);
-        var annotationService = new TranscriptomicsAnnotationService(_ensemblOptions, dbContext);
-        var dataWriter = new TranscriptomicsDataWriter(dbContext);
-        var indexingTaskService = new GeneIndexingTaskService(dbContext);
+        _dataWriter.SaveData(convertedSequencingData, out var audit);
+        _indexingTaskService.PopulateTasks(audit.Genes);
+        _submissionService.DeleteSubmission(submissionId);
 
-        var submission = submissionService.FindSubmission(tasks[0].Target);
-        var expressionModels = AnnotateExpressions(annotationService, submission.Expressions);
-        var expressionData = Convert(expressionModels).ToArray();
-        var analysisData = _dataConverter.Convert(submission);
-        analysisData.AnalysedSamples.First().GeneExpressions = expressionData;
-
-        dataWriter.SaveData(analysisData, out var audit);
-        indexingTaskService.PopulateTasks(audit.Genes);
-        submissionService.DeleteSubmission(tasks[0].Target);
-
-        _logger.LogInformation(audit.ToString());
+        _dataWriter.Refresh();
+        _logger.LogInformation("{audit}", audit.ToString());
     }
 
-	private GeneExpressionModel[] AnnotateExpressions(TranscriptomicsAnnotationService annotationService, ExpressionModel[] expressions)
+	private Annotations.Services.Models.Transcriptomics.BulkExpressionModel[] AnnotateExpressions(BulkExpressionsAnnotationService annotationService, Models.Transcriptomics.BulkExpressionModel[] expressions)
 	{
         var dataType = expressions.First().GetDataType();
 
@@ -108,15 +96,15 @@ public class TranscriptomicsSubmissionHandler
             2 => annotationService.AnnotateByGeneSymbol(data),
             3 => annotationService.AnnotateByTranscriptId(data),
             4 => annotationService.AnnotateByTranscriptSymbol(data),
-            _ => Array.Empty<GeneExpressionModel>()
+            _ => []
         };
     }
 
-    private IEnumerable<Data.Models.Transcriptomics.GeneExpressionModel> Convert(GeneExpressionModel[] source)
+    private static IEnumerable<Data.Models.Transcriptomics.BulkExpressionModel> Convert(Annotations.Services.Models.Transcriptomics.BulkExpressionModel[] source)
     {
         foreach (var model in source)
         {
-            yield return new Data.Models.Transcriptomics.GeneExpressionModel
+            yield return new Data.Models.Transcriptomics.BulkExpressionModel
             {
                 Gene = new Data.Models.GeneModel
                 {

@@ -1,31 +1,32 @@
-﻿using Unite.Data.Entities.Genome;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
+using Unite.Data.Context.Repositories;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Genome.Variants;
-using Unite.Data.Entities.Images;
-using Unite.Data.Entities.Specimens.Tissues.Enums;
-using Unite.Data.Extensions;
-using Unite.Data.Services;
-using Unite.Data.Services.Tasks;
+using Unite.Essentials.Extensions;
+
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 
-public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, TAffectedTranscript> : IndexingTaskService<Variant, long>
-    where TVariant : Variant
-    where TVariantOccurrence : VariantOccurrence<TVariant>
-    where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
+public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Variant, long>
+    where TV : Variant
 {
     protected override int BucketSize => 1000;
+    private readonly VariantsRepository _variantsRepository;
 
 
-    public VariantIndexingTaskService(DomainDbContext dbContext) : base(dbContext)
+    public VariantIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
+        _variantsRepository = new VariantsRepository(dbContextFactory);
     }
 
 
     public override void CreateTasks()
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
 
-        IterateEntities<TVariant, long>(variant => true, variant => variant.Id, variants =>
+        IterateEntities<TV, long>(variant => true, variant => variant.Id, variants =>
         {
             CreateVariantIndexingTasks(variants);
         });
@@ -35,11 +36,15 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
 
     public override void CreateTasks(IEnumerable<long> keys)
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var variants = _dbContext.Set<TVariant>().Where(variant => chunk.Contains(variant.Id)).Select(variant => variant.Id).ToArray();
+            var variants = dbContext.Set<TV>()
+                .Where(variant => chunk.Contains(variant.Id))
+                .Select(variant => variant.Id)
+                .ToArray();
 
             CreateVariantIndexingTasks(variants);
         });
@@ -49,11 +54,15 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
 
     public override void PopulateTasks(IEnumerable<long> keys)
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var variants = _dbContext.Set<TVariant>().Where(variant => chunk.Contains(variant.Id)).Select(variant => variant.Id).ToArray();
+            var variants = dbContext.Set<TV>()
+                .Where(variant => chunk.Contains(variant.Id))
+                .Select(variant => variant.Id)
+                .ToArray();
 
             CreateDonorIndexingTasks(variants);
             CreateImageIndexingTasks(keys);
@@ -68,59 +77,27 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<long> keys)
     {
-        var donorIds = _dbContext.Set<TVariantOccurrence>()
-            .Where(occurrence => keys.Contains(occurrence.VariantId))
-            .Select(occurrence => occurrence.AnalysedSample.Sample.Specimen.DonorId)
-            .Distinct()
-            .ToArray();
-
-        return donorIds;
+        return _variantsRepository.GetRelatedDonors<TV>(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedImages(IEnumerable<long> keys)
     {
-        var donorIds = _dbContext.Set<TVariantOccurrence>()
-            .Where(occurrence => keys.Contains(occurrence.VariantId))
-            .Where(occurrence => occurrence.AnalysedSample.Sample.Specimen.Tissue.TypeId == TissueType.Tumor)
-            .Select(occurrence => occurrence.AnalysedSample.Sample.Specimen.DonorId)
-            .Distinct()
-            .ToArray();
-
-        var imageIds = _dbContext.Set<Image>()
-            .Where(image => donorIds.Contains(image.DonorId))
-            .Select(image => image.Id)
-            .Distinct()
-            .ToArray();
-
-        return imageIds;
+        return _variantsRepository.GetRelatedImages<TV>(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<long> keys)
     {
-        var specimenIds = _dbContext.Set<TVariantOccurrence>()
-            .Where(occurrence => keys.Contains(occurrence.VariantId))
-            .Select(occurrence => occurrence.AnalysedSample.Sample.SpecimenId)
-            .Distinct()
-            .ToArray();
-
-        return specimenIds;
+        return _variantsRepository.GetRelatedSpecimens<TV>(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<long> keys)
     {
-        var geneIds = _dbContext.Set<TAffectedTranscript>()
-            .Where(affectedTranscript => keys.Contains(affectedTranscript.VariantId))
-            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
-            .Select(affectedTranscript => affectedTranscript.Feature.GeneId.Value)
-            .Distinct()
-            .ToArray();
-
-        return geneIds;
+        return _variantsRepository.GetRelatedGenes<TV>(keys).Result;
     }
 
-    protected override IEnumerable<long> LoadRelatedMutations(IEnumerable<long> keys)
+    protected override IEnumerable<long> LoadRelatedSsms(IEnumerable<long> keys)
     {
-        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Variants.SSM.Variant))
+        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Variants.SSM.Variant))
         {
             return keys;
         }
@@ -130,9 +107,9 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
         }
     }
 
-    protected override IEnumerable<long> LoadRelatedCopyNumberVariants(IEnumerable<long> keys)
+    protected override IEnumerable<long> LoadRelatedCnvs(IEnumerable<long> keys)
     {
-        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Variants.CNV.Variant))
+        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Variants.CNV.Variant))
         {
             return keys;
         }
@@ -142,9 +119,9 @@ public abstract class VariantIndexingTaskService<TVariant, TVariantOccurrence, T
         }
     }
 
-    protected override IEnumerable<long> LoadRelatedStructuralVariants(IEnumerable<long> keys)
+    protected override IEnumerable<long> LoadRelatedSvs(IEnumerable<long> keys)
     {
-        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Variants.SV.Variant))
+        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Variants.SV.Variant))
         {
             return keys;
         }

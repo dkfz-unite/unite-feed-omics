@@ -6,24 +6,24 @@ using Unite.Genome.Feed.Web.Services.Indexing;
 namespace Unite.Genome.Feed.Web.Controllers;
 
 [Route("api/[controller]/[action]")]
-[Authorize(Roles = Roles.Admin)]
+[Authorize(Policy = Policies.Data.Writer)]
 public class IndexingController : Controller
 {
     private readonly GeneIndexingTaskService _geneIndexingTaskService;
-    private readonly MutationIndexingTaskService _mutationIndexingTaskService;
-    private readonly CopyNumberVariantIndexingTaskService _copyNumberVariantIndexingTaskService;
-    private readonly StructuralVariantIndexingTaskService _structuralVariantIndexingTaskService;
+    private readonly SsmIndexingTaskService _ssmIndexingTaskService;
+    private readonly CnvIndexingTaskService _cnvIndexingTaskService;
+    private readonly SvIndexingTaskService _svIndexingTaskService;
 
     public IndexingController(
         GeneIndexingTaskService geneIndexingTaskService,
-        MutationIndexingTaskService mutationIndexingTaskService,
-        CopyNumberVariantIndexingTaskService copyNumberVariantIndexingTaskService,
-        StructuralVariantIndexingTaskService structuralVariantIndexingTaskService)
+        SsmIndexingTaskService ssmIndexingTaskService,
+        CnvIndexingTaskService cnvIndexingTaskService,
+        SvIndexingTaskService svIndexingTaskService)
     {
         _geneIndexingTaskService = geneIndexingTaskService;
-        _mutationIndexingTaskService = mutationIndexingTaskService;
-        _copyNumberVariantIndexingTaskService = copyNumberVariantIndexingTaskService;
-        _structuralVariantIndexingTaskService = structuralVariantIndexingTaskService;
+        _ssmIndexingTaskService = ssmIndexingTaskService;
+        _cnvIndexingTaskService = cnvIndexingTaskService;
+        _svIndexingTaskService = svIndexingTaskService;
     }
 
 
@@ -38,9 +38,9 @@ public class IndexingController : Controller
     [HttpPost]
     public IActionResult Variants()
     {
-        _mutationIndexingTaskService.CreateTasks();
-        _copyNumberVariantIndexingTaskService.CreateTasks();
-        _structuralVariantIndexingTaskService.CreateTasks();
+        _ssmIndexingTaskService.CreateTasks();
+        _cnvIndexingTaskService.CreateTasks();
+        _svIndexingTaskService.CreateTasks();
 
         return Ok();
     }

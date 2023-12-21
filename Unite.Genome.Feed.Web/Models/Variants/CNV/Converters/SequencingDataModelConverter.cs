@@ -1,9 +1,8 @@
-﻿using Unite.Genome.Feed.Web.Models.Variants.Base.Converters;
-using Unite.Genome.Feed.Web.Models.Variants.CNV.Mappers;
+﻿using Unite.Genome.Feed.Web.Models.Variants.CNV.Mappers;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.CNV.Converters;
 
-public class SequencingDataModelConverter : SequencingDataModelConverterBase<VariantModel>
+public class SequencingDataModelConverter : Base.Converters.SequencingDataModelConverter<VariantModel>
 {
     private readonly VariantModelMapper _variantsModelMapper;
 
@@ -14,13 +13,13 @@ public class SequencingDataModelConverter : SequencingDataModelConverterBase<Var
     }
 
 
-    protected override void MapVariants(AnalysedSampleModel<VariantModel> source, Data.Models.AnalysedSampleModel target)
+    protected override void MapEntries(Base.SequencingDataModel<VariantModel> source, Data.Models.AnalysedSampleModel target)
     {
-        target.CopyNumberVariants = source.Variants.Select(variant =>
+        target.Cnvs = source.Entries.Select(variant =>
         {
             var variantModel = new Data.Models.Variants.CNV.VariantModel();
 
-            _variantsModelMapper.Map(variant, variantModel, source.Ploidy ?? source.DefaultPloidy);
+            _variantsModelMapper.Map(variant, variantModel, source.TargetSample.Ploidy ?? source.TargetSample.DefaultPloidy);
 
             return variantModel;
 

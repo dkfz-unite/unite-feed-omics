@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome;
-using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources;
@@ -14,17 +14,17 @@ internal class AnnotationsDataLoader
 {
     private readonly EnsemblApiClient1 _ensemblApiClient;
     private readonly EnsemblVepApiClient _ensemblVepApiClient;
-    private readonly DomainDbContext _dbContext;
+    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
 
 
     public AnnotationsDataLoader(
         IEnsemblDataOptions ensemblOptions,
         IEnsemblVepOptions vepOptions,
-        DomainDbContext dbContext)
+        IDbContextFactory<DomainDbContext> dbContextFactory)
     {
         _ensemblApiClient = new EnsemblApiClient1(ensemblOptions);
         _ensemblVepApiClient = new EnsemblVepApiClient(vepOptions);
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
 
@@ -47,6 +47,8 @@ internal class AnnotationsDataLoader
 
     private async Task<GeneResource[]> AnnotateGenes(AnnotatedVariantResource[] variants)
     {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
         var allIdentifiers = variants
             .Where(variant => variant.AffectedTranscripts != null)
             .SelectMany(variant => variant.AffectedTranscripts)
@@ -57,7 +59,7 @@ internal class AnnotationsDataLoader
         //return await _ensemblApiClient.Find<GeneResource>(allIdentifiers, expand: false);
 
         var existingIdentifiers = allIdentifiers
-            .Where(id => _dbContext.Set<Gene>().AsNoTracking().Any(entity => entity.StableId == id))
+            .Where(id => dbContext.Set<Gene>().AsNoTracking().Any(entity => entity.StableId == id))
             .ToArray();
 
         var newIdentifiers = allIdentifiers
@@ -75,6 +77,8 @@ internal class AnnotationsDataLoader
 
     private async Task<TranscriptResource[]> AnnotateTranscripts(AnnotatedVariantResource[] variants)
     {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
         var allIdentifiers = variants
             .Where(variant => variant.AffectedTranscripts != null)
             .SelectMany(variant => variant.AffectedTranscripts)
@@ -85,7 +89,7 @@ internal class AnnotationsDataLoader
         //return await _ensemblApiClient.Find<TranscriptResource>(allIdentifiers, expand: true);
 
         var existingIdentifiers = allIdentifiers
-            .Where(id => _dbContext.Set<Transcript>().AsNoTracking().Any(entity => entity.StableId == id))
+            .Where(id => dbContext.Set<Transcript>().AsNoTracking().Any(entity => entity.StableId == id))
             .ToArray();
 
         var newIdentifiers = allIdentifiers

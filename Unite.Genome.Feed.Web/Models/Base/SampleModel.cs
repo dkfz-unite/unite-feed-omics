@@ -1,49 +1,49 @@
-﻿using Unite.Genome.Feed.Data.Models.Enums;
+﻿using System.Text.Json.Serialization;
+using Unite.Data.Entities.Specimens.Enums;
 
 namespace Unite.Genome.Feed.Web.Models.Base;
 
-public class SampleModel
+public record SampleModel
 {
-    private string _id;
-    private string _donorId;
-    private string _specimenId;
-    private SpecimenType? _specimenType;
-    private double? _ploidy;
-    private double? _purity;
+    protected string _donorId;
+    protected string _specimenId;
+    protected SpecimenType? _specimenType;
+    protected double? _purity;
+    protected double? _ploidy;
 
-
-    /// <summary>
-    /// Sample identifier
-    /// </summary>
-    public string Id { get => _id?.Trim(); set => _id = value; }
 
     /// <summary>
     /// Sample donor identifier
     /// </summary>
-    public string DonorId { get => _donorId?.Trim(); set => _donorId = value; }
+    [JsonPropertyName("donor_id")]
+    public virtual string DonorId { get => _donorId?.Trim(); set => _donorId = value; }
 
     /// <summary>
     /// Specimen identifier
     /// </summary>
-    public string SpecimenId { get => _specimenId?.Trim(); set => _specimenId = value; }
+    [JsonPropertyName("specimen_id")]
+    public virtual string SpecimenId { get => _specimenId?.Trim(); set => _specimenId = value; }
 
     /// <summary>
     /// Specimen type
     /// </summary>
-    public SpecimenType? SpecimenType { get => _specimenType; set => _specimenType = value; }
-
-    /// <summary>
-    /// Sample ploidy
-    /// </summary>
-    public double? Ploidy { get => _ploidy; set => _ploidy = value; }
+    [JsonPropertyName("specimen_type")]
+    public virtual SpecimenType? SpecimenType { get => _specimenType; set => _specimenType = value; }
 
     /// <summary>
     /// Sample purity (TCC)
     /// </summary>
-    public double? Purity { get => _purity; set => _purity = value; }
+    [JsonPropertyName("purity")]
+    public virtual double? Purity { get => _purity; set => _purity = value; }
+
+    /// <summary>
+    /// Sample ploidy
+    /// </summary>
+    [JsonPropertyName("ploidy")]
+    public virtual double? Ploidy { get => _ploidy; set => _ploidy = value; }
 
     /// <summary>
     /// Default sample ploidy
     /// </summary>
-    public double DefaultPloidy => 2;
+    public virtual double DefaultPloidy => 2;
 }

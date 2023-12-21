@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome;
-using Unite.Data.Services;
 using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources;
@@ -11,32 +11,32 @@ namespace Unite.Genome.Annotations.Services.Transcriptomics;
 
 public class AnnotationsDataLoader
 {
-    private readonly DomainDbContext _dbContext;
+    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
     private readonly EnsemblApiClient1 _ensemblApiClient;
 
 
-    public AnnotationsDataLoader(IEnsemblDataOptions ensemblOptions, DomainDbContext dbContext)
+    public AnnotationsDataLoader(IEnsemblDataOptions ensemblOptions, IDbContextFactory<DomainDbContext> dbContextFactory)
     {
         _ensemblApiClient = new EnsemblApiClient1(ensemblOptions);
-        _dbContext = dbContext;
+        _dbContextFactory = dbContextFactory;
     }
 
 
-    public async Task<GeneExpressionModel[]> LoadByGeneId(Dictionary<string, (int Reads, int? Length)> geneExpressions)
+    public async Task<BulkExpressionModel[]> LoadByGeneId(Dictionary<string, (int Reads, int? Length)> geneExpressions)
     {
         var genes = await LoadGenesById(geneExpressions.Keys.ToArray());
 
         return genes.Select(gene => Convert(gene, geneExpressions[gene.Id])).ToArray();
     }
 
-    public async Task<GeneExpressionModel[]> LoadByGeneSymbol(Dictionary<string, (int Reads, int? Length)> geneExpressions)
+    public async Task<BulkExpressionModel[]> LoadByGeneSymbol(Dictionary<string, (int Reads, int? Length)> geneExpressions)
     {
         var genes = await LoadGenesByName(geneExpressions.Keys.ToArray());
 
         return genes.Select(gene => Convert(gene, geneExpressions[gene.Symbol])).ToArray();
     }
 
-    public async Task<GeneExpressionModel[]> LoadByTranscriptId(Dictionary<string, (int Reads, int? Length)> transcriptExpressions)
+    public async Task<BulkExpressionModel[]> LoadByTranscriptId(Dictionary<string, (int Reads, int? Length)> transcriptExpressions)
     {
         var transcripts = await LoadTranscriptsById(transcriptExpressions.Keys.ToArray());
 
@@ -53,7 +53,7 @@ public class AnnotationsDataLoader
         return genes.Select(gene => Convert(gene, geneExpressions[gene.Id])).ToArray();
     }
 
-    public async Task<GeneExpressionModel[]> LoadByTranscriptSymbol(Dictionary<string, (int Reads, int? Length)> transcriptExpressions)
+    public async Task<BulkExpressionModel[]> LoadByTranscriptSymbol(Dictionary<string, (int Reads, int? Length)> transcriptExpressions)
     {
         var transcripts = await LoadTranscriptsByName(transcriptExpressions.Keys.ToArray());
 
@@ -73,7 +73,9 @@ public class AnnotationsDataLoader
 
     private async Task<GeneResource[]> LoadGenesById(string[] identifiers)
     {
-        var existingGenes = _dbContext.Set<Gene>().AsNoTracking().Where(gene => identifiers.Contains(gene.StableId)).Select(Convert).ToArray();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        var existingGenes = dbContext.Set<Gene>().AsNoTracking().Where(gene => identifiers.Contains(gene.StableId)).Select(Convert).ToArray();
 
         var existingIdentifiers = existingGenes.Select(gene => gene.Id).ToArray();
 
@@ -86,7 +88,9 @@ public class AnnotationsDataLoader
 
     private async Task<GeneResource[]> LoadGenesByName(string[] symbols)
     {
-        var existingGenes = _dbContext.Set<Gene>().AsNoTracking().Where(gene => symbols.Contains(gene.Symbol)).Select(Convert).ToArray();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        var existingGenes = dbContext.Set<Gene>().AsNoTracking().Where(gene => symbols.Contains(gene.Symbol)).Select(Convert).ToArray();
 
         var existingSymbols = existingGenes.Select(gene => gene.Symbol).ToArray();
 
@@ -99,7 +103,9 @@ public class AnnotationsDataLoader
 
     private async Task<TranscriptResource[]> LoadTranscriptsById(string[] identifiers)
     {
-        var existingTranscripts = _dbContext.Set<Transcript>().AsNoTracking().Where(transcript => identifiers.Contains(transcript.StableId)).Select(Convert).ToArray();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        var existingTranscripts = dbContext.Set<Transcript>().AsNoTracking().Where(transcript => identifiers.Contains(transcript.StableId)).Select(Convert).ToArray();
 
         var existingIdentifiers = existingTranscripts.Select(transcript => transcript.Id).ToArray();
 
@@ -112,7 +118,9 @@ public class AnnotationsDataLoader
 
     private async Task<TranscriptResource[]> LoadTranscriptsByName(string[] symbols)
     {
-        var existingTranscripts = _dbContext.Set<Transcript>().AsNoTracking().Where(transcript => symbols.Contains(transcript.Symbol)).Select(Convert).ToArray();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        var existingTranscripts = dbContext.Set<Transcript>().AsNoTracking().Where(transcript => symbols.Contains(transcript.Symbol)).Select(Convert).ToArray();
 
         var existingSymbols = existingTranscripts.Select(transcript => transcript.Symbol).ToArray();
 
@@ -129,9 +137,9 @@ public class AnnotationsDataLoader
         return expressions.First(expression => expression.Identifier == Identifier);
     }
 
-    private static GeneExpressionModel Convert(GeneResource resource, (int Reads, int? Length) expression)
+    private static BulkExpressionModel Convert(GeneResource resource, (int Reads, int? Length) expression)
     {
-        return new GeneExpressionModel
+        return new BulkExpressionModel
         {
             Gene = Convert(resource, expression.Length),
             Reads = expression.Reads

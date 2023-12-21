@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome.Variants.SSM;
-using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Models.Variants.SSM;
 
 namespace Unite.Genome.Feed.Data.Repositories.Variants.SSM;

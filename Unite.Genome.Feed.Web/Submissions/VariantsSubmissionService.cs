@@ -7,7 +7,6 @@ public class VariantsSubmissionService
 {
 	private readonly Repositories.Variants.SSM.DefaultSubmissionRepository _ssmDefaultRepository;
 	private readonly Repositories.Variants.CNV.DefaultSubmissionRepository _cnvDefaultRepository;
-	private readonly Repositories.Variants.CNV.AceSeqSubmissionRepository _cnvAceSeqRepository;
 	private readonly Repositories.Variants.SV.DefaultSubmissionRepository _svDefaultRepository;
 
 
@@ -15,7 +14,6 @@ public class VariantsSubmissionService
 	{
 		_ssmDefaultRepository = new Repositories.Variants.SSM.DefaultSubmissionRepository(options);
 		_cnvDefaultRepository = new Repositories.Variants.CNV.DefaultSubmissionRepository(options);
-		_cnvAceSeqRepository = new Repositories.Variants.CNV.AceSeqSubmissionRepository(options);
 		_svDefaultRepository = new Repositories.Variants.SV.DefaultSubmissionRepository(options);
 	}
 
@@ -28,11 +26,6 @@ public class VariantsSubmissionService
     public string AddCnvSubmission(SequencingDataModel<Models.Variants.CNV.VariantModel> data)
     {
         return _cnvDefaultRepository.Add(data);
-    }
-
-    public string AddCnvAceSeqSubmission(SequencingDataModel<Models.Variants.CNV.VariantAceSeqModel> data)
-    {
-        return _cnvAceSeqRepository.Add(data);
     }
 
     public string AddSvSubmission(SequencingDataModel<Models.Variants.SV.VariantModel> data)
@@ -50,11 +43,6 @@ public class VariantsSubmissionService
         return _cnvDefaultRepository.Find(id)?.Document;
     }
 
-    public SequencingDataModel<Models.Variants.CNV.VariantAceSeqModel> FindCnvAceSeqSubmission(string id)
-    {
-        return _cnvAceSeqRepository.Find(id)?.Document;
-    }
-
     public SequencingDataModel<Models.Variants.SV.VariantModel> FindSvSubmission(string id)
     {
         return _svDefaultRepository.Find(id)?.Document;
@@ -68,11 +56,6 @@ public class VariantsSubmissionService
     public void DeleteCnvSubmission(string id)
     {
         _cnvDefaultRepository.Delete(id);
-    }
-
-    public void DeleteCnvAceSeqSubmission(string id)
-    {
-        _cnvAceSeqRepository.Delete(id);
     }
 
     public void DeleteSvSubmission(string id)

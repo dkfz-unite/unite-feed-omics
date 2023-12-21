@@ -6,23 +6,23 @@ namespace Unite.Genome.Feed.Web.HostedServices;
 public class VariantsIndexingHostedService : BackgroundService
 {
     private readonly VariantsIndexingOptions _options;
-    private readonly MutationsIndexingHandler _mutationsIndexingHandler;
-    private readonly CopyNumberVariantsIndexingHandler _copyNumberVariantsIndexingHandler;
-    private readonly StructuralVariantsIndexingHandler _structuralVariantsIndexingHandler;
+    private readonly SsmsIndexingHandler _ssmsIndexingHandler;
+    private readonly CnvsIndexingHandler _cnvsVariantsIndexingHandler;
+    private readonly SvsIndexingHandler _svsIndexingHandler;
     private readonly ILogger _logger;
 
 
     public VariantsIndexingHostedService(
         VariantsIndexingOptions options,
-        MutationsIndexingHandler mutationsIndexingHandler,
-        CopyNumberVariantsIndexingHandler copyNumberVariantsIndexingHandler,
-        StructuralVariantsIndexingHandler structuralVariantsIndexingHandler,
+        SsmsIndexingHandler ssmsIndexingHandler,
+        CnvsIndexingHandler cnvsIndexingHandler,
+        SvsIndexingHandler svsIndexingHandler,
         ILogger<VariantsIndexingHostedService> logger)
     {
         _options = options;
-        _mutationsIndexingHandler = mutationsIndexingHandler;
-        _copyNumberVariantsIndexingHandler = copyNumberVariantsIndexingHandler;
-        _structuralVariantsIndexingHandler = structuralVariantsIndexingHandler;
+        _ssmsIndexingHandler = ssmsIndexingHandler;
+        _cnvsVariantsIndexingHandler = cnvsIndexingHandler;
+        _svsIndexingHandler = svsIndexingHandler;
         _logger = logger;
     }
 
@@ -38,9 +38,9 @@ public class VariantsIndexingHostedService : BackgroundService
 
         try
         {
-            _mutationsIndexingHandler.Prepare();
-            _copyNumberVariantsIndexingHandler.Prepare();
-            _structuralVariantsIndexingHandler.Prepare();
+            _ssmsIndexingHandler.Prepare();
+            _cnvsVariantsIndexingHandler.Prepare();
+            _svsIndexingHandler.Prepare();
         }
         catch (Exception exception)
         {
@@ -51,9 +51,9 @@ public class VariantsIndexingHostedService : BackgroundService
         {
             try
             {
-                _mutationsIndexingHandler.Handle(_options.SsmBucketSize);
-                _copyNumberVariantsIndexingHandler.Handle(_options.CnvBucketSize);
-                _structuralVariantsIndexingHandler.Handle(_options.SvBucketSize);
+                _ssmsIndexingHandler.Handle(_options.SsmBucketSize);
+                _cnvsVariantsIndexingHandler.Handle(_options.CnvBucketSize);
+                _svsIndexingHandler.Handle(_options.SvBucketSize);
             }
             catch (Exception exception)
             {

@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Unite.Data.Context;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Cells;
-using Unite.Data.Services;
+using Unite.Data.Entities.Specimens.Enums;
 
 namespace Unite.Genome.Feed.Data.Repositories.Specimens;
 
@@ -24,10 +24,10 @@ public class CellLineRepository
     public Specimen Find(int donorId, string referenceId)
     {
         var entity = _dbContext.Set<Specimen>()
-            .Include(entity => entity.CellLine)
             .FirstOrDefault(entity =>
                 entity.DonorId == donorId &&
-                entity.CellLine.ReferenceId == referenceId
+                entity.TypeId == SpecimenType.CellLine &&
+                entity.ReferenceId == referenceId
             );
 
         return entity;
@@ -38,6 +38,8 @@ public class CellLineRepository
         var entity = new Specimen
         {
             DonorId = donorId,
+            ReferenceId = referenceId,
+            TypeId = SpecimenType.CellLine,
             CellLine = new CellLine { ReferenceId = referenceId }
         };
 

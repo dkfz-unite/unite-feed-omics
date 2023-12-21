@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome;
-using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Models;
 
 namespace Unite.Genome.Feed.Data.Repositories;

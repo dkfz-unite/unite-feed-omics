@@ -1,19 +1,20 @@
-﻿using Unite.Data.Entities.Genome.Analysis;
-using Unite.Data.Services;
+﻿using Unite.Data.Context;
+using Unite.Data.Entities.Genome.Analysis;
 using Unite.Genome.Feed.Data.Models;
+using Unite.Genome.Feed.Data.Repositories.Specimens;
 
 namespace Unite.Genome.Feed.Data.Repositories;
 
 internal class AnalysedSampleRepository
 {
     private DomainDbContext _dbContext;
-    private readonly SampleRepository _sampleRepository;
+    private readonly SpecimenRepository _specimenRepository;
 
 
     public AnalysedSampleRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
-        _sampleRepository = new SampleRepository(dbContext);
+        _specimenRepository = new SpecimenRepository(dbContext);
     }
 
 
@@ -26,11 +27,11 @@ internal class AnalysedSampleRepository
     {
         if (model.MatchedSample == null)
         {
-            return Find(analysisId, model.AnalysedSample);
+            return Find(analysisId, model.TargetSample);
         }
         else
         {
-            return Find(analysisId, model.AnalysedSample, model.MatchedSample);
+            return Find(analysisId, model.TargetSample, model.MatchedSample);
         }
     }
 
@@ -38,20 +39,20 @@ internal class AnalysedSampleRepository
     {
         if (model.MatchedSample == null)
         {
-            return Create(analysisId, model.AnalysedSample);
+            return Create(analysisId, model, model.TargetSample);
         }
         else
         {
-            return Create(analysisId, model.AnalysedSample, model.MatchedSample);
+            return Create(analysisId, model, model.TargetSample, model.MatchedSample);
         }
     }
 
 
-    private AnalysedSample Find(int analysisId, SampleModel sampleModel)
+    private AnalysedSample Find(int analysisId, SpecimenModel targetSampleModel)
     {
-        var sample = _sampleRepository.Find(sampleModel);
+        var targetSample = _specimenRepository.Find(targetSampleModel);
 
-        if (sample == null)
+        if (targetSample == null)
         {
             return null;
         }
@@ -59,18 +60,18 @@ internal class AnalysedSampleRepository
         {
             return _dbContext.Set<AnalysedSample>().FirstOrDefault(entity =>
                 entity.AnalysisId == analysisId &&
-                entity.SampleId == sample.Id &&
+                entity.TargetSampleId == targetSample.Id &&
                 entity.MatchedSampleId == null
             );
         }
     }
 
-    private AnalysedSample Find(int analysisId, SampleModel sampleModel, SampleModel matchedSampleModel)
+    private AnalysedSample Find(int analysisId, SpecimenModel targetSampleModel, SpecimenModel matchedSampleModel)
     {
-        var sample = _sampleRepository.Find(sampleModel);
-        var matchedSample = _sampleRepository.Find(matchedSampleModel);
+        var targetSample = _specimenRepository.Find(targetSampleModel);
+        var matchedSample = _specimenRepository.Find(matchedSampleModel);
 
-        if (sample == null || matchedSample == null)
+        if (targetSample == null || matchedSample == null)
         {
             return null;
         }
@@ -78,23 +79,23 @@ internal class AnalysedSampleRepository
         {
             return _dbContext.Set<AnalysedSample>().FirstOrDefault(entity =>
                 entity.AnalysisId == analysisId &&
-                entity.SampleId == sample.Id &&
+                entity.TargetSampleId == targetSample.Id &&
                 entity.MatchedSampleId == matchedSample.Id
             );
         }
     }
 
-    private AnalysedSample Create(int analysisId, SampleModel sampleModel)
+    private AnalysedSample Create(int analysisId, SampleModel analysedSampleModel, SpecimenModel targetSampleModel)
     {
-        var sample = _sampleRepository.FindOrCreate(sampleModel);
+        var targetSpecimen = _specimenRepository.FindOrCreate(targetSampleModel);
 
         var entity = new AnalysedSample
         {
             AnalysisId = analysisId,
-            SampleId = sample.Id,
+            TargetSampleId = targetSpecimen.Id,
             MatchedSampleId = null,
-            Ploidy = sampleModel.Ploidy,
-            Purity = sampleModel.Purity
+            Ploidy = analysedSampleModel.Ploidy,
+            Purity = analysedSampleModel.Purity
         };
 
         _dbContext.Add(entity);
@@ -103,18 +104,18 @@ internal class AnalysedSampleRepository
         return entity;
     }
 
-    private AnalysedSample Create(int analysisId, SampleModel sampleModel, SampleModel matchedSampleModel)
+    private AnalysedSample Create(int analysisId, SampleModel analysedSampleModel, SpecimenModel targetSampleModel, SpecimenModel matchedSampleModel)
     {
-        var sample = _sampleRepository.FindOrCreate(sampleModel);
-        var matchedSample = _sampleRepository.FindOrCreate(matchedSampleModel);
+        var targetSample = _specimenRepository.FindOrCreate(targetSampleModel);
+        var matchedSample = _specimenRepository.FindOrCreate(matchedSampleModel);
 
         var entity = new AnalysedSample
         {
             AnalysisId = analysisId,
-            SampleId = sample.Id,
+            TargetSampleId = targetSample.Id,
             MatchedSampleId = matchedSample.Id,
-            Ploidy = sampleModel.Ploidy,
-            Purity = sampleModel.Purity
+            Ploidy = analysedSampleModel.Ploidy,
+            Purity = analysedSampleModel.Purity
         };
 
         _dbContext.Add(entity);

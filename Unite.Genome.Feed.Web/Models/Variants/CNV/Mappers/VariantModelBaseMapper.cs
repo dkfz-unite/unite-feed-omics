@@ -1,6 +1,4 @@
-﻿using Unite.Data.Entities.Genome.Variants.CNV.Enums;
-
-namespace Unite.Genome.Feed.Web.Models.Variants.CNV.Mappers;
+﻿namespace Unite.Genome.Feed.Web.Models.Variants.CNV.Mappers;
 
 public abstract class VariantModelBaseMapper
 {

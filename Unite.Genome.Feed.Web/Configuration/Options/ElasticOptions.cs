@@ -1,4 +1,4 @@
-﻿using Unite.Indices.Services.Configuration.Options;
+﻿using Unite.Indices.Context.Configuration.Options;
 
 namespace Unite.Genome.Feed.Web.Configuration.Options;
 

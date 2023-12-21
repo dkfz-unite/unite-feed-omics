@@ -5,22 +5,22 @@ namespace Unite.Genome.Feed.Web.HostedServices;
 public class SubmissionsHostedService : BackgroundService
 {
     private readonly TranscriptomicsSubmissionHandler _transcriptomicsSubmissionHandler;
-    private readonly MutationsSubmissionHandler _mutationsSubmissionHandler;
-    private readonly CopyNumberVariantsSubmissionHandler _copyNumberVariantsSubmissionHandler;
-    private readonly StructuralVariantsSubmissionHandler _structuralVariantsSubmissionHandler;
+    private readonly SsmsSubmissionHandler _ssmsSubmissionHandler;
+    private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
+    private readonly SvsSubmissionHandler _svsSubmissionHandler;
     private readonly ILogger _logger;
 
     public SubmissionsHostedService(
         TranscriptomicsSubmissionHandler transcriptomicsSubmissionHandler,
-        MutationsSubmissionHandler mutationsSubmissionHandler,
-        CopyNumberVariantsSubmissionHandler copyNumberVariantsSubmissionHandler,
-        StructuralVariantsSubmissionHandler structuralVariantsSubmissionHandler,
+        SsmsSubmissionHandler ssmsSubmissionHandler,
+        CnvsSubmissionHandler cnvsSubmissionHandler,
+        SvsSubmissionHandler svsSubmissionHandler,
         ILogger<SubmissionsHostedService> logger)
     {
         _transcriptomicsSubmissionHandler = transcriptomicsSubmissionHandler;
-        _mutationsSubmissionHandler = mutationsSubmissionHandler;
-        _copyNumberVariantsSubmissionHandler = copyNumberVariantsSubmissionHandler;
-        _structuralVariantsSubmissionHandler = structuralVariantsSubmissionHandler;
+        _ssmsSubmissionHandler = ssmsSubmissionHandler;
+        _cnvsSubmissionHandler = cnvsSubmissionHandler;
+        _svsSubmissionHandler = svsSubmissionHandler;
         _logger = logger;
     }
 
@@ -38,9 +38,9 @@ public class SubmissionsHostedService : BackgroundService
             try
             {
                 _transcriptomicsSubmissionHandler.Handle();
-                _mutationsSubmissionHandler.Handle();
-                _copyNumberVariantsSubmissionHandler.Handle();
-                _structuralVariantsSubmissionHandler.Handle();
+                _ssmsSubmissionHandler.Handle();
+                _cnvsSubmissionHandler.Handle();
+                _svsSubmissionHandler.Handle();
             }
             catch (Exception exception)
             {

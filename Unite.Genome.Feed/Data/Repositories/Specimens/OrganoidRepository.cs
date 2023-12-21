@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Unite.Data.Context;
 using Unite.Data.Entities.Specimens;
+using Unite.Data.Entities.Specimens.Enums;
 using Unite.Data.Entities.Specimens.Organoids;
-using Unite.Data.Services;
 
 namespace Unite.Genome.Feed.Data.Repositories.Specimens;
 
@@ -24,10 +24,10 @@ internal class OrganoidRepository
     public Specimen Find(int donorId, string referenceId)
     {
         var entity = _dbContext.Set<Specimen>()
-            .Include(entity => entity.Organoid)
             .FirstOrDefault(entity =>
                 entity.DonorId == donorId &&
-                entity.Organoid.ReferenceId == referenceId
+                entity.TypeId == SpecimenType.Organoid &&
+                entity.ReferenceId == referenceId
             );
 
         return entity;
@@ -38,6 +38,8 @@ internal class OrganoidRepository
         var entity = new Specimen
         {
             DonorId = donorId,
+            ReferenceId = referenceId,
+            TypeId = SpecimenType.Organoid,
             Organoid = new Organoid { ReferenceId = referenceId }
         };
 

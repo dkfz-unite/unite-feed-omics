@@ -19,50 +19,47 @@ Request implements **UPSERT** logic:
 
 ### Body - application/json
 ```json
-[
-    {
-        "Analysis": {
-            "Type": "WGS"
+{
+    "analysis": {
+        "id": "AN1",
+        "type": "WGS",
+        "date": "2023-12-01",
+        "parameters": {
+            "key1": "value1",
+            "key2": "value2"
+        }
+    },
+    "target_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI1",
+        "specimen_type": "Tissue"
+    },
+    "matched_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI2",
+        "specimen_type": "Tissue"
+    },
+    "variants": [
+        {
+            "chromosome": "7",
+            "position": "141365018",
+            "ref": "C",
+            "alt": "G"
         },
-        "Samples": [
-            {
-                "Id": "SA14",
-                "DonorId": "DO1",
-                "SpecimenId": "TI2",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": null,
-                "Variants": null
-            },
-            {
-                "Id": "SA5",
-                "DonorId": "DO1",
-                "SpecimenId": "TI1",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": "SA14",
-                "Variants": [
-                    {
-                        "Chromosome": "7",
-                        "Position": "141365018",
-                        "Ref": "C",
-                        "Alt": "G"
-                    },
-                    {
-                        "Chromosome": "4",
-                        "Position": "110895931",
-                        "Ref": "A",
-                        "Alt": "T"
-                    },
-                    {
-                        "Chromosome": "13",
-                        "Position": "100515267",
-                        "Ref": "A",
-                        "Alt": "G"
-                    }
-                ]
-            }
-        ]
-    }
-]
+        {
+            "chromosome": "4",
+            "position": "110895931",
+            "ref": "A",
+            "alt": "T"
+        },
+        {
+            "chromosome": "13",
+            "position": "100515267",
+            "ref": "A",
+            "alt": "G"
+        }
+    ]
+}
 ```
 Fields description can be found [here](api-models-ssm.md).
 
@@ -85,79 +82,76 @@ Request implements **UPSERT** logic:
 
 ### Body - application/json
 ```json
-[
-    {
-        "Analysis": {
-            "Type": "WGS"
+{
+    "analysis": {
+        "id": "AN1",
+        "type": "WGS",
+        "date": "2023-12-01",
+        "parameters": {
+            "key1": "value1",
+            "key2": "value2"
+        }
+    },
+    "target_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI1",
+        "specimen_type": "Tissue",
+        "purity": null,
+        "ploidy": 2
+    },
+    "matched_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI2",
+        "specimen_type": "Tissue"
+    },
+    "variants": [
+        {
+            "chromosome": "4",
+            "start": 164362032,
+            "end": 164458144,
+            "type": "Gain",
+            "loh": false,
+            "homo_del": false,
+            "c1_mean": 1.2465,
+            "c2_mean": 2.8643,
+            "tcn_mean": 4.1108,
+            "c1": 1,
+            "c2": 3,
+            "tcn": 4,
+            "dh_max": null
         },
-        "Samples": [
-            {
-                "Id": "SA14",
-                "DonorId": "DO1",
-                "SpecimenId": "TI2",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": null,
-                "Variants": null
-            },
-            {
-                "Id": "SA5",
-                "DonorId": "DO1",
-                "SpecimenId": "TI1",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": "SA14",
-                "Ploidy": 2,
-                "Purity": null,
-                "Variants": [
-                    {
-                        "Chromosome": "4",
-                        "Start": 164362032,
-                        "End": 164458144,
-                        "Type": "Gain",
-                        "Loh": false,
-                        "HomoDel": false,
-                        "C1Mean": 1.2465,
-                        "C2Mean": 2.8643,
-                        "TcnMean": 4.1108,
-                        "C1": 1,
-                        "C2": 3,
-                        "Tcn": 4,
-                        "DhMax": null
-                    },
-                    {
-                        "Chromosome": "5",
-                        "Start": 65498712,
-                        "End": 65608792,
-                        "Type": "Loss",
-                        "Loh": true,
-                        "HomoDel": false,
-                        "C1Mean": 1.1265,
-                        "C2Mean": 0.0378,
-                        "TcnMean": 1.1643,
-                        "C1": 1,
-                        "C2": 0,
-                        "Tcn": 1,
-                        "DhMax": null
-                    },
-                    {
-                        "Chromosome": "6",
-                        "Start": 84236917,
-                        "End": 84337937,
-                        "Type": "Loss",
-                        "Loh": false,
-                        "HomoDel": true,
-                        "C1Mean": 0.1247,
-                        "C2Mean": 0.0129,
-                        "TcnMean": 0.1376,
-                        "C1": 0,
-                        "C2": 0,
-                        "Tcn": 0,
-                        "DhMax": null
-                    }
-                ]
-            }
-        ]
-    }
-]
+        {
+            "chromosome": "5",
+            "start": 65498712,
+            "end": 65608792,
+            "type": "Loss",
+            "loh": true,
+            "homo_del": false,
+            "c1_mean": 1.1265,
+            "c2_mean": 0.0378,
+            "tcn_mean": 1.1643,
+            "c1": 1,
+            "c2": 0,
+            "tcn": 1,
+            "dh_max": null
+        },
+        {
+            "chromosome": "6",
+            "start": 84236917,
+            "end": 84337937,
+            "type": "Loss",
+            "loh": false,
+            "homo_del": true,
+            "c1_mean": 0.1247,
+            "c2_mean": 0.0129,
+            "tcn_mean": 0.1376,
+            "c1": 0,
+            "c2": 0,
+            "tcn": 0,
+            "dh_max": null
+        }
+    ]
+}
 ```
 Fields description can be found [here](api-models-cnv.md).
 
@@ -180,76 +174,73 @@ Request implements **UPSERT** logic:
 
 ### Body - application/json
 ```json
-[
-    {
-        "Analysis": {
-            "Type": "WGS"
+{
+    "analysis": {
+        "id": "AN1",
+        "type": "WGS",
+        "date": "2023-12-01",
+        "parameters": {
+            "key1": "value1",
+            "key2": "value2"
+        }
+    },
+    "target_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI1",
+        "specimen_type": "Tissue",
+        "purity": null,
+        "ploidy": 2
+    },
+    "matched_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI2",
+        "specimen_type": "Tissue"
+    },
+    "variants": [
+        {
+            "chromosome": "4",
+            "start": "164362032",
+            "end": "164458144",
+            "sv.Type": "DUP",
+            "cna.Type": "DUP",
+            "c1Mean": "1.2465",
+            "c2Mean": "2.8643",
+            "tcnMean": "4.1108",
+            "A": "1",
+            "B": "3",
+            "TCN": "4",
+            "dhMax": "NA"
         },
-        "Samples": [
-            {
-                "Id": "SA14",
-                "DonorId": "DO1",
-                "SpecimenId": "TI2",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": null,
-                "Variants": null
-            },
-            {
-                "Id": "SA5",
-                "DonorId": "DO1",
-                "SpecimenId": "TI1",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": "SA14",
-                "Ploidy": 2,
-                "Purity": null,
-                "Variants": [
-                    {
-                        "chromosome": "4",
-                        "start": "164362032",
-                        "end": "164458144",
-                        "sv.Type": "DUP",
-                        "cna.Type": "DUP",
-                        "c1Mean": "1.2465",
-                        "c2Mean": "2.8643",
-                        "tcnMean": "4.1108",
-                        "A": "1",
-                        "B": "3",
-                        "TCN": "4",
-                        "dhMax": "NA"
-                    },
-                    {
-                        "chromosome": "5",
-                        "start": "65498712",
-                        "end": "65608792",
-                        "sv.Type": "NA",
-                        "cna.Type": "DEL;LOH",
-                        "c1Mean": "1.1265",
-                        "c2Mean": "0.0378",
-                        "tcnMean": "1.1643",
-                        "A": "1",
-                        "B": "0",
-                        "TCN": "1",
-                        "dhMax": "NA"
-                    },
-                    {
-                        "chromosome": "6",
-                        "start": "84236917",
-                        "end": "84337937",
-                        "sv.Type": "DEL",
-                        "cna.Type": "DEL;HomoDEL",
-                        "c1Mean": "0.1247",
-                        "c2Mean": "0.0129",
-                        "tcnMean": "0.1376",
-                        "A": "0",
-                        "B": "0",
-                        "TCN": "0",
-                        "dhMax": "NA"
-                    }
-                ]
-            }
-        ]
-    }
-]
+        {
+            "chromosome": "5",
+            "start": "65498712",
+            "end": "65608792",
+            "sv.Type": "NA",
+            "cna.Type": "DEL;LOH",
+            "c1Mean": "1.1265",
+            "c2Mean": "0.0378",
+            "tcnMean": "1.1643",
+            "A": "1",
+            "B": "0",
+            "TCN": "1",
+            "dhMax": "NA"
+        },
+        {
+            "chromosome": "6",
+            "start": "84236917",
+            "end": "84337937",
+            "sv.Type": "DEL",
+            "cna.Type": "DEL;HomoDEL",
+            "c1Mean": "0.1247",
+            "c2Mean": "0.0129",
+            "tcnMean": "0.1376",
+            "A": "0",
+            "B": "0",
+            "TCN": "0",
+            "dhMax": "NA"
+        }
+    ]
+}
 ```
 Fields description can be found [here](api-models-cnv-aceseq.md).
 
@@ -272,68 +263,67 @@ Request implements **UPSERT** logic:
 
 ### Body - application/json
 ```json
-[
-    {
-        "Analysis": {
-            "Type": "WGS"
+{
+    "analysis": {
+        "id": "AN1",
+        "type": "WGS",
+        "date": "2023-12-01",
+        "parameters": {
+            "key1": "value1",
+            "key2": "value2"
+        }
+    },
+    "target_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI1",
+        "specimen_type": "Tissue",
+        "purity": null,
+        "ploidy": 2
+    },
+    "matched_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI2",
+        "specimen_type": "Tissue"
+    },
+    "variants": [
+        {
+            "chromosome_1": "6",
+            "start_1": 84236917,
+            "end_1": 84236918,
+            "chromosome_2": "6",
+            "start_2": 84337937,
+            "end_2": 84337938,
+            "type": "DUP",
+            "inverted": false,
+            "flanking_sequence_1": null,
+            "flanking_sequence_2": null
         },
-        "Samples": [
-            {
-                "Id": "SA14",
-                "DonorId": "DO1",
-                "SpecimenId": "TI2",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": null,
-                "Variants": null
-            },
-            {
-                "Id": "SA5",
-                "DonorId": "DO1",
-                "SpecimenId": "TI1",
-                "SpecimenType": "Tissue",
-                "MatchedSampleId": "SA14",
-                "Variants": [
-                    {
-                        "Chromosome1": "6",
-                        "Start1": 84236917,
-                        "End1": 84236918,
-                        "Chromosome2": "6",
-                        "Start2": 84337937,
-                        "End2": 84337938,
-                        "Type": "DUP",
-                        "Inverted": false,
-                        "FlankingSequence1": null,
-                        "FlankingSequence2": null
-                    },
-                    {
-                        "Chromosome1": "8",
-                        "Start1": 65498712,
-                        "End1": 65498713,
-                        "Chromosome2": "8",
-                        "Start2": 65608792,
-                        "End2": 65608793,
-                        "Type": "DEL",
-                        "Inverted": false,
-                        "FlankingSequence1": null,
-                        "FlankingSequence2": null
-                    },
-                    {
-                        "Chromosome1": "8",
-                        "Start1": 93246857,
-                        "End1": 93246858,
-                        "Chromosome2": "8",
-                        "Start2": 93347877,
-                        "End2": 93347878,
-                        "Type": "INV",
-                        "Inverted": true,
-                        "FlankingSequence1": null,
-                        "FlankingSequence2": null
-                    }
-                ]
-            }
-        ]
-    }
-]
+        {
+            "chromosome_1": "8",
+            "start_1": 65498712,
+            "end_1": 65498713,
+            "chromosome_2": "8",
+            "start_2": 65608792,
+            "end_2": 65608793,
+            "type": "DEL",
+            "inverted": false,
+            "flanking_sequence_1": null,
+            "flanking_sequence_2": null
+        },
+        {
+            "chromosome_1": "8",
+            "start_1": 93246857,
+            "end_1": 93246858,
+            "chromosome_2": "8",
+            "start_2": 93347877,
+            "end_2": 93347878,
+            "type": "INV",
+            "inverted": true,
+            "flanking_sequence_1": null,
+            "flanking_sequence_2": null
+        }
+    ]
+}
 ```
 Fields description can be found [here](api-models-sv.md).
 
@@ -355,33 +345,36 @@ Request implements **OVERRIDE** logic:
 
 ### Body - application/json
 ```json
-[
-    {
-        "Analysis": {
-            "Type": "RNA-Seq"
+{
+    "analysis": {
+        "id": "AN2",
+        "type": "RNASeq",
+        "date": "2023-12-01",
+        "parameters": {
+            "key1": "value1",
+            "key2": "value2"
+        }
+    },
+    "target_sample": {
+        "donor_id": "DO1",
+        "specimen_id": "TI1",
+        "specimen_type": "Tissue"
+    },
+    "expressions": [
+        {
+            "gene_id": "ENSG00000223972",
+            "reads": 238
         },
-        "Sample": {
-            "Id": "SA5",
-            "DonorId": "DO1",
-            "SpecimenId": "TI2",
-            "SpecimenType": "Tissue",
+        {
+            "gene_id": "ENSG00000243485",
+            "reads": 0
         },
-        "Expressions": [
-            {
-                "GeneId": "ENSG00000223972",
-                "Reads": 238
-            },
-            {
-                "GeneId": "ENSG00000243485",
-                "Reads": 0
-            },
-            {
-                "GeneId": "ENSG00000274890",
-                "Reads": 0
-            }
-        ]
-    }
-]
+        {
+            "gene_id": "ENSG00000274890",
+            "reads": 0
+        }
+    ]
+}
 ```
 Fields description can be found [here](api-models-rna-expression.md).
 

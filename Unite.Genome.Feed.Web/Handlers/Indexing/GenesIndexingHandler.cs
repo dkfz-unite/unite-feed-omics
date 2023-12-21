@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Data.Services.Tasks;
 using Unite.Genome.Indices.Services;
+using Unite.Indices.Context;
+using Unite.Indices.Entities.Genes;
 
 namespace Unite.Genome.Feed.Web.Handlers.Indexing;
 
@@ -9,14 +11,14 @@ public class GenesIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
     private readonly GeneIndexCreationService _indexCreationService;
-    private readonly GenesIndexingService _indexingService;
+    private readonly IIndexService<GeneIndex> _indexingService;
     private readonly ILogger _logger;
 
 
     public GenesIndexingHandler(
         TasksProcessingService taskProcessingService,
         GeneIndexCreationService indexCreationService,
-        GenesIndexingService indexingService,
+        IIndexService<GeneIndex> indexingService,
         ILogger<GenesIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
@@ -28,7 +30,7 @@ public class GenesIndexingHandler
 
     public void Prepare()
     {
-        _indexingService.UpdateMapping().GetAwaiter().GetResult();
+        _indexingService.UpdateIndex().GetAwaiter().GetResult();
     }
 
     public void Handle(int bucketSize)
@@ -48,7 +50,7 @@ public class GenesIndexingHandler
                 return false;
             }
 
-            _logger.LogInformation($"Indexing {tasks.Length} genes");
+            _logger.LogInformation("Indexing {number} genes", tasks.Length);
 
             stopwatch.Restart();
 
@@ -64,11 +66,11 @@ public class GenesIndexingHandler
 
             }).ToArray();
 
-            _indexingService.IndexMany(indices);
+            _indexingService.AddRange(indices).GetAwaiter().GetResult();
 
             stopwatch.Stop();
 
-            _logger.LogInformation($"Indexing of {tasks.Length} genes completed in {Math.Round(stopwatch.Elapsed.TotalSeconds, 2)}s");
+            _logger.LogInformation("Indexing of {number} genes completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

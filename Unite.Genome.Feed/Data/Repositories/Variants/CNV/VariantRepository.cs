@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome.Variants.CNV;
-using Unite.Data.Services;
 using Unite.Genome.Feed.Data.Models.Variants.CNV;
 
 namespace Unite.Genome.Feed.Data.Repositories.Variants.CNV;

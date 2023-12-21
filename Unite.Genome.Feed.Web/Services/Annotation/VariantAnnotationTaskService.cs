@@ -1,7 +1,9 @@
-﻿using Unite.Data.Entities.Genome.Variants;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
+using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Genome.Variants;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Data.Extensions;
-using Unite.Data.Services;
+using Unite.Essentials.Extensions;
 
 namespace Unite.Genome.Feed.Web.Services.Annotation;
 
@@ -16,7 +18,7 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     protected override int BucketSize => 1000;
 
 
-    public VariantAnnotationTaskService(DomainDbContext dbContext) : base(dbContext)
+    public VariantAnnotationTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
     }
 
@@ -26,7 +28,8 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// </summary>
     public override void CreateTasks()
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
 
         IterateEntities<TVariant, long>(variant => true, variant => variant.Id, variants =>
         {
@@ -42,11 +45,15 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// <param name="keys">Variants indentifiers.</param>
     public override void CreateTasks(IEnumerable<long> keys)
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var variants = _dbContext.Set<TVariant>().Where(variant => chunk.Contains(variant.Id)).Select(variant => variant.Id).ToArray();
+            var variants = dbContext.Set<TVariant>()
+                .Where(variant => chunk.Contains(variant.Id))
+                .Select(variant => variant.Id)
+                .ToArray();
 
             CreateVariantAnnotationTasks(variants);
         });
@@ -60,11 +67,15 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// <param name="keys">Variants indentifiers.</param>
     public override void PopulateTasks(IEnumerable<long> keys)
     {
-        var transaction = _dbContext.Database.BeginTransaction();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var variants = _dbContext.Set<TVariant>().Where(variant => chunk.Contains(variant.Id)).Select(variant => variant.Id).ToArray();
+            var variants = dbContext.Set<TVariant>()
+                .Where(variant => chunk.Contains(variant.Id))
+                .Select(variant => variant.Id)
+                .ToArray();
 
             CreateVariantAnnotationTasks(variants);
         });

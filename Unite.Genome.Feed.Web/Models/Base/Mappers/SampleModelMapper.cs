@@ -3,18 +3,13 @@
 namespace Unite.Genome.Feed.Web.Models.Base.Mappers;
 
 public class SampleModelMapper
-{
-    public void Map(in SampleModel source, DataModels.SampleModel target)
+{    
+    public static void Map(in SampleModel source, DataModels.SpecimenModel target)
     {
-        target.ReferenceId = source.Id;
-        target.Ploidy = source.Ploidy;
-        target.Purity = source.Purity;
+        target.ReferenceId = source.SpecimenId;
+        target.Type = source.SpecimenType.Value;
 
-        target.Specimen = new DataModels.SpecimenModel();
-        target.Specimen.ReferenceId = source.SpecimenId;
-        target.Specimen.Type = source.SpecimenType.Value;
-
-        target.Specimen.Donor = new DataModels.DonorModel();
-        target.Specimen.Donor.ReferenceId = source.DonorId;
+        target.Donor = new DataModels.DonorModel();
+        target.Donor.ReferenceId = source.DonorId;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Unite.Genome.Feed.Data.Models.Enums;
+﻿using Unite.Data.Entities.Specimens.Enums;
 
 namespace Unite.Genome.Feed.Data.Models;
 

@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Unite.Essentials.Extensions;
+using Unite.Data.Context;
+using Unite.Data.Context.Extensions.Queryable;
+using Unite.Data.Context.Repositories;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome.Analysis;
 using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Entities.Genome.Transcriptomics;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
-using Unite.Data.Entities.Specimens.Tissues.Enums;
-using Unite.Data.Extensions;
-using Unite.Data.Services;
-using Unite.Data.Services.Extensions;
-using Unite.Genome.Indices.Services.Mappers;
+using Unite.Indices.Entities;
 using Unite.Indices.Entities.Variants;
-using Unite.Indices.Services;
+using Unite.Mapping;
 
 using SSM = Unite.Data.Entities.Genome.Variants.SSM;
 using CNV = Unite.Data.Entities.Genome.Variants.CNV;
@@ -19,26 +19,22 @@ using SV = Unite.Data.Entities.Genome.Variants.SV;
 
 namespace Unite.Genome.Indices.Services;
 
-public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexCreationService<VariantIndex>
+public class VariantIndexCreationService<TVariant, TVariantEntry>
     where TVariant : Data.Entities.Genome.Variants.Variant
-    where TVariantOccurrence : Data.Entities.Genome.Variants.VariantOccurrence<TVariant>
+    where TVariantEntry : Data.Entities.Genome.Variants.VariantEntry<TVariant>
 {
-    private readonly DomainDbContext _dbContext;
-    private readonly VariantIndexMapper _variantIndexMapper;
-    private readonly DonorIndexMapper _donorIndexMapper;
-    private readonly ImageIndexMapper _imageIndexMapper;
-    private readonly SpecimenIndexMapper _specimenIndexMapper;
-    private readonly SampleIndexMapper _sampleIndexMapper;
+    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
+    private readonly SpecimensRepository _specimensRepository;
+    private readonly GenesRepository _genesRepository;
+    private readonly VariantsRepository _variantsRepository;
 
 
-    public VariantIndexCreationService(DomainDbContext dbContext)
+    public VariantIndexCreationService(IDbContextFactory<DomainDbContext> dbContextFactory)
     {
-        _dbContext = dbContext;
-        _variantIndexMapper = new VariantIndexMapper();
-        _donorIndexMapper = new DonorIndexMapper();
-        _imageIndexMapper = new ImageIndexMapper();
-        _specimenIndexMapper = new SpecimenIndexMapper();
-        _sampleIndexMapper = new SampleIndexMapper();
+        _dbContextFactory = dbContextFactory;
+        _specimensRepository = new SpecimensRepository(dbContextFactory);
+        _genesRepository = new GenesRepository(dbContextFactory);
+        _variantsRepository = new VariantsRepository(dbContextFactory);
     }
 
 
@@ -66,11 +62,9 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
             return null;
         }
 
-        var index = new VariantIndex();
+        var index = VariantIndexMapper.CreateFrom<VariantIndex>(variant);
 
-        _variantIndexMapper.Map(variant, index);
-
-        index.Samples = CreateSampleIndices(variant.Id);
+        index.Specimens = CreateSpecimenIndices(variant.Id);
         index.Data = CreateDataIndex(index);
 
         return index;
@@ -78,29 +72,27 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private DataIndex CreateDataIndex(VariantIndex index)
     {
-        var dataIndex = index.Data;
+        index.Data.Ssms = HasSsmIntersections(index);
+        index.Data.Cnvs = HasCnvIntersections(index);
+        index.Data.Svs = HasSvIntersections(index);
+        index.Data.GeneExp = HasGeneExpressions(index);
 
-        dataIndex.Ssms = HasSsmIntersections(index);
-        dataIndex.Cnvs = HasCnvIntersections(index);
-        dataIndex.Svs = HasSvIntersections(index);
-        dataIndex.GeneExp = HasGeneExpressions(index);
-
-        return dataIndex;
+        return index.Data;
     }
 
     private TVariant LoadVariant(long variantId)
     {
-        var variant = _dbContext.Set<TVariant>()
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        return dbContext.Set<TVariant>()
             .AsNoTracking()
             .IncludeAffectedTranscripts()
             .FirstOrDefault(variant => variant.Id == variantId);
-
-        return variant;
     }
 
     private bool HasSsmIntersections(VariantIndex index)
     {
-        var specimenIds = index.Samples.Select(sample => sample.Specimen.Id).ToArray();
+        var specimenIds = index.Specimens.Select(specimen => specimen.Id).ToArray();
 
         if (index.Ssm != null)
         {
@@ -129,16 +121,18 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private bool HasSsmIntersections(int[] specimenIds, Chromosome chromosomeId, int start, int end)
     {
-        return _dbContext.Set<SSM.VariantOccurrence>()
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        return dbContext.Set<SSM.VariantEntry>()
             .AsNoTracking()
-            .FilterBySpecimenIds(specimenIds)
-            .FilterByRange(chromosomeId, start, end)
+            .FilterBySpecimenId(specimenIds)
+            .FilterByRange((int)chromosomeId, start, end)
             .Any();
     }
 
     private bool HasCnvIntersections(VariantIndex index)
     {
-        var specimenIds = index.Samples.Select(sample => sample.Specimen.Id).ToArray();
+        var specimenIds = index.Specimens.Select(specimen => specimen.Id).ToArray();
 
         if (index.Cnv != null)
         {
@@ -167,16 +161,18 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private bool HasCnvIntersections(int[] specimenIds, Chromosome chromosomeId, int start, int end)
     {
-        return _dbContext.Set<CNV.VariantOccurrence>()
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        return dbContext.Set<CNV.VariantEntry>()
             .AsNoTracking()
-            .FilterBySpecimenIds(specimenIds)
-            .FilterByRange(chromosomeId, start, end)
+            .FilterBySpecimenId(specimenIds)
+            .FilterByRange((int)chromosomeId, start, end)
             .Any();
     }
 
     private bool HasSvIntersections(VariantIndex index)
     {
-        var specimenIds = index.Samples.Select(sample => sample.Specimen.Id).ToArray();
+        var specimenIds = index.Specimens.Select(specimen => specimen.Id).ToArray();
 
         if (index.Sv != null)
         {
@@ -200,112 +196,66 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
 
     private bool HasSvIntersections(int[] specimenIds, Chromosome chromosomeId, int start, int end)
     {
-        return _dbContext.Set<SV.VariantOccurrence>()
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        return dbContext.Set<SV.VariantEntry>()
             .AsNoTracking()
-            .FilterBySpecimenIds(specimenIds)
-            .FilterByRange(chromosomeId, start, end)
+            .FilterBySpecimenId(specimenIds)
+            .FilterByRange((int)chromosomeId, start, end)
             .Any();
     }
 
     private bool HasGeneExpressions(VariantIndex index)
     {
-        var specimenIds = index.Samples.Select(sample => sample.Specimen.Id).ToArray();
+        using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var genes = index.GetAffectedFeatures()?
+        var specimenIds = index.Specimens
+            .Select(specimen => specimen.Id)
+            .ToArray();
+
+        var geneIds = index.GetAffectedFeatures()?
             .Where(affectedFeature => affectedFeature.Gene != null)
-            .Select(affectedFeature => affectedFeature.Gene.Id)
+            .Select(affectedFeature => (long)affectedFeature.Gene.Id)
             .Distinct()
             .ToArray();
 
-        return genes != null && _dbContext.Set<GeneExpression>()
+        return dbContext.Set<BulkExpression>()
             .AsNoTracking()
-            .Where(expression => specimenIds.Contains(expression.AnalysedSample.Sample.SpecimenId))
-            .Any(expression => genes.Contains(expression.GeneId));
+            .Where(expression => specimenIds.Contains(expression.AnalysedSample.TargetSampleId))
+            .Any(expression => geneIds.Contains(expression.EntityId));
     }
 
 
-    private SampleIndex[] CreateSampleIndices(long variantId)
+    private SpecimenIndex[] CreateSpecimenIndices(long variantId)
     {
-        var samples = LoadSamples(variantId);
+        var specimens = LoadSpecimens(variantId);
 
-        if (samples == null)
+        var indices = specimens.Select(CreateSpecimenIndex);
+
+        return indices.Any() ? indices.ToArray() : null;
+    }
+
+    private SpecimenIndex CreateSpecimenIndex(Specimen specimen)
+    {
+        var index = new SpecimenIndex
         {
-            return null;
-        }
+            Donor = CreateDonorIndex(specimen.Id, out var diagnosisDate),
+            Images = CreateImageIndices(specimen.Id, diagnosisDate),
+            Analyses = CreateAnalysisIndices(specimen.Id, diagnosisDate)
+        };
 
-        var indices = samples
-            .Select(sample => CreateSampleIndex(sample.Sample, sample.Analyses))
-            .ToArray();
+        SpecimenIndexMapper.Map(specimen, index, diagnosisDate);
+
+        return index;
+    }
+
+    private Specimen[] LoadSpecimens(long variantId)
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        var specimenIds = _variantsRepository.GetRelatedSpecimens<TVariantEntry, TVariant>([variantId]).Result;
         
-        return indices;
-    }
-
-    private SampleIndex CreateSampleIndex(Sample sample, Analysis[] analyses)
-    {
-        var index = new SampleIndex();
-
-        index.Donor = CreateDonorIndex(sample.SpecimenId, out var donor);
-
-        index.Specimen = CreateSpecimenIndex(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
-
-        index.Images = CreateImageIndices(sample.SpecimenId, donor.ClinicalData?.DiagnosisDate);
-
-        _sampleIndexMapper.Map(sample, analyses, index, donor.ClinicalData?.DiagnosisDate);
-
-        return index;
-    }
-
-    private (Sample Sample, Analysis[] Analyses)[] LoadSamples(long variantId)
-    {
-        var analysedSampleIds = _dbContext.Set<TVariantOccurrence>()
-            .AsNoTracking()
-            .Where(occurrence => occurrence.VariantId == variantId)
-            .Select(occurrence => occurrence.AnalysedSampleId)
-            .Distinct()
-            .ToArray();
-
-        var analysedSamples = _dbContext.Set<AnalysedSample>()
-            .AsNoTracking()
-            .Include(analysedSample => analysedSample.Sample)
-            .Include(analysedSample => analysedSample.Analysis)
-            .Where(analysedSample => analysedSampleIds.Contains(analysedSample.Id))
-            .ToArray();
-
-        var samples = analysedSamples
-            .GroupBy(analysedSample => analysedSample.SampleId)
-            .Select(group => (group.First().Sample, group.Select(sample => sample.Analysis).ToArray()))
-            .ToArray();
-
-        return samples;
-    }
-
-
-    private SpecimenIndex CreateSpecimenIndex(int specimenId, DateOnly? diagnosisDate)
-    {
-        var specimen = LoadSpecimen(specimenId);
-
-        if (specimen == null)
-        {
-            return null;
-        }
-
-        var index = CreateSpecimenIndex(specimen, diagnosisDate);
-
-        return index;
-    }
-
-    private SpecimenIndex CreateSpecimenIndex(Specimen specimen, DateOnly? diagnosisDate)
-    {
-        var index = new SpecimenIndex();
-
-        _specimenIndexMapper.Map(specimen, index, diagnosisDate);
-
-        return index;
-    }
-
-    private Specimen LoadSpecimen(int specimenId)
-    {
-        var specimen = _dbContext.Set<Specimen>()
+        return dbContext.Set<Specimen>()
             .AsNoTracking()
             .IncludeTissue()
             .IncludeCellLine()
@@ -313,53 +263,46 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
             .IncludeXenograft()
             .IncludeMolecularData()
             .IncludeDrugScreeningData()
-            .FirstOrDefault(specimen => specimen.Id == specimenId);
-
-        return specimen;
+            .Where(specimen => specimenIds.Contains(specimen.Id))
+            .ToArray();
     }
 
 
-    private DonorIndex CreateDonorIndex(int specimenId, out Donor donor)
+    private DonorIndex CreateDonorIndex(int specimenId, out DateOnly? diagnosisDate)
     {
-        donor = LoadDonor(specimenId);
+        var donor = LoadDonor(specimenId);
 
         if (donor == null)
         {
+            diagnosisDate = null;
+
             return null;
         }
 
-        var index = CreateDonorIndex(donor);
+        diagnosisDate = donor.ClinicalData?.DiagnosisDate;
 
-        return index;
+        return CreateDonorIndex(donor);
     }
 
-    private DonorIndex CreateDonorIndex(Donor donor)
+    private static DonorIndex CreateDonorIndex(Donor donor)
     {
-        var index = new DonorIndex();
-
-        _donorIndexMapper.Map(donor, index);
-
-        return index;
+        return DonorIndexMapper.CreateFrom<DonorIndex>(donor);
     }
 
     private Donor LoadDonor(int specimenId)
     {
-        var donorId = _dbContext.Set<Specimen>()
-            .AsNoTracking()
-            .Where(specimen => specimen.Id == specimenId)
-            .Select(specimen => specimen.DonorId)
-            .FirstOrDefault();
+        using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var donor = _dbContext.Set<Donor>()
+        var donorIds = _specimensRepository.GetRelatedDonors([specimenId]).Result;
+
+        return dbContext.Set<Donor>()
             .AsNoTracking()
             .IncludeClinicalData()
             .IncludeTreatments()
             .IncludeProjects()
             .IncludeStudies()
-            .Where(donor => donor.Id == donorId)
+            .Where(donor => donorIds.Contains(donor.Id))
             .FirstOrDefault();
-
-        return donor;
     }
 
 
@@ -367,43 +310,53 @@ public class VariantIndexCreationService<TVariant, TVariantOccurrence> : IIndexC
     {
         var images = LoadImages(specimenId);
 
-        if (images == null)
-        {
-            return null;
-        }
+        var indices = images.Select(entity => CreateImageIndex(entity, diagnosisDate));
 
-        var indices = images
-            .Select(image => CreateImageIndex(image, diagnosisDate))
-            .ToArray();
-
-        return indices;
+        return indices.Any() ? indices.ToArray() : null;
     }
 
-    private ImageIndex CreateImageIndex(Image image, DateOnly? diagnosisDate)
+    private static ImageIndex CreateImageIndex(Image image, DateOnly? diagnosisDate)
     {
-        var index = new ImageIndex();
-
-        _imageIndexMapper.Map(image, index, diagnosisDate);
-
-        return index;
+        return ImageIndexMapper.CreateFrom<ImageIndex>(image, diagnosisDate);
     }
 
     private Image[] LoadImages(int specimenId)
     {
-        var donorId = _dbContext.Set<Specimen>()
-            .AsNoTracking()
-            .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
-            .Where(specimen => specimen.Id == specimenId)
-            .Select(specimen => specimen.DonorId)
-            .FirstOrDefault();
+        using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var images = _dbContext.Set<Image>()
+        var imageIds = _specimensRepository.GetRelatedImages([specimenId]).Result;
+
+        return dbContext.Set<Image>()
             .AsNoTracking()
             .Include(image => image.MriImage)
-            .Where(image => image.DonorId == donorId)
+            .Where(image => imageIds.Contains(image.Id))
             .ToArray();
+    }
 
-        return images;
+
+    private AnalysisIndex[] CreateAnalysisIndices(int specimenId, DateOnly? diagnosisDate)
+    {
+        var analyses = LoadAnalyses(specimenId);
+
+        var indices = analyses.Select(analysis => CreateAnalysisIndex(analysis, diagnosisDate));
+
+        return indices.Any() ? indices.ToArray() : null;
+    }
+
+    private static AnalysisIndex CreateAnalysisIndex(AnalysedSample analysis, DateOnly? diagnosisDate)
+    {
+        return AnalysisIndexMapper.CreateFrom<AnalysisIndex>(analysis, diagnosisDate);
+    }
+
+    private AnalysedSample[] LoadAnalyses(int specimenId)
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        return dbContext.Set<AnalysedSample>()
+            .AsNoTracking()
+            .Include(analysedSample => analysedSample.Analysis)
+            .Where(analysedSample => analysedSample.TargetSampleId == specimenId)
+            .ToArray();
     }
 
 

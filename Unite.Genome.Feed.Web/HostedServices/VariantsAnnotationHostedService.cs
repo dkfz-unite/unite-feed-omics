@@ -6,23 +6,23 @@ namespace Unite.Genome.Feed.Web.HostedServices;
 public class VariantsAnnotationHostedService : BackgroundService
 {
     private readonly VariantsAnnotationOptions _options;
-    private readonly MutationsAnnotationHandler _mutationsAnnotationHandler;
-    private readonly CopyNumberVariantsAnnotationHandler _copyNumberVariantsAnnotationHandler;
-    private readonly StructuralVariantsAnnotationHandler _structuralVariantsAnnotationHandler;
+    private readonly SsmsAnnotationHandler _ssmsAnnotationHandler;
+    private readonly CnvsAnnotationHandler _cnvsAnnotationHandler;
+    private readonly SvsAnnotationHandler _svsAnnotationHandler;
     private readonly ILogger _logger;
 
 
     public VariantsAnnotationHostedService(
         VariantsAnnotationOptions options,
-        MutationsAnnotationHandler mutationsAnnotationHandler,
-        CopyNumberVariantsAnnotationHandler copyNumberVariantsAnnotationHandler,
-        StructuralVariantsAnnotationHandler structuralVariantsAnnotationHandler,
+        SsmsAnnotationHandler ssmsAnnotationHandler,
+        CnvsAnnotationHandler cnvsAnnotationHandler,
+        SvsAnnotationHandler svsAnnotationHandler,
         ILogger<VariantsAnnotationHostedService> logger)
     {
         _options = options;
-        _mutationsAnnotationHandler = mutationsAnnotationHandler;
-        _copyNumberVariantsAnnotationHandler = copyNumberVariantsAnnotationHandler;
-        _structuralVariantsAnnotationHandler = structuralVariantsAnnotationHandler;
+        _ssmsAnnotationHandler = ssmsAnnotationHandler;
+        _cnvsAnnotationHandler = cnvsAnnotationHandler;
+        _svsAnnotationHandler = svsAnnotationHandler;
         _logger = logger;
     }
 
@@ -38,9 +38,9 @@ public class VariantsAnnotationHostedService : BackgroundService
 
         try
         {
-            _mutationsAnnotationHandler.Prepare();
-            _copyNumberVariantsAnnotationHandler.Prepare();
-            _structuralVariantsAnnotationHandler.Prepare();
+            _ssmsAnnotationHandler.Prepare();
+            _cnvsAnnotationHandler.Prepare();
+            _svsAnnotationHandler.Prepare();
         }
         catch (Exception exception)
         {
@@ -51,9 +51,9 @@ public class VariantsAnnotationHostedService : BackgroundService
         {
             try
             {
-                _mutationsAnnotationHandler.Handle(_options.SsmBucketSize);
-                _copyNumberVariantsAnnotationHandler.Handle(_options.CnvBucketSize);
-                _structuralVariantsAnnotationHandler.Handle(_options.SvBucketSize);
+                _ssmsAnnotationHandler.Handle(_options.SsmBucketSize);
+                _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
+                _svsAnnotationHandler.Handle(_options.SvBucketSize);
             }
             catch (Exception exception)
             {

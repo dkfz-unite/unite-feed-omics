@@ -3,92 +3,25 @@
 ## Sequencing Data
 Includes information about the analysis, samples and sequencing data in ACESeq Format.
 
-**`Analysis`** - Sequencing analysis data.
-- Note: It's recomended to set analysis data (at least it's type), but it's not required.
-- Type: _Object([Analysis](api-models-cnv-aceseq.md#analysis))_
+**`analysis`*** - Sequencing analysis data.
+- Type: _Object([Analysis](api-models-analysis.md))_
 - Example: `{...}`
 
-**`Samples`*** - Which samples were analysed.
+**`target_sample`*** - Target sample data. 
+- Type: _Object([Sample](api-models-sample.md))_
+- Example: `{...}`
+
+**`matched_sample`** - Matched sample data.
+- Type: _Object([Sample](api-models-sample.md))_
+- Example: `{...}`
+
+**`variants`*** - Variants found in target sample during the analysis.
 - Type: _Array_
-- Element type: _Object([Sample](api-models-cnv-aceseq.md#sample))_
+- Element type: _Object([Variant](api-models-cnv-aceseq.md#variant))_
+- Limitations: Should contain at leas one element
 - Example: `[{...}, {...}]`
 
-## Analysis
-Sequencing analysis data.
-
-**`Id`** - Analysis identifier.
-- Note: If not set, analysis will be identified by it's type, date and analysed samples.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"AN1"`
-
-**`Type`*** - Analysis type.
-- Type: _String_
-- Possible values: `"WGS"`, `"WES"`
-- Example: `"WES"`
-
-**`Date`** - Date of the analysis.
-- Type: _String_
-- Format: "YYYY-MM-DDTHH:MM:SS"
-- Example: `"2021-01-01T00:00:00"`
-
-#### Analysis Type
-Analysis can be of the following types:
-- `"WGS"` - whole genome sequencing
-- `"WES"` - whole exome sequencing
-
-## Sample
-Analysed sample data.
-
-**`Id`*** - Sample identifier.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"SA5"`
-
-**`DonorId`*** - Sample donor identifier.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"DO1"`
-
-**`SpecimenId`*** - Identifier of the specimen the sample was created from.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"TI1"`
-
-**`SpecimenType`*** - Type of the specimen the sample was created from.
-- Type: _String_
-- Possible values: `"Tissue"`, `"CellLine"`, `"Organoid"`, `"Xenograft"`
-- Example: `"Tissue"`
-
-**`MatchedSampleId`** - Matched(control) sample identifier from samples array.
-- Type: _String_
-- Limitations: Should match single sample identifier from samples array
-- Example: `"SA14"`
-
-**`Ploidy`** - Sample ploidy.
-- Type: _Double_
-- Limitations: Should be greater than 0
-- Example: `2`
-
-**`Purity`** - Sample purity (TCC) percentage of tumor cells in the tissue.
-- Type: _Double_
-- Limitations: Should be greater than 0
-- Example: `95`
-
-**`Variants`** - Copy number variants found in the sample during the analysis.
-- Type: _Array_
-- Element type: _Object([CNV](api-models-cnv-aceseq.md#cnv))_
-- Limitations: If set, should contain at leas one element
-- Example: `[{...}, {...}]`
-
-#### Specimen Type
-Specimen can be of the following types:
-- `"Tissue"` - all donor derived specimens
-- `"CellLine"` - cell lines
-- `"Organoid"` - organoids
-- `"Xenograft"` - xenografts
-
-## CNV
+## Variant
 Copy number variant (CNV) data in ACESeq format.
 
 **`chromosome`*** - Chromosome.

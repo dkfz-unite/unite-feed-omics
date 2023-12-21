@@ -1,11 +1,10 @@
 ﻿using System.Text.Json.Serialization;
 using Unite.Data.Entities.Genome.Enums;
 using Unite.Data.Entities.Genome.Variants.SV.Enums;
-using Unite.Genome.Feed.Web.Models.Base;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SV;
 
-public class VariantModel : IDistinctable
+public class VariantModel
 {
     private Chromosome? _chromosome;
     private int? _start;
@@ -22,71 +21,60 @@ public class VariantModel : IDistinctable
     /// <summary>
     /// Frist breakpoint chromosome.
     /// </summary>
-    [JsonPropertyName("Chromosome1")]
+    [JsonPropertyName("chromosome_1")]
     public Chromosome? Chromosome { get => _chromosome; set => _chromosome = value; }
 
     /// <summary>
     /// Frist breakpoint start..
     /// </summary>
-    [JsonPropertyName("Start1")]
+    [JsonPropertyName("start_1")]
     public int? Start { get => _start; set => _start = value; }
 
     /// <summary>
     /// Frist breakpoint end.
     /// </summary>
-    [JsonPropertyName("End1")]
+    [JsonPropertyName("end_1")]
     public int? End { get => _end ?? _start + 1; set => _end = value; }
+
+    /// <summary>
+    /// Flanking genomic sequence 200bp around first breakpoint.
+    /// </summary>
+    [JsonPropertyName("flanking_sequence_1")]
+    public string FlankingSequenceFrom { get => _flankingSequenceFrom; set => _flankingSequenceFrom = value; }
 
     /// <summary>
     /// Second breakpoint chromosome.
     /// </summary>
-    [JsonPropertyName("Chromosome2")]
+    [JsonPropertyName("chromosome_2")]
     public Chromosome? OtherChromosome { get => _otherChromosome; set => _otherChromosome = value; }
 
     /// <summary>
     /// Second breakpoint start.
     /// </summary>
-    [JsonPropertyName("Start2")]
+    [JsonPropertyName("start_2")]
     public int? OtherStart { get => _otherStart; set => _otherStart = value; }
 
     /// <summary>
     /// Second breakpoint end.
     /// </summary>
-    [JsonPropertyName("End2")]
+    [JsonPropertyName("end_2")]
     public int? OtherEnd { get => _otherEnd ?? _otherStart + 1; set => _otherEnd = value; }
+
+    /// <summary>
+    /// Flanking genomic sequence 200bp around second breakpoint.
+    /// </summary>
+    [JsonPropertyName("flanking_sequence_2")]
+    public string FlankingSequenceTo { get => _flankingSequenceTo; set => _flankingSequenceTo = value; }
 
     /// <summary>
     /// Structural variant type.
     /// </summary>
-    [JsonPropertyName("Type")]
+    [JsonPropertyName("type")]
     public SvType? Type { get => _type; set => _type = value; }
 
     /// <summary>
     /// Whether event is inverted or not.
     /// </summary>
-    [JsonPropertyName("Inverted")]
+    [JsonPropertyName("inverted")]
     public bool? Inverted { get => _inverted; set => _inverted = value; }
-
-    /// <summary>
-    /// Flanking genomic sequence 200bp around first breakpoint.
-    /// </summary>
-    [JsonPropertyName("FlankingSequence1")]
-    public string FlankingSequenceFrom { get => _flankingSequenceFrom; set => _flankingSequenceFrom = value; }
-
-    /// <summary>
-    /// Flanking genomic sequence 200bp around second breakpoint.
-    /// </summary>
-    [JsonPropertyName("FlankingSequence2")]
-    public string FlankingSequenceTo { get => _flankingSequenceTo; set => _flankingSequenceTo = value; }
-
-    public dynamic GetContract()
-    {
-        return new
-        {
-            Chromosome, Start, End,
-            OtherChromosome, OtherStart, OtherEnd,
-            FlankingSequenceFrom, FlankingSequenceTo,
-            Type, Inverted,
-        };
-    }
 }

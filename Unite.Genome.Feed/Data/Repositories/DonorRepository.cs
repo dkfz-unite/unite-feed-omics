@@ -1,5 +1,5 @@
-﻿using Unite.Data.Entities.Donors;
-using Unite.Data.Services;
+﻿using Unite.Data.Context;
+using Unite.Data.Entities.Donors;
 using Unite.Genome.Feed.Data.Models;
 
 namespace Unite.Genome.Feed.Data.Repositories;
@@ -32,10 +32,7 @@ internal class DonorRepository
 
     public Donor Create(DonorModel model)
     {
-        var entity = new Donor
-        {
-            ReferenceId = model.ReferenceId
-        };
+        var entity = new Donor { ReferenceId = model.ReferenceId };
 
         _dbContext.Add(entity);
         _dbContext.SaveChanges();

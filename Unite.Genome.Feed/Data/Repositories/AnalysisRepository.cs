@@ -1,100 +1,110 @@
-﻿using Unite.Data.Entities.Genome.Analysis;
-using Unite.Data.Services;
+﻿using Unite.Data.Context;
+using Unite.Data.Entities.Genome.Analysis;
 using Unite.Genome.Feed.Data.Models;
+using Unite.Genome.Feed.Data.Repositories.Specimens;
 
 namespace Unite.Genome.Feed.Data.Repositories;
 
 internal class AnalysisRepository
 {
     private readonly DomainDbContext _dbContext;
-    private readonly SampleRepository _sampleRepository;
+    private readonly SpecimenRepository _specimenRepository;
 
 
     public AnalysisRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
-        _sampleRepository = new SampleRepository(dbContext);
+        _specimenRepository = new SpecimenRepository(dbContext);
     }
 
 
-    public Analysis FindOrCreate(AnalysisModel model)
+    public Analysis FindOrCreate(AnalysedSampleModel model)
     {
         return Find(model) ?? Create(model);
     }
 
-    public Analysis Find(AnalysisModel model)
+    public Analysis Find(AnalysedSampleModel model)
+    {
+        if (model.Analysis.ReferenceId != null)
+        {
+            return FindByReferenceId(model.Analysis.ReferenceId);
+        }
+        else
+        {
+            return FindByModel(model);
+        }
+    }
+
+    private Analysis FindByReferenceId(string referenceId)
+    {
+        var query = _dbContext.Set<Analysis>().AsQueryable();
+
+        // Reference ID should match
+        query = query.Where(analysis =>
+            analysis.ReferenceId == referenceId
+        );
+
+        return query.FirstOrDefault();
+    }
+
+    private Analysis FindByModel(AnalysedSampleModel model)
     {
         var query = _dbContext.Set<Analysis>().AsQueryable();
 
         // Analysis type should match
         query = query.Where(analysis =>
-            analysis.TypeId == model.Type
+            analysis.TypeId == model.Analysis.Type
         );
 
-        // Analysis date should match
+        // Analysis date and day should match
         query = query.Where(analysis =>
-            analysis.Date == model.Date
+            analysis.Date == model.Analysis.Date &&
+            analysis.Day == model.Analysis.Day
         );
 
-        // Number of analysed samples should match
-        query = query.Where(analysis =>
-            analysis.AnalysedSamples.Count() == model.AnalysedSamples.Count()
-        );
-
-        // Each analysed sample should match
-        foreach (var analysedSampleModel in model.AnalysedSamples)
+        if (model.MatchedSample == null)
         {
-            if (analysedSampleModel.MatchedSample == null)
-            {
-                // Analysed sample should match
-                var sample = _sampleRepository.Find(analysedSampleModel.AnalysedSample);
+            // Target sample should match
+            var targetSample = _specimenRepository.Find(model.TargetSample);
 
-                if (sample == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    query = query.Where(analysis =>
-                        analysis.AnalysedSamples.Any(analysedSample =>
-                            analysedSample.SampleId == sample.Id &&
-                            analysedSample.MatchedSampleId == null
-                        )
-                    );
-                }
+            if (targetSample != null)
+            {
+                query = query.Where(analysis => analysis.AnalysedSample.TargetSampleId == targetSample.Id);
             }
             else
             {
-                // Analysed sample should match
-                var sample = _sampleRepository.Find(analysedSampleModel.AnalysedSample);
+                return null;
+            }
+        }
+        else
+        {
+            // Target sample should match
+            var targetSample = _specimenRepository.Find(model.TargetSample);
 
-                // Matched sample should match
-                var matchedSample = _sampleRepository.Find(analysedSampleModel.MatchedSample);
+            // Matched sample should match
+            var matchedSample = _specimenRepository.Find(model.MatchedSample);
 
-                if (sample == null || matchedSample == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    query = query.Where(analysis =>
-                        analysis.AnalysedSamples.Any(analysedSample =>
-                            analysedSample.SampleId == sample.Id &&
-                            analysedSample.MatchedSampleId == matchedSample.Id
-                        )
-                    );
-                }
+            if (targetSample == null || matchedSample == null)
+            {
+                return null;
+            }
+            else
+            {
+                query = query.Where(analysis =>
+                    analysis.AnalysedSample.TargetSampleId == targetSample.Id &&
+                    analysis.AnalysedSample.MatchedSampleId == matchedSample.Id
+                );
             }
         }
 
         return query.FirstOrDefault();
     }
 
-    public Analysis Create(AnalysisModel model)
+    public Analysis Create(AnalysedSampleModel model)
     {
-        var entity = new Analysis();
+        var entity = new Analysis() { ReferenceId = model.Analysis.ReferenceId };
 
-        Map(model, ref entity);
+        Map(model.Analysis, ref entity);
 
         _dbContext.Add(entity);
         _dbContext.SaveChanges();
@@ -103,10 +113,11 @@ internal class AnalysisRepository
     }
 
 
-    private void Map(in AnalysisModel model, ref Analysis entity)
+    private static void Map(in AnalysisModel model, ref Analysis entity)
     {
         entity.TypeId = model.Type;
         entity.Date = model.Date;
+        entity.Day = model.Day;
         entity.Parameters = model.Parameters;
     }
 }

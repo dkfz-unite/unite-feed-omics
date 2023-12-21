@@ -1,162 +1,94 @@
 # Copy Number Variants (CNV) Data Models
 
 ## Sequencing Data
-Includes information about the analysis, samples and sequencing data.
+Includes information about the analysis, analysed samples and sequencing data.
 
-**`Analysis`** - Sequencing analysis data.
-- Note: It's recomended to set analysis data (at least it's type), but it's not required.
-- Type: _Object([Analysis](api-models-cnv.md#analysis))_
+**`analysis`*** - Sequencing analysis data.
+- Type: _Object([Analysis](api-models-analysis.md))_
 - Example: `{...}`
 
-**`Samples`*** - Which samples were analysed.
+**`target_sample`*** - Target sample data. 
+- Type: _Object([Sample](api-models-sample.md))_
+- Example: `{...}`
+
+**`matched_sample`** - Matched sample data.
+- Type: _Object([Sample](api-models-sample.md))_
+- Example: `{...}`
+
+**`variants`*** - Variants found in target sample during the analysis.
 - Type: _Array_
-- Element type: _Object([Sample](api-models-cnv.md#sample))_
+- Element type: _Object([Variant](api-models-cnv.md#variant))_
+- Limitations: Should contain at leas one element
 - Example: `[{...}, {...}]`
 
-## Analysis
-Sequencing analysis data.
-
-**`Id`** - Analysis identifier.
-- Note: If not set, analysis will be identified by it's type, date and analysed samples.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"AN1"`
-
-**`Type`*** - Analysis type.
-- Type: _String_
-- Possible values: `"WGS"`, `"WES"`
-- Example: `"WES"`
-
-**`Date`** - Date of the analysis.
-- Type: _String_
-- Format: "YYYY-MM-DDTHH:MM:SS"
-- Example: `"2021-01-01T00:00:00"`
-
-#### Analysis Type
-Analysis can be of the following types:
-- `"WGS"` - whole genome sequencing
-- `"WES"` - whole exome sequencing
-
-## Sample
-Analysed sample data.
-
-**`Id`*** - Sample identifier.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"SA5"`
-
-**`DonorId`*** - Sample donor identifier.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"DO1"`
-
-**`SpecimenId`*** - Identifier of the specimen the sample was created from.
-- Type: _String_
-- Limitations: Maximum length 255
-- Example: `"TI1"`
-
-**`SpecimenType`*** - Type of the specimen the sample was created from.
-- Type: _String_
-- Possible values: `"Tissue"`, `"CellLine"`, `"Organoid"`, `"Xenograft"`
-- Example: `"Tissue"`
-
-**`MatchedSampleId`** - Matched(control) sample identifier from samples array.
-- Type: _String_
-- Limitations: Should match single sample identifier from samples array
-- Example: `"SA14"`
-
-**`Ploidy`** - Sample ploidy.
-- Note: If ploidy is not set, calculation of variant properties like `Type`, `Loh` or `HomoDel` (if they were not set explicitly) won't be possible.
-- Type: _Double_
-- Limitations: Should be greater than 0
-- Example: `2`
-
-**`Purity`** - Sample purity (TCC) percentage of tumor cells in the tissue.
-- Type: _Double_
-- Limitations: Should be greater than 0
-- Example: `95`
-
-**`Variants`** - Copy number variants found in the sample during the analysis.
-- Type: _Array_
-- Element type: _Object([CNV](api-models-cnv.md#cnv))_
-- Limitations: If set, should contain at leas one element
-- Example: `[{...}, {...}]`
-
-#### Specimen Type
-Specimen can be of the following types:
-- `"Tissue"` - all donor derived specimens
-- `"CellLine"` - cell lines
-- `"Organoid"` - organoids
-- `"Xenograft"` - xenografts
-
-## CNV
+## Variant
 Copy number variant (CNV) data.
 
-**`Chromosome`*** - Chromosome.
+**`chromosome`*** - Chromosome.
 - Type: _String_
 - Possible values: `"1"`, ..., `"22"`, `"X"`, `"Y"`
 - Example: `"5"`
 
-**`Start`*** - Start position.
+**`start`*** - Start position.
 - Type: _Integer_
 - Limitations: Greater than 0
 - Example: `65498712`
 
-**`End`*** - End position.
+**`end`*** - End position.
 - Type: _Integer_
 - Limitations: Greater than `Start`
 - Example: `65608792`
 
-**`Type`** - Copy number alteration type.
+**`type`*** - Copy number alteration type.
 - Note: If not set, the api will try to calculate the value from `Tcn` and sample `Ploidy`.
 - Type: _String_
-- Possible values: `"Gain"`, `"Loss"`, `"Neutral"`
+- Possible values: `"Gain"`, `"Loss"`, `"Neutral"`, `"Undetermined"`
 - Example: `"Loss"`
 
-**`Loh`** - Loss of heterozygosity.
+**`loh`** - Loss of heterozygosity.
 - Note: If not set, the api will try to calculate the value from `C1`, `C2` and sample `Ploidy`.
 - Type: _Boolean_
 - Example: `true`
 
-**`HomoDel`** - Homozygous deletion.
+**`homo_del`** - Homozygous deletion.
 - Note: If not set, the api will try to calculate the value from `C1`, `C2` and sample `Ploidy`.
 - Type: _Boolean_
 - Example: `false`
 
-**`C1Mean`** - Estimated mean number of copies at **major** allele (calculated from number of reads and sample ploidy). 
+**`c1_mean`** - Estimated mean number of copies at **major** allele (calculated from number of reads and sample ploidy). 
 - Type: _Double_
 - Limitations: Greater or equal to 0
 - Example: `1.1265`
 
-**`C2Mean`** - Estimated mean number of copies at **minor** allele (calculated from number of reads and sample ploidy). 
+**`c2_mean`** - Estimated mean number of copies at **minor** allele (calculated from number of reads and sample ploidy). 
 - Type: _Double_
 - Limitations: Greater or equal to 0
 - Example: `0.0378`
 
-**`TcnMean`** - Estimated mean total number of copies (`C1Mean` + `C2Mean`). 
+**`tcn_mean`** - Estimated mean total number of copies (`C1Mean` + `C2Mean`). 
 - Type: _Double_
 - Limitations: Greater or equal to 0
 - Example: `1.1643`
 
-**`C1`** - Rounded number of copies at **major** allele (Rounded `C1Mean`).
+**`c1`** - Rounded number of copies at **major** allele (Rounded `C1Mean`).
 - Note: If not set, the api will try to calculate the value from `C1Mean` with [threshold rule](api-models-cnv.md#threshold-rule).
 - Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `1`
 
-**`C2`** - Rounded number of copies at **minor** allele (Rounded `C2Mean`).
+**`c2`** - Rounded number of copies at **minor** allele (Rounded `C2Mean`).
 - Note: If not set, the api will try to calculate the value from `C2Mean` with [threshold rule](api-models-cnv.md#threshold-rule).
 - Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `0`
 
-**`TCN`** - Rounded total number of copies (`C1` + `C2`).
+**`tcn`** - Rounded total number of copies (`C1` + `C2`).
 - Note: If not set, the api will try to calculate the value from `C1` and `C2` or `TcnMean` with [threshold rule](api-models-cnv.md#threshold-rule).
 - Limitations: Greater or equal to `0` or `-1` if not precise enough ([threshold rule](api-models-cnv.md#threshold-rule))
 - Type: _Integer_
 - Example: `1`
 
-**`DhMax`** - Esstimated decrease of heterozygosity (calculated from number of reads and sample ploidy).
+**`dh_max`** - Esstimated decrease of heterozygosity (calculated from number of reads and sample ploidy).
 - Limitations: Greater or equal to 0
 - Type: _Integer_
 - Example: `1`
@@ -166,6 +98,7 @@ Type values are:
 - `"Gain"` - total number of copies is certainly higher than sample ploidy
 - `"Loss"` - total number of copies is certainly lower than sample ploidy
 - `"Neutral"` - total number of copies is certainly similar to sample ploidy
+- `"Undetermined"` - variant type is not certain
 
 #### Threshold Rule
 To round double value to integer there is `0.3` certancy threshold applied:

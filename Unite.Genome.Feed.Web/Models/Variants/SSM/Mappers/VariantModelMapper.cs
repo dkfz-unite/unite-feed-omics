@@ -1,5 +1,5 @@
 ﻿using Unite.Data.Entities.Genome.Variants.SSM.Enums;
-using Unite.Data.Utilities.Mutations;
+using Unite.Data.Helpers.Genome.Variants.SSM;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SSM.Mappers;
 
@@ -7,7 +7,7 @@ public class VariantModelMapper
 {
     public void Map(in VariantModel source, Data.Models.Variants.SSM.VariantModel target)
     {
-        target.Type = MutationTypeDetector.Detect(source.Ref, source.Alt);
+        target.Type = TypeDetector.Detect(source.Ref, source.Alt);
         target.Chromosome = source.Chromosome.Value;
         target.Start = PositionParser.Parse(source.Position).Start;
         target.End = PositionParser.Parse(source.Position).End;

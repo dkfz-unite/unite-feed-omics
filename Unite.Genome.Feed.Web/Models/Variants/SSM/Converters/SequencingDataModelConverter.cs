@@ -1,22 +1,21 @@
-﻿using Unite.Genome.Feed.Web.Models.Variants.Base.Converters;
-using Unite.Genome.Feed.Web.Models.Variants.SSM.Mappers;
+﻿using Unite.Genome.Feed.Web.Models.Variants.SSM.Mappers;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SSM.Converters;
 
-public class SequencingDataModelConverter : SequencingDataModelConverterBase<VariantModel>
+public class SequencingDataModelConverter : Base.Converters.SequencingDataModelConverter<VariantModel>
 {
     private readonly VariantModelMapper _variantsModelMapper;
 
 
     public SequencingDataModelConverter() : base()
     {
-        _variantsModelMapper = new Mappers.VariantModelMapper();
+        _variantsModelMapper = new VariantModelMapper();
     }
 
 
-    protected override void MapVariants(AnalysedSampleModel<VariantModel> source, Data.Models.AnalysedSampleModel target)
+    protected override void MapEntries(Base.SequencingDataModel<VariantModel> source, Data.Models.AnalysedSampleModel target)
     {
-        target.Mutations = source.Variants.Select(variant =>
+        target.Ssms = source.Entries.Select(variant =>
         {
             var variantModel = new Data.Models.Variants.SSM.VariantModel();
 
