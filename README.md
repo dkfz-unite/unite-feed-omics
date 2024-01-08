@@ -11,8 +11,6 @@ Genome data feed service provides the following functionality:
   - Genes and transcripts are annotated with local installation of Ensembl Data service.
 - Variants data indexing service - background service responsible for variant-centric data index creation.
 
-Genome data feed service is written in ASP.NET (.NET 6)
-
 ## Dependencies
 - [SQL](https://github.com/dkfz-unite/unite-environment/tree/main/programs/postgresql) - SQL server with domain data and user identity data.
 - [Elasticsearch](https://github.com/dkfz-unite/unite-environment/tree/main/programs/elasticsearch) - Elasticsearch server with indices of domain data.
@@ -26,31 +24,30 @@ Host|http://localhost:5106|5106
 Docker|http://feed.genome.unite.net|80
 
 ## Configuration
-To configure the application, change environment variables in either docker or [launchSettings.json](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Unite.Genome.Feed.Web/Properties/launchSettings.json) file (if running locally):
-Variable|Description|Default(Local)|Default(Docker)
---------|-----------|--------------|---------------
-ASPNETCORE_ENVIRONMENT|ASP.NET environment|Debug|Release
-UNITE_API_KEY|Unite api key||
-UNITE_ELASTIC_HOST|ES service host|http://localhost:9200|es.unite.net:9200
-UNITE_ELASTIC_USER|ES service user||
-UNITE_ELASTIC_PASSWORD|ES service password||
-UNITE_SQL_HOST|SQL server host|localhost|sql.unite.net
-UNITE_SQL_PORT|SQL server port|5432|5432
-UNITE_SQL_USER|SQL server user||
-UNITE_SQL_PASSWORD|SQL server password||
-UNITE_MONGO_HOST|MongoDB server host|localhost|mongo.unite.net
-UNITE_MONGO_PORT|MongoDB server port|27017|27017
-UNITE_MONGO_USER|MongoDB server user||
-UNITE_MONGO_PASSWORD|MongoDB server password||
-UNITE_ENSEMBL_DATA_HOST|Local Ensembl Data host|http://localhost:5200|data.ensembl.unite.net|
-UNITE_ENSEMBL_VEP_HOST|Local Ensembl VEP host|http://localhost:5202|vep.ensembl.unite.net|
-UNITE_GENES_INDEXING_BUCKET_SIZE|Genes indexing bucket size|100|100
-UNITE_SSM_ANNOTATION_BUCKET_SIZE|SSM annotation bucket size|100|100
-UNITE_SSM_INDEXING_BUCKET_SIZE|SSM indexing bucket size|300|300
-UNITE_CNV_ANNOTATION_BUCKET_SIZE|CNV annotation bucket size|10|10
-UNITE_CNV_INDEXING_BUCKET_SIZE|CNV indexing bucket size|100|100
-UNITE_SV_ANNOTATION_BUCKET_SIZE|SV annotation bucket size|10|10
-UNITE_SV_INDEXING_BUCKET_SIZE|SV indexing bucket size|100|100
+To configure the application, change environment variables in either docker or [launchSettings.json](./Unite.Genome.Feed.Web/Properties/launchSettings.json) file (if running locally):
+
+- `ASPNETCORE_ENVIRONMENT` - ASP.NET environment (`Release`).
+- `UNITE_API_KEY` - API key for decription of JWT token and user authorization.
+- `UNITE_ELASTIC_HOST` - Elasticsearch service host (`es.unite.net:9200`).
+- `UNITE_ELASTIC_USER` - Elasticsearch service user.
+- `UNITE_ELASTIC_PASSWORD` - Elasticsearch service password.
+- `UNITE_SQL_HOST` - SQL server host (`sql.unite.net`).
+- `UNITE_SQL_PORT` - SQL server port (`5432`).
+- `UNITE_SQL_USER` - SQL server user.
+- `UNITE_SQL_PASSWORD` - SQL server password.
+- `UNITE_MONGO_HOST` - MongoDB server host (`mongo.unite.net`).
+- `UNITE_MONGO_PORT` - MongoDB server port (`27017`).
+- `UNITE_MONGO_USER` - MongoDB server user.
+- `UNITE_MONGO_PASSWORD` - MongoDB server password.
+- `UNITE_ENSEMBL_DATA_HOST` - Local Ensembl Data host (`data.ensembl.unite.net`).
+- `UNITE_ENSEMBL_VEP_HOST` - Local Ensembl VEP host (`vep.ensembl.unite.net`).
+- `UNITE_GENES_INDEXING_BUCKET_SIZE` - Genes indexing bucket size (`100`).
+- `UNITE_SSM_ANNOTATION_BUCKET_SIZE` - SSM annotation bucket size (`100`).
+- `UNITE_SSM_INDEXING_BUCKET_SIZE` - SSM indexing bucket size (`300`).
+- `UNITE_CNV_ANNOTATION_BUCKET_SIZE` - CNV annotation bucket size (`10`).
+- `UNITE_CNV_INDEXING_BUCKET_SIZE` - CNV indexing bucket size (`100`).
+- `UNITE_SV_ANNOTATION_BUCKET_SIZE` - SV annotation bucket size (`10`).
+- `UNITE_SV_INDEXING_BUCKET_SIZE` - SV indexing bucket size (`100`).
 
 
 ## Installation
@@ -61,7 +58,9 @@ The easiest way to install the application is to use docker-compose:
 - Genome data feed service configuration and installation scripts: https://github.com/dkfz-unite/unite-environment/tree/main/applications/unite-genome-feed
 
 ### Docker
-[Dockerfile](https://github.com/dkfz-unite/unite-genome-feed/blob/main/Dockerfile) is used to build an image of the application.
+The image of the service is available in our [registry](https://github.com/dkfz-unite/unite-genome-feed/pkgs/container/unite-genome-feed).
+
+[Dockerfile](./Dockerfile) is used to build an image of the application.
 To build an image run the following command:
 ```
 docker build -t unite.genome.feed:latest .
