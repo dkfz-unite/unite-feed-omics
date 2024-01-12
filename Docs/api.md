@@ -1,23 +1,40 @@
 # Genome Data Feed API
+API for uploading genome data to the repository.
 
-## GET: [api](http://localhost:5106/api) - [api/genome-feed](https://localhost/api/genome-feed)
+> [!Note]
+> API is accessible for authorized users only and requires `JWT` token as `Authorization` header (read more about [Identity Service](https://github.com/dkfz-unite/unite-identity)).
+
+API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](http://localhost/api/genome-feed) (**without** `api` prefix).
+
+
+## Overview
+- get:[api](#get-api) - health check.
+- post:[api/dna/variants/ssms](#post-apidnavariantsssms) - submit SSM sequencing data.
+- post:[api/dna/variants/cnvs](#post-apidnavariantscnvs) - submit CNV sequencing data.
+- post:[api/dna/variants/svs](#post-apidnavariantssvs) - submit SV sequencing data.
+- post:[api/rna/expressions](#post-apirnaexpressions) - submit **bulk** gene expression sequencing data.
+
+> [!Note]
+> **Json** is default data type for all requests and will be used if no data type is specified.
+
+
+## GET: [api](http://localhost:5106/api)
 Health check.
 
 ### Responses
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
-## POST: [api/dna/variants/ssms](http://localhost:5106/api/dna/variants/ssms) - [api/genome-feed/dna/variants/ssms](https://localhost/api/genome-feed/dna/variants/ssms)
+## POST: [api/dna/variants/ssms](http://localhost:5106/api/dna/variants/ssms)
 Submit mutations (SSM) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-### Headers
-- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
+### Body
 
-### Body - application/json
+#### json - application/json
 ```json
 {
     "analysis": {
@@ -70,17 +87,16 @@ Fields description can be found [here](api-models-ssm.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs) - [api/genome-feed/dna/variants/cnvs](https://localhost/api/genome-feed/dna/variants/cnvs)
+## POST: [api/dna/variants/cnvs](http://localhost:5106/api/dna/variants/cnvs)
 Submit Copy Number Variants (CNV) data (including sequencing analysis data) in default format.
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-### Headers
-- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
+### Body
 
-### Body - application/json
+#### json - application/json
 ```json
 {
     "analysis": {
@@ -162,106 +178,16 @@ Fields description can be found [here](api-models-cnv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/cnvs/aceseq](http://localhost:5106/api/dna/variants/cnvs/aceseq) - [api/genome-feed/dna/variants/cnvs/aceseq](https://localhost/api/genome-feed/dna/variants/cnvs/aceseq)
-Submit Copy Number Variants (CNV) data (including sequencing analysis data) in ACESeq format.
-
-Request implements **UPSERT** logic:
-- Missing data will be populated
-- Existing data will be updated
-
-### Headers
-- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
-
-### Body - application/json
-```json
-{
-    "analysis": {
-        "id": "AN1",
-        "type": "WGS",
-        "date": "2023-12-01",
-        "parameters": {
-            "key1": "value1",
-            "key2": "value2"
-        }
-    },
-    "target_sample": {
-        "donor_id": "DO1",
-        "specimen_id": "TI1",
-        "specimen_type": "Tissue",
-        "purity": null,
-        "ploidy": 2
-    },
-    "matched_sample": {
-        "donor_id": "DO1",
-        "specimen_id": "TI2",
-        "specimen_type": "Tissue"
-    },
-    "variants": [
-        {
-            "chromosome": "4",
-            "start": "164362032",
-            "end": "164458144",
-            "sv.Type": "DUP",
-            "cna.Type": "DUP",
-            "c1Mean": "1.2465",
-            "c2Mean": "2.8643",
-            "tcnMean": "4.1108",
-            "A": "1",
-            "B": "3",
-            "TCN": "4",
-            "dhMax": "NA"
-        },
-        {
-            "chromosome": "5",
-            "start": "65498712",
-            "end": "65608792",
-            "sv.Type": "NA",
-            "cna.Type": "DEL;LOH",
-            "c1Mean": "1.1265",
-            "c2Mean": "0.0378",
-            "tcnMean": "1.1643",
-            "A": "1",
-            "B": "0",
-            "TCN": "1",
-            "dhMax": "NA"
-        },
-        {
-            "chromosome": "6",
-            "start": "84236917",
-            "end": "84337937",
-            "sv.Type": "DEL",
-            "cna.Type": "DEL;HomoDEL",
-            "c1Mean": "0.1247",
-            "c2Mean": "0.0129",
-            "tcnMean": "0.1376",
-            "A": "0",
-            "B": "0",
-            "TCN": "0",
-            "dhMax": "NA"
-        }
-    ]
-}
-```
-Fields description can be found [here](api-models-cnv-aceseq.md).
-
-### Responses
-- `200` - request was processed successfully
-- `400` - request data didn't pass validation
-- `401` - missing JWT token
-- `403` - missing required permissions
-
-
-## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs) - [api/genome-feed/dna/variants/svs](https://localhost/api/genome-feed/dna/variants/svs)
+## POST: [api/dna/variants/svs](http://localhost:5106/api/dna/variants/svs)
 Submit Structural Variants (SV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
 - Existing data will be updated
 
-### Headers
-- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
+### Body
 
-### Body - application/json
+#### json - application/json
 ```json
 {
     "analysis": {
@@ -334,16 +260,15 @@ Fields description can be found [here](api-models-sv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions) - [api/genome-feed/rna/expressions](https://localhost/api/genome-feed/rna/expressions)
+## POST: [api/rna/expressions](http://localhost:5106/api/rna/expressions)
 Submit Gene Expression (Transcriptomics) data (including sequencing analysis data).
 
 Request implements **OVERRIDE** logic:
 - Data will be overriden if existed
 
-### Headers
-- `Authorization: Bearer [token]` - JWT token with `Data.Write` permission.
+### Body
 
-### Body - application/json
+#### json - application/json
 ```json
 {
     "analysis": {

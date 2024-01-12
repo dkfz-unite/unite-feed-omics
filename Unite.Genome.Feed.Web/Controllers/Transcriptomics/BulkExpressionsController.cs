@@ -30,9 +30,7 @@ public class BulkExpressionsController : Controller
 	{
 		var submissionId = _submissionService.AddSubmission(model);
 
-        var submissionData = new SubmissionData(SubmissionType.Default);
-
-        _submissionTaskService.CreateTask(SubmissionTaskType.TEX, submissionId, submissionData);
+        _submissionTaskService.CreateTask(SubmissionTaskType.TEX, submissionId);
 
 		return Ok();
 	}
