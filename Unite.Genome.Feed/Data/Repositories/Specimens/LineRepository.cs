@@ -1,17 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Unite.Data.Context;
+﻿using Unite.Data.Context;
 using Unite.Data.Entities.Specimens;
+using Unite.Data.Entities.Specimens.Lines;
 using Unite.Data.Entities.Specimens.Enums;
-using Unite.Data.Entities.Specimens.Tissues;
 
 namespace Unite.Genome.Feed.Data.Repositories.Specimens;
 
-internal class TissueRepository
+public class LineRepository
 {
     private readonly DomainDbContext _dbContext;
 
 
-    public TissueRepository(DomainDbContext dbContext)
+    public LineRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -27,7 +26,7 @@ internal class TissueRepository
         var entity = _dbContext.Set<Specimen>()
             .FirstOrDefault(entity =>
                 entity.DonorId == donorId &&
-                entity.TypeId == SpecimenType.Tissue &&
+                entity.TypeId == SpecimenType.Line &&
                 entity.ReferenceId == referenceId
             );
 
@@ -40,8 +39,8 @@ internal class TissueRepository
         {
             DonorId = donorId,
             ReferenceId = referenceId,
-            TypeId = SpecimenType.Tissue,
-            Tissue = new Tissue { ReferenceId = referenceId }
+            TypeId = SpecimenType.Line,
+            Line = new Line { ReferenceId = referenceId }
         };
 
         _dbContext.Add(entity);

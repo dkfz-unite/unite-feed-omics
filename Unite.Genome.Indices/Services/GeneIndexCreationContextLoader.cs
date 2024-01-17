@@ -8,7 +8,7 @@ using Unite.Data.Entities.Genome.Transcriptomics;
 using Unite.Data.Entities.Genome.Variants;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
-using Unite.Data.Entities.Specimens.Tissues.Enums;
+using Unite.Data.Entities.Specimens.Materials.Enums;
 
 using CNV = Unite.Data.Entities.Genome.Variants.CNV;
 using SSM = Unite.Data.Entities.Genome.Variants.SSM;
@@ -124,12 +124,13 @@ internal class GeneIndexCreationContextLoader
 
         return dbContext.Set<Specimen>()
             .AsNoTracking()
-            .IncludeTissue()
-            .IncludeCellLine()
+            .IncludeMaterial()
+            .IncludeLine()
             .IncludeOrganoid()
             .IncludeXenograft()
             .IncludeMolecularData()
-            .IncludeDrugScreeningData()
+            .IncludeInterventions()
+            .IncludeDrugScreenings()
             .Where(specimen => specimenids.Contains(specimen.Id))
             .ToDictionary(specimen => specimen.Id, specimen => specimen);
     }
@@ -173,7 +174,7 @@ internal class GeneIndexCreationContextLoader
 
         var specimensToDonorsMap = dbContext.Set<Specimen>()
             .AsNoTracking()
-            .Where(specimen => specimen.Tissue.TypeId == TissueType.Tumor)
+            .Where(specimen => specimen.Material.TypeId == MaterialType.Tumor)
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .ToDictionary(specimen => specimen.Id, specimen => specimen.DonorId);
 

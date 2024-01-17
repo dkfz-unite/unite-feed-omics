@@ -1,16 +1,16 @@
 ﻿using Unite.Data.Context;
 using Unite.Data.Entities.Specimens;
-using Unite.Data.Entities.Specimens.Cells;
 using Unite.Data.Entities.Specimens.Enums;
+using Unite.Data.Entities.Specimens.Materials;
 
 namespace Unite.Genome.Feed.Data.Repositories.Specimens;
 
-public class CellLineRepository
+internal class MaterialRepository
 {
     private readonly DomainDbContext _dbContext;
 
 
-    public CellLineRepository(DomainDbContext dbContext)
+    public MaterialRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -26,7 +26,7 @@ public class CellLineRepository
         var entity = _dbContext.Set<Specimen>()
             .FirstOrDefault(entity =>
                 entity.DonorId == donorId &&
-                entity.TypeId == SpecimenType.CellLine &&
+                entity.TypeId == SpecimenType.Material &&
                 entity.ReferenceId == referenceId
             );
 
@@ -39,8 +39,8 @@ public class CellLineRepository
         {
             DonorId = donorId,
             ReferenceId = referenceId,
-            TypeId = SpecimenType.CellLine,
-            CellLine = new CellLine { ReferenceId = referenceId }
+            TypeId = SpecimenType.Material,
+            Material = new Material { ReferenceId = referenceId }
         };
 
         _dbContext.Add(entity);

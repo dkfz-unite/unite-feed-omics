@@ -257,12 +257,13 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
         
         return dbContext.Set<Specimen>()
             .AsNoTracking()
-            .IncludeTissue()
-            .IncludeCellLine()
+            .IncludeMaterial()
+            .IncludeLine()
             .IncludeOrganoid()
             .IncludeXenograft()
             .IncludeMolecularData()
-            .IncludeDrugScreeningData()
+            .IncludeInterventions()
+            .IncludeDrugScreenings()
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .ToArray();
     }
