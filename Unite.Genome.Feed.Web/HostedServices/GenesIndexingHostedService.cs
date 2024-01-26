@@ -1,4 +1,5 @@
-﻿using Unite.Genome.Feed.Web.Configuration.Options;
+﻿using Unite.Essentials.Extensions;
+using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers.Indexing;
 
 namespace Unite.Genome.Feed.Web.HostedServices;
@@ -36,7 +37,7 @@ public class GenesIndexingHostedService : BackgroundService
         }
         catch (Exception exception)
         {
-            LogError(exception);
+            _logger.LogError("{error}", exception.GetShortMessage());
         }
 
         while (!stoppingToken.IsCancellationRequested)
@@ -47,22 +48,12 @@ public class GenesIndexingHostedService : BackgroundService
             }
             catch (Exception exception)
             {
-                LogError(exception);
+                _logger.LogError("{error}", exception.GetShortMessage());
             }
             finally
             {
                 await Task.Delay(10000, stoppingToken);
             }
-        }
-    }
-
-    private void LogError(Exception exception)
-    {
-        _logger.LogError(exception.Message);
-
-        if (exception.InnerException != null)
-        {
-            LogError(exception.InnerException);
         }
     }
 }

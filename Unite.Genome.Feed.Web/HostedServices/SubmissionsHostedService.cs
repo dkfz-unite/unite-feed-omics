@@ -1,4 +1,5 @@
-﻿using Unite.Genome.Feed.Web.Handlers.Submission;
+﻿using Unite.Essentials.Extensions;
+using Unite.Genome.Feed.Web.Handlers.Submission;
 
 namespace Unite.Genome.Feed.Web.HostedServices;
 
@@ -44,22 +45,12 @@ public class SubmissionsHostedService : BackgroundService
             }
             catch (Exception exception)
             {
-                LogError(exception);
+                _logger.LogError("{error}", exception.GetShortMessage());
             }
             finally
             {
                 await Task.Delay(10000, stoppingToken);
             }
-        }
-    }
-
-    private void LogError(Exception exception)
-    {
-        _logger.LogError(exception.Message);
-
-        if (exception.InnerException != null)
-        {
-            LogError(exception.InnerException);
         }
     }
 }
