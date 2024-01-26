@@ -1,6 +1,9 @@
 # Analysis Data Model
 Includes the information about sequencing analysis.
 
+>[!NOTE]
+> All exact dates are hiddent and protected. Relative dates are shown instead, if calculation was possible.
+
 **`id`** - Analysis identifier.
 - Note: If not set, analysis will be identified by it's type, date and analysed samples.
 - Type: _String_
@@ -13,7 +16,6 @@ Includes the information about sequencing analysis.
 - Example: `"WES"`
 
 **`date`** - Date of the analysis.
-- Note: Not displayed. Relative day is calculated if possible.
 - Type: _String_
 - Limitations: Either 'date' or 'day' should be set.
 - Format: "YYYY-MM-DD"
@@ -21,7 +23,7 @@ Includes the information about sequencing analysis.
 
 **`day`** - Relative number of days from the diagnosis statement.
 - Type: _Integer_
-- Limitations: Either 'date' or 'day' should be set.
+- Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
 - Example: `22`
 
 #### Analysis Type
