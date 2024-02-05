@@ -1,4 +1,4 @@
-name: Publish Docker Image
+name: Publish Docker Image (Multiplatform)
 
 on:
   push:
@@ -29,6 +29,8 @@ jobs:
         run: |
           docker buildx build \
             --file ./Dockerfile \
+            --build-arg USER=${{ github.actor }} \
+            --build-arg TOKEN=${{ secrets.GITHUB_TOKEN }} \
             --platform linux/arm64,linux/amd64 \
             --tag ${{env.REGISTRY}}/${{github.repository}} \
             --push .
