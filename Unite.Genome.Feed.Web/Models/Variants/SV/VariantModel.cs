@@ -4,7 +4,7 @@ using Unite.Data.Entities.Genome.Variants.SV.Enums;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SV;
 
-public class VariantModel
+public record VariantModel
 {
     private Chromosome? _chromosome;
     private int? _start;

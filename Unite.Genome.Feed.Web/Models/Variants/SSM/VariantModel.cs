@@ -4,7 +4,7 @@ using Unite.Data.Helpers.Genome.Variants.SSM;
 
 namespace Unite.Genome.Feed.Web.Models.Variants.SSM;
 
-public class VariantModel
+public record VariantModel
 {
     private Chromosome? _chromosome;
     private string _position;

@@ -15,7 +15,7 @@ public class SequencingDataModelConverter : Base.Converters.SequencingDataModelC
 
     protected override void MapEntries(Base.SequencingDataModel<VariantModel> source, Data.Models.AnalysedSampleModel target)
     {
-        target.Cnvs = source.Entries.Select(variant =>
+        target.Cnvs = source.Entries.Distinct().Select(variant =>
         {
             var variantModel = new Data.Models.Variants.CNV.VariantModel();
 
