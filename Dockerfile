@@ -1,10 +1,10 @@
 # FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 ENV ASPNETCORE_HTTP_PORTS=80
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
 ARG USER
 ARG TOKEN
 WORKDIR /src
