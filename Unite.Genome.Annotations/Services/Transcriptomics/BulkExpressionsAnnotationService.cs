@@ -73,9 +73,9 @@ public class BulkExpressionsAnnotationService
 
             double fpkm = (expression.Reads * 1e9) / (totalReads * expression.Gene.ExonicLength.Value);
 
-            expression.TPM = Math.Round(tpm, 2);
+            expression.TPM = Math.Round(tpm, 3);
 
-            expression.FPKM = Math.Round(fpkm, 2);
+            expression.FPKM = Math.Round(fpkm, 3);
         }
 	}
 }
