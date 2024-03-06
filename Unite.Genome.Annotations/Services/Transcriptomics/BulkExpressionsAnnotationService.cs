@@ -56,25 +56,15 @@ public class BulkExpressionsAnnotationService
 
     private static void CalculateNormalizedReads(ref BulkExpressionModel[] expressions)
 	{
-		long totalReads = 0;
-
-		double totalNormalizedExonicLength = 0;
-
-		foreach (var expression in expressions)
-		{
-			totalReads += expression.Reads;
-
-			totalNormalizedExonicLength += expression.Reads * 1e3 / expression.Gene.ExonicLength.Value;
-		}
+		long totalReads = expressions.Sum(e => e.Reads);
+		double totalLengt = expressions.Sum(e => e.Reads * 1e3 / e.Gene.ExonicLength.Value);
 
         foreach (var expression in expressions)
-		{
-			double tpm = ((expression.Reads * 1e3) / (expression.Gene.ExonicLength.Value * 1e6)) / (totalNormalizedExonicLength);
-
+        {
+            double tpm = (expression.Reads * 1e3 / expression.Gene.ExonicLength.Value * 1e6) / (totalLengt);
             double fpkm = (expression.Reads * 1e9) / (totalReads * expression.Gene.ExonicLength.Value);
 
             expression.TPM = Math.Round(tpm, 3);
-
             expression.FPKM = Math.Round(fpkm, 3);
         }
 	}
