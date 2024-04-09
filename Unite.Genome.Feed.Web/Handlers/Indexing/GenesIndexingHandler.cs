@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Essentials.Extensions;
 using Unite.Genome.Indices.Services;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.Genes;
@@ -45,7 +46,7 @@ public class GenesIndexingHandler
         
         _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, (tasks) =>
         {
-            if (_taskProcessingService.HasSubmissionTasks() || _taskProcessingService.HasAnnotationTasks())
+            if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             {
                 return false;
             }
@@ -54,19 +55,24 @@ public class GenesIndexingHandler
 
             stopwatch.Restart();
 
-            var grouped = tasks.DistinctBy(task => task.Target);
+            var indicesToRemove = new List<string>();
+            var indicesToCreate = new List<GeneIndex>();
 
-            var indices = grouped.Select(task =>
+            tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
                 var index = _indexCreationService.CreateIndex(id);
 
-                return index;
+                if (index == null)
+                    indicesToRemove.Add(id.ToString());
+                else
+                    indicesToCreate.Add(index);
 
-            }).ToArray();
+            });
 
-            _indexingService.AddRange(indices).GetAwaiter().GetResult();
+            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
+            _indexingService.DeleteRange(indicesToRemove).GetAwaiter().GetResult();
 
             stopwatch.Stop();
 

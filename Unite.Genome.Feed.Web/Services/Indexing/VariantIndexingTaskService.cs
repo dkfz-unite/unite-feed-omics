@@ -64,6 +64,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
                 .Select(variant => variant.Id)
                 .ToArray();
 
+            CreateProjectIndexingTasks(variants);
             CreateDonorIndexingTasks(variants);
             CreateImageIndexingTasks(keys);
             CreateSpecimenIndexingTasks(variants);
@@ -74,6 +75,11 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         transaction.Commit();
     }
 
+
+    protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<long> keys)
+    {
+        return [];
+    }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<long> keys)
     {

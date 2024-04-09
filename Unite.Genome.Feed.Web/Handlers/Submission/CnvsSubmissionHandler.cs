@@ -70,7 +70,6 @@ public class CnvsSubmissionHandler
         _annotationTaskService.PopulateTasks(audit.Cnvs);
         _submissionService.DeleteCnvSubmission(submissionId);
 
-        _dataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 }

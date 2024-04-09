@@ -65,7 +65,14 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
         var index = VariantIndexMapper.CreateFrom<VariantIndex>(variant);
 
         index.Specimens = CreateSpecimenIndices(variant.Id);
+
         index.Data = CreateDataIndex(index);
+
+        // If variant doesn't affect any specimens it should be removed.
+        if (index.Specimens.IsEmpty())
+        {
+            return null;
+        }
 
         return index;
     }

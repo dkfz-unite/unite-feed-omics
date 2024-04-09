@@ -49,7 +49,7 @@ public class SvsAnnotationHandler
 
         _taskProcessingService.Process(AnnotationTaskType.SV, bucketSize, (tasks) =>
         {
-            if (_taskProcessingService.HasSubmissionTasks())
+            if (_taskProcessingService.HasTasks(WorkerType.Submission))
             {
                 return false;
             }
@@ -77,7 +77,6 @@ public class SvsAnnotationHandler
         _consequencesDataWriter.SaveData(consequences, out var audit);
         _indexingTaskService.PopulateTasks(audit.Variants);
 
-        _consequencesDataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 }

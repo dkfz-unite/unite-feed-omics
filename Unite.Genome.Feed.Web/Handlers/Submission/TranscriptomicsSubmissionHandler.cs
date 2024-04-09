@@ -77,7 +77,6 @@ public class TranscriptomicsSubmissionHandler
         _indexingTaskService.PopulateTasks(audit.Genes);
         _submissionService.DeleteSubmission(submissionId);
 
-        _dataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 

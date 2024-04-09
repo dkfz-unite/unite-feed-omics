@@ -70,7 +70,6 @@ public class SvsSubmissionHandler
         _annotationTaskService.PopulateTasks(audit.Svs);
         _submissionService.DeleteSvSubmission(submissionId);
 
-        _dataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 }

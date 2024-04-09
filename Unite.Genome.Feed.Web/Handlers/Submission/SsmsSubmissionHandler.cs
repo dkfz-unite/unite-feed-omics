@@ -70,7 +70,6 @@ public class SsmsSubmissionHandler
         _annotationTaskService.PopulateTasks(audit.Ssms);
         _submissionService.DeleteSsmSubmission(submissionId);
 
-        _dataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 }

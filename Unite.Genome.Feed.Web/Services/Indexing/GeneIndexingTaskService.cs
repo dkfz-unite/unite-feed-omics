@@ -67,6 +67,7 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
                 .Select(gene => gene.Id)
                 .ToArray();
 
+            CreateProjectIndexingTasks(genes);
             CreateDonorIndexingTasks(genes);
             CreateImageIndexingTasks(genes);
             CreateSpecimenIndexingTasks(genes);
@@ -77,6 +78,11 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
         transaction.Commit();
     }
 
+
+    protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
+    {
+        return [];
+    }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)
     {
