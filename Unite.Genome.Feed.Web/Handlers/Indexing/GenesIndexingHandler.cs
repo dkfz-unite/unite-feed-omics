@@ -71,8 +71,8 @@ public class GenesIndexingHandler
 
             });
 
-            _indexingService.DeleteRange(indicesToRemove).GetAwaiter().GetResult();
-            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
+            _indexingService.DeleteRange(indicesToRemove);
+            _indexingService.AddRange(indicesToCreate);
 
             stopwatch.Stop();
 

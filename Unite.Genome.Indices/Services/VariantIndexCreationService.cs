@@ -66,13 +66,13 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
 
         index.Specimens = CreateSpecimenIndices(variant.Id);
 
-        index.Data = CreateDataIndex(index);
-
         // If variant doesn't affect any specimens it should be removed.
         if (index.Specimens.IsEmpty())
         {
             return null;
         }
+
+        index.Data = CreateDataIndex(index);
 
         return index;
     }

@@ -21,7 +21,7 @@ public class CnvsIndexingHandler
         TasksProcessingService taskProcessingService,
         VariantIndexCreationService<Variant, VariantEntry> indexCreationService,
         IIndexService<VariantIndex> indexingService,
-        ILogger<SsmsIndexingHandler> logger)
+        ILogger<CnvsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
         _indexCreationService = indexCreationService;
@@ -71,8 +71,8 @@ public class CnvsIndexingHandler
                     indicesToCreate.Add(index);
             });
 
-            _indexingService.DeleteRange(indicesToRemove).GetAwaiter().GetResult();
-            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
+            _indexingService.DeleteRange(indicesToRemove);
+            _indexingService.AddRange(indicesToCreate);
 
             stopwatch.Stop();
 

@@ -21,7 +21,7 @@ public class SvsIndexingHandler
         TasksProcessingService taskProcessingService,
         VariantIndexCreationService<Variant, VariantEntry> indexCreationService,
         IIndexService<VariantIndex> indexingService,
-        ILogger<SsmsIndexingHandler> logger)
+        ILogger<SvsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
         _indexCreationService = indexCreationService;
@@ -71,8 +71,8 @@ public class SvsIndexingHandler
                     indicesToCreate.Add(index);
             });
 
-            _indexingService.DeleteRange(indicesToRemove).GetAwaiter().GetResult();
-            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
+            _indexingService.DeleteRange(indicesToRemove);
+            _indexingService.AddRange(indicesToCreate);
 
             stopwatch.Stop();
 
