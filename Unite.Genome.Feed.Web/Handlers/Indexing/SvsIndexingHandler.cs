@@ -66,13 +66,13 @@ public class SvsIndexingHandler
                 var index = _indexCreationService.CreateIndex(id);
 
                 if (index == null)
-                    indicesToRemove.Add(id.ToString());
+                    indicesToRemove.Add($"SV{id}");
                 else
                     indicesToCreate.Add(index);
             });
 
-            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
             _indexingService.DeleteRange(indicesToRemove).GetAwaiter().GetResult();
+            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
 
             stopwatch.Stop();
 

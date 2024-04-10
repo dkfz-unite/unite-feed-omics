@@ -66,13 +66,13 @@ public class CnvsIndexingHandler
                 var index = _indexCreationService.CreateIndex(id);
 
                 if (index == null)
-                    indicesToRemove.Add(id.ToString());
+                    indicesToRemove.Add($"CNV{id}");
                 else
                     indicesToCreate.Add(index);
             });
 
-            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
             _indexingService.DeleteRange(indicesToRemove).GetAwaiter().GetResult();
+            _indexingService.AddRange(indicesToCreate).GetAwaiter().GetResult();
 
             stopwatch.Stop();
 
