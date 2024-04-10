@@ -3,6 +3,7 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Genome.Feed.Data.Writers.Variants;
 using Unite.Genome.Feed.Web.Services.Annotation;
+using Unite.Genome.Feed.Web.Services.Indexing;
 using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Handlers.Submission;
@@ -11,6 +12,7 @@ public class SvsSubmissionHandler
 {
     private readonly VariantsDataWriter _dataWriter;
     private readonly SvAnnotationTaskService _annotationTaskService;
+    private readonly SvIndexingTaskService _indexingTaskService;
     private readonly VariantsSubmissionService _submissionService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -21,12 +23,14 @@ public class SvsSubmissionHandler
     public SvsSubmissionHandler(
         VariantsDataWriter dataWriter,
         SvAnnotationTaskService annotationTaskService,
+        SvIndexingTaskService indexingTaskService,
         VariantsSubmissionService submissionService,
         TasksProcessingService taskProcessingService,
         ILogger<SvsSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
+        _indexingTaskService = indexingTaskService;
         _submissionService = submissionService;
         _taskProcessingService = taskProcessingService;
         _logger = logger;
@@ -68,6 +72,7 @@ public class SvsSubmissionHandler
 
         _dataWriter.SaveData(convertedSequencingData, out var audit);
         _annotationTaskService.PopulateTasks(audit.Svs);
+        _indexingTaskService.PopulateTasks(audit.SvsEntries.Except(audit.Svs));
         _submissionService.DeleteSvSubmission(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());

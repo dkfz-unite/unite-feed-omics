@@ -146,7 +146,9 @@ public class GeneIndexCreationService
 
     private static ImageIndex[] CreateImageIndices(int specimenId, GeneIndexCreationContext context, DateOnly? diagnosisDate)
     {
-        var indices = LoadImages(specimenId, context).Select(entity => CreateImageIndex(entity, diagnosisDate));
+        var images = LoadImages(specimenId, context);
+        
+        var indices = images.Select(entity => CreateImageIndex(entity, diagnosisDate));
 
         return indices.Any() ? indices.ToArray() : null;
     }

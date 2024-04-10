@@ -187,7 +187,7 @@ internal class GeneIndexCreationContextLoader
             .GroupBy(image => image.DonorId)
             .ToDictionary(group => group.Key, group => group.ToArray());
 
-        return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsToImagesMap.TryGetValue(map.Value, out var value) ? value : null);
+        return specimensToDonorsMap.ToDictionary(map => map.Key, map => donorsToImagesMap.TryGetValue(map.Value, out var value) ? value : []);
     }
 
     /// <summary>
