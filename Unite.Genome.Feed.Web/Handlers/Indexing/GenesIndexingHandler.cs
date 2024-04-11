@@ -29,22 +29,22 @@ public class GenesIndexingHandler
     }
 
 
-    public void Prepare()
+    public async Task Prepare()
     {
-        _indexingService.UpdateIndex().GetAwaiter().GetResult();
+        await _indexingService.UpdateIndex();
     }
 
-    public void Handle(int bucketSize)
+    public async Task Handle(int bucketSize)
     {
-        ProcessIndexingTasks(bucketSize);
+        await ProcessIndexingTasks(bucketSize);
     }
 
 
-    private void ProcessIndexingTasks(int bucketSize)
+    private async Task ProcessIndexingTasks(int bucketSize)
     {
         var stopwatch = new Stopwatch();
         
-        _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             {
@@ -55,7 +55,7 @@ public class GenesIndexingHandler
 
             stopwatch.Restart();
 
-            var indicesToRemove = new List<string>();
+            var indicesToDelete = new List<string>();
             var indicesToCreate = new List<GeneIndex>();
 
             tasks.ForEach(task =>
@@ -65,14 +65,17 @@ public class GenesIndexingHandler
                 var index = _indexCreationService.CreateIndex(id);
 
                 if (index == null)
-                    indicesToRemove.Add($"{id}");
+                    indicesToDelete.Add($"{id}");
                 else
                     indicesToCreate.Add(index);
 
             });
 
-            _indexingService.DeleteRange(indicesToRemove);
-            _indexingService.AddRange(indicesToCreate);
+            if (indicesToDelete.Any())
+                await _indexingService.DeleteRange(indicesToDelete);
+
+            if (indicesToCreate.Any())
+                await _indexingService.AddRange(indicesToCreate);
 
             stopwatch.Stop();
 

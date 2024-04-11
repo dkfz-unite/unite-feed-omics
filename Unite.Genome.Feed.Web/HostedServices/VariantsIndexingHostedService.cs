@@ -8,7 +8,7 @@ public class VariantsIndexingHostedService : BackgroundService
 {
     private readonly VariantsIndexingOptions _options;
     private readonly SsmsIndexingHandler _ssmsIndexingHandler;
-    private readonly CnvsIndexingHandler _cnvsVariantsIndexingHandler;
+    private readonly CnvsIndexingHandler _cnvsIndexingHandler;
     private readonly SvsIndexingHandler _svsIndexingHandler;
     private readonly ILogger _logger;
 
@@ -22,7 +22,7 @@ public class VariantsIndexingHostedService : BackgroundService
     {
         _options = options;
         _ssmsIndexingHandler = ssmsIndexingHandler;
-        _cnvsVariantsIndexingHandler = cnvsIndexingHandler;
+        _cnvsIndexingHandler = cnvsIndexingHandler;
         _svsIndexingHandler = svsIndexingHandler;
         _logger = logger;
     }
@@ -39,9 +39,9 @@ public class VariantsIndexingHostedService : BackgroundService
 
         try
         {
-            _ssmsIndexingHandler.Prepare();
-            _cnvsVariantsIndexingHandler.Prepare();
-            _svsIndexingHandler.Prepare();
+            await _ssmsIndexingHandler.Prepare();
+            await _cnvsIndexingHandler.Prepare();
+            await _svsIndexingHandler.Prepare();
         }
         catch (Exception exception)
         {
@@ -52,9 +52,9 @@ public class VariantsIndexingHostedService : BackgroundService
         {
             try
             {
-                _ssmsIndexingHandler.Handle(_options.SsmBucketSize);
-                _cnvsVariantsIndexingHandler.Handle(_options.CnvBucketSize);
-                _svsIndexingHandler.Handle(_options.SvBucketSize);
+                await _ssmsIndexingHandler.Handle(_options.SsmBucketSize);
+                await _cnvsIndexingHandler.Handle(_options.CnvBucketSize);
+                await _svsIndexingHandler.Handle(_options.SvBucketSize);
             }
             catch (Exception exception)
             {

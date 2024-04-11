@@ -30,22 +30,22 @@ public class CnvsIndexingHandler
     }
 
 
-    public void Prepare()
+    public async Task Prepare()
     {
-        _indexingService.UpdateIndex().GetAwaiter().GetResult();
+        await _indexingService.UpdateIndex();
     }
 
-    public void Handle(int bucketSize)
+    public async Task Handle(int bucketSize)
     {
-        ProcessIndexingTasks(bucketSize);
+        await ProcessIndexingTasks(bucketSize);
     }
 
 
-    private void ProcessIndexingTasks(int bucketSize)
+    private async Task ProcessIndexingTasks(int bucketSize)
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, async (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             {
@@ -56,7 +56,7 @@ public class CnvsIndexingHandler
 
             stopwatch.Restart();
 
-            var indicesToRemove = new List<string>();
+            var indicesToDelete = new List<string>();
             var indicesToCreate = new List<VariantIndex>();
 
             tasks.ForEach(task =>
@@ -66,13 +66,16 @@ public class CnvsIndexingHandler
                 var index = _indexCreationService.CreateIndex(id);
 
                 if (index == null)
-                    indicesToRemove.Add($"CNV{id}");
+                    indicesToDelete.Add($"CNV{id}");
                 else
                     indicesToCreate.Add(index);
             });
 
-            _indexingService.DeleteRange(indicesToRemove);
-            _indexingService.AddRange(indicesToCreate);
+            if (indicesToDelete.Any())
+                await _indexingService.DeleteRange(indicesToDelete);
+            
+            if (indicesToCreate.Any())
+                await _indexingService.AddRange(indicesToCreate);
 
             stopwatch.Stop();
 
