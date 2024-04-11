@@ -51,15 +51,13 @@ public class SsmsSubmissionHandler
 
         _taskProcessingService.Process(SubmissionTaskType.SSM, 1, (tasks) =>
         {
-            _logger.LogInformation($"Processing SSM data submission");
-
             stopwatch.Restart();
 
             ProcessSubmission(tasks[0].Target);
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Processing of SSM data submission completed in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Processed SSMs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

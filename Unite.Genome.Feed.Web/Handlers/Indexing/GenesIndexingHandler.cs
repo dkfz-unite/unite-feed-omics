@@ -47,11 +47,7 @@ public class GenesIndexingHandler
         await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-            {
                 return false;
-            }
-
-            _logger.LogInformation("Indexing {number} genes", tasks.Length);
 
             stopwatch.Restart();
 
@@ -79,7 +75,7 @@ public class GenesIndexingHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexing of {number} genes completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

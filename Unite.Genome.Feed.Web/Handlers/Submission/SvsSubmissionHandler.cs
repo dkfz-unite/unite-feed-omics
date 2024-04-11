@@ -51,15 +51,13 @@ public class SvsSubmissionHandler
 
         _taskProcessingService.Process(SubmissionTaskType.SV, 1, (tasks) =>
         {
-            _logger.LogInformation($"Processing SV data submission");
-
             stopwatch.Restart();
 
             ProcessSubmission(tasks[0].Target);
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Processing of SV data submission completed in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Processed SVs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

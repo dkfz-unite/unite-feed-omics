@@ -50,11 +50,7 @@ public class SsmsAnnotationHandler
         _taskProcessingService.Process(AnnotationTaskType.SSM, bucketSize, (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission))
-            {
                 return false;
-            }
-
-            _logger.LogInformation("Annotating {number} SSMs", tasks.Length);
 
             stopwatch.Restart();
 
@@ -62,7 +58,7 @@ public class SsmsAnnotationHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Annotation of {number} SSMs completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Annotated {number} SSMs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

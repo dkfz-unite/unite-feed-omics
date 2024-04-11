@@ -50,11 +50,7 @@ public class CnvsAnnotationHandler
         _taskProcessingService.Process(AnnotationTaskType.CNV, bucketSize, (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission))
-            {
                 return false;
-            }
-
-            _logger.LogInformation("Annotating {number} CNVs", tasks.Length);
 
             stopwatch.Restart();
 
@@ -62,7 +58,7 @@ public class CnvsAnnotationHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Annotation of {number} CNVs completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Annotated {number} CNVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

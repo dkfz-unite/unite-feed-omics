@@ -48,11 +48,7 @@ public class SsmsIndexingHandler
         await _taskProcessingService.Process(IndexingTaskType.SSM, bucketSize, async (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-            {
                 return false;
-            }
-
-            _logger.LogInformation("Indexing {number} SSMs", tasks.Length);
 
             stopwatch.Restart();
 
@@ -79,7 +75,7 @@ public class SsmsIndexingHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexing of {number} SSMs completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} SSMs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

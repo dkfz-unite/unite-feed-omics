@@ -48,11 +48,7 @@ public class SvsIndexingHandler
         await _taskProcessingService.Process(IndexingTaskType.SV, bucketSize, async (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-            {
                 return false;
-            }
-
-            _logger.LogInformation("Indexing {number} SVs", tasks.Length);
 
             stopwatch.Restart();
 
@@ -79,7 +75,7 @@ public class SvsIndexingHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexing of {number} SVs completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} SVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

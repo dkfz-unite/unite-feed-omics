@@ -48,11 +48,7 @@ public class CnvsIndexingHandler
         await _taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, async (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-            {
                 return false;
-            }
-
-            _logger.LogInformation("Indexing {number} CNVs", tasks.Length);
 
             stopwatch.Restart();
 
@@ -79,7 +75,7 @@ public class CnvsIndexingHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexing of {number} CNVs completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} CNVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

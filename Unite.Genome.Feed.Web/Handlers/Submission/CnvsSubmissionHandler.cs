@@ -51,15 +51,13 @@ public class CnvsSubmissionHandler
 
         _taskProcessingService.Process(SubmissionTaskType.CNV, 1, (tasks) =>
         {
-            _logger.LogInformation($"Processing CNV data submission");
-
             stopwatch.Restart();
 
             ProcessSubmission(tasks[0].Target);
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Processing of CNV data submission completed in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Processed CNVs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
