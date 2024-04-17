@@ -16,16 +16,20 @@ public abstract class ConsequencesDataWriter<TAffectedTranscriptEntity, TVariant
     where TVariantEntity : Variant
     where TVariantModel : VariantModel
 {
-    protected DomainDbContext _dbContext;
     protected GeneRepository _geneRepository;
     protected ProteinRepository _proteinRepository;
     protected TranscriptRepository _transcriptRepository;
     protected VariantRepository<TVariantEntity, TVariantModel> _variantRepository;
     protected AffectedTranscriptRepository<TAffectedTranscriptEntity, TVariantEntity, TVariantModel> _affectedTranscriptRepository;
 
+
     protected ConsequencesDataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
+        var dbContext = dbContextFactory.CreateDbContext();
+
+        Initialize(dbContext);
     }
+
 
     protected override void ProcessModel(ConsequencesDataModel consequencesDataModel, ref ConsequencesDataUploadAudit audit)
     {

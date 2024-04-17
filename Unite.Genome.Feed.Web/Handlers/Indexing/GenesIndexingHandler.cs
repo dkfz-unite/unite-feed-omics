@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Essentials.Extensions;
 using Unite.Genome.Indices.Services;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.Genes;
@@ -28,49 +29,53 @@ public class GenesIndexingHandler
     }
 
 
-    public void Prepare()
+    public async Task Prepare()
     {
-        _indexingService.UpdateIndex().GetAwaiter().GetResult();
+        await _indexingService.UpdateIndex();
     }
 
-    public void Handle(int bucketSize)
+    public async Task Handle(int bucketSize)
     {
-        ProcessIndexingTasks(bucketSize);
+        await ProcessIndexingTasks(bucketSize);
     }
 
 
-    private void ProcessIndexingTasks(int bucketSize)
+    private async Task ProcessIndexingTasks(int bucketSize)
     {
         var stopwatch = new Stopwatch();
         
-        _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
         {
-            if (_taskProcessingService.HasSubmissionTasks() || _taskProcessingService.HasAnnotationTasks())
-            {
+            if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
                 return false;
-            }
-
-            _logger.LogInformation("Indexing {number} genes", tasks.Length);
 
             stopwatch.Restart();
 
-            var grouped = tasks.DistinctBy(task => task.Target);
+            var indicesToDelete = new List<string>();
+            var indicesToCreate = new List<GeneIndex>();
 
-            var indices = grouped.Select(task =>
+            tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
                 var index = _indexCreationService.CreateIndex(id);
 
-                return index;
+                if (index == null)
+                    indicesToDelete.Add($"{id}");
+                else
+                    indicesToCreate.Add(index);
 
-            }).ToArray();
+            });
 
-            _indexingService.AddRange(indices).GetAwaiter().GetResult();
+            if (indicesToDelete.Any())
+                await _indexingService.DeleteRange(indicesToDelete);
+
+            if (indicesToCreate.Any())
+                await _indexingService.AddRange(indicesToCreate);
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexing of {number} genes completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

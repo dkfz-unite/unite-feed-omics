@@ -10,24 +10,15 @@ public class CnvConsequencesDataWriter : ConsequencesDataWriter<AffectedTranscri
 {
     public CnvConsequencesDataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        _dbContext = dbContextFactory.CreateDbContext();
-
-        _geneRepository = new GeneRepository(_dbContext);
-        _proteinRepository = new ProteinRepository(_dbContext);
-        _transcriptRepository = new TranscriptRepository(_dbContext);
-        _variantRepository = new VariantRepository(_dbContext);
-        _affectedTranscriptRepository = new AffectedTranscriptRepository(_dbContext, (VariantRepository)_variantRepository);
     }
 
-    public void Refresh()
-    {
-        _dbContext.Dispose();
-        _dbContext = _dbContextFactory.CreateDbContext();
 
-        _geneRepository = new GeneRepository(_dbContext);
-        _proteinRepository = new ProteinRepository(_dbContext);
-        _transcriptRepository = new TranscriptRepository(_dbContext);
-        _variantRepository = new VariantRepository(_dbContext);
-        _affectedTranscriptRepository = new AffectedTranscriptRepository(_dbContext, (VariantRepository)_variantRepository);
+    protected override void Initialize(DomainDbContext dbContext)
+    {
+        _geneRepository = new GeneRepository(dbContext);
+        _proteinRepository = new ProteinRepository(dbContext);
+        _transcriptRepository = new TranscriptRepository(dbContext);
+        _variantRepository = new VariantRepository(dbContext);
+        _affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext, (VariantRepository)_variantRepository);
     }
 }

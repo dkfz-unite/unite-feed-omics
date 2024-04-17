@@ -49,12 +49,8 @@ public class SvsAnnotationHandler
 
         _taskProcessingService.Process(AnnotationTaskType.SV, bucketSize, (tasks) =>
         {
-            if (_taskProcessingService.HasSubmissionTasks())
-            {
+            if (_taskProcessingService.HasTasks(WorkerType.Submission))
                 return false;
-            }
-
-            _logger.LogInformation("Annotating {number} SVs", tasks.Length);
 
             stopwatch.Restart();
 
@@ -62,7 +58,7 @@ public class SvsAnnotationHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Annotation of {number} SVs completed in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Annotated {number} SVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
@@ -77,7 +73,6 @@ public class SvsAnnotationHandler
         _consequencesDataWriter.SaveData(consequences, out var audit);
         _indexingTaskService.PopulateTasks(audit.Variants);
 
-        _consequencesDataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 }

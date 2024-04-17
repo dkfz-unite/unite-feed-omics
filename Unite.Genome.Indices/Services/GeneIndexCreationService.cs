@@ -42,7 +42,7 @@ public class GeneIndexCreationService
     {
         var context = _contextLoader.LoadContext(geneId);
 
-        if (context.Gene == null)
+        if (context.Gene == null || !context.DonorsCache.Any())
         {
             return null;
         }
@@ -57,6 +57,12 @@ public class GeneIndexCreationService
         var index = GeneIndexMapper.CreateFrom<GeneIndex>(context.Gene);
 
         index.Specimens = CreateSpecimenIndices(context);
+
+        // If gene doesn't affect any specimens it should be removed.
+        if (index.Specimens.IsEmpty())
+        {
+            return null;
+        }
 
         return index;
     }
@@ -140,7 +146,9 @@ public class GeneIndexCreationService
 
     private static ImageIndex[] CreateImageIndices(int specimenId, GeneIndexCreationContext context, DateOnly? diagnosisDate)
     {
-        var indices = LoadImages(specimenId, context).Select(entity => CreateImageIndex(entity, diagnosisDate));
+        var images = LoadImages(specimenId, context);
+        
+        var indices = images.Select(entity => CreateImageIndex(entity, diagnosisDate));
 
         return indices.Any() ? indices.ToArray() : null;
     }

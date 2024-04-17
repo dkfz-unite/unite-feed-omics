@@ -10,7 +10,6 @@ namespace Unite.Genome.Feed.Data.Writers.Variants;
 
 public class VariantsDataWriter : DataWriter<AnalysedSampleModel, VariantsDataUploadAudit>
 {
-    private DomainDbContext _dbContext;
     private Repositories.AnalysisRepository _analysisRepository;
     private Repositories.AnalysedSampleRepository _analysedSampleRepository;
     private Repositories.Variants.SSM.VariantRepository _ssmRepository;
@@ -23,32 +22,22 @@ public class VariantsDataWriter : DataWriter<AnalysedSampleModel, VariantsDataUp
 
     public VariantsDataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        _dbContext = dbContextFactory.CreateDbContext();
+        var dbContext = dbContextFactory.CreateDbContext();
 
-        _analysisRepository = new Repositories.AnalysisRepository(_dbContext);
-        _analysedSampleRepository = new Repositories.AnalysedSampleRepository(_dbContext);
-        _ssmRepository = new Repositories.Variants.SSM.VariantRepository(_dbContext);
-        _ssmEntryRepository = new Repositories.Variants.SSM.VariantEntryRepository(_dbContext, _ssmRepository);
-        _cnvRepository = new Repositories.Variants.CNV.VariantRepository(_dbContext);
-        _cnvEntryRepository = new Repositories.Variants.CNV.VariantEntryRepository(_dbContext, _cnvRepository);
-        _svRepository = new Repositories.Variants.SV.VariantRepository(_dbContext);
-        _svEntryRepository = new Repositories.Variants.SV.VariantEntryRepository(_dbContext, _svRepository);
+        Initialize(dbContext);
     }
 
 
-    public void Refresh()
+    protected override void Initialize(DomainDbContext dbContext)
     {
-        _dbContext.Dispose();
-        _dbContext = _dbContextFactory.CreateDbContext();
-
-        _analysisRepository = new Repositories.AnalysisRepository(_dbContext);
-        _analysedSampleRepository = new Repositories.AnalysedSampleRepository(_dbContext);
-        _ssmRepository = new Repositories.Variants.SSM.VariantRepository(_dbContext);
-        _ssmEntryRepository = new Repositories.Variants.SSM.VariantEntryRepository(_dbContext, _ssmRepository);
-        _cnvRepository = new Repositories.Variants.CNV.VariantRepository(_dbContext);
-        _cnvEntryRepository = new Repositories.Variants.CNV.VariantEntryRepository(_dbContext, _cnvRepository);
-        _svRepository = new Repositories.Variants.SV.VariantRepository(_dbContext);
-        _svEntryRepository = new Repositories.Variants.SV.VariantEntryRepository(_dbContext, _svRepository);
+        _analysisRepository = new Repositories.AnalysisRepository(dbContext);
+        _analysedSampleRepository = new Repositories.AnalysedSampleRepository(dbContext);
+        _ssmRepository = new Repositories.Variants.SSM.VariantRepository(dbContext);
+        _ssmEntryRepository = new Repositories.Variants.SSM.VariantEntryRepository(dbContext, _ssmRepository);
+        _cnvRepository = new Repositories.Variants.CNV.VariantRepository(dbContext);
+        _cnvEntryRepository = new Repositories.Variants.CNV.VariantEntryRepository(dbContext, _cnvRepository);
+        _svRepository = new Repositories.Variants.SV.VariantRepository(dbContext);
+        _svEntryRepository = new Repositories.Variants.SV.VariantEntryRepository(dbContext, _svRepository);
     }
 
     protected override void ProcessModel(AnalysedSampleModel model, ref VariantsDataUploadAudit audit)

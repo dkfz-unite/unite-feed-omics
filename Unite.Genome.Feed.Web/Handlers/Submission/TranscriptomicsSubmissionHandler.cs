@@ -51,15 +51,13 @@ public class TranscriptomicsSubmissionHandler
 
         _taskProcessingService.Process(SubmissionTaskType.TEX, 1, (tasks) =>
         {
-            _logger.LogInformation($"Processing bulk transcriptomics data submission");
-
             stopwatch.Restart();
 
             ProcessSubmission(tasks[0].Target);
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Processing of bulk transcriptomics data submission completed in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Processed bulk transcriptomics data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
@@ -77,7 +75,6 @@ public class TranscriptomicsSubmissionHandler
         _indexingTaskService.PopulateTasks(audit.Genes);
         _submissionService.DeleteSubmission(submissionId);
 
-        _dataWriter.Refresh();
         _logger.LogInformation("{audit}", audit.ToString());
     }
 

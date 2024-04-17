@@ -13,7 +13,6 @@ public class BulkExpressionsDataWriter : DataWriter<AnalysedSampleModel, BulkExp
 {
     private const int _batchSize = 1000;
 
-    private DomainDbContext _dbContext;
     private AnalysisRepository _analysisRepository;
     private AnalysedSampleRepository _analysedSampleRepository;
     private GeneRepository _geneRepository;
@@ -22,25 +21,19 @@ public class BulkExpressionsDataWriter : DataWriter<AnalysedSampleModel, BulkExp
 
     public BulkExpressionsDataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        _dbContext = dbContextFactory.CreateDbContext();
+        var dbContext = dbContextFactory.CreateDbContext();
         
-        _analysisRepository = new AnalysisRepository(_dbContext);
-        _analysedSampleRepository = new AnalysedSampleRepository(_dbContext);
-        _geneRepository = new GeneRepository(_dbContext);
-        _bulkExpressionRepository = new BulkExpressionRepository(_dbContext);
+        Initialize(dbContext);
     }
 
-    public void Refresh()
+    
+    protected override void Initialize(DomainDbContext dbContext)
     {
-        _dbContext.Dispose();
-        _dbContext = _dbContextFactory.CreateDbContext();
-
-        _analysisRepository = new AnalysisRepository(_dbContext);
-        _analysedSampleRepository = new AnalysedSampleRepository(_dbContext);
-        _geneRepository = new GeneRepository(_dbContext);
-        _bulkExpressionRepository = new BulkExpressionRepository(_dbContext);
+        _analysisRepository = new AnalysisRepository(dbContext);
+        _analysedSampleRepository = new AnalysedSampleRepository(dbContext);
+        _geneRepository = new GeneRepository(dbContext);
+        _bulkExpressionRepository = new BulkExpressionRepository(dbContext);
     }
-
 
     protected override void ProcessModel(AnalysedSampleModel model, ref BulkExpressionsDataUploadAudit audit)
     {
