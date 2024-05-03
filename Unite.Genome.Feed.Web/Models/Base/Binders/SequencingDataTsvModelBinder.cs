@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Unite.Data.Entities.Genome.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
@@ -127,8 +128,12 @@ public abstract class SequencingDataTsvModelBinder<TModel> : IModelBinder
             return default;
         else if (typeof(T) == typeof(string))
             return (T)(object)value;
+        else if (typeof(T) == typeof(int?))
+            return (T)(object)int.Parse(value, NumberStyles.Any, CultureInfo.InvariantCulture);
+        else if (typeof(T) == typeof(double?))
+            return (T)(object)double.Parse(value, NumberStyles.Any, CultureInfo.InvariantCulture);
         else if (typeof(T) == typeof(DateOnly?))
-            return (T)(object)DateOnly.Parse(value);
+            return (T)(object)DateOnly.Parse(value, CultureInfo.InvariantCulture);
         else if (typeof(T) == typeof(AnalysisType?))
             return (T)(object)Enum.Parse<AnalysisType>(value);
         else if (typeof(T) == typeof(SpecimenType?))
