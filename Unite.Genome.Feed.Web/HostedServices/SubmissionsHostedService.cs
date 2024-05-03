@@ -5,20 +5,23 @@ namespace Unite.Genome.Feed.Web.HostedServices;
 
 public class SubmissionsHostedService : BackgroundService
 {
-    private readonly TranscriptomicsSubmissionHandler _transcriptomicsSubmissionHandler;
+    private readonly BulkTranscriptomicsSubmissionHandler _bulkTranscriptomicsSubmissionHandler;
+    private readonly CellTranscriptomicsSubmissionHandler _cellTranscriptomicsSubmissionHandler;
     private readonly SsmsSubmissionHandler _ssmsSubmissionHandler;
     private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
     private readonly SvsSubmissionHandler _svsSubmissionHandler;
     private readonly ILogger _logger;
 
     public SubmissionsHostedService(
-        TranscriptomicsSubmissionHandler transcriptomicsSubmissionHandler,
+        BulkTranscriptomicsSubmissionHandler bulkTranscriptomicsSubmissionHandler,
+        CellTranscriptomicsSubmissionHandler cellTranscriptomicsSubmissionHandler,
         SsmsSubmissionHandler ssmsSubmissionHandler,
         CnvsSubmissionHandler cnvsSubmissionHandler,
         SvsSubmissionHandler svsSubmissionHandler,
         ILogger<SubmissionsHostedService> logger)
     {
-        _transcriptomicsSubmissionHandler = transcriptomicsSubmissionHandler;
+        _bulkTranscriptomicsSubmissionHandler = bulkTranscriptomicsSubmissionHandler;
+        _cellTranscriptomicsSubmissionHandler = cellTranscriptomicsSubmissionHandler;
         _ssmsSubmissionHandler = ssmsSubmissionHandler;
         _cnvsSubmissionHandler = cnvsSubmissionHandler;
         _svsSubmissionHandler = svsSubmissionHandler;
@@ -38,7 +41,8 @@ public class SubmissionsHostedService : BackgroundService
         {
             try
             {
-                _transcriptomicsSubmissionHandler.Handle();
+                _cellTranscriptomicsSubmissionHandler.Handle();
+                _bulkTranscriptomicsSubmissionHandler.Handle();
                 _ssmsSubmissionHandler.Handle();
                 _cnvsSubmissionHandler.Handle();
                 _svsSubmissionHandler.Handle();
@@ -54,4 +58,3 @@ public class SubmissionsHostedService : BackgroundService
         }
     }
 }
-

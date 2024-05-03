@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
@@ -10,42 +10,42 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Transcriptomics;
 
-[Route("api/rna/exp/bulk")]
+[Route("api/rna/exp/cell")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class BulkExpressionsController : Controller
+public class CellExpressionsController : Controller
 {
     private readonly TranscriptomicsSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
 
-	public BulkExpressionsController(
+    public CellExpressionsController(
         TranscriptomicsSubmissionService submissionService,
         SubmissionTaskService submissionTaskService)
-	{
-		_submissionService = submissionService;
+    {
+        _submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
     }
 
 
     [HttpPost("")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] SequencingDataModel<BulkExpressionModel> model)
-	{
+    [Consumes("application/json")]
+    public IActionResult Post([FromBody] SequencingDataModel<CellExpressionModel> model)
+    {
         return PostData(model);
-	}
+    }
 
     [HttpPost("tsv")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(BulkExpressionTsvModelsBinder))] SequencingDataModel<BulkExpressionModel> model)
+    [Consumes("text/tab-separated-values")]
+    public IActionResult PostTsv([ModelBinder(typeof(CellExpressionTsvModelsBinder))] SequencingDataModel<CellExpressionModel> model)
     {
         return PostData(model);
     }
 
 
-    private IActionResult PostData(SequencingDataModel<BulkExpressionModel> model)
+    private IActionResult PostData(SequencingDataModel<CellExpressionModel> model)
     {
-        var submissionId = _submissionService.AddBulkSubmission(model);
+        var submissionId = _submissionService.AddCellSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.BGE, submissionId);
+        _submissionTaskService.CreateTask(SubmissionTaskType.CGE, submissionId);
 
         return Ok();
     }

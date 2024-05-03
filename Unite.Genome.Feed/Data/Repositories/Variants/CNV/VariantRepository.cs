@@ -18,7 +18,7 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
             entity.Start == model.Start &&
             entity.End == model.End &&
             entity.TypeId == model.Type &&
-            entity.HomoDel == model.HomoDel &&
+            entity.Del == model.Del &&
             entity.Loh == model.Loh &&
             entity.C1Mean == model.C1Mean &&
             entity.C2Mean == model.C2Mean &&
@@ -35,7 +35,7 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
 
         entity.TypeId = model.Type;
         entity.Loh = model.Loh;
-        entity.HomoDel = model.HomoDel;
+        entity.Del = model.Del;
         entity.C1Mean = model.C1Mean;
         entity.C2Mean = model.C2Mean;
         entity.TcnMean = model.TcnMean;

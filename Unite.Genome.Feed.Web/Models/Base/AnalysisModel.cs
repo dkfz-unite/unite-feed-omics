@@ -1,6 +1,7 @@
 ﻿
 using System.Text.Json.Serialization;
 using Unite.Data.Entities.Genome.Analysis.Enums;
+using Unite.Essentials.Extensions;
 
 namespace Unite.Genome.Feed.Web.Models.Base;
 
@@ -43,6 +44,17 @@ public record AnalysisModel
     /// </summary>
     [JsonPropertyName("parameters")]
     public virtual Dictionary<string, string> Parameters { get => Trim(_parameters); set => _parameters = value; }
+
+
+    public virtual bool IsNotEmpty()
+    {
+        return !string.IsNullOrWhiteSpace(Id)
+            || Type.HasValue
+            || Date.HasValue
+            || Day.HasValue
+            || Parameters.IsNotEmpty();
+    
+    }
 
 
     protected static Dictionary<string, string> Trim(Dictionary<string, string> dictionary)

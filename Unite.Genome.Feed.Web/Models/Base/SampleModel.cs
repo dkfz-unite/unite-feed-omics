@@ -10,6 +10,8 @@ public record SampleModel
     protected SpecimenType? _specimenType;
     protected double? _purity;
     protected double? _ploidy;
+    protected int? _cellsNumber;
+    protected string _genesModel;
 
 
     /// <summary>
@@ -43,7 +45,31 @@ public record SampleModel
     public virtual double? Ploidy { get => _ploidy; set => _ploidy = value; }
 
     /// <summary>
+    /// Sample cells number (if it's single cell sequencing)
+    /// </summary>
+    [JsonPropertyName("cells_number")]
+    public virtual int? CellsNumber { get => _cellsNumber; set => _cellsNumber = value; }
+
+    /// <summary>
+    /// Sample genes model (if it's single cell sequencing)
+    /// </summary>
+    [JsonPropertyName("genes_model")]
+    public virtual string GenesModel { get => _genesModel?.Trim(); set => _genesModel = value; }
+
+    /// <summary>
     /// Default sample ploidy
     /// </summary>
     public virtual double DefaultPloidy => 2;
+
+
+    public virtual bool IsNotEmpty()
+    {
+        return !string.IsNullOrWhiteSpace(DonorId)
+            || !string.IsNullOrWhiteSpace(SpecimenId)
+            || SpecimenType.HasValue
+            || Purity.HasValue
+            || Ploidy.HasValue
+            || CellsNumber.HasValue
+            || !string.IsNullOrWhiteSpace(GenesModel);
+    }
 }

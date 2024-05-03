@@ -9,7 +9,7 @@ using Unite.Genome.Feed.Data.Repositories.Transcriptomics;
 
 namespace Unite.Genome.Feed.Data.Writers.Transcriptomics;
 
-public class BulkExpressionsDataWriter : DataWriter<AnalysedSampleModel, BulkExpressionsDataUploadAudit>
+public class BulkDataWriter : DataWriter<AnalysedSampleModel, BulkDataUploadAudit>
 {
     private const int _batchSize = 1000;
 
@@ -19,7 +19,7 @@ public class BulkExpressionsDataWriter : DataWriter<AnalysedSampleModel, BulkExp
     private BulkExpressionRepository _bulkExpressionRepository;
 
 
-    public BulkExpressionsDataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public BulkDataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
         var dbContext = dbContextFactory.CreateDbContext();
         
@@ -35,7 +35,7 @@ public class BulkExpressionsDataWriter : DataWriter<AnalysedSampleModel, BulkExp
         _bulkExpressionRepository = new BulkExpressionRepository(dbContext);
     }
 
-    protected override void ProcessModel(AnalysedSampleModel model, ref BulkExpressionsDataUploadAudit audit)
+    protected override void ProcessModel(AnalysedSampleModel model, ref BulkDataUploadAudit audit)
     {
         var analysis = _analysisRepository.FindOrCreate(model);
 
@@ -48,7 +48,7 @@ public class BulkExpressionsDataWriter : DataWriter<AnalysedSampleModel, BulkExp
     }
 
 
-    private void WriteExpressions(int analysedSampleId, IEnumerable<BulkExpressionModel> models, ref BulkExpressionsDataUploadAudit audit)
+    private void WriteExpressions(int analysedSampleId, IEnumerable<BulkExpressionModel> models, ref BulkDataUploadAudit audit)
     {
         var queue = new Queue<BulkExpressionModel>(models);
 

@@ -1,65 +1,65 @@
 ﻿using Unite.Cache.Configuration.Options;
-using Unite.Genome.Feed.Web.Models.Variants;
+using Unite.Genome.Feed.Web.Models.Base;
 
 namespace Unite.Genome.Feed.Web.Submissions;
 
 public class VariantsSubmissionService
 {
-	private readonly Repositories.Variants.SSM.DefaultSubmissionRepository _ssmDefaultRepository;
-	private readonly Repositories.Variants.CNV.DefaultSubmissionRepository _cnvDefaultRepository;
-	private readonly Repositories.Variants.SV.DefaultSubmissionRepository _svDefaultRepository;
+	private readonly Repositories.Variants.SsmSubmissionRepository _ssmRepository;
+	private readonly Repositories.Variants.CnvSubmissionRepository _cnvRepository;
+	private readonly Repositories.Variants.SvSubmissionRepository _svRepository;
 
 
     public VariantsSubmissionService(IMongoOptions options)
 	{
-		_ssmDefaultRepository = new Repositories.Variants.SSM.DefaultSubmissionRepository(options);
-		_cnvDefaultRepository = new Repositories.Variants.CNV.DefaultSubmissionRepository(options);
-		_svDefaultRepository = new Repositories.Variants.SV.DefaultSubmissionRepository(options);
+		_ssmRepository = new Repositories.Variants.SsmSubmissionRepository(options);
+		_cnvRepository = new Repositories.Variants.CnvSubmissionRepository(options);
+		_svRepository = new Repositories.Variants.SvSubmissionRepository(options);
 	}
 
 
 	public string AddSsmSubmission(SequencingDataModel<Models.Variants.SSM.VariantModel> data)
 	{
-		return _ssmDefaultRepository.Add(data);
+		return _ssmRepository.Add(data);
 	}
 
     public string AddCnvSubmission(SequencingDataModel<Models.Variants.CNV.VariantModel> data)
     {
-        return _cnvDefaultRepository.Add(data);
+        return _cnvRepository.Add(data);
     }
 
     public string AddSvSubmission(SequencingDataModel<Models.Variants.SV.VariantModel> data)
     {
-        return _svDefaultRepository.Add(data);
+        return _svRepository.Add(data);
     }
 
 	public SequencingDataModel<Models.Variants.SSM.VariantModel> FindSsmSubmission(string id)
 	{
-		return _ssmDefaultRepository.Find(id)?.Document;
+		return _ssmRepository.Find(id)?.Document;
 	}
 
     public SequencingDataModel<Models.Variants.CNV.VariantModel> FindCnvSubmission(string id)
     {
-        return _cnvDefaultRepository.Find(id)?.Document;
+        return _cnvRepository.Find(id)?.Document;
     }
 
     public SequencingDataModel<Models.Variants.SV.VariantModel> FindSvSubmission(string id)
     {
-        return _svDefaultRepository.Find(id)?.Document;
+        return _svRepository.Find(id)?.Document;
     }
 
     public void DeleteSsmSubmission(string id)
     {
-        _ssmDefaultRepository.Delete(id);
+        _ssmRepository.Delete(id);
     }
 
     public void DeleteCnvSubmission(string id)
     {
-        _cnvDefaultRepository.Delete(id);
+        _cnvRepository.Delete(id);
     }
 
     public void DeleteSvSubmission(string id)
     {
-        _svDefaultRepository.Delete(id);
+        _svRepository.Delete(id);
     }
 }

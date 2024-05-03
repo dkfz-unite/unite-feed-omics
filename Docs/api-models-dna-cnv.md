@@ -15,7 +15,7 @@ Includes information about the analysis, analysed samples and sequencing data.
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 
-**`variants`*** - Variants found in target sample during the analysis.
+**`entries`*** - Variants found in target sample during the analysis.
 - Type: _Array_
 - Element type: _Object([Variant](api-models-cnv.md#variant))_
 - Limitations: Should contain at leas one element

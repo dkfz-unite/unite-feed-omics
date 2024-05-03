@@ -1,4 +1,5 @@
 ﻿using Unite.Cache.Configuration.Options;
+using Unite.Genome.Feed.Web.Models.Base;
 using Unite.Genome.Feed.Web.Models.Transcriptomics;
 using Unite.Genome.Feed.Web.Submissions.Repositories.Transcriptomics;
 
@@ -6,27 +7,44 @@ namespace Unite.Genome.Feed.Web.Submissions;
 
 public class TranscriptomicsSubmissionService
 {
-	private readonly DefaultSubmissionRepository _defaultRepository;
+	private readonly BulkSubmissionRepository _bulkRepository;
+	private readonly CellSubmissionRepository _cellRepository;
 
 
 	public TranscriptomicsSubmissionService(IMongoOptions options)
 	{
-		_defaultRepository = new DefaultSubmissionRepository(options);
+		_bulkRepository = new BulkSubmissionRepository(options);
+		_cellRepository = new CellSubmissionRepository(options);
 	}
 
 
-	public string AddSubmission(SequencingDataModel<BulkExpressionModel> data)
+	public string AddBulkSubmission(SequencingDataModel<BulkExpressionModel> data)
 	{
-		return _defaultRepository.Add(data);
+		return _bulkRepository.Add(data);
 	}
 
-	public SequencingDataModel<BulkExpressionModel> FindSubmission(string id)
+	public string AddCellSubmission(SequencingDataModel<CellExpressionModel> data)
 	{
-		return _defaultRepository.Find(id)?.Document;
+		return _cellRepository.Add(data);
 	}
 
-	public void DeleteSubmission(string id)
+	public SequencingDataModel<BulkExpressionModel> FindBulkSubmission(string id)
 	{
-		_defaultRepository.Delete(id);
+		return _bulkRepository.Find(id)?.Document;
+	}
+
+	public SequencingDataModel<CellExpressionModel> FindCellSubmission(string id)
+	{
+		return _cellRepository.Find(id)?.Document;
+	}
+
+	public void DeleteBulkSubmission(string id)
+	{
+		_bulkRepository.Delete(id);
+	}
+
+	public void DeleteCellSubmission(string id)
+	{
+		_cellRepository.Delete(id);
 	}
 }

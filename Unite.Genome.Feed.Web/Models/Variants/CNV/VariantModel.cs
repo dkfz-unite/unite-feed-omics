@@ -53,8 +53,8 @@ public record VariantModel
     /// <summary>
     /// Homozygous deletion (both C1 and C2 are 0)
     /// </summary>
-    [JsonPropertyName("homo_del")]
-    public bool? HomoDel { get => _homoDel ?? GetHomoDel(C1, C2); set => _homoDel = value; }
+    [JsonPropertyName("del")]
+    public bool? Del { get => _homoDel ?? GetDel(C1, C2); set => _homoDel = value; }
 
     /// <summary>
     /// Mean number of copies in minor allele
@@ -99,7 +99,7 @@ public record VariantModel
     public double? DhMax { get => GetDouble(_dhMax); set => _dhMax = value; }
 
 
-    private static bool? GetHomoDel(int? c1, int? c2)
+    private static bool? GetDel(int? c1, int? c2)
     {
         return (c1 == -1 || c2 == -1) ? null : (c1 == 0 && c2 == 0);
     }
