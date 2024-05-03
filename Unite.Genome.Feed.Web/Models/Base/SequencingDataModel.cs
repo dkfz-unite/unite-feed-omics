@@ -2,10 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Unite.Genome.Feed.Web.Models.Base;
 
-public record SequencingDataModel<TEntry>
-    where TEntry : class, new()
+public record SequencingDataModel<TEntryModel>
+    where TEntryModel : class, new()
 {
-    protected TEntry[] _entries;
+    protected ResourceModel[] _resources;
+    protected TEntryModel[] _entries;
 
     /// <summary>
     /// Analysis data.
@@ -27,8 +28,14 @@ public record SequencingDataModel<TEntry>
     public virtual SampleModel MatchedSample { get; set; }
 
     /// <summary>
+    /// Resources data.
+    /// </summary>
+    [JsonPropertyName("resources")]
+    public virtual ResourceModel[] Resources { get => _resources?.Distinct().ToArray(); set => _resources = value; }
+
+    /// <summary>
     /// Entries data.
     /// </summary>
     [JsonPropertyName("entries")]
-    public virtual TEntry[] Entries { get => _entries?.Distinct().ToArray(); set => _entries = value; }
+    public virtual TEntryModel[] Entries { get => _entries?.Distinct().ToArray(); set => _entries = value; }
 }

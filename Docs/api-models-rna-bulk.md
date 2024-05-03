@@ -1,6 +1,6 @@
-# Gene Expressions Transcriptomics) Data Models
+# Bulk Transcriptomics Data Models
 
-## Transcriptomics Data
+## Sequencing Data
 Includes information about the analysis, sample and expression data.
 
 **`analysis`*** - Sequencing analysis data.
@@ -11,7 +11,7 @@ Includes information about the analysis, sample and expression data.
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 
-**`expressions`*** - Gene expressions found in the sample during the analysis.
+**`entries`*** - Gene expressions found in the sample during the analysis.
 - Type: _Array_
 - Element type: _Object([Expression](api-models-rna-expression.md#expression))_
 - Limitations: If set, should contain at leas one element
@@ -25,7 +25,6 @@ The data can be submitted by only one of the following strategies (one of this f
 - `gene_symbol` - slower than by `gene_id`
 - `transcript_id` - significantly slower than by `gene_id` or `gene_symbol`
 - `transcript_symbol` - slower than by `transcript_id`
-
 
 **`gene_id`** - Gene identifier. 
 - Type: _String_

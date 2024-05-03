@@ -1,6 +1,6 @@
 ﻿namespace Unite.Genome.Feed.Data.Writers.Transcriptomics;
 
-public class BulkExpressionsDataUploadAudit
+public class BulkDataUploadAudit
 {
     public int GenesCreated;
     public int ExpressionsAssociated;

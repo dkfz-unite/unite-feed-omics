@@ -41,5 +41,20 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         RuleFor(model => model.Ploidy)
             .GreaterThanOrEqualTo(0)
             .WithMessage("Should be greater than or equal to 0");
+
+
+        RuleFor(model => model.CellsNumber)
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("Should be greater than or equal to 0");
+
+
+        RuleFor(model => model.GenesModel)
+            .NotEmpty()
+            .When(model => model.CellsNumber > 0)
+            .WithMessage("Should not be empty if 'cellsNumber' is set");
+
+        RuleFor(model => model.GenesModel)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
     }
 }

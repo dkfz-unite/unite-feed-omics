@@ -15,7 +15,7 @@ Includes information about the analysis, analysed samples and sequencing data.
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 
-**`variants`*** - Variants found in target sample during the analysis.
+**`entries`*** - Variants found in target sample during the analysis.
 - Type: _Array_
 - Element type: _Object([Variant](api-models-sv.md#variant))_
 - Limitations: Should contain at leas one element
@@ -40,6 +40,10 @@ Structural variant (SV) data.
 - Limitations: Greater than `Start1`
 - Example: `65498713`
 
+**`flanking_sequence_1`** - Flanking genomic sequence 200bp around first breakpoint.
+- Type: _String_
+- Example: `null`
+
 **`chromosome_2`*** - Second breakpoint chromosome.
 - Type: _String_
 - Possible values: `"1"`, ..., `"22"`, `"X"`, `"Y"`
@@ -56,6 +60,10 @@ Structural variant (SV) data.
 - Limitations: Greater than `Start2`
 - Example: `65608793`
 
+**`flanking_sequence_2`** - Flanking genomic sequence 200bp around second breakpoint.
+- Type: _String_
+- Example: `null`
+
 **`type`*** - Structural variant type.
 - Type: _String_
 - Possible values: `"DUP"`, `"TDUP"`, `"INS"`, `"DEL"`, `"INV"`, `"ITX"`, `"CTX"`, `"COM"`
@@ -64,14 +72,6 @@ Structural variant (SV) data.
 **`inverted`** - Event inversion.
 - Type: _Boolean_
 - Example: `false`
-
-**`flanking_sequence_1`** - Flanking genomic sequence 200bp around first breakpoint.
-- Type: _String_
-- Example: `null`
-
-**`flanking_sequence_2`** - Flanking genomic sequence 200bp around second breakpoint.
-- Type: _String_
-- Example: `null`
 
 #### Type
 Structural variant type values are:

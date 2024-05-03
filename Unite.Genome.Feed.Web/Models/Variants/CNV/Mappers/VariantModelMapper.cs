@@ -21,6 +21,6 @@ public class VariantModelMapper : VariantModelBaseMapper
 
         target.Type = source.Type.Value;
         target.Loh = source.Loh;
-        target.HomoDel = source.HomoDel;
+        target.HomoDel = source.Del;
     }
 }

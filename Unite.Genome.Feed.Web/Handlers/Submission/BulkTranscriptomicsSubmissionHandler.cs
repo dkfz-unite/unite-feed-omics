@@ -8,9 +8,9 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Handlers.Submission;
 
-public class TranscriptomicsSubmissionHandler
+public class BulkTranscriptomicsSubmissionHandler
 {
-    private readonly BulkExpressionsDataWriter _dataWriter;
+    private readonly BulkDataWriter _dataWriter;
     private readonly BulkExpressionsAnnotationService _annotationService;
     private readonly TranscriptomicsSubmissionService _submissionService;
     private readonly GeneIndexingTaskService _indexingTaskService;
@@ -20,13 +20,13 @@ public class TranscriptomicsSubmissionHandler
     private readonly Models.Transcriptomics.Converters.SequencingDataModelConverter _converter;
 
 
-	public TranscriptomicsSubmissionHandler(
-        BulkExpressionsDataWriter dataWriter,
+	public BulkTranscriptomicsSubmissionHandler(
+        BulkDataWriter dataWriter,
         BulkExpressionsAnnotationService annotationService,
         TranscriptomicsSubmissionService submissionService,
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ILogger<TranscriptomicsSubmissionHandler> logger)
+        ILogger<BulkTranscriptomicsSubmissionHandler> logger)
 	{
         _dataWriter = dataWriter;
         _annotationService = annotationService;
@@ -49,7 +49,7 @@ public class TranscriptomicsSubmissionHandler
 	{
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.TEX, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.BGE, 1, (tasks) =>
         {
             stopwatch.Restart();
 
@@ -65,7 +65,7 @@ public class TranscriptomicsSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submitedSequencingData = _submissionService.FindSubmission(submissionId);
+        var submitedSequencingData = _submissionService.FindBulkSubmission(submissionId);
         var annotatedExpressions = AnnotateExpressions(_annotationService, submitedSequencingData.Entries);
         var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedSequencingData = _converter.Convert(submitedSequencingData);
@@ -73,7 +73,7 @@ public class TranscriptomicsSubmissionHandler
 
         _dataWriter.SaveData(convertedSequencingData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Genes);
-        _submissionService.DeleteSubmission(submissionId);
+        _submissionService.DeleteBulkSubmission(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

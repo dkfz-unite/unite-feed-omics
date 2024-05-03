@@ -12,7 +12,7 @@ Includes the information about sequencing analysis.
 
 **`type`*** - Analysis type.
 - Type: _String_
-- Possible values: `"WGS"`, `"WES"`
+- Possible values: `"WGS"`, `"WES"`, `"RNASeq"`, `"ScRNASeq"`, `"Other"`
 - Example: `"WES"`
 
 **`date`** - Date of the analysis.
