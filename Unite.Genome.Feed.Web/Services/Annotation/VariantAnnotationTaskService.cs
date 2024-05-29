@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
-using Unite.Data.Entities.Genome.Variants;
+using Unite.Data.Entities.Genome.Analysis.Dna;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 
@@ -12,7 +12,7 @@ namespace Unite.Genome.Feed.Web.Services.Annotation;
 /// Variants annotation tasks service.
 /// </summary>
 /// <typeparam name="TVariant">Variant type.</typeparam>
-public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskService<TVariant, long>
+public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskService<TVariant, int>
     where TVariant : Variant
 {
     protected override int BucketSize => 1000;
@@ -31,7 +31,7 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
 
-        IterateEntities<TVariant, long>(variant => true, variant => variant.Id, variants =>
+        IterateEntities<TVariant, int>(variant => true, variant => variant.Id, variants =>
         {
             CreateVariantAnnotationTasks(variants);
         });
@@ -43,7 +43,7 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// Creates only variant annotation tasks for all variants with given identifiers.
     /// </summary>
     /// <param name="keys">Variants indentifiers.</param>
-    public override void CreateTasks(IEnumerable<long> keys)
+    public override void CreateTasks(IEnumerable<int> keys)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
@@ -65,7 +65,7 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// Populates all types of annotation tasks for variants with given identifiers.
     /// </summary>
     /// <param name="keys">Variants indentifiers.</param>
-    public override void PopulateTasks(IEnumerable<long> keys)
+    public override void PopulateTasks(IEnumerable<int> keys)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
@@ -88,17 +88,17 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// Creates annotation tasks for given variant identifiers depedning on variant type.
     /// </summary>
     /// <param name="keys">Variants identifiers.</param>
-    private void CreateVariantAnnotationTasks(IEnumerable<long> keys)
+    private void CreateVariantAnnotationTasks(IEnumerable<int> keys)
     {
-        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Variants.SSM.Variant))
+        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Ssm.Variant))
         {
             CreateTasks(AnnotationTaskType.SSM, keys);
         }
-        else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Variants.CNV.Variant))
+        else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Cnv.Variant))
         {
             CreateTasks(AnnotationTaskType.CNV, keys);
         }
-        else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Variants.SV.Variant))
+        else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Sv.Variant))
         {
             CreateTasks(AnnotationTaskType.SV, keys);
         }

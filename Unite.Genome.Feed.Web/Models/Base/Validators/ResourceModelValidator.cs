@@ -6,9 +6,23 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
 {
     private static readonly string[] _allowedTypes =
     {
+        "dna", // dna allignment
+        "dna/ssm", // simple somatic mutations
+        "dna/cnv", // copy number variants
+        "dna/sv", // structural variants
+        "rna", // rna allignment
+        "rna/exp", // gene expressions
+        "rnasc", // single cell rna allignment
+        "rnasc/exp", // single cell gene expressions
+    };
+
+    private static readonly string[] _allowedFormats = 
+    {
         "tsv",
         "csv[(delimeter)]", // csv or csv(;), "," is default delimeter
-        "mtx", // Matrix Market format
+        "vcf", // variant call format
+        "bam", // alligned reads
+        "mex", // 10x genomics single cell gene expression matrix
     };
 
     public ResourceModelValidator()
@@ -21,14 +35,16 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
             .Must(type => _allowedTypes.Contains(type))
             .WithMessage("Type is not allowed");
 
-        RuleFor(model => model.Path)
+        RuleFor(model => model.Format)
             .NotEmpty()
-            .When(model => string.IsNullOrEmpty(model.Url))
-            .WithMessage("Should not be empty if 'url' is not set");
+            .WithMessage("Should not be empty");
+
+        RuleFor(model => model.Format)
+            .Must(format => _allowedFormats.Contains(format))
+            .WithMessage("Format is not allowed");
 
         RuleFor(model => model.Url)
             .NotEmpty()
-            .When(model => string.IsNullOrEmpty(model.Path))
-            .WithMessage("Should not be empty if 'path' is not set");
+            .WithMessage("Should not be empty");
     }
 }

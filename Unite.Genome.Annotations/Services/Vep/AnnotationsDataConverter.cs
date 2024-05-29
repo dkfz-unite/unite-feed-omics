@@ -1,7 +1,7 @@
 ﻿using Unite.Genome.Annotations.Clients.Ensembl.Resources;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
 using Unite.Genome.Annotations.Services.Models;
-using Unite.Genome.Annotations.Services.Models.Variants;
+using Unite.Genome.Annotations.Services.Models.Dna;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
@@ -15,17 +15,15 @@ internal static class AnnotationsDataConverter
     /// <param name="geneResources">Annotated genes cache</param>
     /// <param name="transcriptResources">Annotated transcripts cache</param>
     /// <returns>List of variant consequences data models.</returns>
-    public static ConsequencesDataModel[] Convert(AnnotatedVariantResource[] variantResources, GeneResource[] geneResources, TranscriptResource[] transcriptResources)
+    public static EffectsDataModel[] Convert(AnnotatedVariantResource[] variantResources, GeneResource[] geneResources, TranscriptResource[] transcriptResources)
     {
-        var consequencesDataModels = new List<ConsequencesDataModel>();
+        var effectsDataModels = new List<EffectsDataModel>();
 
         foreach (var variantResource in variantResources)
         {
-            var consequencesDataModel = new ConsequencesDataModel();
+            var effectsDataModel = new EffectsDataModel() { VariantId = variantResource.VariantId }; 
 
-            consequencesDataModel.VariantId = variantResource.VariantId;
-
-            consequencesDataModel.AffectedTranscripts = variantResource.AffectedTranscripts?.Select(affectedTranscript =>
+            effectsDataModel.AffectedTranscripts = variantResource.AffectedTranscripts?.Select(affectedTranscript =>
             {
                 var affectedTranscriptModel = new AffectedTranscriptModel();
 
@@ -67,17 +65,12 @@ internal static class AnnotationsDataConverter
 
             }).ToArray();
 
-            consequencesDataModels.Add(consequencesDataModel);
+            effectsDataModels.Add(effectsDataModel);
         }
 
-        return consequencesDataModels.ToArray();
+        return effectsDataModels.ToArray();
     }
 
-
-    private static void Map(AnnotatedVariantResource resource, VariantModel model)
-    {
-        model.Id = resource.VariantId;
-    }
 
     private static void Map(AffectedTranscriptResource resource, AffectedTranscriptModel model)
     {
@@ -87,13 +80,13 @@ internal static class AnnotationsDataConverter
         model.ProteinEnd = resource.ProteinEnd;
         model.CDNAStart = resource.CDNAStart;
         model.CDNAEnd = resource.CDNAEnd;
-        model.AminoAcidChange = resource.AminoAcidChange;
+        model.AminoAcidChange = resource.ProteinChange;
         model.CodonChange = resource.CodonChange;
-        model.Consequences = resource.Consequences;
+        model.Effects = resource.Effects;
         model.OverlapBpNumber = resource.OverlapBpNumber;
         model.OverlapPercentage = resource.OverlapPercentage;
         model.Distance = resource.Distance;
-        model.Consequences = resource.Consequences;
+        model.Effects = resource.Effects;
     }
 
     private static void Map(GeneResource resource, GeneModel model)

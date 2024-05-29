@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
-using Unite.Data.Entities.Genome.Variants.SV;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Indices.Services;

@@ -2,7 +2,7 @@
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Genome.Annotations.Services.Vep;
-using Unite.Genome.Feed.Data.Writers.Variants;
+using Unite.Genome.Feed.Data.Writers.Dna;
 using Unite.Genome.Feed.Web.Handlers.Annotation.Converters;
 using Unite.Genome.Feed.Web.Services.Indexing;
 
@@ -11,7 +11,7 @@ namespace Unite.Genome.Feed.Web.Handlers.Annotation;
 public class SsmsAnnotationHandler
 {
     private readonly SsmsAnnotationService _annotationService;
-    private readonly SsmConsequencesDataWriter _consequencesDataWriter;
+    private readonly EffectsDataSsmWriter _effectsDataWriter;
     private readonly SsmIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -19,13 +19,13 @@ public class SsmsAnnotationHandler
 
     public SsmsAnnotationHandler(
         SsmsAnnotationService annotationService,
-        SsmConsequencesDataWriter consequencesDataWriter,
+        EffectsDataSsmWriter effectsDataWriter,
         SsmIndexingTaskService indexingTaskService,
         TasksProcessingService taskProcessingService,
         ILogger<SsmsAnnotationHandler> logger)
     {
         _annotationService = annotationService;
-        _consequencesDataWriter = consequencesDataWriter;
+        _effectsDataWriter = effectsDataWriter;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = taskProcessingService;
         _logger = logger;
@@ -68,9 +68,9 @@ public class SsmsAnnotationHandler
     {
         var variants = tasks.Select(task => long.Parse(task.Target)).ToArray();
         var annotations = _annotationService.Annotate(variants);
-        var consequences = ConsequencesDataConverter.Convert(annotations);
+        var effects = EffectsDataConverter.Convert(annotations);
 
-        _consequencesDataWriter.SaveData(consequences, out var audit);
+        _effectsDataWriter.SaveData(effects, out var audit);
         _indexingTaskService.PopulateTasks(audit.Variants);
 
         _logger.LogInformation("{audit}", audit.ToString());

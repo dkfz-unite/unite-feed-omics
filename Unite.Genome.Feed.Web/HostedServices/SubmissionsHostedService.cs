@@ -5,16 +5,16 @@ namespace Unite.Genome.Feed.Web.HostedServices;
 
 public class SubmissionsHostedService : BackgroundService
 {
-    private readonly BulkTranscriptomicsSubmissionHandler _bulkTranscriptomicsSubmissionHandler;
-    private readonly CellTranscriptomicsSubmissionHandler _cellTranscriptomicsSubmissionHandler;
+    private readonly BulkRnaSubmissionHandler _bulkTranscriptomicsSubmissionHandler;
+    private readonly CellRnaSubmissionHandler _cellTranscriptomicsSubmissionHandler;
     private readonly SsmsSubmissionHandler _ssmsSubmissionHandler;
     private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
     private readonly SvsSubmissionHandler _svsSubmissionHandler;
     private readonly ILogger _logger;
 
     public SubmissionsHostedService(
-        BulkTranscriptomicsSubmissionHandler bulkTranscriptomicsSubmissionHandler,
-        CellTranscriptomicsSubmissionHandler cellTranscriptomicsSubmissionHandler,
+        BulkRnaSubmissionHandler bulkTranscriptomicsSubmissionHandler,
+        CellRnaSubmissionHandler cellTranscriptomicsSubmissionHandler,
         SsmsSubmissionHandler ssmsSubmissionHandler,
         CnvsSubmissionHandler cnvsSubmissionHandler,
         SvsSubmissionHandler svsSubmissionHandler,

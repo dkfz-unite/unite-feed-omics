@@ -6,22 +6,22 @@ using Unite.Data.Context.Repositories;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome.Analysis;
 using Unite.Data.Entities.Genome.Enums;
-using Unite.Data.Entities.Genome.Transcriptomics;
+using Unite.Data.Entities.Genome.Analysis.Rna;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Indices.Entities;
 using Unite.Indices.Entities.Variants;
 using Unite.Mapping;
 
-using SSM = Unite.Data.Entities.Genome.Variants.SSM;
-using CNV = Unite.Data.Entities.Genome.Variants.CNV;
-using SV = Unite.Data.Entities.Genome.Variants.SV;
+using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
+using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 
 namespace Unite.Genome.Indices.Services;
 
 public class VariantIndexCreationService<TVariant, TVariantEntry>
-    where TVariant : Data.Entities.Genome.Variants.Variant
-    where TVariantEntry : Data.Entities.Genome.Variants.VariantEntry<TVariant>
+    where TVariant : Data.Entities.Genome.Analysis.Dna.Variant
+    where TVariantEntry : Data.Entities.Genome.Analysis.Dna.VariantEntry<TVariant>
 {
     private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
     private readonly SpecimensRepository _specimensRepository;
@@ -226,14 +226,14 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
             .Distinct()
             .ToArray();
 
-        return dbContext.Set<BulkExpression>()
+        return dbContext.Set<GeneExpression>()
             .AsNoTracking()
-            .Where(expression => specimenIds.Contains(expression.AnalysedSample.TargetSampleId))
+            .Where(expression => specimenIds.Contains(expression.Sample.SpecimenId))
             .Any(expression => geneIds.Contains(expression.EntityId));
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(long variantId)
+    private SpecimenIndex[] CreateSpecimenIndices(int variantId)
     {
         var specimens = LoadSpecimens(variantId);
 
@@ -248,7 +248,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
         {
             Donor = CreateDonorIndex(specimen.Id, out var diagnosisDate),
             Images = CreateImageIndices(specimen.Id, diagnosisDate),
-            Analyses = CreateAnalysisIndices(specimen.Id, diagnosisDate)
+            Samples = CreateSampleIndices(specimen.Id, diagnosisDate)
         };
 
         SpecimenIndexMapper.Map(specimen, index, diagnosisDate);
@@ -256,7 +256,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
         return index;
     }
 
-    private Specimen[] LoadSpecimens(long variantId)
+    private Specimen[] LoadSpecimens(int variantId)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
@@ -270,7 +270,9 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
             .IncludeXenograft()
             .IncludeMolecularData()
             .IncludeInterventions()
-            .IncludeDrugScreenings()
+            .Include(specimen => specimen.SpecimenSamples)
+                .ThenInclude(sample => sample.DrugScreenings)
+                    .ThenInclude(drugScreening => drugScreening.Entity)
             .Where(specimen => specimenIds.Contains(specimen.Id))
             .ToArray();
     }
@@ -342,28 +344,28 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
     }
 
 
-    private AnalysisIndex[] CreateAnalysisIndices(int specimenId, DateOnly? diagnosisDate)
+    private SampleIndex[] CreateSampleIndices(int specimenId, DateOnly? diagnosisDate)
     {
-        var analyses = LoadAnalyses(specimenId);
+        var samples = LoadAnalyses(specimenId);
 
-        var indices = analyses.Select(analysis => CreateAnalysisIndex(analysis, diagnosisDate));
+        var indices = samples.Select(sample => CreateAnalysisIndex(sample, diagnosisDate));
 
         return indices.Any() ? indices.ToArray() : null;
     }
 
-    private static AnalysisIndex CreateAnalysisIndex(AnalysedSample analysis, DateOnly? diagnosisDate)
+    private static SampleIndex CreateAnalysisIndex(Sample sample, DateOnly? diagnosisDate)
     {
-        return AnalysisIndexMapper.CreateFrom<AnalysisIndex>(analysis, diagnosisDate);
+        return SampleIndexMapper.CreateFrom<SampleIndex>(sample, diagnosisDate);
     }
 
-    private AnalysedSample[] LoadAnalyses(int specimenId)
+    private Sample[] LoadAnalyses(int specimenId)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        return dbContext.Set<AnalysedSample>()
+        return dbContext.Set<Sample>()
             .AsNoTracking()
-            .Include(analysedSample => analysedSample.Analysis)
-            .Where(analysedSample => analysedSample.TargetSampleId == specimenId)
+            .Include(sample => sample.Analysis)
+            .Where(sample => sample.SpecimenId == specimenId)
             .ToArray();
     }
 

@@ -40,7 +40,7 @@ public class XenograftRepository
             DonorId = donorId,
             ReferenceId = referenceId,
             TypeId = SpecimenType.Xenograft,
-            Xenograft = new Xenograft { ReferenceId = referenceId }
+            Xenograft = new Xenograft()
         };
 
         _dbContext.Add(entity);

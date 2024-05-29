@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Variants.CNV;
+using Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Genome.Annotations.Services.Models.Variants;
+using Unite.Genome.Annotations.Services.Models.Dna;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
@@ -25,7 +25,7 @@ public class CnvsAnnotationService
     }
 
 
-    public ConsequencesDataModel[] Annotate(long[] variantIds)
+    public EffectsDataModel[] Annotate(long[] variantIds)
     {
         var variants = LoadVariants(variantIds);
 

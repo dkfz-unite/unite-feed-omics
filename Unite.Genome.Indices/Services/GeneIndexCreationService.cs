@@ -1,19 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Entities.Donors;
-using Unite.Data.Entities.Genome.Transcriptomics;
-using Unite.Data.Entities.Genome.Variants;
+using Unite.Data.Entities.Genome.Analysis.Dna;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Genome.Analysis;
-using Unite.Genome.Indices.Services.Mappers;
+using Unite.Essentials.Extensions;
 using Unite.Indices.Entities.Genes;
 using Unite.Mapping;
 
-using CNV = Unite.Data.Entities.Genome.Variants.CNV;
-using SSM = Unite.Data.Entities.Genome.Variants.SSM;
-using SV = Unite.Data.Entities.Genome.Variants.SV;
-using Unite.Essentials.Extensions;
+using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
+using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
+
 
 namespace Unite.Genome.Indices.Services;
 
@@ -84,9 +83,8 @@ public class GeneIndexCreationService
         var index = SpecimenIndexMapper.CreateFrom<SpecimenIndex>(specimen, diagnosisDate);
 
         index.Donor = CreateDonorIndex(specimen.Id, context);
-        index.Expression = CreateExpressionIndex(specimen.Id, context);
         index.Images = CreateImageIndices(specimen.Id, context, diagnosisDate);
-        index.Analyses = CreateAnalysisIndices(specimen.Id, context, diagnosisDate);
+        index.Samples = CreateSampleIndices(specimen.Id, context, diagnosisDate);
         index.Variants = CreateVariantIndices(specimen.Id, context);
         
         return index;
@@ -121,29 +119,6 @@ public class GeneIndexCreationService
     }
 
 
-    private static BulkExpressionIndex CreateExpressionIndex(int specimenId, GeneIndexCreationContext context)
-    {
-        var expression = LoadExpression(specimenId, context);
-
-        if (expression == null)
-        {
-            return null;
-        }
-
-        return CreateExpressionIndex(expression);
-    }
-
-    private static BulkExpressionIndex CreateExpressionIndex(BulkExpression expression)
-    {
-        return BulkExpressionIndexMapper.CreateFrom(expression);
-    }
-
-    private static BulkExpression LoadExpression(int specimenId, GeneIndexCreationContext context)
-    {
-        return context.BulkExpressionsCache.TryGetValue(specimenId, out var value) ? value : null;
-    }
-
-
     private static ImageIndex[] CreateImageIndices(int specimenId, GeneIndexCreationContext context, DateOnly? diagnosisDate)
     {
         var images = LoadImages(specimenId, context);
@@ -164,23 +139,23 @@ public class GeneIndexCreationService
     }
 
 
-    private static AnalysisIndex[] CreateAnalysisIndices(int specimenId, GeneIndexCreationContext context, DateOnly? diagnosisDate)
+    private static SampleIndex[] CreateSampleIndices(int specimenId, GeneIndexCreationContext context, DateOnly? diagnosisDate)
     {
-        var analyses = LoadAnalyses(specimenId, context);
+        var samples = LoadSamples(specimenId, context);
 
-        var indices = analyses.Select(analysis => CreateAnalysisIndex(analysis, diagnosisDate));
+        var indices = samples.Select(sample => CreateSampleIndex(sample, diagnosisDate));
 
         return indices.Any() ? indices.ToArray() : null;
     }
 
-    private static AnalysisIndex CreateAnalysisIndex(AnalysedSample analysis, DateOnly? diagnosisDate)
+    private static SampleIndex CreateSampleIndex(Sample sample, DateOnly? diagnosisDate)
     {
-        return AnalysisIndexMapper.CreateFrom<AnalysisIndex>(analysis, diagnosisDate);
+        return SampleIndexMapper.CreateFrom<SampleIndex>(sample, diagnosisDate);
     }
 
-    private static AnalysedSample[] LoadAnalyses(int specimenId, GeneIndexCreationContext context)
+    private static Sample[] LoadSamples(int specimenId, GeneIndexCreationContext context)
     {
-        return context.AnalysesCache.TryGetValue(specimenId, out var value) ? value : [];
+        return context.Samples.TryGetValue(specimenId, out var value) ? value : [];
     }
 
 
@@ -236,7 +211,7 @@ public class GeneIndexCreationService
         return variants;
     }
 
-    private TVariant[] LoadVariants<TVariantEntry, TVariant>(int specimenId, IEnumerable<long> affectedTranscriptsCache)
+    private TVariant[] LoadVariants<TVariantEntry, TVariant>(int specimenId, IEnumerable<int> affectedTranscriptsCache)
         where TVariantEntry : VariantEntry<TVariant>
         where TVariant : Variant
     {
@@ -245,7 +220,7 @@ public class GeneIndexCreationService
         return dbContext.Set<TVariantEntry>()
             .AsNoTracking()
             .Include(entry => entry.Entity)
-            .Where(entry => entry.AnalysedSample.TargetSampleId == specimenId)
+            .Where(entry => entry.Sample.SpecimenId == specimenId)
             .Where(entry => affectedTranscriptsCache.Contains(entry.EntityId))
             .GroupBy(entry => entry.EntityId)
             .Select(group => group.First().Entity)

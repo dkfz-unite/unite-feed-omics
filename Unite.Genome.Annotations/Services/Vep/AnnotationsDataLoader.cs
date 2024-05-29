@@ -5,7 +5,7 @@ using Unite.Genome.Annotations.Clients.Ensembl;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources;
 using Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
-using Unite.Genome.Annotations.Services.Models.Variants;
+using Unite.Genome.Annotations.Services.Models.Dna;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
@@ -28,7 +28,7 @@ internal class AnnotationsDataLoader
     }
 
 
-    public async Task<ConsequencesDataModel[]> LoadData(string[] vepCodes)
+    public async Task<EffectsDataModel[]> LoadData(string[] vepCodes)
     {
         var variants = await AnnotateVariants(vepCodes);
         var genes = await AnnotateGenes(variants);

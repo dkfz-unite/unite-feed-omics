@@ -40,7 +40,7 @@ public class LineRepository
             DonorId = donorId,
             ReferenceId = referenceId,
             TypeId = SpecimenType.Line,
-            Line = new Line { ReferenceId = referenceId }
+            Line = new Line()
         };
 
         _dbContext.Add(entity);

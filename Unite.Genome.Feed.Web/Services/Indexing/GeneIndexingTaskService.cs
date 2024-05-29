@@ -6,9 +6,9 @@ using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 
-using SSM = Unite.Data.Entities.Genome.Variants.SSM;
-using CNV = Unite.Data.Entities.Genome.Variants.CNV;
-using SV = Unite.Data.Entities.Genome.Variants.SV;
+using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
+using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 
@@ -104,17 +104,17 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
         return keys;
     }
 
-    protected override IEnumerable<long> LoadRelatedSsms(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
     {
         return _genesRepository.GetRelatedVariants<SSM.Variant>(keys).Result;
     }
 
-    protected override IEnumerable<long> LoadRelatedCnvs(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedCnvs(IEnumerable<int> keys)
     {
         return _genesRepository.GetRelatedVariants<CNV.Variant>(keys).Result;
     }
 
-    protected override IEnumerable<long> LoadRelatedSvs(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSvs(IEnumerable<int> keys)
     {
         return _genesRepository.GetRelatedVariants<SV.Variant>(keys).Result;
     }

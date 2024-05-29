@@ -4,15 +4,15 @@ using Unite.Data.Context.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Analysis;
-using Unite.Data.Entities.Genome.Transcriptomics;
-using Unite.Data.Entities.Genome.Variants;
+using Unite.Data.Entities.Genome.Analysis.Rna;
+using Unite.Data.Entities.Genome.Analysis.Dna;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Data.Entities.Specimens.Materials.Enums;
 
-using CNV = Unite.Data.Entities.Genome.Variants.CNV;
-using SSM = Unite.Data.Entities.Genome.Variants.SSM;
-using SV = Unite.Data.Entities.Genome.Variants.SV;
+using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
+using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 
 namespace Unite.Genome.Indices.Services;
 
@@ -34,24 +34,24 @@ internal class GeneIndexCreationContextLoader
         var ssmAffectedTranscriptsCache = LoadAffectedTranscriptsCache<SSM.Variant, SSM.AffectedTranscript>(geneId);
         var cnvAffectedTranscriptsCache = LoadAffectedTranscriptsCache<CNV.Variant, CNV.AffectedTranscript>(geneId);
         var svAffectedTranscriptsCache = LoadAffectedTranscriptsCache<SV.Variant, SV.AffectedTranscript>(geneId);
-        var bulkExpressionsCache = LoadExpressionsCache(geneId);
+        var geneExpressionsCache = LoadExpressionsCache(geneId);
 
         var ssmAffectedSpecimenIds = LoadAffectedSpecimenIds<SSM.Variant, SSM.VariantEntry, SSM.AffectedTranscript>(ssmAffectedTranscriptsCache);
         var cnvAffectedSpecimenIds = LoadAffectedSpecimenIds<CNV.Variant, CNV.VariantEntry, CNV.AffectedTranscript>(cnvAffectedTranscriptsCache);
         var svAffectedSpecimenIds = LoadAffectedSpecimenIds<SV.Variant, SV.VariantEntry, SV.AffectedTranscript>(svAffectedTranscriptsCache);
-        var bulkExpressionSpecimenIds = LoadAffectedSpecimenIds(bulkExpressionsCache);
+        var geneExpressionSpecimenIds = LoadAffectedSpecimenIds(geneExpressionsCache);
 
         var specimenIds = Enumerable.Empty<int>()
             .Union(ssmAffectedSpecimenIds)
             .Union(cnvAffectedSpecimenIds)
             .Union(svAffectedSpecimenIds)
-            .Union(bulkExpressionSpecimenIds)
+            .Union(geneExpressionSpecimenIds)
             .ToArray();
 
         var specimensCache = LoadSpecimensCache(specimenIds);
         var donorsCache = LoadDonorsCache(specimenIds);
         var imagesCache = LoadImagesCache(specimenIds);
-        var analysesCache = LoadAnalysesCache(specimenIds);
+        var samplesCache = LoadSamplesCache(specimenIds);
 
         return new GeneIndexCreationContext
         {
@@ -59,11 +59,11 @@ internal class GeneIndexCreationContextLoader
             SsmAffectedTranscriptsCache = ssmAffectedTranscriptsCache,
             CnvAffectedTranscriptsCache = cnvAffectedTranscriptsCache,
             SvAffectedTranscriptsCache = svAffectedTranscriptsCache,
-            BulkExpressionsCache = bulkExpressionsCache,
+            GeneExpressionsCache = geneExpressionsCache,
             SpecimensCache = specimensCache,
             DonorsCache = donorsCache,
             ImagesCache = imagesCache,
-            AnalysesCache = analysesCache
+            Samples = samplesCache
         };
     }
 
@@ -83,7 +83,7 @@ internal class GeneIndexCreationContextLoader
     /// <typeparam name="TVariant">Variant type,</typeparam>
     /// <typeparam name="TAffectedTranscript">Affected transcript type.</typeparam>
     /// <returns>Dictionary of affected transcripts cached by variant ids.</returns>
-    private Dictionary<long, TAffectedTranscript[]> LoadAffectedTranscriptsCache<TVariant, TAffectedTranscript>(int geneId)
+    private Dictionary<int, TAffectedTranscript[]> LoadAffectedTranscriptsCache<TVariant, TAffectedTranscript>(int geneId)
         where TVariant : Variant
         where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
     {
@@ -102,14 +102,14 @@ internal class GeneIndexCreationContextLoader
     /// </summary>
     /// <param name="geneId">Gene id.</param>
     /// <returns>Dictionary of bulk gene expressions cached by specimen ids.</returns>
-    private Dictionary<int, BulkExpression> LoadExpressionsCache(int geneId)
+    private Dictionary<int, GeneExpression> LoadExpressionsCache(int geneId)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        return dbContext.Set<BulkExpression>()
+        return dbContext.Set<GeneExpression>()
             .AsNoTracking()
             .Where(expresson => expresson.EntityId == geneId)
-            .GroupBy(expression => expression.AnalysedSample.TargetSampleId) // Translated to SQL GROUP BY
+            .GroupBy(expression => expression.Sample.SpecimenId) // Translated to SQL GROUP BY
             .ToDictionary(group => group.Key, group => group.FirstOrDefault());
     }
 
@@ -130,7 +130,9 @@ internal class GeneIndexCreationContextLoader
             .IncludeXenograft()
             .IncludeMolecularData()
             .IncludeInterventions()
-            .IncludeDrugScreenings()
+            .Include(specimen => specimen.SpecimenSamples)
+                .ThenInclude(sample => sample.DrugScreenings)
+                    .ThenInclude(drugScreening => drugScreening.Entity)
             .Where(specimen => specimenids.Contains(specimen.Id))
             .ToDictionary(specimen => specimen.Id, specimen => specimen);
     }
@@ -191,19 +193,19 @@ internal class GeneIndexCreationContextLoader
     }
 
     /// <summary>
-    /// Loads analyses for selected specimen ids.
+    /// Loads samples for selected specimen ids.
     /// </summary>
     /// <param name="specimenIds">Specimen ids.</param>
-    /// <returns>Dictionary of analyses cached by specimen ids.</returns>
-    private Dictionary<int, AnalysedSample[]> LoadAnalysesCache(IEnumerable<int> specimenIds)
+    /// <returns>Dictionary of samples cached by specimen ids.</returns>
+    private Dictionary<int, Sample[]> LoadSamplesCache(IEnumerable<int> specimenIds)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        return dbContext.Set<AnalysedSample>()
+        return dbContext.Set<Sample>()
             .AsNoTracking()
             .Include(analysedSample => analysedSample.Analysis)
-            .Where(analysedSample => specimenIds.Contains(analysedSample.TargetSampleId))
-            .GroupBy(analysedSample => analysedSample.TargetSampleId)
+            .Where(analysedSample => specimenIds.Contains(analysedSample.SpecimenId))
+            .GroupBy(analysedSample => analysedSample.SpecimenId)
             .ToDictionary(group => group.Key, group => group.ToArray());
     }
 
@@ -215,7 +217,7 @@ internal class GeneIndexCreationContextLoader
     /// <typeparam name="TVariantEntry">Variant entry type.</typeparam>
     /// <typeparam name="TAffectedTranscript">Affected transcript type.</typeparam>
     /// <returns>Array of specimen ids if were found or empty array otherwise.</returns>
-    private int[] LoadAffectedSpecimenIds<TVariant, TVariantEntry, TAffectedTranscript>(IDictionary<long, TAffectedTranscript[]> affectedTranscriptsCache)
+    private int[] LoadAffectedSpecimenIds<TVariant, TVariantEntry, TAffectedTranscript>(IDictionary<int, TAffectedTranscript[]> affectedTranscriptsCache)
         where TVariant : Variant
         where TVariantEntry : VariantEntry<TVariant>
         where TAffectedTranscript : VariantAffectedFeature<TVariant, Transcript>
@@ -227,7 +229,7 @@ internal class GeneIndexCreationContextLoader
             return dbContext.Set<TVariantEntry>()
                 .AsNoTracking()
                 .Where(entry => affectedTranscriptsCache.Keys.Contains(entry.EntityId))
-                .Select(entry => entry.AnalysedSample.TargetSampleId)
+                .Select(entry => entry.Sample.SpecimenId)
                 .Distinct()
                 .ToArray();
         }

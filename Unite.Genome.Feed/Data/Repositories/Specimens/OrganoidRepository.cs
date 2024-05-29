@@ -40,7 +40,7 @@ internal class OrganoidRepository
             DonorId = donorId,
             ReferenceId = referenceId,
             TypeId = SpecimenType.Organoid,
-            Organoid = new Organoid { ReferenceId = referenceId }
+            Organoid = new Organoid()
         };
 
         _dbContext.Add(entity);

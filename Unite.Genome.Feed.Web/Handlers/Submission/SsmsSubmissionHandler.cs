@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Genome.Feed.Data.Writers.Variants;
+using Unite.Genome.Feed.Data.Writers.Dna;
 using Unite.Genome.Feed.Web.Services.Annotation;
 using Unite.Genome.Feed.Web.Services.Indexing;
 using Unite.Genome.Feed.Web.Submissions;
@@ -13,18 +13,18 @@ public class SsmsSubmissionHandler
     private readonly VariantsDataWriter _dataWriter;
     private readonly SsmAnnotationTaskService _annotationTaskService;
     private readonly SsmIndexingTaskService _indexingTaskService;
-    private readonly VariantsSubmissionService _submissionService;
+    private readonly DnaSubmissionService _submissionService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Variants.SSM.Converters.SequencingDataModelConverter _converter;
+    private readonly Models.Dna.Ssm.Converters.SeqDataModelConverter _converter;
 
 
     public SsmsSubmissionHandler(
         VariantsDataWriter dataWriter,
         SsmAnnotationTaskService annotationTaskService,
         SsmIndexingTaskService indexingTaskService,
-        VariantsSubmissionService submissionService,
+        DnaSubmissionService submissionService,
         TasksProcessingService tasksProcessingService,
         ILogger<SsmsSubmissionHandler> logger)
     {
@@ -35,7 +35,7 @@ public class SsmsSubmissionHandler
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
 
-        _converter = new Models.Variants.SSM.Converters.SequencingDataModelConverter();
+        _converter = new Models.Dna.Ssm.Converters.SeqDataModelConverter();
     }
 
 
