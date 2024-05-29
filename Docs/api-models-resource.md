@@ -8,8 +8,8 @@ Includes the information about available analysis resource (file).
 
 **`format`*** - Resource format.
 - Type: _String_
-- Available values: `"tsv"`, `"csv"`, `"vcf"`, `"BAM"`, `"MEX"`
-- Example: `"BAM"`
+- Available values: `"tsv"`, `"csv"`, `"vcf"`, `"bam"`, `"mex"`
+- Example: `"bam"`
 
 **`url`*** - Resource URL on remote a server.
 - NOTE: Resource can be gzipped
@@ -29,10 +29,10 @@ Resource data can be of the following types:
 #### Resource Format
 Resource format can be of the following types:
 - `"tsv"` - Tab-separated values
-- `"csv"` or `"csv[(del)]"` - Comma-separated or other delimeter (e.g. `csv(;)`) separated values
+- `"csv"` - Comma-separated values
 - `"vcf"` - Variant Calling Format
 - `"BAM"` - Binary Alignment Map
-- `"MEX"` - 10x Genomics single cell dense gene expressions matrix
+- `"MEX"` - 10x Genomics single cell dense gene expressions matrix (folder)
 
 
 ##

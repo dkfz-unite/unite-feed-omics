@@ -19,7 +19,7 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
     private static readonly string[] _allowedFormats = 
     {
         "tsv",
-        "csv[(delimeter)]", // csv or csv(;), "," is default delimeter
+        "csv",
         "vcf", // variant call format
         "bam", // alligned reads
         "mex", // 10x genomics single cell gene expression matrix

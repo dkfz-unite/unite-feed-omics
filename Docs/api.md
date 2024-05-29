@@ -10,7 +10,7 @@ API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](h
 ## Overview
 - get:[api](#get-api) - health check.
 - post:[api/dna/ssms/{type?}](#post-apidnassmstype) - submit SSMs data.
-- post:[api/dna/cnvs/{type?}](#post-apidnacnvtype) - submit CNVs data.
+- post:[api/dna/cnvs/{type?}](#post-apidnacnvstype) - submit CNVs data.
 - post:[api/dna/svs/{type?}](#post-apidnasvstype) - submit SVs data.
 - post:[api/rna/exps/{type?}](#post-apirnaexpstype) - submit **bulk** gene expressions data.
 - post:[api/rnasc/exps/{type?}](#post-apirnascexpstype) - submit **single cell** gene expressions data.
@@ -61,7 +61,7 @@ Supported formats are:
         "resources": [
             {
                 "type": "dna",
-                "format": "BAM",
+                "format": "bam",
                 "url": "example.com/my/file"
             }
         ]
@@ -76,7 +76,7 @@ Supported formats are:
         "resources": [
             {
                 "type": "dna",
-                "format": "BAM",
+                "format": "bam",
                 "url": "example.com/my/file"
             }
         ]
@@ -112,7 +112,7 @@ Supported formats are:
 # tsample_analysis_type: WGS
 # tsample_analysis_date: 2023-12-01
 # tsample_resource_type: dna
-# tsample_resource_format: BAM
+# tsample_resource_format: bam
 # tsample_resource_url: example.com/my/file
 # msample_donor_id: Donor1
 # msample_specimen_id: Material1
@@ -120,7 +120,7 @@ Supported formats are:
 # msample_analysis_type: WGS
 # msample_analysis_date: 2023-12-01
 # msample_resource_type: dna
-# msample_resource_format: BAM
+# msample_resource_format: bam
 # msample_resource_url: example.com/my/file
 chromosome	position	ref	alt
 7	141365018	C	G
@@ -365,7 +365,7 @@ Supported formats are:
         "resources": [
             {
                 "type": "rna",
-                "format": "BAM",
+                "format": "bam",
                 "url": "example.com/my/file"
             }
         ]
@@ -395,7 +395,7 @@ Supported formats are:
 # tsample_analysis_type: RNASeq
 # tsample_analysis_date: 2023-12-01
 # tsample_resource_type: rna
-# tsample_resource_format: BAM
+# tsample_resource_format: bam
 # tsample_resource_url: example.com/my/file
 gene_id	reads
 ENSG00000223972	238
@@ -437,7 +437,12 @@ Supported formats are:
         "resources": [
             {
                 "type": "rnasc",
-                "format": "MEX",
+                "format": "bam",
+                "url": "example.com/my/file"
+            },
+            {
+                "type": "rnasc/exp",
+                "format": "mex",
                 "url": "example.com/my/file"
             }
         ]
@@ -455,7 +460,7 @@ Supported formats are:
 # tsample_cells_number: 5000
 # tsample_genes_model: Marker genes
 # tsample_resource_type: rnasc
-# tsample_resource_format: MEX
+# tsample_resource_format: bam
 # tsample_resource_url: example.com/my/file
 ```
 
