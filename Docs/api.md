@@ -16,15 +16,15 @@ API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](h
 - post:[api/rnasc/exps/{type?}](#post-apirnascexpstype) - submit **single cell** gene expressions data.
 
 > [!Note]
-> **Json** is default data type for all requests and will be used if no data type is specified. 
+> **Json** is default data type for all requests and will be used if no data type is specified.  
 > **Tsv** utilizes comment lines to specify metadata, it supports samples only of one donor and only one uploaded resource.
 
 > [!Note]
-> You can upload only one sample per data type (DNASeq(WES,WGS), RNASeq, RNASeqSc). 
+> You can upload only one sample per data type (DNASeq(WES,WGS), RNASeq, RNASeqSc).  
 > You can upload only **one** resource per sample in **Tsv** format.
 
 > [!Note]
-> Variants calling utilizes the same sample alingment files, so they can be uploaded only once. 
+> Variants calling utilizes the same sample alingment files, so they can be uploaded only once.  
 > E.g. if you upload samples alignement resources with SSMs data, you don't need to upload them again for CNVs or SVs.
 
 
