@@ -11,13 +11,13 @@ public record SeqDataModel<TEntryModel>
     /// Analysed sample.
     /// </summary>
     /// <value></value>
-    [JsonPropertyName("target_sample")]
+    [JsonPropertyName("tsample")]
     public virtual SampleModel TargetSample { get; set; }
 
     /// <summary>
     /// Matched sample.
     /// </summary>
-    [JsonPropertyName("matched_sample")]
+    [JsonPropertyName("msample")]
     public virtual SampleModel MatchedSample { get; set; }
 
     /// <summary>
