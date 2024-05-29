@@ -1,17 +1,13 @@
 # Simple Somatic Mutations (SSM) Data Model
 
 ## Sequencing Data
-Includes information about the analysis, analysed samples and sequencing data.
+Includes information about analysed samples and variants data.
 
-**`analysis`*** - Sequencing analysis data.
-- Type: _Object([Analysis](api-models-analysis.md))_
-- Example: `{...}`
-
-**`target_sample`*** - Target sample data. 
+**`tsample`*** - Target sample data. 
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 
-**`matched_sample`** - Matched sample data.
+**`msample`** - Matched sample data.
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 

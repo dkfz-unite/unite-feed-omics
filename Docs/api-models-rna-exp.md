@@ -1,13 +1,9 @@
 # Bulk Transcriptomics Data Models
 
 ## Sequencing Data
-Includes information about the analysis, sample and expression data.
+Includes information about analysed sample and expression data.
 
-**`analysis`*** - Sequencing analysis data.
-- Type: _Object([Analysis](api-models-analysis.md))_
-- Example: `{...}`
-
-**`target_sample`*** - Target sample data. 
+**`tsample`*** - Target sample data. 
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 

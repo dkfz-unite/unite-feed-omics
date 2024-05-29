@@ -10,7 +10,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Dna;
 
-[Route("api/dna/variants/cnvs")]
+[Route("api/dna/cnvs")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class CnvsController : Controller
 {

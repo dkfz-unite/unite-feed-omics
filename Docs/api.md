@@ -9,15 +9,23 @@ API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](h
 
 ## Overview
 - get:[api](#get-api) - health check.
-- post:[api/dna/variants/ssms/{type?}](#post-apidnavariantsssmstype) - submit SSM sequencing data.
-- post:[api/dna/variants/cnvs{type?}](#post-apidnavariantscnvstype) - submit CNV sequencing data.
-- post:[api/dna/variants/svs{type?}](#post-apidnavariantssvstype) - submit SV sequencing data.
-- post:[api/rna/exp/bulk/{type?}](#post-apirnaexpbulktype) - submit **bulk** gene expression sequencing data.
-- post:[api/rna/exp/cell/{type?}](#post-apirnaexpcelltype) - submit **single cell** gene expression sequencing data.
+- post:[api/dna/ssms/{type?}](#post-apidnassmstype) - submit SSMs data.
+- post:[api/dna/cnvs/{type?}](#post-apidnacnvtype) - submit CNVs data.
+- post:[api/dna/svs/{type?}](#post-apidnasvstype) - submit SVs data.
+- post:[api/rna/exps/{type?}](#post-apirnaexpstype) - submit **bulk** gene expressions data.
+- post:[api/rnasc/exps/{type?}](#post-apirnascexpstype) - submit **single cell** gene expressions data.
 
 > [!Note]
 > **Json** is default data type for all requests and will be used if no data type is specified. 
 > **Tsv** utilizes comment lines to specify metadata, it supports samples only of one donor and only one uploaded resource.
+
+> [!Note]
+> You can upload only one sample per data type (DNASeq(WES,WGS), RNASeq, RNASeqSc). 
+> You can upload only **one** resource per sample in **Tsv** format.
+
+> [!Note]
+> Variants calling utilizes the same sample alingment files, so they can be uploaded only once. 
+> E.g. if you upload samples alignement resources with SSMs data, you don't need to upload them again for CNVs or SVs.
 
 
 ## GET: [api](http://localhost:5106/api)
@@ -27,7 +35,7 @@ Health check.
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
-## POST: [api/dna/variants/ssms/{type?}](http://localhost:5106/api/dna/variants/ssms)
+## POST: [api/dna/ssms/{type?}](http://localhost:5106/api/dna/ssms)
 Submit mutations (SSM) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -44,19 +52,34 @@ Supported formats are:
 #### json - application/json
 ```json
 {
-    "analysis": {
-        "type": "WGS",
-        "date": "2023-12-01"
-    },
-    "target_sample": {
+    "tsample": {
         "donor_id": "Donor1",
         "specimen_id": "Material2",
-        "specimen_type": "Material"
+        "specimen_type": "Material",
+        "analysis_type": "WGS",
+        "analysis_date": "2023-12-01",
+        "resources": [
+            {
+                "type": "dna",
+                "format": "BAM",
+                "url": "example.com/my/file"
+            }
+        ]
+                
     },
-    "matched_sample": {
+    "msample": {
         "donor_id": "Donor1",
         "specimen_id": "Material1",
-        "specimen_type": "Material"
+        "specimen_type": "Material",
+        "analysis_type": "WGS",
+        "analysis_date": "2023-12-01",
+        "resources": [
+            {
+                "type": "dna",
+                "format": "BAM",
+                "url": "example.com/my/file"
+            }
+        ]
     },
     "entries": [
         {
@@ -83,13 +106,22 @@ Supported formats are:
 
 #### tsv - text/tab-separated-values
 ```tsv
-# donor_id: Donor1
-# target_sample_id: Material2
-# target_sample_type: Material
-# matched_sample_id: Material1
-# matched_sample_type: Material
-# analysis_type: WGS
-# analysis_date: 2023-12-01
+# tsample_donor_id: Donor1
+# tsample_specimen_id: Material2
+# tsample_specimen_type: Material
+# tsample_analysis_type: WGS
+# tsample_analysis_date: 2023-12-01
+# tsample_resource_type: dna
+# tsample_resource_format: BAM
+# tsample_resource_url: example.com/my/file
+# msample_donor_id: Donor1
+# msample_specimen_id: Material1
+# msample_specimen_type: Material
+# msample_analysis_type: WGS
+# msample_analysis_date: 2023-12-01
+# msample_resource_type: dna
+# msample_resource_format: BAM
+# msample_resource_url: example.com/my/file
 chromosome	position	ref	alt
 7	141365018	C	G
 4	110895931	A	T
@@ -106,8 +138,8 @@ Fields description can be found [here](api-models-dna-ssm.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/cnvs/{type?}](http://localhost:5106/api/dna/variants/cnvs)
-Submit Copy Number Variants (CNV) data (including sequencing analysis data) in default format.
+## POST: [api/dna/cnvs/{type?}](http://localhost:5106/api/dna/cnvs)
+Submit Copy Number Variants (CNV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
@@ -121,21 +153,21 @@ Supported formats are:
 #### json - application/json
 ```json
 {
-    "analysis": {
-        "type": "WGS",
-        "date": "2023-12-01"
-    },
-    "target_sample": {
+    "tsample": {
         "donor_id": "Donor1",
         "specimen_id": "Material2",
         "specimen_type": "Material",
-        "purity": 0.95,
+        "analysis_type": "WGS",
+        "analysis_date": "2023-12-01",
+        "purity": 95,
         "ploidy": 2
     },
-    "matched_sample": {
+    "msample": {
         "donor_id": "Donor1",
         "specimen_id": "Material1",
-        "specimen_type": "Material"
+        "specimen_type": "Material",
+        "analysis_type": "WGS",
+        "analysis_date": "2023-12-01",
     },
     "entries": [
         {
@@ -186,15 +218,18 @@ Supported formats are:
 
 #### tsv - text/tab-separated-values
 ```tsv
-# donor_id: Donor1
-# target_sample_id: Material2
-# target_sample_type: Material
-# target_sample_purity: 0.95
-# target_sample_ploidy: 2
-# matched_sample_id: Material1
-# matched_sample_type: Material
-# analysis_type: WGS
-# analysis_date: 2023-12-01
+# tsample_donor_id: Donor1
+# tsample_specimen_id: Material2
+# tsample_specimen_type: Material
+# tsample_analysis_type: WGS
+# tsample_analysis_date: 2023-12-01
+# tsample_purity: 95
+# tsample_ploidy: 2
+# msample_donor_id: Donor1
+# msample_specimen_id: Material1
+# msample_specimen_type: Material
+# msample_analysis_type: WGS
+# msample_analysis_date: 2023-12-01
 chromosome	start	end	type	loh	del	c1_mean	c2_mean	tcn_mean	c1	c2	tcn
 4	164362032	164458144	Gain	false	false	1.2465	2.8643	4.1108	1	3	4
 5	65498712	65608792	Loss	true	false	1.1265	0.0378	1.1643	1	0	1
@@ -210,7 +245,7 @@ Fields description can be found [here](api-model-dna-cnv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/variants/svs/{type?}](http://localhost:5106/api/dna/variants/svs)
+## POST: [api/dna/svs/{type?}](http://localhost:5106/api/dna/svs)
 Submit Structural Variants (SV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -225,21 +260,19 @@ Supported formats are:
 #### json - application/json
 ```json
 {
-    "analysis": {
-        "type": "WGS",
-        "date": "2023-12-01"
-    },
-    "target_sample": {
+    "tsample": {
         "donor_id": "Donor1",
         "specimen_id": "Material2",
         "specimen_type": "Material",
-        "purity": null,
-        "ploidy": 2
+        "analysis_type": "WGS",
+        "analysis_date": "2023-12-01"
     },
     "matched_sample": {
         "donor_id": "Donor1",
         "specimen_id": "Material1",
-        "specimen_type": "Material"
+        "specimen_type": "Material",
+        "analysis_type": "WGS",
+        "analysis_date": "2023-12-01"
     },
     "entries": [
         {
@@ -284,13 +317,16 @@ Supported formats are:
 
 #### tsv - text/tab-separated-values
 ```tsv
-# donor_id: Donor1
-# target_sample_id: Material2
-# target_sample_type: Material
-# matched_sample_id: Material1
-# matched_sample_type: Material
-# analysis_type: WGS
-# analysis_date: 2023-12-01
+# tsample_donor_id: Donor1
+# tsample_specimen_id: Material2
+# tsample_specimen_type: Material
+# tsample_analysis_type: WGS
+# tsample_analysis_date: 2023-12-01
+# msample_donor_id: Donor1
+# msample_specimen_id: Material1
+# msample_specimen_type: Material
+# msample_analysis_type: WGS
+# msample_analysis_date: 2023-12-01
 chromosome_1	start_1	end_1	flanking_sequence_1	chromosome_2	start_2	end_2	flanking_sequence_2	type	inverted
 6	84236917	84236918	.	6	84337937	84337938	.	DUP	false
 8	65498712	65498713	.	8	65608792	65608793	.	DEL	false
@@ -306,7 +342,7 @@ Fields description can be found [here](api-models-dna-sv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/rna/exp/bulk/{type?}](http://localhost:5106/api/rna/exp/bulk)
+## POST: [api/rna/exps/{type?}](http://localhost:5106/api/rna/exps)
 Submit Bulk Gene Expression (Transcriptomics) data (including sequencing analysis data).
 
 Request implements **OVERRIDE** logic:
@@ -320,14 +356,19 @@ Supported formats are:
 #### json - application/json
 ```json
 {
-    "analysis": {
-        "type": "RNASeq",
-        "date": "2023-12-01"
-    },
     "target_sample": {
         "donor_id": "Donor1",
         "specimen_id": "Material2",
-        "specimen_type": "Material"
+        "specimen_type": "Material",
+        "analysis_type": "RNASeq",
+        "analysis_date": "2023-12-01",
+        "resources": [
+            {
+                "type": "rna",
+                "format": "BAM",
+                "url": "example.com/my/file"
+            }
+        ]
     },
     "entries": [
         {
@@ -348,18 +389,21 @@ Supported formats are:
 
 #### tsv - text/tab-separated-values
 ```tsv
-# donor_id: Donor1
-# target_sample_id: Material2
-# target_sample_type: Material
-# analysis_type: RNASeq
-# analysis_date: 2023-12-01
+# tsample_donor_id: Donor1
+# tsample_specimen_id: Material2
+# tsample_specimen_type: Material
+# tsample_analysis_type: RNASeq
+# tsample_analysis_date: 2023-12-01
+# tsample_resource_type: rna
+# tsample_resource_format: BAM
+# tsample_resource_url: example.com/my/file
 gene_id	reads
 ENSG00000223972	238
 ENSG00000243485	0
 ENSG00000274890	0
 ```
 
-Fields description can be found [here](api-models-rna-bulk.md).
+Fields description can be found [here](api-models-rna-exp.md).
 
 ### Responses
 - `200` - request was processed successfully
@@ -368,7 +412,7 @@ Fields description can be found [here](api-models-rna-bulk.md).
 - `403` - missing required permissions
 
 
-## POST: [api/rna/exp/cell/{type?}](http://localhost:5106/api/rna/exp/cell)
+## POST: [api/rnasc/exps/{type?}](http://localhost:5106/api/rnasc/exps)
 Submit Single Cell Gene Expression (Transcriptomics) data (including sequencing analysis data).
 
 Request implements **OVERRIDE** logic:
@@ -382,37 +426,40 @@ Supported formats are:
 #### json - application/json
 ```json
 {
-    "analysis": {
-        "type": "scRNASeq",
-        "date": "2023-12-01"
-    },
     "target_sample": {
         "donor_id": "Donor1",
         "specimen_id": "Material2",
-        "specimen_type": "Material"
-    },
-    "resources": [
-        {
-            "type": "MEX",
-            "path": "path/to/mex",
-            "url": null
-        }
-    ]
+        "specimen_type": "Material",
+        "analysis_type": "RNASeqSc",
+        "analysis_date": "2023-12-01",
+        "cells_number": 5000,
+        "genes_model": "Marker genes",
+        "resources": [
+            {
+                "type": "rnasc",
+                "format": "MEX",
+                "url": "example.com/my/file"
+            }
+        ]
+    }
 }
 ```
 
 #### tsv - text/tab-separated-values
 ```tsv
-# donor_id: Donor1
-# target_sample_id: Material2
-# target_sample_type: Material
-# analysis_type: scRNASeq
-# analysis_date: 2023-12-01
-# resource_type: MEX
-# resource_path: data/donor1/scrna/results
+# tsample_donor_id: Donor1
+# tsample_specimen_id: Material2
+# tsample_specimen_type: Material
+# tsample_analysis_type: RNASeqSc
+# tsample_analysis_date: 2023-12-01
+# tsample_cells_number: 5000
+# tsample_genes_model: Marker genes
+# tsample_resource_type: rnasc
+# tsample_resource_format: MEX
+# tsample_resource_url: example.com/my/file
 ```
 
-Fields description can be found [here](api-models-rna-cell.md).
+Fields description can be found [here](api-models-rnasc-exp.md).
 
 ### Responses
 - `200` - request was processed successfully
