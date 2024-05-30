@@ -346,19 +346,19 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
 
     private SampleIndex[] CreateSampleIndices(int specimenId, DateOnly? diagnosisDate)
     {
-        var samples = LoadAnalyses(specimenId);
+        var samples = LoadSamples(specimenId);
 
-        var indices = samples.Select(sample => CreateAnalysisIndex(sample, diagnosisDate));
+        var indices = samples.Select(sample => CreateSampleIndex(sample, diagnosisDate));
 
         return indices.Any() ? indices.ToArray() : null;
     }
 
-    private static SampleIndex CreateAnalysisIndex(Sample sample, DateOnly? diagnosisDate)
+    private static SampleIndex CreateSampleIndex(Sample sample, DateOnly? diagnosisDate)
     {
         return SampleIndexMapper.CreateFrom<SampleIndex>(sample, diagnosisDate);
     }
 
-    private Sample[] LoadAnalyses(int specimenId)
+    private Sample[] LoadSamples(int specimenId)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
