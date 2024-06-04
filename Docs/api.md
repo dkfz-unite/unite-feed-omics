@@ -9,11 +9,11 @@ API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](h
 
 ## Overview
 - get:[api](#get-api) - health check.
-- post:[api/dna/ssms/{type?}](#post-apidnassmstype) - submit SSMs data.
-- post:[api/dna/cnvs/{type?}](#post-apidnacnvstype) - submit CNVs data.
-- post:[api/dna/svs/{type?}](#post-apidnasvstype) - submit SVs data.
-- post:[api/rna/exps/{type?}](#post-apirnaexpstype) - submit **bulk** gene expressions data.
-- post:[api/rnasc/exps/{type?}](#post-apirnascexpstype) - submit **single cell** gene expressions data.
+- post:[api/dna/analysis/ssms/{type?}](#post-apidnaanalysisssmstype) - submit SSMs data.
+- post:[api/dna/analysis/cnvs/{type?}](#post-apidnaanalysiscnvstype) - submit CNVs data.
+- post:[api/dna/analysis/svs/{type?}](#post-apidnaanalysissvstype) - submit SVs data.
+- post:[api/rna/analysis/exps/{type?}](#post-apirnaanalysisexpstype) - submit **bulk** gene expressions data.
+- post:[api/rnasc/analysis/exps/{type?}](#post-apirnascanalysisexpstype) - submit **single cell** gene expressions data.
 
 > [!Note]
 > **Json** is default data type for all requests and will be used if no data type is specified.  
@@ -32,7 +32,7 @@ Health check.
 `"2022-03-17T09:45:10.9359202Z"` - Current UTC date and time in JSON format, if service is up and running
 
 
-## POST: [api/dna/ssms/{type?}](http://localhost:5106/api/dna/ssms)
+## POST: [api/dna/analysis/ssms/{type?}](http://localhost:5106/api/dna/analysis/ssms)
 Submit mutations (SSM) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -135,7 +135,7 @@ Fields description can be found [here](api-models-dna-ssm.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/cnvs/{type?}](http://localhost:5106/api/dna/cnvs)
+## POST: [api/dna/analysis/cnvs/{type?}](http://localhost:5106/api/dna/analysis/cnvs)
 Submit Copy Number Variants (CNV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -242,7 +242,7 @@ Fields description can be found [here](api-model-dna-cnv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/dna/svs/{type?}](http://localhost:5106/api/dna/svs)
+## POST: [api/dna/analysis/svs/{type?}](http://localhost:5106/api/dna/analysis/svs)
 Submit Structural Variants (SV) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
@@ -339,7 +339,7 @@ Fields description can be found [here](api-models-dna-sv.md).
 - `403` - missing required permissions
 
 
-## POST: [api/rna/exps/{type?}](http://localhost:5106/api/rna/exps)
+## POST: [api/rna/analysis/exps/{type?}](http://localhost:5106/api/rna/analysis/exps)
 Submit Bulk Gene Expression (Transcriptomics) data (including sequencing analysis data).
 
 Request implements **OVERRIDE** logic:
@@ -409,7 +409,7 @@ Fields description can be found [here](api-models-rna-exp.md).
 - `403` - missing required permissions
 
 
-## POST: [api/rnasc/exps/{type?}](http://localhost:5106/api/rnasc/exps)
+## POST: [api/rnasc/analysis/exps/{type?}](http://localhost:5106/api/rnasc/analysis/exps)
 Submit Single Cell Gene Expression (Transcriptomics) data (including sequencing analysis data).
 
 Request implements **OVERRIDE** logic:
