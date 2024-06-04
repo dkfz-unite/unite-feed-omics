@@ -18,32 +18,32 @@ public class DnaSubmissionService
 	}
 
 
-	public string AddSsmSubmission(SeqDataModel<Models.Dna.Ssm.VariantModel> data)
+	public string AddSsmSubmission(AnalysisModel<Models.Dna.Ssm.VariantModel> data)
 	{
 		return _ssmRepository.Add(data);
 	}
 
-    public string AddCnvSubmission(SeqDataModel<Models.Dna.Cnv.VariantModel> data)
+    public string AddCnvSubmission(AnalysisModel<Models.Dna.Cnv.VariantModel> data)
     {
         return _cnvRepository.Add(data);
     }
 
-    public string AddSvSubmission(SeqDataModel<Models.Dna.Sv.VariantModel> data)
+    public string AddSvSubmission(AnalysisModel<Models.Dna.Sv.VariantModel> data)
     {
         return _svRepository.Add(data);
     }
 
-	public SeqDataModel<Models.Dna.Ssm.VariantModel> FindSsmSubmission(string id)
+	public AnalysisModel<Models.Dna.Ssm.VariantModel> FindSsmSubmission(string id)
 	{
 		return _ssmRepository.Find(id)?.Document;
 	}
 
-    public SeqDataModel<Models.Dna.Cnv.VariantModel> FindCnvSubmission(string id)
+    public AnalysisModel<Models.Dna.Cnv.VariantModel> FindCnvSubmission(string id)
     {
         return _cnvRepository.Find(id)?.Document;
     }
 
-    public SeqDataModel<Models.Dna.Sv.VariantModel> FindSvSubmission(string id)
+    public AnalysisModel<Models.Dna.Sv.VariantModel> FindSvSubmission(string id)
     {
         return _svRepository.Find(id)?.Document;
     }

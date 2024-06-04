@@ -5,7 +5,7 @@ using Unite.Genome.Feed.Web.Models.Dna.Ssm;
 
 namespace Unite.Genome.Feed.Web.Submissions.Repositories.Dna;
 
-public class SsmSubmissionRepository : CacheRepository<SeqDataModel<VariantModel>>
+public class SsmSubmissionRepository : CacheRepository<AnalysisModel<VariantModel>>
 {
     public override string DatabaseName => "submissions";
     public override string CollectionName => "dna_ssms";

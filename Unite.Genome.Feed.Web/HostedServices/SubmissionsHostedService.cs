@@ -5,23 +5,23 @@ namespace Unite.Genome.Feed.Web.HostedServices;
 
 public class SubmissionsHostedService : BackgroundService
 {
-    private readonly BulkRnaSubmissionHandler _bulkTranscriptomicsSubmissionHandler;
-    private readonly CellRnaSubmissionHandler _cellTranscriptomicsSubmissionHandler;
+    private readonly BulkGeneExpSubmissionHandler _bulkGeneExpSubmissionHandler;
+    private readonly CellGeneExpSubmissionHandler _cellGeneExpSubmissionHandler;
     private readonly SsmsSubmissionHandler _ssmsSubmissionHandler;
     private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
     private readonly SvsSubmissionHandler _svsSubmissionHandler;
     private readonly ILogger _logger;
 
     public SubmissionsHostedService(
-        BulkRnaSubmissionHandler bulkTranscriptomicsSubmissionHandler,
-        CellRnaSubmissionHandler cellTranscriptomicsSubmissionHandler,
+        BulkGeneExpSubmissionHandler bulkGeneExpSubmissionHandler,
+        CellGeneExpSubmissionHandler cellGeneExpSubmissionHandler,
         SsmsSubmissionHandler ssmsSubmissionHandler,
         CnvsSubmissionHandler cnvsSubmissionHandler,
         SvsSubmissionHandler svsSubmissionHandler,
         ILogger<SubmissionsHostedService> logger)
     {
-        _bulkTranscriptomicsSubmissionHandler = bulkTranscriptomicsSubmissionHandler;
-        _cellTranscriptomicsSubmissionHandler = cellTranscriptomicsSubmissionHandler;
+        _bulkGeneExpSubmissionHandler = bulkGeneExpSubmissionHandler;
+        _cellGeneExpSubmissionHandler = cellGeneExpSubmissionHandler;
         _ssmsSubmissionHandler = ssmsSubmissionHandler;
         _cnvsSubmissionHandler = cnvsSubmissionHandler;
         _svsSubmissionHandler = svsSubmissionHandler;
@@ -41,8 +41,8 @@ public class SubmissionsHostedService : BackgroundService
         {
             try
             {
-                _cellTranscriptomicsSubmissionHandler.Handle();
-                _bulkTranscriptomicsSubmissionHandler.Handle();
+                _cellGeneExpSubmissionHandler.Handle();
+                _bulkGeneExpSubmissionHandler.Handle();
                 _ssmsSubmissionHandler.Handle();
                 _cnvsSubmissionHandler.Handle();
                 _svsSubmissionHandler.Handle();

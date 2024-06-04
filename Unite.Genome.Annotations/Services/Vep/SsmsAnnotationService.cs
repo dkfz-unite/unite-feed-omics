@@ -25,7 +25,7 @@ public class SsmsAnnotationService
     }
 
 
-    public EffectsDataModel[] Annotate(long[] variantIds)
+    public EffectsDataModel[] Annotate(int[] variantIds)
     {
         var variants = LoadVariants(variantIds);
 
@@ -37,7 +37,7 @@ public class SsmsAnnotationService
     }
 
 
-    private Variant[] LoadVariants(long[] variantIds)
+    private Variant[] LoadVariants(int[] variantIds)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 

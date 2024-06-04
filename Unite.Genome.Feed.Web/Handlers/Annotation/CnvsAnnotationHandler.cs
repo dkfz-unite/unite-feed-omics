@@ -11,7 +11,7 @@ namespace Unite.Genome.Feed.Web.Handlers.Annotation;
 public class CnvsAnnotationHandler
 {
     private readonly CnvsAnnotationService _annotationService;
-    private readonly EffectsDataCnvWriter _effectsDataWriter;
+    private readonly EffectsCnvWriter _dataWriter;
     private readonly CnvIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -19,13 +19,13 @@ public class CnvsAnnotationHandler
 
     public CnvsAnnotationHandler(
         CnvsAnnotationService annotationService,
-        EffectsDataCnvWriter effectsDataWriter,
+        EffectsCnvWriter dataWriter,
         CnvIndexingTaskService indexingTaskService,
         TasksProcessingService taskProcessingService,
         ILogger<CnvsAnnotationHandler> logger)
     {
         _annotationService = annotationService;
-        _effectsDataWriter = effectsDataWriter;
+        _dataWriter = dataWriter;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = taskProcessingService;
         _logger = logger;
@@ -66,11 +66,11 @@ public class CnvsAnnotationHandler
 
     private void ProcessAnnotationTasks(Unite.Data.Entities.Tasks.Task[] tasks)
     {
-        var variants = tasks.Select(task => long.Parse(task.Target)).ToArray();
+        var variants = tasks.Select(task => int.Parse(task.Target)).ToArray();
         var annotations = _annotationService.Annotate(variants);
-        var effects = EffectsDataConverter.Convert(annotations);
+        var data = EffectsDataConverter.Convert(annotations);
 
-        _effectsDataWriter.SaveData(effects, out var audit);
+        _dataWriter.SaveData(data, out var audit);
         _indexingTaskService.PopulateTasks(audit.Variants);
 
         _logger.LogInformation("{audit}", audit.ToString());

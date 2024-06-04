@@ -10,7 +10,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Dna;
 
-[Route("api/dna/ssms")]
+[Route("api/dna/analysis/ssms")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class SsmsController : Controller
 {
@@ -28,25 +28,19 @@ public class SsmsController : Controller
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] SeqDataModel<VariantModel> model)
-    {
-        return PostData(model);
-    }
-
-    [HttpPost("tsv")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(TsvModelBinder))] SeqDataModel<VariantModel> model)
-    {
-        return PostData(model);
-    }
-
-
-    private IActionResult PostData(SeqDataModel<VariantModel> model)
+    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model)
     {
         var submissionId = _submissionService.AddSsmSubmission(model);
 
         _submissionTaskService.CreateTask(SubmissionTaskType.SSM, submissionId);
 
         return Ok();
+    }
+
+    [HttpPost("tsv")]
+    [RequestSizeLimit(100_000_000)]
+    public IActionResult PostTsv([ModelBinder(typeof(VariantsTsvModelBinder))] AnalysisModel<VariantModel> model)
+    {
+        return Post(model);
     }
 }

@@ -30,7 +30,15 @@ public class SampleIndexingTaskService : IndexingTaskService<Sample, int>
 
     public override void PopulateTasks(IEnumerable<int> keys)
     {
-        throw new NotImplementedException();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
+
+        CreateProjectIndexingTasks(keys);
+        CreateDonorIndexingTasks(keys);
+        CreateImageIndexingTasks(keys);
+        CreateSpecimenIndexingTasks(keys);
+
+        transaction.Commit();
     }
 
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)

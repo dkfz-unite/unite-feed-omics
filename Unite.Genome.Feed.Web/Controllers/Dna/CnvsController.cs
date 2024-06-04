@@ -10,7 +10,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Dna;
 
-[Route("api/dna/cnvs")]
+[Route("api/dna/analysis/cnvs")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class CnvsController : Controller
 {
@@ -28,25 +28,19 @@ public class CnvsController : Controller
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] SeqDataModel<VariantModel> model)
-    {
-        return PostData(model);
-    }
-
-    [HttpPost("tsv")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(TsvModelBinder))] SeqDataModel<VariantModel> model)
-    {
-        return PostData(model);
-    }
-
-
-    private IActionResult PostData(SeqDataModel<VariantModel> model)
+    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model)
     {
         var submissionId = _submissionService.AddCnvSubmission(model);
 
         _submissionTaskService.CreateTask(SubmissionTaskType.CNV, submissionId);
 
         return Ok();
+    }
+
+    [HttpPost("tsv")]
+    [RequestSizeLimit(100_000_000)]
+    public IActionResult PostTsv([ModelBinder(typeof(VariantsTsvModelBinder))] AnalysisModel<VariantModel> model)
+    {
+        return Post(model);
     }
 }
