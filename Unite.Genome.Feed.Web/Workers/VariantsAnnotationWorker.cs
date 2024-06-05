@@ -2,9 +2,9 @@
 using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers.Annotation;
 
-namespace Unite.Genome.Feed.Web.HostedServices;
+namespace Unite.Genome.Feed.Web.Workers;
 
-public class VariantsAnnotationHostedService : BackgroundService
+public class VariantsAnnotationWorker : BackgroundService
 {
     private readonly VariantsAnnotationOptions _options;
     private readonly SsmsAnnotationHandler _ssmsAnnotationHandler;
@@ -13,12 +13,12 @@ public class VariantsAnnotationHostedService : BackgroundService
     private readonly ILogger _logger;
 
 
-    public VariantsAnnotationHostedService(
+    public VariantsAnnotationWorker(
         VariantsAnnotationOptions options,
         SsmsAnnotationHandler ssmsAnnotationHandler,
         CnvsAnnotationHandler cnvsAnnotationHandler,
         SvsAnnotationHandler svsAnnotationHandler,
-        ILogger<VariantsAnnotationHostedService> logger)
+        ILogger<VariantsAnnotationWorker> logger)
     {
         _options = options;
         _ssmsAnnotationHandler = ssmsAnnotationHandler;
@@ -30,9 +30,9 @@ public class VariantsAnnotationHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Variants annotation service started");
+        _logger.LogInformation("Variants annotation worker started");
 
-        stoppingToken.Register(() => _logger.LogInformation("Variants annotation service stopped"));
+        stoppingToken.Register(() => _logger.LogInformation("Variants annotation worker stopped"));
 
         // Delay 5 seconds to let the web api start working
         await Task.Delay(5000, stoppingToken);

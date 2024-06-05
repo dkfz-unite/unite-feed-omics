@@ -3,7 +3,7 @@ using Unite.Genome.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Genome.Feed.Web.Models.Dna.Ssm.Binders;
 
-public class VariantsTsvModelBinder : AnalysisTsvModelBinder<VariantModel>
+public class AnalysisTsvModelBinder : AnalysisTsvModelBinder<VariantModel>
 {
     protected override ClassMap<VariantModel> CreateMap()
     {

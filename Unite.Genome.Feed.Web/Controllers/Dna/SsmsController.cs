@@ -39,7 +39,7 @@ public class SsmsController : Controller
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(VariantsTsvModelBinder))] AnalysisModel<VariantModel> model)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model)
     {
         return Post(model);
     }

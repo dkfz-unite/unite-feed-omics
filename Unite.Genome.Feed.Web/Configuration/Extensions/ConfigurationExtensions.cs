@@ -12,7 +12,7 @@ using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers.Annotation;
 using Unite.Genome.Feed.Web.Handlers.Indexing;
 using Unite.Genome.Feed.Web.Handlers.Submission;
-using Unite.Genome.Feed.Web.HostedServices;
+using Unite.Genome.Feed.Web.Workers;
 using Unite.Genome.Feed.Web.Models.Base;
 using Unite.Genome.Feed.Web.Models.Base.Validators;
 using Unite.Genome.Feed.Web.Services.Annotation;
@@ -80,7 +80,7 @@ public static class ConfigurationExtensions
         services.AddTransient<SvIndexingTaskService>();
 
         // Submissions hosted services
-        services.AddHostedService<SubmissionsHostedService>();
+        services.AddHostedService<SubmissionsWorker>();
         services.AddTransient<BulkGeneExpSubmissionHandler>();
         services.AddTransient<CellGeneExpSubmissionHandler>();
         services.AddTransient<SsmsSubmissionHandler>();
@@ -88,21 +88,21 @@ public static class ConfigurationExtensions
         services.AddTransient<SvsSubmissionHandler>();
 
         // Variants annotation hosted service
-        services.AddHostedService<VariantsAnnotationHostedService>();
+        services.AddHostedService<VariantsAnnotationWorker>();
         services.AddTransient<VariantsAnnotationOptions>();
         services.AddTransient<SsmsAnnotationHandler>();
         services.AddTransient<CnvsAnnotationHandler>();
         services.AddTransient<SvsAnnotationHandler>();
 
         // Variants indexing hosted service
-        services.AddHostedService<VariantsIndexingHostedService>();
+        services.AddHostedService<VariantsIndexingWorker>();
         services.AddTransient<VariantsIndexingOptions>();
         services.AddTransient<SsmsIndexingHandler>();
         services.AddTransient<CnvsIndexingHandler>();
         services.AddTransient<SvsIndexingHandler>();
 
         // Genes indexing hosted service
-        services.AddHostedService<GenesIndexingHostedService>();
+        services.AddHostedService<GenesIndexingWorker>();
         services.AddTransient<GenesIndexingOptions>();
         services.AddTransient<GenesIndexingHandler>();
 

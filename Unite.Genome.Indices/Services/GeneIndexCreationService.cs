@@ -41,14 +41,10 @@ public class GeneIndexCreationService
     {
         var context = _contextLoader.LoadContext(geneId);
 
-        if (context.Gene == null || !context.DonorsCache.Any())
-        {
+        if (context.Gene == null || context.DonorsCache.IsEmpty())
             return null;
-        }
 
-        var index = CreateGeneIndex(context);
-
-        return index;
+        return CreateGeneIndex(context);
     }
 
     private GeneIndex CreateGeneIndex(GeneIndexCreationContext context)
@@ -59,9 +55,7 @@ public class GeneIndexCreationService
 
         // If gene doesn't affect any specimens it should be removed.
         if (index.Specimens.IsEmpty())
-        {
             return null;
-        }
 
         return index;
     }
@@ -71,9 +65,7 @@ public class GeneIndexCreationService
     {
         var specimens = LoadSpecimens(context);
 
-        var indices = specimens.Select(specimen => CreateSpecimenIndex(specimen, context));
-
-        return indices.Any() ? indices.ToArray() : null;
+        return specimens.Select(specimen => CreateSpecimenIndex(specimen, context)).ToArrayOrNull();
     }
 
     private SpecimenIndex CreateSpecimenIndex(Specimen specimen, GeneIndexCreationContext context)
@@ -101,9 +93,7 @@ public class GeneIndexCreationService
         var donor = LoadDonor(specimenId, context);
 
         if (donor == null)
-        {
             return null;
-        }
 
         return CreateDonorIndex(donor);
     }
@@ -123,9 +113,7 @@ public class GeneIndexCreationService
     {
         var images = LoadImages(specimenId, context);
         
-        var indices = images.Select(entity => CreateImageIndex(entity, diagnosisDate));
-
-        return indices.Any() ? indices.ToArray() : null;
+        return images.Select(entity => CreateImageIndex(entity, diagnosisDate)).ToArrayOrNull();
     }
 
     private static ImageIndex CreateImageIndex(Image image, DateOnly? diagnosisDate)
@@ -143,9 +131,7 @@ public class GeneIndexCreationService
     {
         var samples = LoadSamples(specimenId, context);
 
-        var indices = samples.Select(sample => CreateSampleIndex(sample, diagnosisDate));
-
-        return indices.Any() ? indices.ToArray() : null;
+        return samples.Select(sample => CreateSampleIndex(sample, diagnosisDate)).ToArrayOrNull();
     }
 
     private static SampleIndex CreateSampleIndex(Sample sample, DateOnly? diagnosisDate)
@@ -167,7 +153,7 @@ public class GeneIndexCreationService
         LoadCnvs(specimenId, context).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
         LoadSvs(specimenId, context).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
 
-        return indices.Any() ? indices.ToArray() : null;
+        return indices.ToArrayOrNull();
     }
 
     private static VariantIndex CreateVariantIndex<TVariant>(TVariant variant) where TVariant : Variant

@@ -2,9 +2,9 @@
 using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers.Indexing;
 
-namespace Unite.Genome.Feed.Web.HostedServices;
+namespace Unite.Genome.Feed.Web.Workers;
 
-public class VariantsIndexingHostedService : BackgroundService
+public class VariantsIndexingWorker : BackgroundService
 {
     private readonly VariantsIndexingOptions _options;
     private readonly SsmsIndexingHandler _ssmsIndexingHandler;
@@ -13,12 +13,12 @@ public class VariantsIndexingHostedService : BackgroundService
     private readonly ILogger _logger;
 
 
-    public VariantsIndexingHostedService(
+    public VariantsIndexingWorker(
         VariantsIndexingOptions options,
         SsmsIndexingHandler ssmsIndexingHandler,
         CnvsIndexingHandler cnvsIndexingHandler,
         SvsIndexingHandler svsIndexingHandler,
-        ILogger<VariantsIndexingHostedService> logger)
+        ILogger<VariantsIndexingWorker> logger)
     {
         _options = options;
         _ssmsIndexingHandler = ssmsIndexingHandler;
@@ -30,9 +30,9 @@ public class VariantsIndexingHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Variants indexing service started");
+        _logger.LogInformation("Variants indexing worker started");
 
-        stoppingToken.Register(() => _logger.LogInformation("Variants indexing service stopped"));
+        stoppingToken.Register(() => _logger.LogInformation("Variants indexing worker stopped"));
 
         // Delay 5 seconds to let the web api start working
         await Task.Delay(5000, stoppingToken);

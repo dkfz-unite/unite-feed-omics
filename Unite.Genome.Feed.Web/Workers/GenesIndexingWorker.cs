@@ -2,19 +2,19 @@
 using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers.Indexing;
 
-namespace Unite.Genome.Feed.Web.HostedServices;
+namespace Unite.Genome.Feed.Web.Workers;
 
-public class GenesIndexingHostedService : BackgroundService
+public class GenesIndexingWorker : BackgroundService
 {
     private readonly GenesIndexingOptions _options;
     private readonly GenesIndexingHandler _handler;
     private readonly ILogger _logger;
 
 
-    public GenesIndexingHostedService(
+    public GenesIndexingWorker(
         GenesIndexingOptions options,
         GenesIndexingHandler handler,
-        ILogger<GenesIndexingHostedService> logger)
+        ILogger<GenesIndexingWorker> logger)
     {
         _options = options;
         _handler = handler;
@@ -24,9 +24,9 @@ public class GenesIndexingHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Genes indexing service started");
+        _logger.LogInformation("Genes indexing worker started");
 
-        stoppingToken.Register(() => _logger.LogInformation("Genes indexing service stopped"));
+        stoppingToken.Register(() => _logger.LogInformation("Genes indexing worker stopped"));
 
         // Delay 5 seconds to let the web api start working
         await Task.Delay(5000, stoppingToken);

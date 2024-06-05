@@ -50,17 +50,16 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
     {
         var variant = LoadVariant(variantId);
 
-        var index = CreateVariantIndex(variant);
+        if (variant == null)
+            return null;
 
-        return index;
+        return CreateVariantIndex(variant);
     }
 
     private VariantIndex CreateVariantIndex(TVariant variant)
     {
         if (variant == null)
-        {
             return null;
-        }
 
         var index = VariantIndexMapper.CreateFrom<VariantIndex>(variant);
 
@@ -68,9 +67,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
 
         // If variant doesn't affect any specimens it should be removed.
         if (index.Specimens.IsEmpty())
-        {
             return null;
-        }
 
         index.Data = CreateDataIndex(index);
 
@@ -237,9 +234,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
     {
         var specimens = LoadSpecimens(variantId);
 
-        var indices = specimens.Select(CreateSpecimenIndex);
-
-        return indices.Any() ? indices.ToArray() : null;
+        return specimens.Select(CreateSpecimenIndex).ToArrayOrNull();
     }
 
     private SpecimenIndex CreateSpecimenIndex(Specimen specimen)
@@ -285,12 +280,10 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
         if (donor == null)
         {
             diagnosisDate = null;
-
             return null;
         }
 
         diagnosisDate = donor.ClinicalData?.DiagnosisDate;
-
         return CreateDonorIndex(donor);
     }
 
@@ -320,9 +313,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
     {
         var images = LoadImages(specimenId);
 
-        var indices = images.Select(entity => CreateImageIndex(entity, diagnosisDate));
-
-        return indices.Any() ? indices.ToArray() : null;
+        return images.Select(entity => CreateImageIndex(entity, diagnosisDate)).ToArrayOrNull();
     }
 
     private static ImageIndex CreateImageIndex(Image image, DateOnly? diagnosisDate)
@@ -348,9 +339,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
     {
         var samples = LoadSamples(specimenId);
 
-        var indices = samples.Select(sample => CreateSampleIndex(sample, diagnosisDate));
-
-        return indices.Any() ? indices.ToArray() : null;
+        return samples.Select(sample => CreateSampleIndex(sample, diagnosisDate)).ToArrayOrNull();
     }
 
     private static SampleIndex CreateSampleIndex(Sample sample, DateOnly? diagnosisDate)

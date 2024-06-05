@@ -1,9 +1,9 @@
 ﻿using Unite.Essentials.Extensions;
 using Unite.Genome.Feed.Web.Handlers.Submission;
 
-namespace Unite.Genome.Feed.Web.HostedServices;
+namespace Unite.Genome.Feed.Web.Workers;
 
-public class SubmissionsHostedService : BackgroundService
+public class SubmissionsWorker : BackgroundService
 {
     private readonly BulkGeneExpSubmissionHandler _bulkGeneExpSubmissionHandler;
     private readonly CellGeneExpSubmissionHandler _cellGeneExpSubmissionHandler;
@@ -12,13 +12,13 @@ public class SubmissionsHostedService : BackgroundService
     private readonly SvsSubmissionHandler _svsSubmissionHandler;
     private readonly ILogger _logger;
 
-    public SubmissionsHostedService(
+    public SubmissionsWorker(
         BulkGeneExpSubmissionHandler bulkGeneExpSubmissionHandler,
         CellGeneExpSubmissionHandler cellGeneExpSubmissionHandler,
         SsmsSubmissionHandler ssmsSubmissionHandler,
         CnvsSubmissionHandler cnvsSubmissionHandler,
         SvsSubmissionHandler svsSubmissionHandler,
-        ILogger<SubmissionsHostedService> logger)
+        ILogger<SubmissionsWorker> logger)
     {
         _bulkGeneExpSubmissionHandler = bulkGeneExpSubmissionHandler;
         _cellGeneExpSubmissionHandler = cellGeneExpSubmissionHandler;
@@ -30,9 +30,9 @@ public class SubmissionsHostedService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Submissions service started");
+        _logger.LogInformation("Submissions worker started");
 
-        stoppingToken.Register(() => _logger.LogInformation("Submissions service stopped"));
+        stoppingToken.Register(() => _logger.LogInformation("Submissions worker stopped"));
 
         // Delay 5 seconds to let the web api start working
         await Task.Delay(5000, stoppingToken);
