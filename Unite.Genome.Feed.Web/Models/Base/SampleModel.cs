@@ -6,7 +6,7 @@ namespace Unite.Genome.Feed.Web.Models.Base;
 
 public record SampleModel
 {
-    protected const double _defaultPloidy = 2.0;
+    public const double DefaultPloidy = 2.0;
 
     protected string _donorId;
     protected string _specimenId;
@@ -66,7 +66,7 @@ public record SampleModel
     /// Sample ploidy
     /// </summary>
     [JsonPropertyName("ploidy")]
-    public virtual double? Ploidy { get => _ploidy ?? _defaultPloidy; set => _ploidy = value; }
+    public virtual double? Ploidy { get => _ploidy; set => _ploidy = value; }
 
     /// <summary>
     /// Sample cells number (if it's single cell sequencing)

@@ -7,13 +7,11 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
     where TValidator : IValidator<T>, new()
 {
     private readonly IValidator<SampleModel> _sampleModelValidator;
-    private readonly IValidator<ResourceModel> _resourceModelValidator;
     private readonly IValidator<T> _entryModelValidator;
 
     public AnalysisModelValidator()
     {
         _sampleModelValidator = new SampleModelValidator();
-        _resourceModelValidator = new ResourceModelValidator();
         _entryModelValidator = new TValidator();
 
         RuleFor(model => model.TargetSample)

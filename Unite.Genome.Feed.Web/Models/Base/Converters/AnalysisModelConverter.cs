@@ -24,7 +24,7 @@ public abstract class AnalysisModelConverter<TEntry> where TEntry : class, new()
         return new DataModels.SampleModel
         {
             Purity = sampleModel.Purity,
-            Ploidy = sampleModel.Ploidy,
+            Ploidy = sampleModel.Ploidy ?? SampleModel.DefaultPloidy,
             CellsNumber = sampleModel.CellsNumber,
             GenesModel = sampleModel.GenesModel,
             Specimen = ConvertSpecimen(sampleModel),
