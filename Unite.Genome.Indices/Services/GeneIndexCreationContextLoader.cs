@@ -130,9 +130,7 @@ internal class GeneIndexCreationContextLoader
             .IncludeXenograft()
             .IncludeMolecularData()
             .IncludeInterventions()
-            .Include(specimen => specimen.SpecimenSamples)
-                .ThenInclude(sample => sample.DrugScreenings)
-                    .ThenInclude(drugScreening => drugScreening.Entity)
+            .IncludeDrugScreenings()
             .Where(specimen => specimenids.Contains(specimen.Id))
             .ToDictionary(specimen => specimen.Id, specimen => specimen);
     }
