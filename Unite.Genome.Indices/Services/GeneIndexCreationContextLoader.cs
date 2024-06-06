@@ -183,6 +183,7 @@ internal class GeneIndexCreationContextLoader
         var donorsToImagesMap = dbContext.Set<Image>()
             .AsNoTracking()
             .Include(image => image.MriImage)
+            .IncludeRadiomicsFeatures()
             .Where(image => donorIds.Contains(image.DonorId))
             .GroupBy(image => image.DonorId)
             .ToDictionary(group => group.Key, group => group.ToArray());
