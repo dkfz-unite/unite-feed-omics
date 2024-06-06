@@ -27,7 +27,7 @@ public class AffectedTranscriptRepository : AffectedTranscriptRepository<Affecte
         entity.ProteinStart = model.ProteinStart;
         entity.ProteinEnd = model.ProteinEnd;
 
-        entity.AminoAcidChange = model.AminoAcidChange;
+        entity.ProteinChange = model.ProteinChange;
         entity.CodonChange = model.CodonChange;
 
         return entity;

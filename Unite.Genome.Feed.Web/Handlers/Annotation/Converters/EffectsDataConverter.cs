@@ -59,7 +59,7 @@ public static class EffectsDataConverter
         model.ProteinEnd = resource.ProteinEnd;
         model.CDNAStart = resource.CDNAStart;
         model.CDNAEnd = resource.CDNAEnd;
-        model.AminoAcidChange = resource.AminoAcidChange;
+        model.ProteinChange = resource.AminoAcidChange;
         model.CodonChange = resource.CodonChange;
         model.OverlapBpNumber = resource.OverlapBpNumber;
         model.OverlapPercentage = resource.OverlapPercentage;

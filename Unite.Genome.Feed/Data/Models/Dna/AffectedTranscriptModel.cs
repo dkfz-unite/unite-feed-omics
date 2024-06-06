@@ -10,7 +10,7 @@ public class AffectedTranscriptModel
     public int? CDSEnd;
     public int? ProteinStart;
     public int? ProteinEnd;
-    public string AminoAcidChange;
+    public string ProteinChange;
     public string CodonChange;
     public int? OverlapBpNumber;
     public double? OverlapPercentage;
