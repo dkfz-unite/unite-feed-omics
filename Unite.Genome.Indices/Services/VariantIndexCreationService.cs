@@ -329,7 +329,7 @@ public class VariantIndexCreationService<TVariant, TVariantEntry>
 
         return dbContext.Set<Image>()
             .AsNoTracking()
-            .Include(image => image.MriImage)
+            .IncludeMriImage()
             .IncludeRadiomicsFeatures()
             .Where(image => imageIds.Contains(image.Id))
             .ToArray();
