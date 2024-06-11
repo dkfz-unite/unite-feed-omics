@@ -11,19 +11,19 @@ namespace Unite.Genome.Feed.Web.Handlers.Indexing;
 public class GenesIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly GeneIndexCreationService _indexCreationService;
+    private readonly GenesIndexingCache _indexingCache;
     private readonly IIndexService<GeneIndex> _indexingService;
     private readonly ILogger _logger;
 
 
     public GenesIndexingHandler(
         TasksProcessingService taskProcessingService,
-        GeneIndexCreationService indexCreationService,
+        GenesIndexingCache indexingCache,
         IIndexService<GeneIndex> indexingService,
         ILogger<GenesIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
-        _indexCreationService = indexCreationService;
+        _indexingCache = indexingCache;
         _indexingService = indexingService;
         _logger = logger;
     }
@@ -51,14 +51,17 @@ public class GenesIndexingHandler
 
             stopwatch.Restart();
 
+            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<GeneIndex>();
+            var indexCreator = new GeneIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = _indexCreationService.CreateIndex(id);
+                var index = indexCreator.CreateIndex(id);
 
                 if (index == null)
                     indicesToDelete.Add($"{id}");
@@ -72,6 +75,8 @@ public class GenesIndexingHandler
 
             if (indicesToCreate.Any())
                 await _indexingService.AddRange(indicesToCreate);
+
+            _indexingCache.Clear();
 
             stopwatch.Stop();
 

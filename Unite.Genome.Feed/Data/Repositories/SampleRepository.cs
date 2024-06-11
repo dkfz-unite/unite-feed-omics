@@ -32,14 +32,17 @@ internal class SampleRepository
         if (model.MatchedSample == null)
         {
             return _dbContext.Set<Sample>().FirstOrDefault(entity =>
+                entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
                 entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
                 entity.Analysis.TypeId == model.Analysis.Type);
         }
         else
         {
             return _dbContext.Set<Sample>().FirstOrDefault(entity =>
+                entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
                 entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
                 entity.Analysis.TypeId == model.Analysis.Type &&
+                entity.MatchedSample.Specimen.Donor.ReferenceId == model.MatchedSample.Specimen.Donor.ReferenceId &&
                 entity.MatchedSample.Specimen.ReferenceId == model.MatchedSample.Specimen.ReferenceId &&
                 entity.MatchedSample.Analysis.TypeId == model.MatchedSample.Analysis.Type);
         }
@@ -67,6 +70,9 @@ internal class SampleRepository
 
     private Specimen FindOrCreate(SpecimenModel model)
     {
+        if (model == null)
+            return null;
+
         return _specimenRepository.FindOrCreate(model);
     }
 

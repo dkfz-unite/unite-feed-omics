@@ -107,12 +107,12 @@ public static class ConfigurationExtensions
         services.AddTransient<GenesIndexingHandler>();
 
         // Variant indexing services
-        services.AddTransient<VariantIndexCreationService<DnaEntities.Ssm.Variant, DnaEntities.Ssm.VariantEntry>>();
-        services.AddTransient<VariantIndexCreationService<DnaEntities.Cnv.Variant, DnaEntities.Cnv.VariantEntry>>();
-        services.AddTransient<VariantIndexCreationService<DnaEntities.Sv.Variant, DnaEntities.Sv.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Ssm.Variant, DnaEntities.Ssm.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Cnv.Variant, DnaEntities.Cnv.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Sv.Variant, DnaEntities.Sv.VariantEntry>>();
 
         // Gene indexing services
-        services.AddTransient<GeneIndexCreationService>();
+        services.AddTransient<GenesIndexingCache>();
     }
 
 

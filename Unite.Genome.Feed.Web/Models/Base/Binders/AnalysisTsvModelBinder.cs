@@ -108,6 +108,8 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
                 targetResource.Url = GetValue<string>(parts[1]);
 
             // Matched sample
+            else if (parts[0].Equals(_msample_donor_id, comparison))
+                matchedSample.DonorId = GetValue<string>(parts[1]);
             else if (parts[0].Equals(_msample_specimen_id, comparison))
                 matchedSample.SpecimenId = GetValue<string>(parts[1]);
             else if (parts[0].Equals(_msample_specimen_type, comparison))

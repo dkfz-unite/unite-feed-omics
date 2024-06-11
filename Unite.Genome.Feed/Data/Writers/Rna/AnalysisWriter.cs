@@ -33,14 +33,10 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         var sample = _sampleRepository.FindOrCreate(model);
 
         if (model.Exps != null)
-        {
             WriteExpressions(sample.Id, model.Exps, ref audit);
-        }
 
         if (model.Resources != null)
-        {
             WriteResources(sample.Id, model.Resources, ref audit);
-        }
     }
 
 

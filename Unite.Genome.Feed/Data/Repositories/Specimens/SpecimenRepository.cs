@@ -34,9 +34,7 @@ internal class SpecimenRepository
         var donor = _donorRepository.Find(model.Donor);
 
         if (donor == null)
-        {
             return null;
-        }
 
         return model.Type switch
         {
