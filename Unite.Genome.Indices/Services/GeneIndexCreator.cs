@@ -78,7 +78,7 @@ public class GeneIndexCreator
         var donorIndex = CreateDonorIndex(specimen.DonorId, out var diagnosisDate);
         var imageIndices = CreateImageIndices(specimen.DonorId, diagnosisDate);
         var sampleIndices = CreateSampleIndices(specimen.Id, diagnosisDate);
-        var variantIndices = CreateVariantIndices(geneId);
+        var variantIndices = CreateVariantIndices(specimen.Id, geneId);
 
         var index = SpecimenIndexMapper.CreateFrom<SpecimenIndex>(specimen, diagnosisDate);
 
@@ -127,6 +127,7 @@ public class GeneIndexCreator
         return _cache.Donors.FirstOrDefault(donor => donor.Id == donorId);
     }
 
+
     private ImageIndex[] CreateImageIndices(int donorId, DateOnly? diagnosisDate)
     {
         var images = LoadImages(donorId);
@@ -163,13 +164,13 @@ public class GeneIndexCreator
     }
 
 
-    private VariantIndex[] CreateVariantIndices(int geneId)
+    private VariantIndex[] CreateVariantIndices(int specimenId, int geneId)
     {
         var indices = new List<VariantIndex>();
 
-        LoadSsms(geneId).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
-        LoadCnvs(geneId).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
-        LoadSvs(geneId).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
+        LoadSsms(specimenId, geneId).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
+        LoadCnvs(specimenId, geneId).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
+        LoadSvs(specimenId, geneId).ForEach(variant => indices.Add(CreateVariantIndex(variant)));
 
         return indices.ToArrayOrNull();
     }
@@ -179,36 +180,42 @@ public class GeneIndexCreator
         return VariantIndexMapper.CreateFrom<VariantIndex>(variant);
     }
 
-    private SSM.Variant[] LoadSsms(int geneId)
+    private SSM.Variant[] LoadSsms(int specimenId, int geneId)
     {
-        var transcripts = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).ToArray();
-        var variantIds = transcripts.Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var variants = _cache.Ssms.Where(variant => variantIds.Contains(variant.Id)).ToArray();
+        var sampleIds = _cache.Samples.Where(sample => sample.SpecimenId == specimenId).Select(sample => sample.Id).Distinct().ToArray();
+        var sampleVariantIds = _cache.SsmEntries.Where(entry => sampleIds.Contains(entry.SampleId)).Select(entry => entry.EntityId).Distinct().ToArray();
+        var affectedTranscripts = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId && sampleVariantIds.Contains(transcript.VariantId)).ToArray();
+        var affectedVariantIds = affectedTranscripts.Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var affectedVariants = _cache.Ssms.Where(variant => affectedVariantIds.Contains(variant.Id)).ToArray();
 
-        variants.ForEach(variant => variant.AffectedTranscripts = transcripts.Where(transcript => transcript.VariantId == variant.Id).ToArray());
+        affectedVariants.ForEach(variant => variant.AffectedTranscripts = affectedTranscripts.Where(transcript => transcript.VariantId == variant.Id).ToArray());
 
-        return variants.ToArray();
+        return affectedVariants.ToArray();
     }
 
-    private CNV.Variant[] LoadCnvs(int geneId)
+    private CNV.Variant[] LoadCnvs(int specimenId, int geneId)
     {
-        var transcripts = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).ToArray();
-        var variantIds = transcripts.Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var variants = _cache.Cnvs.Where(variant => variantIds.Contains(variant.Id)).ToArray();
+        var sampleIds = _cache.Samples.Where(sample => sample.SpecimenId == specimenId).Select(sample => sample.Id).Distinct().ToArray();
+        var sampleVariantIds = _cache.CnvEntries.Where(entry => sampleIds.Contains(entry.SampleId)).Select(entry => entry.EntityId).Distinct().ToArray();
+        var affectedTranscripts = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId && sampleVariantIds.Contains(transcript.VariantId)).ToArray();
+        var affectedVariantIds = affectedTranscripts.Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var affectedVariants = _cache.Cnvs.Where(variant => affectedVariantIds.Contains(variant.Id)).ToArray();
 
-        variants.ForEach(variant => variant.AffectedTranscripts = transcripts.Where(transcript => transcript.VariantId == variant.Id).ToArray());
+        affectedVariants.ForEach(variant => variant.AffectedTranscripts = affectedTranscripts.Where(transcript => transcript.VariantId == variant.Id).ToArray());
 
-        return variants.ToArray();
+        return affectedVariants.ToArray();
     }
 
-    private SV.Variant[] LoadSvs(int geneId)
+    private SV.Variant[] LoadSvs(int specimenId, int geneId)
     {
-        var transcripts = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).ToArray();
-        var variantIds = transcripts.Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var variants = _cache.Svs.Where(variant => variantIds.Contains(variant.Id)).ToArray();
-        
-        variants.ForEach(variant => variant.AffectedTranscripts = transcripts.Where(transcript => transcript.VariantId == variant.Id).ToArray());
+        var sampleIds = _cache.Samples.Where(sample => sample.SpecimenId == specimenId).Select(sample => sample.Id).Distinct().ToArray();
+        var sampleVariantIds = _cache.SvEntries.Where(entry => sampleIds.Contains(entry.SampleId)).Select(entry => entry.EntityId).Distinct().ToArray();
+        var affectedTranscripts = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId && sampleVariantIds.Contains(transcript.VariantId)).ToArray();
+        var affectedVariantIds = affectedTranscripts.Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var affectedVariants = _cache.Svs.Where(variant => affectedVariantIds.Contains(variant.Id)).ToArray();
 
-        return variants.ToArray();
+        affectedVariants.ForEach(variant => variant.AffectedTranscripts = affectedTranscripts.Where(transcript => transcript.VariantId == variant.Id).ToArray());
+
+        return affectedVariants.ToArray();
     }
 }
