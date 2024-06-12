@@ -1,13 +1,19 @@
 ﻿using System.Text.Json.Serialization;
+using Unite.Data.Entities.Genome.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
 
 namespace Unite.Genome.Feed.Web.Models.Base;
 
 public record SampleModel
 {
+    public const double DefaultPloidy = 2.0;
+
     protected string _donorId;
     protected string _specimenId;
     protected SpecimenType? _specimenType;
+    protected AnalysisType? _analysisType;
+    protected DateOnly? _analysisDate;
+    protected int? _analysisDay;
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cellsNumber;
@@ -31,6 +37,24 @@ public record SampleModel
     /// </summary>
     [JsonPropertyName("specimen_type")]
     public virtual SpecimenType? SpecimenType { get => _specimenType; set => _specimenType = value; }
+
+    /// <summary>
+    /// Analysis type (WGS, WES, RNASeq, RNASeqSc)
+    /// </summary>
+    [JsonPropertyName("analysis_type")]
+    public virtual AnalysisType? AnalysisType { get => _analysisType; set => _analysisType = value; }
+
+    /// <summary>
+    /// Analysis date
+    /// </summary>
+    [JsonPropertyName("analysis_date")]
+    public virtual DateOnly? AnalysisDate { get => _analysisDate; set => _analysisDate = value; }
+
+    /// <summary>
+    /// Analysis day - relative day since the diagnosis statement when the analysis was performed
+    /// </summary> 
+    [JsonPropertyName("analysis_day")]
+    public virtual int? AnalysisDay { get => _analysisDay; set => _analysisDay = value; } 
 
     /// <summary>
     /// Sample purity (TCC)
@@ -57,19 +81,8 @@ public record SampleModel
     public virtual string GenesModel { get => _genesModel?.Trim(); set => _genesModel = value; }
 
     /// <summary>
-    /// Default sample ploidy
+    /// Sample resources
     /// </summary>
-    public virtual double DefaultPloidy => 2;
-
-
-    public virtual bool IsNotEmpty()
-    {
-        return !string.IsNullOrWhiteSpace(DonorId)
-            || !string.IsNullOrWhiteSpace(SpecimenId)
-            || SpecimenType.HasValue
-            || Purity.HasValue
-            || Ploidy.HasValue
-            || CellsNumber.HasValue
-            || !string.IsNullOrWhiteSpace(GenesModel);
-    }
+    [JsonPropertyName("resources")]
+    public virtual ResourceModel[] Resources { get; set; }
 }

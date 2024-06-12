@@ -1,6 +1,9 @@
 # Sample Data Model
 Includes the information about analysed sample.
 
+>[!NOTE]
+> All exact dates are hiddent and protected. Relative dates are shown instead, if calculation was possible.
+
 **`donor_id`*** - Sample donor identifier.
 - Type: _String_
 - Limitations: Maximum length 255
@@ -16,17 +19,33 @@ Includes the information about analysed sample.
 - Possible values: `"Material"`, `"Line"`, `"Organoid"`, `"Xenograft"`
 - Example: `"Material"`
 
-**`ploidy`** - Sample ploidy.
-- Notes: Available for CNVs data only.
-- Type: _Double_
-- Limitations: Should be greater than 0
-- Example: `2`
+**`analysis_type`*** - Type of the analysis performed on the sample.
+- Type: _String_
+- Possible values: `"WGS"`, `"WES"`, `"RNASeq"`, `"RNASeqSc"`
+- Example: `"WES"`
+
+**`analysis_date`** - Date when the analysis was performed.
+- Type: _Date_
+- Limitations: Either 'analysis_date' or 'analysis_day' should be set.
+- Format: "YYYY-MM-DD"
+- Example: `2023-12-01`
+
+**`analysis_day`** - Relative number of days since diagnosis statement when the analysis was performed.
+- Type: _Integer_
+- Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
+- Example: `22`
 
 **`purity`** - Sample purity (TCC) percentage of tumor cells in the tissue.
 - Notes: Available for CNVs data only.
 - Type: _Double_
 - Limitations: Should be between 0 and 100
 - Example: `95`
+
+**`ploidy`** - Sample ploidy.
+- Notes: Available for CNVs data only.
+- Type: _Double_
+- Limitations: Should be greater than 0
+- Example: `2`
 
 **`cells_number`** - Number of cells in the sample.
 - Notes: Available for single cell RNA sequenicng dat only.
@@ -40,6 +59,12 @@ Includes the information about analysed sample.
 - Limitations: Maximum length 100
 - Example: `"Ensembl v99"`
 
+**`resources`** - Resources associated with the sample.
+- Type: _Array_
+- Element type: _Object([Resource](api-models-resource.md))_
+- Limitations: Should contain at leas one element
+- Example: `[{...}, {...}]`
+
 
 #### Specimen Type
 Specimen can be of the following types:
@@ -47,6 +72,13 @@ Specimen can be of the following types:
 - `"Line"` - cell lines
 - `"Organoid"` - organoids
 - `"Xenograft"` - xenografts
+
+#### Analysis Type
+Analysis can be of the following types:
+- `"WGS"` - whole genome sequencing
+- `"WES"` - whole exome sequencing
+- `"RNASeq"` - bulk RNA sequencing
+- `"RNASeqSc"` - single cell RNA sequencing
 
 ##
 **`*`** - Required fields

@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Variants.SV;
-using Unite.Data.Entities.Genome.Variants.SV.Enums;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sv;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sv.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Genome.Annotations.Services.Models.Variants;
+using Unite.Genome.Annotations.Services.Models.Dna;
 
 namespace Unite.Genome.Annotations.Services.Vep;
 
@@ -26,7 +26,7 @@ public class SvsAnnotationService
     }
 
 
-    public ConsequencesDataModel[] Annotate(long[] variantIds)
+    public EffectsDataModel[] Annotate(int[] variantIds)
     {
         var variants = LoadVariants(variantIds);
 
@@ -38,7 +38,7 @@ public class SvsAnnotationService
     }
 
 
-    private Variant[] LoadVariants(long[] variantIds)
+    private Variant[] LoadVariants(int[] variantIds)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 

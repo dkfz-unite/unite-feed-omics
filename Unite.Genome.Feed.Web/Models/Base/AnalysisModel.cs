@@ -1,64 +1,28 @@
-﻿
 using System.Text.Json.Serialization;
-using Unite.Data.Entities.Genome.Analysis.Enums;
-using Unite.Essentials.Extensions;
 
 namespace Unite.Genome.Feed.Web.Models.Base;
 
-public record AnalysisModel
+public record AnalysisModel<TEntryModel>
+    where TEntryModel : class, new()
 {
-    protected string _id;
-    protected AnalysisType? _type;
-    protected DateOnly? _date;
-    protected int? _day;
-
-    protected Dictionary<string, string> _parameters;
-
+    protected TEntryModel[] _entries;
 
     /// <summary>
-    /// Analysis identifier
+    /// Analysed sample.
     /// </summary>
-    [JsonPropertyName("id")]
-    public virtual string Id { get => _id?.Trim(); set => _id = value; }
+    /// <value></value>
+    [JsonPropertyName("tsample")]
+    public virtual SampleModel TargetSample { get; set; }
 
     /// <summary>
-    /// Type of the analysis (WGS, WES)
+    /// Matched sample.
     /// </summary>
-    [JsonPropertyName("type")]
-    public virtual AnalysisType? Type { get => _type; set => _type = value; }
+    [JsonPropertyName("msample")]
+    public virtual SampleModel MatchedSample { get; set; }
 
     /// <summary>
-    /// Date when the analysis was performed
+    /// Entries data.
     /// </summary>
-    [JsonPropertyName("date")]
-    public virtual DateOnly? Date { get => _date; set => _date = value; }
-
-    /// <summary>
-    /// Relative day since the diagnisis statement when the analysis was performed
-    /// </summary>
-    [JsonPropertyName("day")]
-    public virtual int? Day { get => _day; set => _day = value; }  
-     
-    /// <summary>
-    /// Analysis parameters
-    /// </summary>
-    [JsonPropertyName("parameters")]
-    public virtual Dictionary<string, string> Parameters { get => Trim(_parameters); set => _parameters = value; }
-
-
-    public virtual bool IsNotEmpty()
-    {
-        return !string.IsNullOrWhiteSpace(Id)
-            || Type.HasValue
-            || Date.HasValue
-            || Day.HasValue
-            || Parameters.IsNotEmpty();
-    
-    }
-
-
-    protected static Dictionary<string, string> Trim(Dictionary<string, string> dictionary)
-    {
-        return dictionary?.ToDictionary(entry => entry.Key.Trim(), entry => entry.Value.Trim());
-    }
+    [JsonPropertyName("entries")]
+    public virtual TEntryModel[] Entries { get => _entries?.Distinct().ToArray(); set => _entries = value; }
 }

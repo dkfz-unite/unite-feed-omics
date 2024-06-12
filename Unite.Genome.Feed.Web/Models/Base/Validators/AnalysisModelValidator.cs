@@ -1,32 +1,29 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Unite.Genome.Feed.Web.Models.Base.Validators;
 
-public class AnalysisModelValidator : AbstractValidator<AnalysisModel>
+public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisModel<T>>
+    where T : class, new()
+    where TValidator : IValidator<T>, new()
 {
+    private readonly IValidator<SampleModel> _sampleModelValidator;
+    private readonly IValidator<T> _entryModelValidator;
+
     public AnalysisModelValidator()
     {
-        RuleFor(model => model.Id)
-            .MaximumLength(255)
-            .WithMessage("Maximum length is 255");
+        _sampleModelValidator = new SampleModelValidator();
+        _entryModelValidator = new TValidator();
 
-        RuleFor(model => model.Type)
-            .NotEmpty()
-            .WithMessage("Should not be empty");
+        RuleFor(model => model.TargetSample)
+            .NotEmpty().WithMessage("Should not be empty")
+            .SetValidator(_sampleModelValidator);
 
-        RuleFor(model => model.Date)
-            .Empty()
-            .When(model => model.Day.HasValue)
-            .WithMessage("Either exact 'date' or relative 'days' can be set, not both");
+        RuleFor(model => model.MatchedSample)
+            .SetValidator(_sampleModelValidator)
+            .When(model => model.MatchedSample != null);
 
-        RuleFor(model => model.Day)
-            .Empty()
-            .When(model => model.Date.HasValue)
-            .WithMessage("Either exact 'date' or relative 'days' can be set, not both");
-
-        RuleFor(model => model.Day)
-            .GreaterThanOrEqualTo(1)
-            .When(model => model.Day.HasValue)
-            .WithMessage("Should be greater than or equal to 1");
+        RuleForEach(model => model.Entries)
+            .SetValidator(_entryModelValidator)
+            .When(model => model.Entries != null);
     }
 }

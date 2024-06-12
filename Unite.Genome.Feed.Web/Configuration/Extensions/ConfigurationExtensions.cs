@@ -6,15 +6,13 @@ using Unite.Indices.Context.Configuration.Options;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Genome.Annotations.Services.Transcriptomics;
+using Unite.Genome.Annotations.Services.Rna;
 using Unite.Genome.Annotations.Services.Vep;
-using Unite.Genome.Feed.Data.Writers.Variants;
-using Unite.Genome.Feed.Data.Writers.Transcriptomics;
 using Unite.Genome.Feed.Web.Configuration.Options;
 using Unite.Genome.Feed.Web.Handlers.Annotation;
 using Unite.Genome.Feed.Web.Handlers.Indexing;
 using Unite.Genome.Feed.Web.Handlers.Submission;
-using Unite.Genome.Feed.Web.HostedServices;
+using Unite.Genome.Feed.Web.Workers;
 using Unite.Genome.Feed.Web.Models.Base;
 using Unite.Genome.Feed.Web.Models.Base.Validators;
 using Unite.Genome.Feed.Web.Services.Annotation;
@@ -22,18 +20,18 @@ using Unite.Genome.Feed.Web.Services.Indexing;
 using Unite.Genome.Feed.Web.Submissions;
 using Unite.Genome.Indices.Services;
 
-using VariantEntities = Unite.Data.Entities.Genome.Variants;
+using DnaEntities = Unite.Data.Entities.Genome.Analysis.Dna;
 
-using SsmModel = Unite.Genome.Feed.Web.Models.Variants.SSM.VariantModel;
-using SsmModelValidator = Unite.Genome.Feed.Web.Models.Variants.SSM.Validators.VariantModelValidator;
-using CnvModel = Unite.Genome.Feed.Web.Models.Variants.CNV.VariantModel;
-using CnvModelValidator = Unite.Genome.Feed.Web.Models.Variants.CNV.Validators.VariantModelValidator;
-using SvModel = Unite.Genome.Feed.Web.Models.Variants.SV.VariantModel;
-using SvModelValidator = Unite.Genome.Feed.Web.Models.Variants.SV.Validators.VariantModelValidator;
-using BulkExpressionModel = Unite.Genome.Feed.Web.Models.Transcriptomics.BulkExpressionModel;
-using BulkExpressionModelValidator = Unite.Genome.Feed.Web.Models.Transcriptomics.Validators.BulkExpressionModelValidator;
-using CellExpressionModel = Unite.Genome.Feed.Web.Models.Transcriptomics.CellExpressionModel;
-using CellExpressionModelValidator = Unite.Genome.Feed.Web.Models.Transcriptomics.Validators.CellExpressionModelValidator;
+using SsmModel = Unite.Genome.Feed.Web.Models.Dna.Ssm.VariantModel;
+using SsmModelValidator = Unite.Genome.Feed.Web.Models.Dna.Ssm.Validators.VariantModelValidator;
+using CnvModel = Unite.Genome.Feed.Web.Models.Dna.Cnv.VariantModel;
+using CnvModelValidator = Unite.Genome.Feed.Web.Models.Dna.Cnv.Validators.VariantModelValidator;
+using SvModel = Unite.Genome.Feed.Web.Models.Dna.Sv.VariantModel;
+using SvModelValidator = Unite.Genome.Feed.Web.Models.Dna.Sv.Validators.VariantModelValidator;
+using BulkExpModel = Unite.Genome.Feed.Web.Models.Rna.ExpressionModel;
+using BulkExpModelValidator = Unite.Genome.Feed.Web.Models.Rna.Validators.ExpressionModelValidator;
+using CellExpModel = Unite.Genome.Feed.Web.Models.RnaSc.ExpressionModel;
+using CellExpModelValidator = Unite.Genome.Feed.Web.Models.RnaSc.Validators.ExpressionModelValidator;
 
 
 namespace Unite.Genome.Feed.Web.Configuration.Extensions;
@@ -50,22 +48,22 @@ public static class ConfigurationExtensions
         services.AddIndexServices();
         services.AddValidators();
 
-        services.AddTransient<VariantsDataWriter>();
-        services.AddTransient<SsmConsequencesDataWriter>();
-        services.AddTransient<CnvConsequencesDataWriter>();
-        services.AddTransient<SvConsequencesDataWriter>();
-        services.AddTransient<BulkDataWriter>();
-        services.AddTransient<CellDataWriter>();
+        services.AddTransient<Data.Writers.Dna.AnalysisWriter>();
+        services.AddTransient<Data.Writers.Dna.EffectsSsmWriter>();
+        services.AddTransient<Data.Writers.Dna.EffectsCnvWriter>();
+        services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();
+        services.AddTransient<Data.Writers.Rna.AnalysisWriter>();
+        services.AddTransient<Data.Writers.RnaSc.AnalysisWriter>();
 
         // Submission services
-        services.AddTransient<VariantsSubmissionService>();
-        services.AddTransient<TranscriptomicsSubmissionService>();
+        services.AddTransient<DnaSubmissionService>();
+        services.AddTransient<RnaSubmissionService>();
 
         // Annotation services
         services.AddTransient<SsmsAnnotationService>();
         services.AddTransient<CnvsAnnotationService>();
         services.AddTransient<SvsAnnotationService>();
-        services.AddTransient<BulkExpressionsAnnotationService>();
+        services.AddTransient<ExpressionsAnnotationService>();
 
         // Task processing services
         services.AddTransient<TasksProcessingService>();
@@ -82,39 +80,39 @@ public static class ConfigurationExtensions
         services.AddTransient<SvIndexingTaskService>();
 
         // Submissions hosted services
-        services.AddHostedService<SubmissionsHostedService>();
-        services.AddTransient<BulkTranscriptomicsSubmissionHandler>();
-        services.AddTransient<CellTranscriptomicsSubmissionHandler>();
+        services.AddHostedService<SubmissionsWorker>();
+        services.AddTransient<BulkGeneExpSubmissionHandler>();
+        services.AddTransient<CellGeneExpSubmissionHandler>();
         services.AddTransient<SsmsSubmissionHandler>();
         services.AddTransient<CnvsSubmissionHandler>();
         services.AddTransient<SvsSubmissionHandler>();
 
         // Variants annotation hosted service
-        services.AddHostedService<VariantsAnnotationHostedService>();
+        services.AddHostedService<VariantsAnnotationWorker>();
         services.AddTransient<VariantsAnnotationOptions>();
         services.AddTransient<SsmsAnnotationHandler>();
         services.AddTransient<CnvsAnnotationHandler>();
         services.AddTransient<SvsAnnotationHandler>();
 
         // Variants indexing hosted service
-        services.AddHostedService<VariantsIndexingHostedService>();
+        services.AddHostedService<VariantsIndexingWorker>();
         services.AddTransient<VariantsIndexingOptions>();
         services.AddTransient<SsmsIndexingHandler>();
         services.AddTransient<CnvsIndexingHandler>();
         services.AddTransient<SvsIndexingHandler>();
 
         // Genes indexing hosted service
-        services.AddHostedService<GenesIndexingHostedService>();
+        services.AddHostedService<GenesIndexingWorker>();
         services.AddTransient<GenesIndexingOptions>();
         services.AddTransient<GenesIndexingHandler>();
 
         // Variant indexing services
-        services.AddTransient<VariantIndexCreationService<VariantEntities.SSM.Variant, VariantEntities.SSM.VariantEntry>>();
-        services.AddTransient<VariantIndexCreationService<VariantEntities.CNV.Variant, VariantEntities.CNV.VariantEntry>>();
-        services.AddTransient<VariantIndexCreationService<VariantEntities.SV.Variant, VariantEntities.SV.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Ssm.Variant, DnaEntities.Ssm.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Cnv.Variant, DnaEntities.Cnv.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Sv.Variant, DnaEntities.Sv.VariantEntry>>();
 
         // Gene indexing services
-        services.AddTransient<GeneIndexCreationService>();
+        services.AddTransient<GenesIndexingCache>();
     }
 
 
@@ -132,11 +130,11 @@ public static class ConfigurationExtensions
 
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
-        services.AddTransient<IValidator<SequencingDataModel<SsmModel>>, SequencingDataModelValidator<SsmModel, SsmModelValidator>>();
-        services.AddTransient<IValidator<SequencingDataModel<CnvModel>>, SequencingDataModelValidator<CnvModel, CnvModelValidator>>();
-        services.AddTransient<IValidator<SequencingDataModel<SvModel>>, SequencingDataModelValidator<SvModel, SvModelValidator>>();
-        services.AddTransient<IValidator<SequencingDataModel<BulkExpressionModel>>, SequencingDataModelValidator<BulkExpressionModel, BulkExpressionModelValidator>>();
-        services.AddTransient<IValidator<SequencingDataModel<CellExpressionModel>>, SequencingDataModelValidator<CellExpressionModel, CellExpressionModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<SsmModel>>, AnalysisModelValidator<SsmModel, SsmModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<CnvModel>>, AnalysisModelValidator<CnvModel, CnvModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<SvModel>>, AnalysisModelValidator<SvModel, SvModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<BulkExpModel>>, AnalysisModelValidator<BulkExpModel, BulkExpModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<CellExpModel>>, AnalysisModelValidator<CellExpModel, CellExpModelValidator>>();
 
         return services;
     }

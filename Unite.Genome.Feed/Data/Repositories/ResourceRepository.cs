@@ -15,25 +15,23 @@ public class ResourceRepository
     }
 
 
-    public AnalysedSampleResource FindOrCreate(int analysedSampleId, ResourceModel model)
+    public SampleResource FindOrCreate(int sampleId, ResourceModel model)
     {
-        return Find(analysedSampleId, model) ?? Create(analysedSampleId, model);
+        return Find(sampleId, model) ?? Create(sampleId, model);
     }
 
-    public AnalysedSampleResource Find(int analysedSampleId, ResourceModel model)
+    public SampleResource Find(int sampleId, ResourceModel model)
     {
-        var entity =  _dbContext.Set<AnalysedSampleResource>()
+        return _dbContext.Set<SampleResource>()
             .FirstOrDefault(entity => 
-                entity.AnalysedSampleId == analysedSampleId && 
+                entity.SampleId == sampleId && 
                 entity.Type == model.Type
             );
-
-        return entity;
     }
 
-    public AnalysedSampleResource Create(int analysedSampleId, ResourceModel model)
+    public SampleResource Create(int sampleId, ResourceModel model)
     {
-        var entity = Convert(analysedSampleId, model);
+        var entity = Convert(sampleId, model);
 
         _dbContext.Add(entity);
         _dbContext.SaveChanges();
@@ -41,46 +39,22 @@ public class ResourceRepository
         return entity;
     }
 
-    public IEnumerable<AnalysedSampleResource> CreateAll(int analysedSampleId, IEnumerable<ResourceModel> models)
+    public void Update(SampleResource entity, ResourceModel model)
     {
-        var entitiesToAdd = new List<AnalysedSampleResource>();
+        entity.Format = model.Format;
+        entity.Url = model.Url;
 
-        foreach (var model in models)
-        {
-            var entity = Convert(analysedSampleId, model);
-
-            entitiesToAdd.Add(entity);
-        }
-
-        if (entitiesToAdd.Any())
-        {
-            _dbContext.AddRange(entitiesToAdd);
-            _dbContext.SaveChanges();
-        }
-
-        return entitiesToAdd;
+        _dbContext.Update(entity);
+        _dbContext.SaveChanges();
     }
 
-    public void RemoveAll(int analysedSampleId)
+    private static SampleResource Convert(int sampleId, ResourceModel model)
     {
-        var entitiesToRemove = _dbContext.Set<AnalysedSampleResource>()
-            .Where(entity => entity.AnalysedSampleId == analysedSampleId);
-
-        if (entitiesToRemove.Any())
+        return new SampleResource
         {
-            _dbContext.RemoveRange(entitiesToRemove);
-            _dbContext.SaveChanges();
-        }
-    }
-
-
-    private static AnalysedSampleResource Convert(int analysedSampleId, ResourceModel model)
-    {
-        return new AnalysedSampleResource
-        {
-            AnalysedSampleId = analysedSampleId,
+            SampleId = sampleId,
             Type = model.Type,
-            Path = model.Path,
+            Format = model.Format,
             Url = model.Url
         };
     }

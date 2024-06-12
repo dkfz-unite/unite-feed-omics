@@ -1,46 +1,47 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Genome.Feed.Web.Configuration.Constants;
 using Unite.Genome.Feed.Web.Services.Indexing;
 
 namespace Unite.Genome.Feed.Web.Controllers;
 
-[Route("api/[controller]/[action]")]
+[Route("api/indexing")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class IndexingController : Controller
 {
-    private readonly GeneIndexingTaskService _geneIndexingTaskService;
-    private readonly SsmIndexingTaskService _ssmIndexingTaskService;
-    private readonly CnvIndexingTaskService _cnvIndexingTaskService;
-    private readonly SvIndexingTaskService _svIndexingTaskService;
+    private readonly SsmIndexingTaskService _ssmTasksService;
+    private readonly CnvIndexingTaskService _cnvTasksService;
+    private readonly SvIndexingTaskService _svTasksService;
+    private readonly GeneIndexingTaskService _geneTasksService;
+
 
     public IndexingController(
-        GeneIndexingTaskService geneIndexingTaskService,
-        SsmIndexingTaskService ssmIndexingTaskService,
-        CnvIndexingTaskService cnvIndexingTaskService,
-        SvIndexingTaskService svIndexingTaskService)
+        SsmIndexingTaskService ssmTasksService,
+        CnvIndexingTaskService cnvTasksService,
+        SvIndexingTaskService svTasksService,
+        GeneIndexingTaskService geneTasksService)
     {
-        _geneIndexingTaskService = geneIndexingTaskService;
-        _ssmIndexingTaskService = ssmIndexingTaskService;
-        _cnvIndexingTaskService = cnvIndexingTaskService;
-        _svIndexingTaskService = svIndexingTaskService;
+        _ssmTasksService = ssmTasksService;
+        _cnvTasksService = cnvTasksService;
+        _svTasksService = svTasksService;
+        _geneTasksService = geneTasksService;
     }
 
 
-    [HttpPost]
-    public IActionResult Genes()
+    [HttpPost("variants")]
+    public IActionResult Variants()
     {
-        _geneIndexingTaskService.CreateTasks();
+        _ssmTasksService.CreateTasks();
+        _cnvTasksService.CreateTasks();
+        _svTasksService.CreateTasks();
 
         return Ok();
     }
 
-    [HttpPost]
-    public IActionResult Variants()
+    [HttpPost("genes")]
+    public IActionResult Genes()
     {
-        _ssmIndexingTaskService.CreateTasks();
-        _cnvIndexingTaskService.CreateTasks();
-        _svIndexingTaskService.CreateTasks();
+        _geneTasksService.CreateTasks();
 
         return Ok();
     }

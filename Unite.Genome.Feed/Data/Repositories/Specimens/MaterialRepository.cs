@@ -40,7 +40,7 @@ internal class MaterialRepository
             DonorId = donorId,
             ReferenceId = referenceId,
             TypeId = SpecimenType.Material,
-            Material = new Material { ReferenceId = referenceId }
+            Material = new Material()
         };
 
         _dbContext.Add(entity);

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Variants.CNV;
+using Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 

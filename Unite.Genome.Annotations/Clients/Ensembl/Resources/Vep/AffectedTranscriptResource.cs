@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Unite.Data.Entities.Genome.Variants;
 
 namespace Unite.Genome.Annotations.Clients.Ensembl.Resources.Vep;
 
@@ -34,7 +33,7 @@ internal record AffectedTranscriptResource
     public int? ProteinEnd { get; set; }
 
     [JsonPropertyName("amino_acids")]
-    public string AminoAcidChange { get; set; }
+    public string ProteinChange { get; set; }
 
     [JsonPropertyName("codons")]
     public string CodonChange { get; set; }
@@ -49,7 +48,7 @@ internal record AffectedTranscriptResource
     public int? Distance { get; set; }
 
     [JsonPropertyName("consequence_terms")]
-    public string[] Consequences { get; set; }
+    public string[] Effects { get; set; }
 
 
     public bool IsCanonical
@@ -60,7 +59,7 @@ internal record AffectedTranscriptResource
     public bool IsIntergenic
     {
         get => OverlapPercentage == 100
-            && Consequences.Length == 1
-            && Consequences.Contains("intergenic_variant");
+            && Effects.Length == 1
+            && Effects.Contains("intergenic_variant");
     }
 }

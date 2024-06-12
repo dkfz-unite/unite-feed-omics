@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Variants.SSM;
+using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 

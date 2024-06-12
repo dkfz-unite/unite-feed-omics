@@ -2,13 +2,13 @@
 using Unite.Data.Context;
 using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Services.Tasks;
-using Unite.Data.Entities.Genome.Variants;
+using Unite.Data.Entities.Genome.Analysis.Dna;
 using Unite.Essentials.Extensions;
 
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 
-public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Variant, long>
+public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Variant, int>
     where TV : Variant
 {
     protected override int BucketSize => 1000;
@@ -26,7 +26,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
 
-        IterateEntities<TV, long>(variant => true, variant => variant.Id, variants =>
+        IterateEntities<TV, int>(variant => true, variant => variant.Id, variants =>
         {
             CreateVariantIndexingTasks(variants);
         });
@@ -34,7 +34,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         transaction.Commit();
     }
 
-    public override void CreateTasks(IEnumerable<long> keys)
+    public override void CreateTasks(IEnumerable<int> keys)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
@@ -52,7 +52,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         transaction.Commit();
     }
 
-    public override void PopulateTasks(IEnumerable<long> keys)
+    public override void PopulateTasks(IEnumerable<int> keys)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
@@ -76,64 +76,52 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
     }
 
 
-    protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
     {
         return [];
     }
 
-    protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)
     {
         return _variantsRepository.GetRelatedDonors<TV>(keys).Result;
     }
 
-    protected override IEnumerable<int> LoadRelatedImages(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedImages(IEnumerable<int> keys)
     {
         return _variantsRepository.GetRelatedImages<TV>(keys).Result;
     }
 
-    protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<int> keys)
     {
         return _variantsRepository.GetRelatedSpecimens<TV>(keys).Result;
     }
 
-    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
     {
         return _variantsRepository.GetRelatedGenes<TV>(keys).Result;
     }
 
-    protected override IEnumerable<long> LoadRelatedSsms(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Variants.SSM.Variant))
-        {
+        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Ssm.Variant))
             return keys;
-        }
-        else
-        {
-            return Enumerable.Empty<long>();
-        }
+        
+        return [];
     }
 
-    protected override IEnumerable<long> LoadRelatedCnvs(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedCnvs(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Variants.CNV.Variant))
-        {
+        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Cnv.Variant))
             return keys;
-        }
-        else
-        {
-            return Enumerable.Empty<long>();
-        }
+        
+        return [];
     }
 
-    protected override IEnumerable<long> LoadRelatedSvs(IEnumerable<long> keys)
+    protected override IEnumerable<int> LoadRelatedSvs(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Variants.SV.Variant))
-        {
+        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Sv.Variant))
             return keys;
-        }
-        else
-        {
-            return Enumerable.Empty<long>();
-        }
+        
+        return [];
     }
 }

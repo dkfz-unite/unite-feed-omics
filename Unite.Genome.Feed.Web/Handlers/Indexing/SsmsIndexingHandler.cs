@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
-using Unite.Data.Entities.Genome.Variants.SSM;
+using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Indices.Services;
@@ -12,19 +12,19 @@ namespace Unite.Genome.Feed.Web.Handlers.Indexing;
 public class SsmsIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantIndexCreationService<Variant, VariantEntry> _indexCreationService;
+    private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
     private readonly IIndexService<VariantIndex> _indexingService;
     private readonly ILogger _logger;
 
 
     public SsmsIndexingHandler(
         TasksProcessingService taskProcessingService,
-        VariantIndexCreationService<Variant, VariantEntry> indexCreationService,
+        VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<VariantIndex> indexingService,
         ILogger<SsmsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
-        _indexCreationService = indexCreationService;
+        _indexingCache = indexingCache;
         _indexingService = indexingService;
         _logger = logger;
     }
@@ -52,14 +52,17 @@ public class SsmsIndexingHandler
 
             stopwatch.Restart();
 
+            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+
+            var indexCreator = new VariantIndexCreator<Variant, VariantEntry>(_indexingCache);
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<VariantIndex>();
 
             tasks.ForEach(task =>
             {
-                var id = long.Parse(task.Target);
+                var id = int.Parse(task.Target);
 
-                var index = _indexCreationService.CreateIndex(id);
+                var index = indexCreator.CreateIndex(id);
 
                 if (index == null)
                     indicesToDelete.Add($"SSM{id}");
@@ -72,6 +75,8 @@ public class SsmsIndexingHandler
 
             if (indicesToCreate.Any())
                 await _indexingService.AddRange(indicesToCreate);
+
+            _indexingCache.Clear();
 
             stopwatch.Stop();
 

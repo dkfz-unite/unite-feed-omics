@@ -6,7 +6,7 @@ using Unite.Data.Entities.Genome.Analysis;
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 
-public class SampleIndexingTaskService : IndexingTaskService<AnalysedSample, int>
+public class SampleIndexingTaskService : IndexingTaskService<Sample, int>
 {
     protected override int BucketSize => 1000;
     private readonly SpecimensRepository _specimensRepository;
@@ -30,7 +30,15 @@ public class SampleIndexingTaskService : IndexingTaskService<AnalysedSample, int
 
     public override void PopulateTasks(IEnumerable<int> keys)
     {
-        throw new NotImplementedException();
+        using var dbContext = _dbContextFactory.CreateDbContext();
+        var transaction = dbContext.Database.BeginTransaction();
+
+        CreateProjectIndexingTasks(keys);
+        CreateDonorIndexingTasks(keys);
+        CreateImageIndexingTasks(keys);
+        CreateSpecimenIndexingTasks(keys);
+
+        transaction.Commit();
     }
 
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
@@ -42,11 +50,11 @@ public class SampleIndexingTaskService : IndexingTaskService<AnalysedSample, int
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        return dbContext.Set<AnalysedSample>()
+        return dbContext.Set<Sample>()
             .AsNoTracking()
-            .Include(analysedSample => analysedSample.TargetSample)
-            .Where(analysedSample => keys.Contains(analysedSample.Id))
-            .Select(analysedSample => analysedSample.TargetSample.DonorId)
+            .Include(sample => sample.Specimen)
+            .Where(sample => keys.Contains(sample.Id))
+            .Select(sample => sample.Specimen.DonorId)
             .Distinct()
             .ToArray();
     }
@@ -62,10 +70,10 @@ public class SampleIndexingTaskService : IndexingTaskService<AnalysedSample, int
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        return dbContext.Set<AnalysedSample>()
+        return dbContext.Set<Sample>()
             .AsNoTracking()
-            .Where(analysedSample => keys.Contains(analysedSample.Id))
-            .Select(analysedSample => analysedSample.TargetSampleId)
+            .Where(sample => keys.Contains(sample.Id))
+            .Select(sample => sample.SpecimenId)
             .Distinct()
             .ToArray();
     }
@@ -75,17 +83,17 @@ public class SampleIndexingTaskService : IndexingTaskService<AnalysedSample, int
         return [];
     }
 
-    protected override IEnumerable<long> LoadRelatedSsms(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
     {
         return [];
     }
 
-    protected override IEnumerable<long> LoadRelatedCnvs(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedCnvs(IEnumerable<int> keys)
     {
         return [];
     }
 
-    protected override IEnumerable<long> LoadRelatedSvs(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSvs(IEnumerable<int> keys)
     {
         return [];
     }
