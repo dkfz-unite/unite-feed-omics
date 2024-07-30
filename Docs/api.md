@@ -176,7 +176,7 @@ Supported formats are:
         "specimen_id": "Material2",
         "specimen_type": "Material",
         "analysis_type": "WGS",
-        "purity": 95,
+        "purity": 0.95,
         "ploidy": 2
     },
     "msample": {
@@ -238,7 +238,7 @@ Supported formats are:
 # tsample_specimen_id: Material2
 # tsample_specimen_type: Material
 # tsample_analysis_type: WGS
-# tsample_purity: 95
+# tsample_purity: 0.95
 # tsample_ploidy: 2
 # msample_donor_id: Donor1
 # msample_specimen_id: Material1
