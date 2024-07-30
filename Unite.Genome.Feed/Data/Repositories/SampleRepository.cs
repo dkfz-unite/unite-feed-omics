@@ -33,7 +33,7 @@ public class SampleRepository
     public Sample Find(SampleModel model)
     {
         return _dbContext.Set<Sample>()
-            .Include(entity => entity.Analysis.Parameters)
+            .Include(entity => entity.Analysis)
             .FirstOrDefault(entity =>
                 entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
                 entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
