@@ -12,7 +12,6 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 {
     private const int _batchSize = 1000;
 
-    private SampleRepository _sampleRepository;
     private GeneRepository _geneRepository;
     private GeneExpressionRepository _geneExpressionRepository;
 
@@ -30,13 +29,13 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 
     protected override void ProcessModel(SampleModel model, ref AnalysisWriteAudit audit)
     {
-        var sample = _sampleRepository.FindOrCreate(model);
+        var sampleId = WriteSample(model, ref audit);
 
-        if (model.Exps != null)
-            WriteExpressions(sample.Id, model.Exps, ref audit);
+        if (model.Exps.IsNotEmpty())
+            WriteExpressions(sampleId, model.Exps, ref audit);
 
-        if (model.Resources != null)
-            WriteResources(sample.Id, model.Resources, ref audit);
+        if (model.Resources.IsNotEmpty())
+            WriteResources(sampleId, model.Resources, ref audit);
     }
 
 

@@ -8,7 +8,6 @@ namespace Unite.Genome.Feed.Data.Writers.Dna;
 
 public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 {
-    private Repositories.SampleRepository _sampleRepository;
     private Repositories.Dna.Ssm.VariantRepository _ssmRepository;
     private Repositories.Dna.Ssm.VariantEntryRepository _ssmEntryRepository;
     private Repositories.Dna.Cnv.VariantRepository _cnvRepository;
@@ -39,19 +38,19 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 
     protected override void ProcessModel(SampleModel model, ref AnalysisWriteAudit audit)
     {
-        var sample = _sampleRepository.FindOrCreate(model);
+        var sampleId = WriteSample(model, ref audit);
 
         if (model.Ssms.IsNotEmpty())
-            WriteSsms(sample.Id, model.Ssms, ref audit);
+            WriteSsms(sampleId, model.Ssms, ref audit);
 
         if (model.Cnvs.IsNotEmpty())
-            WriteCnvs(sample.Id, model.Cnvs, ref audit);
+            WriteCnvs(sampleId, model.Cnvs, ref audit);
 
         if (model.Svs.IsNotEmpty())
-            WriteSvs(sample.Id, model.Svs, ref audit);
+            WriteSvs(sampleId, model.Svs, ref audit);
 
         if (model.Resources.IsNotEmpty())
-            WriteResources(sample.Id, model.Resources, ref audit);
+            WriteResources(sampleId, model.Resources, ref audit);
     }
 
     private void WriteSsms(int sampleId, IEnumerable<Models.Dna.Ssm.VariantModel> models, ref AnalysisWriteAudit audit)

@@ -60,7 +60,7 @@ public record SampleModel
     /// Sample purity (TCC)
     /// </summary>
     [JsonPropertyName("purity")]
-    public virtual double? Purity { get => _purity; set => _purity = value; }
+    public virtual double? Purity { get => GetPercent(_purity); set => _purity = value; }
 
     /// <summary>
     /// Sample ploidy
@@ -85,4 +85,16 @@ public record SampleModel
     /// </summary>
     [JsonPropertyName("resources")]
     public virtual ResourceModel[] Resources { get; set; }
+
+
+    private static double? GetPercent(double? value)
+    {
+        if (!value.HasValue)
+            return null;
+
+        if (value.Value > 1)
+            return value.Value / 100;
+        else
+            return value.Value;
+    }
 }

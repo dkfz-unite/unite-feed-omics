@@ -9,13 +9,13 @@ public record ResourceModel
     private string _url;
 
     /// <summary>
-    /// Resource type (Alignment, MEX, etc.)
+    /// Resource type (dna, dna-ssm, dna-cnv, dna-sv, rna, rna-exp, rnasc, rnasc-exp,  etc.)
     /// </summary>
     [JsonPropertyName("type")]
     public virtual string Type { get => _type?.Trim(); set => _type = value; }
 
     /// <summary>
-    /// Resource format (BAM, MEX, etc.)
+    /// Resource format (bam, vcf, tsv, csv, mex, etc.)
     /// </summary>
     [JsonPropertyName("format")]
     public virtual string Format { get => _format?.Trim(); set => _format = value; }

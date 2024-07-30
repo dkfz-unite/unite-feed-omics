@@ -48,6 +48,7 @@ public static class ConfigurationExtensions
         services.AddIndexServices();
         services.AddValidators();
 
+        services.AddTransient<Data.Writers.SampleWriter>();
         services.AddTransient<Data.Writers.Dna.AnalysisWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsSsmWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsCnvWriter>();
@@ -130,6 +131,7 @@ public static class ConfigurationExtensions
 
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
+        services.AddTransient<IValidator<SampleModel>, SampleModelValidator>();
         services.AddTransient<IValidator<AnalysisModel<SsmModel>>, AnalysisModelValidator<SsmModel, SsmModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<CnvModel>>, AnalysisModelValidator<CnvModel, CnvModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<SvModel>>, AnalysisModelValidator<SvModel, SvModelValidator>>();
