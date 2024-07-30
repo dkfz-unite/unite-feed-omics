@@ -20,13 +20,13 @@ public class AnalysisWriteAudit : DataWriteAudit
     {
         return string.Join(Environment.NewLine,
         [
+            base.ToString(),
             $"{SsmsCreated} SSMs created",
             $"{SsmsAssociated} SSMs associated",
             $"{CnvsCreated} CNVs created",
             $"{CnvsAssociated} CNVs associated",
             $"{SvsCreated} SVs created",
-            $"{SvsAssociated} SVs associated",
-            base.ToString()
+            $"{SvsAssociated} SVs associated"
         ]);
     }
 }

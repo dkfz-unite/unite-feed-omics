@@ -26,10 +26,6 @@ public class ExpressionModelValidator : AbstractValidator<ExpressionModel>
             .MaximumLength(100)
             .WithMessage("Maximum length is 100");
 
-        RuleFor(model => model.Source)
-            .NotEmpty().WithMessage("Should not be empty")
-            .MaximumLength(100).WithMessage("Maximum length is 100");
-
         RuleFor(model => model.ExonicLength)
             .Must(value => value > 0)
             .When(model => model.ExonicLength != null)

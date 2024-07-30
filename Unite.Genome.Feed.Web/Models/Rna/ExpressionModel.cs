@@ -1,11 +1,9 @@
-﻿
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Unite.Genome.Feed.Web.Models.Rna;
 
 public record ExpressionModel
 {
-    private string _source = "Ensembl";
     private string _geneId;
     private string _geneSymbol;
     private string _transcriptId;
@@ -13,8 +11,6 @@ public record ExpressionModel
     private int? _exonicLength;
     private int? _reads;
 
-    [JsonPropertyName("source")]
-    public string Source { get => _source?.Trim(); set => _source = value; }
 
     [JsonPropertyName("gene_id")]
     public string GeneId { get => ParseId(_geneId)?.Trim(); set => _geneId = value; }

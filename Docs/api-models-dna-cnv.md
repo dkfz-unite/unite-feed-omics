@@ -46,7 +46,7 @@ Copy number variant (CNV) data.
 - Type: _Boolean_
 - Example: `true`
 
-**`homo_del`** - Homozygous deletion.
+**`del`** - Homozygous deletion.
 - Note: If not set, the api will try to calculate the value from `C1`, `C2` and sample `Ploidy`.
 - Type: _Boolean_
 - Example: `false`

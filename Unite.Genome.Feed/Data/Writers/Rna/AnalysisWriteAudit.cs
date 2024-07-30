@@ -11,9 +11,9 @@ public class AnalysisWriteAudit : DataWriteAudit
     {
         return string.Join(Environment.NewLine,
         [
+            base.ToString(),
             $"{GenesCreated} genes created",
-            $"{ExpressionsCreated} gene expressions created",
-            base.ToString()
+            $"{ExpressionsCreated} gene expressions created"
         ]);
     }
 }

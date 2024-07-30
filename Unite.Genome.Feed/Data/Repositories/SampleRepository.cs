@@ -1,4 +1,5 @@
-﻿using Unite.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Entities.Genome.Analysis;
 using Unite.Data.Entities.Specimens;
 using Unite.Genome.Feed.Data.Models;
@@ -6,15 +7,17 @@ using Unite.Genome.Feed.Data.Repositories.Specimens;
 
 namespace Unite.Genome.Feed.Data.Repositories;
 
-internal class SampleRepository
+public class SampleRepository
 {
     private DomainDbContext _dbContext;
+    private readonly AnalysisRepository _analysisRepository;
     private readonly SpecimenRepository _specimenRepository;
-
+    
 
     public SampleRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
+        _analysisRepository = new AnalysisRepository(dbContext);
         _specimenRepository = new SpecimenRepository(dbContext);
     }
 
@@ -29,30 +32,19 @@ internal class SampleRepository
 
     public Sample Find(SampleModel model)
     {
-        if (model.MatchedSample == null)
-        {
-            return _dbContext.Set<Sample>().FirstOrDefault(entity =>
+        return _dbContext.Set<Sample>()
+            .Include(entity => entity.Analysis.Parameters)
+            .FirstOrDefault(entity =>
                 entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
                 entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
                 entity.Analysis.TypeId == model.Analysis.Type);
-        }
-        else
-        {
-            return _dbContext.Set<Sample>().FirstOrDefault(entity =>
-                entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
-                entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
-                entity.Analysis.TypeId == model.Analysis.Type &&
-                entity.MatchedSample.Specimen.Donor.ReferenceId == model.MatchedSample.Specimen.Donor.ReferenceId &&
-                entity.MatchedSample.Specimen.ReferenceId == model.MatchedSample.Specimen.ReferenceId &&
-                entity.MatchedSample.Analysis.TypeId == model.MatchedSample.Analysis.Type);
-        }
     }
 
     public Sample Create(SampleModel model)
     {
         var entity = new Sample
         {
-            Analysis = Create(model.Analysis),
+            Analysis = _analysisRepository.Create(model.Analysis),
             SpecimenId = FindOrCreate(model.Specimen).Id,
             MatchedSampleId = FindOrCreate(model.MatchedSample)?.Id,
             Purity = model.Purity,
@@ -67,6 +59,26 @@ internal class SampleRepository
         return entity;
     }
 
+    public void Update(Sample entity, SampleModel model)
+    {
+        _analysisRepository.Update(entity.Analysis, model.Analysis);
+
+        if (model.Purity != null)
+            entity.Purity = model.Purity;
+
+        if (model.Ploidy != null)
+            entity.Ploidy = model.Ploidy;
+
+        if (model.CellsNumber != null)
+            entity.CellsNumber = model.CellsNumber;
+
+        if (model.GenesModel != null)
+            entity.GenesModel = model.GenesModel;
+
+        _dbContext.Update(entity);
+        _dbContext.SaveChanges();
+    }
+
 
     private Specimen FindOrCreate(SpecimenModel model)
     {
@@ -74,21 +86,5 @@ internal class SampleRepository
             return null;
 
         return _specimenRepository.FindOrCreate(model);
-    }
-
-    private Analysis Create(AnalysisModel analysisModel)
-    {
-        var entity = new Analysis
-        {
-            TypeId = analysisModel.Type,
-            Date = analysisModel.Date,
-            Day = analysisModel.Day,
-            Parameters = analysisModel.Parameters
-        };
-
-        _dbContext.Add(entity);
-        _dbContext.SaveChanges();
-
-        return entity;
     }
 }

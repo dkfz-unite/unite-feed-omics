@@ -2,6 +2,8 @@ namespace Unite.Genome.Feed.Data.Writers;
 
 public abstract class DataWriteAudit
 {
+    public int SamplesCreated;
+    public int SamplesUpdated;
     public int ResourcesCreated;
     public int ResourcesUpdated;
 
@@ -11,6 +13,8 @@ public abstract class DataWriteAudit
     {
         return string.Join(Environment.NewLine,
         [
+            $"{SamplesCreated} samples created",
+            $"{SamplesUpdated} samples updated",
             $"{ResourcesCreated} resources created",
             $"{ResourcesUpdated} resources updated",
         ]);

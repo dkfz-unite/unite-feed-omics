@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
+using Unite.Essentials.Extensions;
 using Unite.Genome.Feed.Data.Models;
 using Unite.Genome.Feed.Data.Repositories;
 
@@ -7,8 +8,6 @@ namespace Unite.Genome.Feed.Data.Writers.RnaSc;
 
 public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 {
-    private SampleRepository _sampleRepository;
-
     public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
     }
@@ -21,13 +20,9 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 
     protected override void ProcessModel(SampleModel model, ref AnalysisWriteAudit audit)
     {
-        var sample = _sampleRepository.FindOrCreate(model);
+        var sampleId = WriteSample(model, ref audit);
 
-        audit.Samples.Add(sample.Id);
-
-        if (model.Resources != null)
-        {
-            WriteResources(sample.Id, model.Resources, ref audit);
-        }
+        if (model.Resources.IsNotEmpty())
+            WriteResources(sampleId, model.Resources, ref audit);
     }
 }

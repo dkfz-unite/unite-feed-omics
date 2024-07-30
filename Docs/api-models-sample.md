@@ -38,8 +38,8 @@ Includes the information about analysed sample.
 **`purity`** - Sample purity (TCC) percentage of tumor cells in the tissue.
 - Notes: Available for CNVs data only.
 - Type: _Double_
-- Limitations: Should be between 0 and 100
-- Example: `95`
+- Limitations: Should be in range [0, 1].
+- Example: `0.95`
 
 **`ploidy`** - Sample ploidy.
 - Notes: Available for CNVs data only.
@@ -75,8 +75,8 @@ Specimen can be of the following types:
 
 #### Analysis Type
 Analysis can be of the following types:
-- `"WGS"` - whole genome sequencing
-- `"WES"` - whole exome sequencing
+- `"WGS"` - whole genome DNA sequencing
+- `"WES"` - whole exome DNA sequencing
 - `"RNASeq"` - bulk RNA sequencing
 - `"RNASeqSc"` - single cell RNA sequencing
 

@@ -16,6 +16,9 @@ Includes information about analysed sample and expression data.
 ## Expression
 Gene expression data.
 
+> [!Note]
+> System supports only [Ensembl](https://www.ensembl.org/index.html) gene and transcript [identifiers](https://www.ensembl.org/info/genome/stable_ids/index.html). If such are unavailable, provide gene and transcript symbols.
+
 The data can be submitted by only one of the following strategies (one of this fields should be set):
 - `gene_id` - fastest
 - `gene_symbol` - slower than by `gene_id`
@@ -41,13 +44,6 @@ The data can be submitted by only one of the following strategies (one of this f
 - Type: _String_
 - Limitations: Maximum length 100
 - Example: `"DDX11L1-002"`
-
-**`source`** - Source feature identifier or symbol.
-- Note: If source is `"Ensembl"`, then this field can be ignored to reduce submission data size.
-- Type: _String_
-- Possible values: `"Ensembl"`
-- Default value: `"Ensembl"`
-- Example: `"Ensembl"`
 
 **`exonic_length`** - Exonic length of the feature.
 - Note: If not set, API will caclulate exonic length of the feature (Transcript or gene canonical transcript exonic length).
