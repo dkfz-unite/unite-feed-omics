@@ -58,8 +58,8 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage("Should be greater than or equal to 0");
 
         RuleFor(model => model.Purity)
-            .LessThanOrEqualTo(100)
-            .WithMessage("Should be less than or equal to 100");
+            .LessThanOrEqualTo(1)
+            .WithMessage("Should be less than or equal to 1");
 
         
         RuleFor(model => model.Ploidy)

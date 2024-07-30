@@ -38,8 +38,8 @@ Includes the information about analysed sample.
 **`purity`** - Sample purity (TCC) percentage of tumor cells in the tissue.
 - Notes: Available for CNVs data only.
 - Type: _Double_
-- Limitations: Should be either integer value between 0 and 100 or double value between 0 and 1.
-- Example: `95`
+- Limitations: Should be in range [0, 1].
+- Example: `0.95`
 
 **`ploidy`** - Sample ploidy.
 - Notes: Available for CNVs data only.
