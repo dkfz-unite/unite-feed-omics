@@ -10,7 +10,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Dna;
 
-[Route("api/dna/analysis/ssms")]
+[Route("api/dna/analysis/ssm")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class SsmsController : Controller
 {
