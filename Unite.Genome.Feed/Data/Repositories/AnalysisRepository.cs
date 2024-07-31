@@ -39,11 +39,15 @@ internal class AnalysisRepository
             _dbContext.RemoveRange(entity.Parameters);
             _dbContext.SaveChanges();
         }
+        
+        if (model.Date != null)
+            entity.Date = model.Date;
 
-        entity.TypeId = model.Type;
-        entity.Date = model.Date;
-        entity.Day = model.Day;
-        entity.Parameters = model.Parameters;
+        if (model.Day != null)
+            entity.Day = model.Day;
+
+        if (model.Parameters.IsNotEmpty())
+            entity.Parameters = model.Parameters;
         
         _dbContext.SaveChanges();
     }
