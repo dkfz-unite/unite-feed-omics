@@ -10,7 +10,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Controllers.Rna;
 
-[Route("api/rna/analysis/exps")]
+[Route("api/rna/analysis/exp")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class ExpressionsController : Controller
 {
