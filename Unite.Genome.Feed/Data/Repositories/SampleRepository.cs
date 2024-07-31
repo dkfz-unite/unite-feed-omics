@@ -37,6 +37,7 @@ public class SampleRepository
             .FirstOrDefault(entity =>
                 entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
                 entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
+                entity.Specimen.TypeId == model.Specimen.Type &&
                 entity.Analysis.TypeId == model.Analysis.Type);
     }
 
