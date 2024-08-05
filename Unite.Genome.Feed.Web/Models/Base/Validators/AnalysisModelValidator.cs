@@ -36,8 +36,11 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
     private bool HaveData(AnalysisModel<T> model)
     {
         var hasEntries = model.Entries.IsNotEmpty();
+
+        // "dna-ssm", "dna-cnv", "dna-sv", "rna-exp", "rnasc-exp"
+        var dataResources = new string[] { "rnasc-exp" };
         
-        var hasResources = model.TargetSample.Resources?.FirstOrDefault(resource => string.Equals(resource.Type, "data", StringComparison.InvariantCultureIgnoreCase)) != null;
+        var hasResources = model.TargetSample?.Resources?.FirstOrDefault(resource => dataResources.Contains(resource.Format.Trim().ToLower())) != null;
 
         return hasEntries || hasResources;
     }
