@@ -4,22 +4,25 @@ namespace Unite.Genome.Feed.Web.Models.Base.Converters;
 
 public class SampleModelConverter
 {
+    private readonly ResourceModelConverter _resourceModelConverter = new();
+
+
     public DataModels.SampleModel Convert(SampleModel sampleModel)
     {
         return new DataModels.SampleModel
         {
             Purity = sampleModel.Purity,
             Ploidy = sampleModel.Ploidy ?? SampleModel.DefaultPloidy,
-            CellsNumber = sampleModel.CellsNumber,
-            GenesModel = sampleModel.GenesModel,
+            Cells = sampleModel.Cells,
+            Genome = sampleModel.Genome,
             Specimen = ConvertSpecimen(sampleModel),
             Analysis = ConvertAnalysis(sampleModel),
-            Resources = sampleModel.Resources?.Select(ConvertResource).ToArray(),
+            Resources = ConvertResources(sampleModel.Resources)
         };
     }
 
 
-    private static DataModels.SpecimenModel ConvertSpecimen(SampleModel sampleModel)
+    private DataModels.SpecimenModel ConvertSpecimen(SampleModel sampleModel)
     {
         return new DataModels.SpecimenModel
         {
@@ -29,7 +32,7 @@ public class SampleModelConverter
         };
     }
 
-    private static DataModels.AnalysisModel ConvertAnalysis(SampleModel sampleModel)
+    private DataModels.AnalysisModel ConvertAnalysis(SampleModel sampleModel)
     {
         return new DataModels.AnalysisModel
         {
@@ -39,13 +42,8 @@ public class SampleModelConverter
         };
     }
 
-    private static DataModels.ResourceModel ConvertResource(ResourceModel resourceModel)
+    private DataModels.ResourceModel[] ConvertResources(ResourceModel[] resourceModels)
     {
-        return new DataModels.ResourceModel
-        {
-            Type = resourceModel.Type,
-            Format = resourceModel.Format,
-            Url = resourceModel.Url
-        };
+        return resourceModels?.Select(_resourceModelConverter.Convert).ToArray();
     }
 }

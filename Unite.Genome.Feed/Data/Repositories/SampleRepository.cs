@@ -48,10 +48,10 @@ public class SampleRepository
             Analysis = _analysisRepository.Create(model.Analysis),
             SpecimenId = FindOrCreate(model.Specimen).Id,
             MatchedSampleId = FindOrCreate(model.MatchedSample)?.Id,
+            Genome = model.Genome,
             Purity = model.Purity,
             Ploidy = model.Ploidy,
-            CellsNumber = model.CellsNumber,
-            GenesModel = model.GenesModel
+            Cells = model.Cells
         };
 
         _dbContext.Add(entity);
@@ -64,17 +64,17 @@ public class SampleRepository
     {
         _analysisRepository.Update(entity.Analysis, model.Analysis);
 
+        if (model.Genome != null)
+            entity.Genome = model.Genome;
+
         if (model.Purity != null)
             entity.Purity = model.Purity;
 
         if (model.Ploidy != null)
             entity.Ploidy = model.Ploidy;
 
-        if (model.CellsNumber != null)
-            entity.CellsNumber = model.CellsNumber;
-
-        if (model.GenesModel != null)
-            entity.GenesModel = model.GenesModel;
+        if (model.Cells != null)
+            entity.Cells = model.Cells;
 
         _dbContext.Update(entity);
         _dbContext.SaveChanges();

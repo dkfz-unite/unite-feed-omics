@@ -4,7 +4,7 @@ namespace Unite.Genome.Feed.Data.Models.Dna.Ssm;
 
 public class VariantModel : Dna.VariantModel
 {
-    public SsmType Type { get; set; }
-    public string Ref { get; set; }
-    public string Alt { get; set; }
+    public SsmType Type;
+    public string Ref;
+    public string Alt;
 }

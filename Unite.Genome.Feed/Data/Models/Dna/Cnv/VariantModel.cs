@@ -4,15 +4,15 @@ namespace Unite.Genome.Feed.Data.Models.Dna.Cnv;
 
 public class VariantModel : Dna.VariantModel
 {
-    public CnvType Type { get; set; }
-    public bool? Loh { get; set; }
-    public bool? Del { get; set; }
-    public double? C1Mean { get; set; }
-    public double? C2Mean { get; set; }
-    public double? TcnMean { get; set; }
-    public int? C1 { get; set; }
-    public int? C2 { get; set; }
-    public int? Tcn { get; set; }
-    public double? TcnRatio { get; set; }
-    public double? DhMax { get; set; }
+    public CnvType Type;
+    public bool? Loh;
+    public bool? Del;
+    public double? C1Mean;
+    public double? C2Mean;
+    public double? TcnMean;
+    public int? C1;
+    public int? C2;
+    public int? Tcn;
+    public double? TcnRatio;
+    public double? DhMax;
 }

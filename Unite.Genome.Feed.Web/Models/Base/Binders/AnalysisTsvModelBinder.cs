@@ -13,16 +13,13 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
     protected const string _tsample_donor_id = "tsample_donor_id";
     protected const string _tsample_specimen_id = "tsample_specimen_id";
     protected const string _tsample_specimen_type = "tsample_specimen_type";
-    protected const string _tsample_purity = "tsample_purity";
-    protected const string _tsample_ploidy = "tsample_ploidy";
-    protected const string _tsample_cells_number = "tsample_cells_number";
-    protected const string _tsample_genes_model = "tsample_genes_model";
     protected const string _tsample_analysis_type = "tsample_analysis_type";
     protected const string _tsample_analysis_date = "tsample_analysis_date";
     protected const string _tsample_analysis_day = "tsample_analysis_day";
-    protected const string _tsample_resource_type = "tsample_resource_type";
-    protected const string _tsample_resource_format = "tsample_resource_format";
-    protected const string _tsample_resource_url = "tsample_resource_url";
+    protected const string _tsample_genome = "tsample_genome";
+    protected const string _tsample_purity = "tsample_purity";
+    protected const string _tsample_ploidy = "tsample_ploidy";
+    protected const string _tsample_cells = "tsample_cells";
 
     protected const string _msample_donor_id = "msample_donor_id";
     protected const string _msample_specimen_id = "msample_specimen_id";
@@ -30,9 +27,7 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
     protected const string _msample_analysis_type = "msample_analysis_type";
     protected const string _msample_analysis_date = "msample_analysis_date";
     protected const string _msample_analysis_day = "msample_analysis_day";
-    protected const string _msample_resource_type = "msample_resource_type";
-    protected const string _msample_resource_format = "msample_resource_format";
-    protected const string _msample_resource_url = "msample_resource_url";
+    protected const string _msample_genome = "msample_genome";
 
 
     public virtual async Task BindModelAsync(ModelBindingContext bindingContext)
@@ -68,9 +63,7 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
         var comparison = StringComparison.InvariantCultureIgnoreCase;
 
         var targetSample = new SampleModel();
-        var targetResource = new ResourceModel();
         var matchedSample = new SampleModel();
-        var matchedResource = new ResourceModel();
 
         foreach (var comment in comments)
         {
@@ -86,26 +79,20 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
                 targetSample.SpecimenId = GetValue<string>(parts[1]);
             else if (parts[0].Equals(_tsample_specimen_type, comparison))
                 targetSample.SpecimenType = GetValue<SpecimenType?>(parts[1]);
-            else if (parts[0].Equals(_tsample_purity, comparison))
-                targetSample.Purity = GetValue<double?>(parts[1]);
-            else if (parts[0].Equals(_tsample_ploidy, comparison))
-                targetSample.Ploidy = GetValue<double?>(parts[1]);
-            else if (parts[0].Equals(_tsample_cells_number, comparison))
-                targetSample.CellsNumber = GetValue<int?>(parts[1]);
-            else if (parts[0].Equals(_tsample_genes_model, comparison))
-                targetSample.GenesModel = GetValue<string>(parts[1]);
             else if (parts[0].Equals(_tsample_analysis_type, comparison))
                 targetSample.AnalysisType = GetValue<AnalysisType?>(parts[1]);
             else if (parts[0].Equals(_tsample_analysis_date, comparison))
                 targetSample.AnalysisDate = GetValue<DateOnly?>(parts[1]);
             else if (parts[0].Equals(_tsample_analysis_day, comparison))
                 targetSample.AnalysisDay = GetValue<int?>(parts[1]);
-            else if (parts[0].Equals(_tsample_resource_type, comparison))
-                targetResource.Type = GetValue<string>(parts[1]);
-            else if (parts[0].Equals(_tsample_resource_format, comparison))
-                targetResource.Format = GetValue<string>(parts[1]);
-            else if (parts[0].Equals(_tsample_resource_url, comparison))
-                targetResource.Url = GetValue<string>(parts[1]);
+            else if (parts[0].Equals(_tsample_genome, comparison))
+                targetSample.Genome = GetValue<string>(parts[1]);
+            else if (parts[0].Equals(_tsample_purity, comparison))
+                targetSample.Purity = GetValue<double?>(parts[1]);
+            else if (parts[0].Equals(_tsample_ploidy, comparison))
+                targetSample.Ploidy = GetValue<double?>(parts[1]);
+            else if (parts[0].Equals(_tsample_cells, comparison))
+                targetSample.Cells = GetValue<int?>(parts[1]);
 
             // Matched sample
             else if (parts[0].Equals(_msample_donor_id, comparison))
@@ -120,25 +107,15 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
                 matchedSample.AnalysisDate = GetValue<DateOnly?>(parts[1]);
             else if (parts[0].Equals(_msample_analysis_day, comparison))
                 matchedSample.AnalysisDay = GetValue<int?>(parts[1]);
-            else if (parts[0].Equals(_msample_resource_type, comparison))
-                matchedResource.Type = GetValue<string>(parts[1]);
-            else if (parts[0].Equals(_msample_resource_format, comparison))
-                matchedResource.Format = GetValue<string>(parts[1]);
-            else if (parts[0].Equals(_msample_resource_url, comparison))
-                matchedResource.Url = GetValue<string>(parts[1]);
+            else if (parts[0].Equals(_msample_genome, comparison))
+                matchedSample.Genome = GetValue<string>(parts[1]);
         }
         
         if (IsNotEmpty(targetSample))
             model.TargetSample = targetSample;
-        
-        if (IsNotEmpty(targetResource))
-            model.TargetSample.Resources = [targetResource];
 
         if (IsNotEmpty(matchedSample))
             model.MatchedSample = matchedSample;
-
-        if (IsNotEmpty(matchedResource))
-            model.MatchedSample.Resources = [matchedResource];
     }
 
     protected virtual T GetValue<T>(string value)

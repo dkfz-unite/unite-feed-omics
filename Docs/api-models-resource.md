@@ -8,7 +8,7 @@ Includes the information about available analysis resource (file).
 
 **`format`*** - Resource format.
 - Type: _String_
-- Available values: `"tsv"`, `"csv"`, `"vcf"`, `"bam"`, `"mex"`
+- Available values: `"txt"`, `"tsv"`, `"csv"`, `"vcf"`, `"bam"`, `"mtx"`
 - Example: `"bam"`
 
 **`url`*** - Resource URL on remote a server.
@@ -29,11 +29,12 @@ Resource data can be of the following types:
 
 #### Resource Format
 Resource format can be of the following types:
+- `"txt"` - Plain text
 - `"tsv"` - Tab-separated values
 - `"csv"` - Comma-separated values
 - `"vcf"` - Variant Calling Format
-- `"BAM"` - Binary Alignment Map
-- `"MEX"` - [10xGenomics](https://www.10xgenomics.com/) single cell [dense gene expressions matrix](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/outputs/cr-outputs-mex-matrices) (folder)
+- `"bam"` - Binary Alignment Map
+- `"mtx"` - [10xGenomics](https://www.10xgenomics.com/) single cell [dense gene expressions matrix](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/outputs/cr-outputs-mex-matrices)
 
 
 ##

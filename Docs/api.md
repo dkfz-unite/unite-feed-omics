@@ -54,11 +54,12 @@ Supported formats are:
     "specimen_type": "Material",
     "analysis_type": "WGS",
     "analysis_date": "2023-12-01",
+    "genome": "grch37",
     "resources": [
         {
             "type": "dna",
             "format": "bam",
-            "url": "example.com/my/file"
+            "url": "example.com/bam/abc"
         }
     ]
 }
@@ -71,8 +72,9 @@ Supported formats are:
 # specimen_type: Material
 # analysis_type: WGS
 # analysis_date: 2023-12-01
+# genome: grch37
 type    format  url
-dna     bam     example.com/my/file
+dna     bam     example.com/bam/abc
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -131,6 +133,9 @@ Supported formats are:
 ```
 
 #### tsv - text/tab-separated-values
+> [!Note]
+> It's not possible to upload any resources in this format.
+
 ```tsv
 # tsample_donor_id: Donor1
 # tsample_specimen_id: Material2
@@ -233,6 +238,9 @@ Supported formats are:
 ```
 
 #### tsv - text/tab-separated-values
+> [!Note]
+> It's not possible to upload any resources in this format.
+
 ```tsv
 # tsample_donor_id: Donor1
 # tsample_specimen_id: Material2
@@ -328,6 +336,9 @@ Supported formats are:
 ```
 
 #### tsv - text/tab-separated-values
+> [!Note]
+> It's not possible to upload any resources in this format.
+
 ```tsv
 # tsample_donor_id: Donor1
 # tsample_specimen_id: Material2
@@ -372,11 +383,12 @@ Supported formats are:
     "specimen_type": "Material",
     "analysis_type": "RNASeq",
     "analysis_date": "2023-12-01",
+    "genome": "grch37",
     "resources": [
         {
             "type": "rna",
             "format": "bam",
-            "url": "example.com/my/file"
+            "url": "example.com/bam/abc"
         }
     ]
 }
@@ -389,8 +401,9 @@ Supported formats are:
 # specimen_type: Material
 # analysis_type: RNASeq
 # analysis_date: 2023-12-01
+# genome: grch37
 type    format  url
-rna     bam     example.com/my/file
+rna     bam     example.com/bam/abc
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -434,6 +447,9 @@ Supported formats are:
 ```
 
 #### tsv - text/tab-separated-values
+> [!Note]
+> It's not possible to upload any resources in this format.
+
 ```tsv
 # tsample_donor_id: Donor1
 # tsample_specimen_id: Material2
@@ -473,11 +489,12 @@ Supported formats are:
     "specimen_id": "Material1",
     "specimen_type": "Material",
     "analysis_type": "RNASeqSc",
+    "genome": "grch38",
     "resources": [
         {
             "type": "rnasc",
             "format": "bam",
-            "url": "example.com/my/file"
+            "url": "example.com/bam/abc"
         }
     ]
 }
@@ -489,8 +506,9 @@ Supported formats are:
 # specimen_id: Material1
 # specimen_type: Material
 # analysis_type: RNASeqSc
+# genome: grch38
 type    format  url
-rnasc   bam     example.com/my/file
+rnasc   bam     example.com/bam/abc
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -515,13 +533,12 @@ Supported formats are:
         "specimen_id": "Material2",
         "specimen_type": "Material",
         "analysis_type": "RNASeqSc",
-        "cells_number": 5000,
-        "genes_model": "Marker genes",
+        "cells": 5000,
         "resources": [
             {
-                "type": "rnasc/exp",
-                "format": "mex",
-                "url": "example.com/my/file"
+                "type": "rnasc-exp",
+                "format": "mtx",
+                "url": "example.com/mtx/abc"
             }
         ]
     }
@@ -537,11 +554,9 @@ Supported formats are:
 # tsample_specimen_id: Material2
 # tsample_specimen_type: Material
 # tsample_analysis_type: RNASeqSc
-# tsample_cells_number: 5000
-# tsample_genes_model: Marker genes
-# tsample_resource_type: rnasc/exp
-# tsample_resource_format: mex
-# tsample_resource_url: example.com/my/file
+# tsample_cells: 5000
+type    format  url
+rnasc-exp   mtx example.com/mtx/abc
 ```
 
 Fields description can be found [here](api-models-rnasc-exp.md).
