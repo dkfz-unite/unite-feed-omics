@@ -35,6 +35,12 @@ Includes the information about analysed sample.
 - Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
 - Example: `22`
 
+**`genome`** - Reference genome.
+- Notes: for DNA samples only `grch37` is supported for now.
+- Type: _String_
+- Limitations: Maximum length 100
+- Example: `"grch37"`
+
 **`purity`** - Sample purity (TCC) percentage of tumor cells in the tissue.
 - Notes: Available for CNVs data only.
 - Type: _Double_
@@ -47,17 +53,11 @@ Includes the information about analysed sample.
 - Limitations: Should be greater than 0
 - Example: `2`
 
-**`cells_number`** - Number of cells in the sample.
-- Notes: Available for single cell RNA sequenicng dat only.
+**`cells`** - Number of cells in the sample.
+- Notes: Available for single cell RNA sequenicng analysis only.
 - Type: _Integer_
 - Limitations: Should be greater than 1
 - Example: `1000`
-
-**`genes_model`** - Genes model used for the analysis.
-- Notes: Available for single cell RNA sequenicng data only. Usually model names is known, but if not, it can be calculated as MD5 hash of alphabetically ordered gene symbols.
-- Type: _String_
-- Limitations: Maximum length 100
-- Example: `"Ensembl v99"`
 
 **`resources`** - Resources associated with the sample.
 - Type: _Array_

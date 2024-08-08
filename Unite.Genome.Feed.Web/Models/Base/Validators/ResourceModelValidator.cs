@@ -18,11 +18,12 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
 
     private static readonly string[] _allowedFormats = 
     {
+        "txt",
         "tsv",
         "csv",
         "vcf", // variant call format
-        "bam", // alligned reads
-        "mex", // 10x genomics single cell gene expression matrix
+        "bam", // binary alignment map
+        "mtx", // 10x genomics single cell gene expression matrix
     };
 
     public ResourceModelValidator()

@@ -2,10 +2,10 @@
 
 public class SampleModel
 {
-    public double? Purity { get; set; }
-    public double? Ploidy { get; set; }
-    public int? CellsNumber { get; set; }
-    public string GenesModel { get; set; }
+    public string Genome;
+    public double? Purity;
+    public double? Ploidy;
+    public int? Cells;
 
     public SpecimenModel Specimen;
     public AnalysisModel Analysis;

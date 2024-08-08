@@ -5,6 +5,7 @@ namespace Unite.Genome.Feed.Web.Models.Base;
 public record AnalysisModel<TEntryModel>
     where TEntryModel : class, new()
 {
+    protected ResourceModel[] _resources;
     protected TEntryModel[] _entries;
 
     /// <summary>
@@ -19,6 +20,12 @@ public record AnalysisModel<TEntryModel>
     /// </summary>
     [JsonPropertyName("msample")]
     public virtual SampleModel MatchedSample { get; set; }
+
+    /// <summary>
+    /// Resources data.
+    /// </summary>
+    [JsonPropertyName("resources")]
+    public virtual ResourceModel[] Resources { get => _resources?.Distinct().ToArray(); set => _resources = value; }
 
     /// <summary>
     /// Entries data.

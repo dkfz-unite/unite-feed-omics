@@ -15,8 +15,8 @@ public class SampleTsvModelBinder : IModelBinder
     protected const string _analysis_type = "analysis_type";
     protected const string _analysis_date = "analysis_date";
     protected const string _analysis_day = "analysis_day";
-    protected const string _cells_number = "cells_number";
-    protected const string _genes_model = "genes_model";
+    protected const string _genome = "genome";
+    protected const string _cells = "cells";
     protected const string _purity = "purity";
     protected const string _ploidy = "ploidy";
 
@@ -78,10 +78,10 @@ public class SampleTsvModelBinder : IModelBinder
                 model.AnalysisDate = GetValue<DateOnly?>(parts[1]);
             else if (parts[0].Equals(_analysis_day, comparison))
                 model.AnalysisDay = GetValue<int?>(parts[1]);
-            else if (parts[0].Equals(_cells_number, comparison))
-                model.CellsNumber = GetValue<int?>(parts[1]);
-            else if (parts[0].Equals(_genes_model, comparison))
-                model.GenesModel = GetValue<string>(parts[1]);
+            else if (parts[0].Equals(_genome, comparison))
+                model.Genome = GetValue<string>(parts[1]);
+            else if (parts[0].Equals(_cells, comparison))
+                model.Cells = GetValue<int?>(parts[1]);
             else if (parts[0].Equals(_purity, comparison))
                 model.Purity = GetValue<double?>(parts[1]);
             else if (parts[0].Equals(_ploidy, comparison))

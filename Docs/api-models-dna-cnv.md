@@ -11,6 +11,12 @@ Includes information about analysed samples and variants data.
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 
+**`resources`** - Analysis result resource files.
+- Type: _Array_
+- Element type: _Object([Resource](api-models-resource.md))_
+- Limitations: Should contain at leas one element
+- Example: `[{...}, {...}]`
+
 **`entries`*** - Variants found in target sample during the analysis.
 - Type: _Array_
 - Element type: _Object([Variant](api-models-cnv.md#variant))_

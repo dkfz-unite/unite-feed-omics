@@ -7,6 +7,12 @@ Includes information about analysed sample and expression data.
 - Type: _Object([Sample](api-models-sample.md))_
 - Example: `{...}`
 
+**`resources`** - Analysis result resource files.
+- Type: _Array_
+- Element type: _Object([Resource](api-models-resource.md))_
+- Limitations: Should contain at leas one element
+- Example: `[{...}, {...}]`
+
 **`entries`*** - Gene expressions found in the sample during the analysis.
 - Type: _Array_
 - Element type: _Object([Expression](api-models-rna-expression.md#expression))_
@@ -17,7 +23,7 @@ Includes information about analysed sample and expression data.
 Gene expression data.
 
 > [!Note]
-> System supports only [Ensembl](https://www.ensembl.org/index.html) gene and transcript [identifiers](https://www.ensembl.org/info/genome/stable_ids/index.html). If such are unavailable, provide gene and transcript symbols.
+> System supports only [Ensembl](https://www.ensembl.org/index.html) gene and transcript [identifiers](https://www.ensembl.org/info/genome/stable_ids/index.html). If such are unavailable, provide gene or transcript symbols.
 
 The data can be submitted by only one of the following strategies (one of this fields should be set):
 - `gene_id` - fastest

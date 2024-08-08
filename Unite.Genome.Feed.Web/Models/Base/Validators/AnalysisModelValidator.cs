@@ -1,4 +1,5 @@
 using FluentValidation;
+using Unite.Data.Entities.Genome.Analysis.Enums;
 using Unite.Essentials.Extensions;
 
 namespace Unite.Genome.Feed.Web.Models.Base.Validators;
@@ -8,11 +9,14 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
     where TValidator : IValidator<T>, new()
 {
     private readonly IValidator<SampleModel> _sampleModelValidator;
+    private readonly IValidator<ResourceModel> _resourceModelValidator;
     private readonly IValidator<T> _entryModelValidator;
+
 
     public AnalysisModelValidator()
     {
         _sampleModelValidator = new SampleModelValidator();
+        _resourceModelValidator = new ResourceModelValidator();
         _entryModelValidator = new TValidator();
 
         RuleFor(model => model.TargetSample)
@@ -23,25 +27,42 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
             .SetValidator(_sampleModelValidator)
             .When(model => model.MatchedSample != null);
 
+
+        RuleFor(model => model.Resources)
+            .NotEmpty().WithMessage("Should not be empty if `entries` are not set")
+            .When(model => model.Entries.IsEmpty());
+
+        RuleForEach(model => model.Resources)
+            .SetValidator(_resourceModelValidator)
+            .When(model => model.Resources.IsNotEmpty());
+
+
+        RuleFor(model => model.Entries)
+            .NotEmpty().WithMessage("Should not be empty if `resources` are not set")
+            .When(model => model.Resources.IsEmpty());
+
         RuleForEach(model => model.Entries)
             .SetValidator(_entryModelValidator)
-            .When(model => model.Entries != null);
+            .When(model => model.Entries.IsNotEmpty());
+
 
         RuleFor(model => model)
-            .Must(HaveData)
-            .WithMessage("Either 'entries' or data 'resource' should be set");
+            .Must(model => HaveCorrectGenome(model.TargetSample))
+            .WithMessage($"Only '{SampleModel.DefaultGenome}' reference genome is supported for DNA samples")
+            .When(model => model.TargetSample != null);
+
+        RuleFor(model => model)
+            .Must(model => HaveCorrectGenome(model.MatchedSample))
+            .WithMessage($"Only '{SampleModel.DefaultGenome}' reference genome is supported for DNA samples")
+            .When(model => model.MatchedSample != null);
     }
 
 
-    private bool HaveData(AnalysisModel<T> model)
+    private static bool HaveCorrectGenome(SampleModel model)
     {
-        var hasEntries = model.Entries.IsNotEmpty();
-
-        // "dna-ssm", "dna-cnv", "dna-sv", "rna-exp", "rnasc-exp"
-        var dataResources = new string[] { "rnasc-exp" };
-        
-        var hasResources = model.TargetSample?.Resources?.FirstOrDefault(resource => dataResources.Contains(resource.Format.Trim().ToLower())) != null;
-
-        return hasEntries || hasResources;
+        if (model.AnalysisType == AnalysisType.WGS || model.AnalysisType == AnalysisType.WES)
+            return model.Genome == SampleModel.DefaultGenome;
+        else
+            return true;
     }
 }

@@ -52,34 +52,26 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .When(model => model.AnalysisDay != null)
             .WithMessage("Should be greater than or equal to 1");
 
+
+        RuleFor(model => model.Genome)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
+
         
         RuleFor(model => model.Purity)
             .GreaterThanOrEqualTo(0)
-            .WithMessage("Should be greater than or equal to 0");
-
-        RuleFor(model => model.Purity)
             .LessThanOrEqualTo(1)
-            .WithMessage("Should be less than or equal to 1");
+            .WithMessage("Should be in range [0, 1]");
 
         
         RuleFor(model => model.Ploidy)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("Should be greater than or equal to 0");
-
-
-        RuleFor(model => model.CellsNumber)
             .GreaterThanOrEqualTo(1)
             .WithMessage("Should be greater than or equal to 1");
 
 
-        RuleFor(model => model.GenesModel)
-            .NotEmpty()
-            .When(model => model.CellsNumber != null)
-            .WithMessage("Should not be empty if 'cells_number' is set");
-
-        RuleFor(model => model.GenesModel)
-            .MaximumLength(100)
-            .WithMessage("Maximum length is 100");
+        RuleFor(model => model.Cells)
+            .GreaterThanOrEqualTo(1)
+            .WithMessage("Should be greater than or equal to 1");
 
 
         RuleForEach(model => model.Resources)
