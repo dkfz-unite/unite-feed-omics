@@ -81,6 +81,10 @@ public class GenesIndexingCache
         Ssms = null;
         Cnvs = null;
         Svs = null;
+        ExpEntries = null;
+        SsmEntries = null;
+        CnvEntries = null;
+        SvEntries = null;
         Donors = null;
         Images = null;
         Specimens = null;
