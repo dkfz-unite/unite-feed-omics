@@ -152,19 +152,4 @@ public abstract class AnalysisTsvModelBinder<TModel> : IModelBinder
 
         return false;
     }
-
-    protected bool IsNotEmpty(ResourceModel model)
-    {
-        var properties = model.GetType().GetProperties();
-
-        foreach (var property in properties)
-        {
-            var value = property.GetValue(model);
-
-            if (value != null)
-                return true;
-        }
-
-        return false;
-    }
 }

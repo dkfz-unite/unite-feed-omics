@@ -61,7 +61,7 @@ public record SampleModel
     /// Sample reference genome (e.g. grch37)
     /// </summary>
     [JsonPropertyName("genome")]
-    public virtual string Genome { get => _genome?.Trim().ToLower() ?? DefaultGenome; set => _genome = value; }
+    public virtual string Genome { get => _genome?.Trim().ToLower(); set => _genome = value; }
 
     /// <summary>
     /// Sample purity (TCC)

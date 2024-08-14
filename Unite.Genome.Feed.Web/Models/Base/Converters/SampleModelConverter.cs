@@ -11,10 +11,10 @@ public class SampleModelConverter
     {
         return new DataModels.SampleModel
         {
+            Genome = sampleModel.Genome ?? SampleModel.DefaultGenome,
             Purity = sampleModel.Purity,
             Ploidy = sampleModel.Ploidy ?? SampleModel.DefaultPloidy,
             Cells = sampleModel.Cells,
-            Genome = sampleModel.Genome,
             Specimen = ConvertSpecimen(sampleModel),
             Analysis = ConvertAnalysis(sampleModel),
             Resources = ConvertResources(sampleModel.Resources)

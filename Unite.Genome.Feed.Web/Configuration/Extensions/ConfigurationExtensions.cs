@@ -59,6 +59,7 @@ public static class ConfigurationExtensions
         // Submission services
         services.AddTransient<DnaSubmissionService>();
         services.AddTransient<RnaSubmissionService>();
+        services.AddTransient<RnaScSubmissionService>();
 
         // Annotation services
         services.AddTransient<SsmsAnnotationService>();
