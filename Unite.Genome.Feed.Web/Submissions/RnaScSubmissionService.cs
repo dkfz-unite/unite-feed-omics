@@ -1,4 +1,4 @@
-using Unite.Genome.Feed.Web.Configuration.Options;
+using Unite.Cache.Configuration.Options;
 using Unite.Genome.Feed.Web.Models.Base;
 using Unite.Genome.Feed.Web.Models.RnaSc;
 using Unite.Genome.Feed.Web.Submissions.Repositories.RnaSc;
@@ -10,7 +10,7 @@ public class RnaScSubmissionService
     private readonly ExpSubmissionRepository _expRepository;
 
 
-    public RnaScSubmissionService(MongoOptions options)
+    public RnaScSubmissionService(IMongoOptions options)
 	{
 		_expRepository = new ExpSubmissionRepository(options);
 	}

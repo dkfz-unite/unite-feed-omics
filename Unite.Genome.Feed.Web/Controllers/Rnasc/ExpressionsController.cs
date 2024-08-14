@@ -39,8 +39,15 @@ public class ExpressionsController : Controller
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ExpressionModel> model)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ResourceModel> model)
     {
-        return Post(model);
+        var analysisModel = new AnalysisModel<ExpressionModel>
+        {
+            TargetSample = model.TargetSample,
+            MatchedSample = model.MatchedSample,
+            Resources = model.Entries
+        };
+
+        return Post(analysisModel);
     }
 }

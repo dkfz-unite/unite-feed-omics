@@ -8,6 +8,7 @@ public record AnalysisModel<TEntryModel>
     protected ResourceModel[] _resources;
     protected TEntryModel[] _entries;
 
+
     /// <summary>
     /// Analysed sample.
     /// </summary>

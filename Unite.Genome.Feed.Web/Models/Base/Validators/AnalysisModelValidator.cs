@@ -49,12 +49,12 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
         RuleFor(model => model)
             .Must(model => HaveCorrectGenome(model.TargetSample))
             .WithMessage($"Only '{SampleModel.DefaultGenome}' reference genome is supported for DNA samples")
-            .When(model => model.TargetSample != null);
+            .When(model => model.TargetSample != null && model.TargetSample.Genome != null);
 
         RuleFor(model => model)
             .Must(model => HaveCorrectGenome(model.MatchedSample))
             .WithMessage($"Only '{SampleModel.DefaultGenome}' reference genome is supported for DNA samples")
-            .When(model => model.MatchedSample != null);
+            .When(model => model.MatchedSample != null && model.MatchedSample.Genome != null);
     }
 
 

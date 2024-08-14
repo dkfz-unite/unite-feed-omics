@@ -10,17 +10,17 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 public class CellGeneExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly RnaSubmissionService _submissionService;
+    private readonly RnaScSubmissionService _submissionService;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Rna.Converters.AnalysisModelConverter _converter = new();
+    private readonly Models.RnaSc.Converters.AnalysisModelConverter _converter = new();
 
 
     public CellGeneExpSubmissionHandler(
         AnalysisWriter dataWriter,
-        RnaSubmissionService submissionService,
+        RnaScSubmissionService submissionService,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ILogger<CellGeneExpSubmissionHandler> logger)
