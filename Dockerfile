@@ -18,7 +18,7 @@ RUN dotnet restore "Unite.Genome.Indices/Unite.Genome.Indices.csproj"
 RUN dotnet restore "Unite.Genome.Feed/Unite.Genome.Feed.csproj"
 RUN dotnet restore "Unite.Genome.Feed.Web/Unite.Genome.Feed.Web.csproj"
 
-FROM restore as build
+FROM restore AS build
 COPY . .
 WORKDIR "/src/Unite.Genome.Feed.Web"
 RUN dotnet build --no-restore "Unite.Genome.Feed.Web.csproj" -c Release
