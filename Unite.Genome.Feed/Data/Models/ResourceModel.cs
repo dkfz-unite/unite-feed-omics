@@ -4,5 +4,6 @@ public class ResourceModel
 {
     public string Type;
     public string Format;
+    public string Archive;
     public string Url;
 }

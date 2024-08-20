@@ -11,6 +11,11 @@ Includes the information about available analysis resource (file).
 - Available values: `"txt"`, `"tsv"`, `"csv"`, `"vcf"`, `"bam"`, `"mtx"`
 - Example: `"bam"`
 
+**`archive`** - Resource archive type, if the file is archived.
+- Type: _String_
+- Available values: `"zip"`, `"gz"`
+- Example: `"gz"`
+
 **`url`*** - Resource URL on remote a server.
 - NOTE: Resource can be gzipped
 - Type: _String_

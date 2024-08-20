@@ -26,6 +26,12 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         "mtx", // 10x genomics single cell gene expression matrix
     };
 
+    private static readonly string[] _allowedArchives = 
+    {
+        "zip",
+        "gz"
+    };
+
     public ResourceModelValidator()
     {
         RuleFor(model => model.Type)
@@ -43,6 +49,10 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         RuleFor(model => model.Format)
             .Must(format => _allowedFormats.Contains(format))
             .WithMessage("Format is not allowed");
+
+        RuleFor(model => model.Archive)
+            .Must(format => _allowedArchives.Contains(format))
+            .WithMessage("Archive is not allowed");
 
         RuleFor(model => model.Url)
             .NotEmpty()

@@ -55,6 +55,7 @@ public class ResourceRepository
             SampleId = sampleId,
             Type = model.Type,
             Format = model.Format,
+            Archive = model.Archive,
             Url = model.Url
         };
     }
