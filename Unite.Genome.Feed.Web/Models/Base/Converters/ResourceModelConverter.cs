@@ -9,6 +9,7 @@ public class ResourceModelConverter
         {
             Type = resourceModel.Type,
             Format = resourceModel.Format,
+            Archive = resourceModel.Archive,
             Url = resourceModel.Url
         };
     }

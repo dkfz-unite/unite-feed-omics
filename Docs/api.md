@@ -538,6 +538,7 @@ Supported formats are:
             {
                 "type": "rnasc-exp",
                 "format": "mtx",
+                "archive": "gz",
                 "url": "example.com/mtx/abc"
             }
         ]
@@ -555,8 +556,8 @@ Supported formats are:
 # tsample_specimen_type: Material
 # tsample_analysis_type: RNASeqSc
 # tsample_cells: 5000
-type    format  url
-rnasc-exp   mtx example.com/mtx/abc
+type    format  archive  url
+rnasc-exp   mtx gz example.com/mtx/abc
 ```
 
 Fields description can be found [here](api-models-rnasc-exp.md).
