@@ -52,6 +52,7 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
 
         RuleFor(model => model.Archive)
             .Must(format => _allowedArchives.Contains(format))
+            .When(model => model.Archive != null)
             .WithMessage("Archive is not allowed");
 
         RuleFor(model => model.Url)
