@@ -32,7 +32,7 @@ public class SsmsController : Controller
     {
         var submissionId = _submissionService.AddSsmSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.SSM, submissionId);
+        _submissionTaskService.CreateTask(SubmissionTaskType.DNA_SSM, submissionId);
 
         return Ok();
     }

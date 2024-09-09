@@ -92,15 +92,15 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     {
         if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Ssm.Variant))
         {
-            CreateTasks(AnnotationTaskType.SSM, keys);
+            CreateTasks(AnnotationTaskType.DNA_SSM, keys);
         }
         else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Cnv.Variant))
         {
-            CreateTasks(AnnotationTaskType.CNV, keys);
+            CreateTasks(AnnotationTaskType.DNA_CNV, keys);
         }
         else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Sv.Variant))
         {
-            CreateTasks(AnnotationTaskType.SV, keys);
+            CreateTasks(AnnotationTaskType.DNA_SV, keys);
         }
     }
 }

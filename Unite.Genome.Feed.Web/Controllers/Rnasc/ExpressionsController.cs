@@ -32,7 +32,7 @@ public class ExpressionsController : Controller
     {
         var submissionId = _submissionService.AddExpSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.CGE, submissionId);
+        _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId);
 
         return Ok();
     }
