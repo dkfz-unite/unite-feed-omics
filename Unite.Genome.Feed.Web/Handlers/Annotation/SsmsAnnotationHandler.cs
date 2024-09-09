@@ -47,7 +47,7 @@ public class SsmsAnnotationHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(AnnotationTaskType.SSM, bucketSize, (tasks) =>
+        _taskProcessingService.Process(AnnotationTaskType.DNA_SSM, bucketSize, (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission))
                 return false;

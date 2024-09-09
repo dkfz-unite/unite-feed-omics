@@ -32,7 +32,7 @@ public class CnvsController : Controller
     {
         var submissionId = _submissionService.AddCnvSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.CNV, submissionId);
+        _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId);
 
         return Ok();
     }

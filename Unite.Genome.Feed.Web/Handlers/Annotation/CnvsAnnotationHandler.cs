@@ -47,7 +47,7 @@ public class CnvsAnnotationHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(AnnotationTaskType.CNV, bucketSize, (tasks) =>
+        _taskProcessingService.Process(AnnotationTaskType.DNA_CNV, bucketSize, (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission))
                 return false;

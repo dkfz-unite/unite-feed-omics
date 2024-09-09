@@ -32,7 +32,7 @@ public class SvsController : Controller
     {
         var submissionId = _submissionService.AddSvSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.SV, submissionId);
+        _submissionTaskService.CreateTask(SubmissionTaskType.DNA_SV, submissionId);
 
         return Ok();
     }
