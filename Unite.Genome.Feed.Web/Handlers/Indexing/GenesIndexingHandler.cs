@@ -74,7 +74,26 @@ public class GenesIndexingHandler
                 await _indexingService.DeleteRange(indicesToDelete);
 
             if (indicesToCreate.Any())
-                await _indexingService.AddRange(indicesToCreate);
+            {
+                try
+                {
+                    await _indexingService.AddRange(indicesToCreate);
+                }
+                catch
+                {
+                    foreach (var index in indicesToCreate)
+                    {
+                        try
+                        {
+                            await _indexingService.Add(index);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Failed to index gene {id}", index.Id);
+                        }
+                    }
+                }
+            }
 
             _indexingCache.Clear();
 
