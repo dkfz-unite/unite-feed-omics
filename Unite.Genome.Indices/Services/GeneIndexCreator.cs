@@ -51,11 +51,14 @@ public class GeneIndexCreator
 
         index.Specimens = CreateSpecimenIndices(gene.Id);
 
-        index.Data.GeneExp = _cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
+        var hasSpecimens = index.Specimens?.Any();
+        var hasExpressions = _cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
 
         // If gene is not affected by any variant and has no expression data, it should be removed.
-        if (index.Specimens.IsEmpty() && index.Data.GeneExp != true)
+        if (hasSpecimens != true && hasExpressions != true)
             return null;
+
+        index.Data.GeneExp = hasExpressions;
 
         return index;
     }
@@ -99,9 +102,8 @@ public class GeneIndexCreator
         var ssmSamples = _cache.SsmEntries.Where(entry => ssms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
-        var expSamples = _cache.ExpEntries.Where(entry => entry.EntityId == geneId).Select(entry => entry.SampleId).ToArray();
 
-        var sampleIds = ssmSamples.Concat(cnvSamples).Concat(svSamples).Concat(expSamples).Distinct().ToArray();
+        var sampleIds = ssmSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
         var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
 
         return _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).ToArray();
