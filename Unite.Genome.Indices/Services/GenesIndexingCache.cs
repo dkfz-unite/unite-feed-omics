@@ -101,12 +101,12 @@ public class GenesIndexingCache
             .Where(expression => ids.Contains(expression.EntityId))
             .ToArrayAsync();
 
-        var sampleIds = ExpEntries.Select(expression => expression.SampleId).Distinct().ToArray();
+        // var sampleIds = ExpEntries.Select(expression => expression.SampleId).Distinct().ToArray();
 
-        lock (_lock)
-        {
-            _sampleIds.AddRange(sampleIds);
-        }
+        // lock (_lock)
+        // {
+        //     _sampleIds.AddRange(sampleIds);
+        // }
     }
 
     private async Task LoadSsmTranscripts(int[] ids)
