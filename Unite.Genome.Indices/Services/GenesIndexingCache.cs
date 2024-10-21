@@ -116,7 +116,7 @@ public class GenesIndexingCache
         SsmTranscripts = await dbContext.Set<SSM.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
             .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
             .ToArrayAsync();
     }
@@ -128,7 +128,7 @@ public class GenesIndexingCache
         CnvTranscripts = await dbContext.Set<CNV.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
             .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
             .ToArrayAsync();
     }
@@ -140,7 +140,7 @@ public class GenesIndexingCache
         SvTranscripts = await dbContext.Set<SV.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
             .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
             .ToArrayAsync();
     }
