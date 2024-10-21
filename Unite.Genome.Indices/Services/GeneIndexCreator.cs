@@ -51,7 +51,7 @@ public class GeneIndexCreator
 
         index.Specimens = CreateSpecimenIndices(gene.Id);
 
-        index.Data.GeneExp = _cache.ExpEntries.Any(entry => entry.EntityId == gene.Id);
+        index.Data.GeneExp = _cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
 
         // If gene is not affected by any variant and has no expression data, it should be removed.
         if (index.Specimens.IsEmpty() && index.Data.GeneExp != true)
