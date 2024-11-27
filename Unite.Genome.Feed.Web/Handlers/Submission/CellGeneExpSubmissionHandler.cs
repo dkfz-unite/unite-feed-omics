@@ -43,7 +43,7 @@ public class CellGeneExpSubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.RNASC_EXP, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.RNASC_EXP, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

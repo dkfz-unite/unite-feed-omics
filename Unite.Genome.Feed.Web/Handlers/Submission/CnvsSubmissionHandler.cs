@@ -49,7 +49,7 @@ public class CnvsSubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.DNA_CNV, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.DNA_CNV, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

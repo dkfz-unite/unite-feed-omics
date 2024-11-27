@@ -26,21 +26,33 @@ public class CnvsController : Controller
     }
 
 
+    [HttpGet("{id}")]
+    public IActionResult Get(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+
+        var submission = _submissionService.FindCnvSubmission(task.Target);
+
+        return Ok(submission);
+    }
+
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model)
+    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model, [FromQuery] bool validate = true)
     {
         var submissionId = _submissionService.AddCnvSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId);
+        var taskStatus = validate ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        return Ok();
+        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId, taskStatus);
+
+        return Ok(taskId);
     }
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool validate = true)
     {
-        return Post(model);
+        return Post(model, validate);
     }
 }
