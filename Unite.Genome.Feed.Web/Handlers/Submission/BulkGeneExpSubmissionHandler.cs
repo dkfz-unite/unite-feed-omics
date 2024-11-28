@@ -49,7 +49,7 @@ public class BulkGeneExpSubmissionHandler
 	{
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.RNA_EXP, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.RNA_EXP, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

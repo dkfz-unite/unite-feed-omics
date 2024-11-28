@@ -25,22 +25,33 @@ public class SsmsController : Controller
         _submissionTaskService = submissionTaskService;
     }
 
+    [HttpGet("{id}")]
+    public IActionResult Get(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+
+        var submission = _submissionService.FindSsmSubmission(task.Target);
+
+        return Ok(submission);
+    }
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model)
+    public IActionResult Post([FromBody] AnalysisModel<VariantModel> models, [FromQuery] bool review = true)
     {
-        var submissionId = _submissionService.AddSsmSubmission(model);
+        var submissionId = _submissionService.AddSsmSubmission(models);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.DNA_SSM, submissionId);
+        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        return Ok();
+        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.DNA_SSM, submissionId, taskStatus);
+
+        return Ok(taskId);
     }
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
     {
-        return Post(model);
+        return Post(model, review);
     }
 }
