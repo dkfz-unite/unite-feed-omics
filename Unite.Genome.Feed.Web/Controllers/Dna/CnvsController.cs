@@ -38,11 +38,11 @@ public class CnvsController : Controller
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model, [FromQuery] bool validate = true)
+    public IActionResult Post([FromBody] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
     {
         var submissionId = _submissionService.AddCnvSubmission(model);
 
-        var taskStatus = validate ? TaskStatusType.Preparing : TaskStatusType.Prepared;
+        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
         var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId, taskStatus);
 
@@ -51,8 +51,8 @@ public class CnvsController : Controller
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool validate = true)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
     {
-        return Post(model, validate);
+        return Post(model, review);
     }
 }

@@ -37,11 +37,11 @@ public class ExpressionsController : Controller
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool validate = true)
+    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
     {
         var submissionId = _submissionService.AddExpSubmission(model);
 
-        var taskStatus = validate ? TaskStatusType.Preparing : TaskStatusType.Prepared;
+        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
         var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.RNA_EXP, submissionId, taskStatus);
 
@@ -50,8 +50,8 @@ public class ExpressionsController : Controller
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ExpressionModel> model, [FromQuery] bool validate = true)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
     {
-        return Post(model, validate);
+        return Post(model, review);
     }
 }
