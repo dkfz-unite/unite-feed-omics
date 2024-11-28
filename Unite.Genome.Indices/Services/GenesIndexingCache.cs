@@ -101,12 +101,12 @@ public class GenesIndexingCache
             .Where(expression => ids.Contains(expression.EntityId))
             .ToArrayAsync();
 
-        var sampleIds = ExpEntries.Select(expression => expression.SampleId).Distinct().ToArray();
+        // var sampleIds = ExpEntries.Select(expression => expression.SampleId).Distinct().ToArray();
 
-        lock (_lock)
-        {
-            _sampleIds.AddRange(sampleIds);
-        }
+        // lock (_lock)
+        // {
+        //     _sampleIds.AddRange(sampleIds);
+        // }
     }
 
     private async Task LoadSsmTranscripts(int[] ids)
@@ -116,7 +116,7 @@ public class GenesIndexingCache
         SsmTranscripts = await dbContext.Set<SSM.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
             .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
             .ToArrayAsync();
     }
@@ -128,7 +128,7 @@ public class GenesIndexingCache
         CnvTranscripts = await dbContext.Set<CNV.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
             .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
             .ToArrayAsync();
     }
@@ -140,7 +140,7 @@ public class GenesIndexingCache
         SvTranscripts = await dbContext.Set<SV.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
             .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
             .ToArrayAsync();
     }
