@@ -49,7 +49,7 @@ public class SvsSubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.DNA_SV, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.DNA_SV, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

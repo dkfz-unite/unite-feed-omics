@@ -49,7 +49,7 @@ public class SsmsSubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.DNA_SSM, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.DNA_SSM, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

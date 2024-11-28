@@ -25,21 +25,32 @@ public class ExpressionsController : Controller
         _submissionTaskService = submissionTaskService;
     }
 
+    [HttpGet("{id}")]
+    public IActionResult Get(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+
+        var submission = _submissionService.FindExpSubmission(task.Target);
+
+        return Ok(submission);
+    }
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model)
+    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
     {
         var submissionId = _submissionService.AddExpSubmission(model);
 
-        _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId);
+        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        return Ok();
+        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
+
+        return Ok(taskId);
     }
 
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ResourceModel> model)
+    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ResourceModel> model, [FromQuery] bool review = true)
     {
         var analysisModel = new AnalysisModel<ExpressionModel>
         {
@@ -48,6 +59,6 @@ public class ExpressionsController : Controller
             Resources = model.Entries
         };
 
-        return Post(analysisModel);
+        return Post(analysisModel, review);
     }
 }
