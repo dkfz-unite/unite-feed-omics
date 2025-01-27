@@ -49,6 +49,7 @@ public class SampleTsvModelBinder : IModelBinder
         return new ClassMap<ResourceModel>()
             .Map(entity => entity.Type, "type")
             .Map(entity => entity.Format, "format")
+            .Map(entity => entity.Archive, "archive")
             .Map(entity => entity.Url, "url");
     }
 
