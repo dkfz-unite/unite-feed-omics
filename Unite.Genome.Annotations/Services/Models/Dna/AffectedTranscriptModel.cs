@@ -2,7 +2,7 @@
 
 public class AffectedTranscriptModel
 {
-    public long VariantId;
+    public int VariantId;
 
     public int? CDNAStart;
     public int? CDNAEnd;

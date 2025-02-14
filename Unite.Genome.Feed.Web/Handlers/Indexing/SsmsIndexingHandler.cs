@@ -13,14 +13,14 @@ public class SsmsIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
     private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
-    private readonly IIndexService<VariantIndex> _indexingService;
+    private readonly IIndexService<SsmIndex> _indexingService;
     private readonly ILogger _logger;
 
 
     public SsmsIndexingHandler(
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexService<VariantIndex> indexingService,
+        IIndexService<SsmIndex> indexingService,
         ILogger<SsmsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
@@ -54,9 +54,9 @@ public class SsmsIndexingHandler
 
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
-            var indexCreator = new VariantIndexCreator<Variant, VariantEntry>(_indexingCache);
+            var indexCreator = new SsmIndexCreator(_indexingCache);
             var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<VariantIndex>();
+            var indicesToCreate = new List<SsmIndex>();
 
             tasks.ForEach(task =>
             {
@@ -65,7 +65,7 @@ public class SsmsIndexingHandler
                 var index = indexCreator.CreateIndex(id);
 
                 if (index == null)
-                    indicesToDelete.Add($"SSM{id}");
+                    indicesToDelete.Add($"{id}");
                 else
                     indicesToCreate.Add(index);
             });
