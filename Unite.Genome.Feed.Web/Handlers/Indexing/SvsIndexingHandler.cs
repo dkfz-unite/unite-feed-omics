@@ -13,14 +13,14 @@ public class SvsIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
     private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
-    private readonly IIndexService<VariantIndex> _indexingService;
+    private readonly IIndexService<SvIndex> _indexingService;
     private readonly ILogger _logger;
 
 
     public SvsIndexingHandler(
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexService<VariantIndex> indexingService,
+        IIndexService<SvIndex> indexingService,
         ILogger<SvsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
@@ -55,8 +55,8 @@ public class SvsIndexingHandler
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<VariantIndex>();
-            var indexCreator = new VariantIndexCreator<Variant, VariantEntry>(_indexingCache);
+            var indicesToCreate = new List<SvIndex>();
+            var indexCreator = new SvIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
@@ -65,7 +65,7 @@ public class SvsIndexingHandler
                 var index = indexCreator.CreateIndex(id);
 
                 if (index == null)
-                    indicesToDelete.Add($"SV{id}");
+                    indicesToDelete.Add($"{id}");
                 else
                     indicesToCreate.Add(index);
             });
