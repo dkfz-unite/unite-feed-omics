@@ -90,13 +90,14 @@ public class GeneIndexCreator
 
     private Sample[] LoadSamples(int geneId)
     {
-        var ssms = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).ToArray();
-        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).ToArray();
-        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).ToArray();
+        var ssms = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
         var ssmSamples = _cache.SsmEntries.Where(entry => ssms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        
         var sampleIds = ssmSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
 
         return _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).ToArray();
@@ -105,9 +106,9 @@ public class GeneIndexCreator
 
     private StatsIndex CreateStatsIndex(int geneId)
     {
-        var ssms = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).ToArray();
-        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).ToArray();
-        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).ToArray();
+        var ssms = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
         var ssmSamples = _cache.SsmEntries.Where(entry => ssms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
