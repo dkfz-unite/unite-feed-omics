@@ -13,14 +13,14 @@ public class CnvsIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
     private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
-    private readonly IIndexService<VariantIndex> _indexingService;
+    private readonly IIndexService<CnvIndex> _indexingService;
     private readonly ILogger _logger;
 
 
     public CnvsIndexingHandler(
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexService<VariantIndex> indexingService,
+        IIndexService<CnvIndex> indexingService,
         ILogger<CnvsIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
@@ -55,8 +55,8 @@ public class CnvsIndexingHandler
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<VariantIndex>();
-            var indexCreator = new VariantIndexCreator<Variant, VariantEntry>(_indexingCache);
+            var indicesToCreate = new List<CnvIndex>();
+            var indexCreator = new CnvIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
@@ -65,7 +65,7 @@ public class CnvsIndexingHandler
                 var index = indexCreator.CreateIndex(id);
 
                 if (index == null)
-                    indicesToDelete.Add($"CNV{id}");
+                    indicesToDelete.Add($"{id}");
                 else
                     indicesToCreate.Add(index);
             });
