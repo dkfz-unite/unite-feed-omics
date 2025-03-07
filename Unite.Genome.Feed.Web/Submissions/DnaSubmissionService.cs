@@ -1,5 +1,6 @@
 ﻿using Unite.Cache.Configuration.Options;
 using Unite.Genome.Feed.Web.Models.Base;
+using Unite.Genome.Feed.Web.Models.Dna.Meth;
 
 namespace Unite.Genome.Feed.Web.Submissions;
 
@@ -8,6 +9,7 @@ public class DnaSubmissionService
 	private readonly Repositories.Dna.SsmSubmissionRepository _ssmRepository;
 	private readonly Repositories.Dna.CnvSubmissionRepository _cnvRepository;
 	private readonly Repositories.Dna.SvSubmissionRepository _svRepository;
+	private readonly Repositories.Dna.MethSubmissionRepository _methRepository;
 
 
     public DnaSubmissionService(IMongoOptions options)
@@ -15,6 +17,7 @@ public class DnaSubmissionService
 		_ssmRepository = new Repositories.Dna.SsmSubmissionRepository(options);
 		_cnvRepository = new Repositories.Dna.CnvSubmissionRepository(options);
 		_svRepository = new Repositories.Dna.SvSubmissionRepository(options);
+		_methRepository = new Repositories.Dna.MethSubmissionRepository(options);
 	}
 
 
@@ -33,6 +36,11 @@ public class DnaSubmissionService
         return _svRepository.Add(data);
     }
 
+    public string AddMethSubmission(AnalysisModel<ExpressionModel> data)
+    {
+        return _methRepository.Add(data);
+    }
+
 	public AnalysisModel<Models.Dna.Ssm.VariantModel> FindSsmSubmission(string id)
 	{
 		return _ssmRepository.Find(id)?.Document;
@@ -48,6 +56,11 @@ public class DnaSubmissionService
         return _svRepository.Find(id)?.Document;
     }
 
+    public AnalysisModel<ExpressionModel> FindMethSubmission(string id)
+    {
+        return _methRepository.Find(id)?.Document;
+    }
+
     public void DeleteSsmSubmission(string id)
     {
         _ssmRepository.Delete(id);
@@ -61,5 +74,10 @@ public class DnaSubmissionService
     public void DeleteSvSubmission(string id)
     {
         _svRepository.Delete(id);
+    }
+
+    public void DeleteMethSubmission(string id)
+    {
+        _methRepository.Delete(id);
     }
 }

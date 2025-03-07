@@ -88,6 +88,7 @@ public static class ConfigurationExtensions
         services.AddTransient<SsmsSubmissionHandler>();
         services.AddTransient<CnvsSubmissionHandler>();
         services.AddTransient<SvsSubmissionHandler>();
+        services.AddTransient<MethSubmissionHandler>();
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();
