@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
@@ -40,8 +41,11 @@ public class CnvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
         if (index.Specimens.IsEmpty())
             return null;
 
+        index.Similars = CreateSimilarIndices(variant.Id);
         index.Stats = CreateStatsIndex(variant.Id);
         index.Data = CreateDataIndex(variant.Id);
+
+        index.Stats.Donors = index.Similars?.Length ?? 1;
 
         return index;
     }
@@ -49,6 +53,48 @@ public class CnvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
     private Variant LoadVariant(int variantId)
     {
         return _cache.Variants.FirstOrDefault(variant => variant.Id == variantId);
+    }
+
+
+    private Unite.Indices.Entities.Basic.Genome.Variants.VariantNavIndex[] CreateSimilarIndices(int variantId)
+    {
+        var variants = LoadSimilarVariants(variantId);
+
+        return variants.Select(CreateSimilarIndex).ToArrayOrNull();
+    }
+
+    private Unite.Indices.Entities.Basic.Genome.Variants.VariantNavIndex CreateSimilarIndex(Variant variant)
+    {
+        return VariantNavIndexMapper.CreateFrom(variant);
+    }
+
+    private Variant[] LoadSimilarVariants(int variantId)
+    {
+        using var dbContext = _cache.DbContextFactory.CreateDbContext();
+
+        var variant = _cache.Variants.First(entity => entity.Id == variantId);
+
+        var target = variant;
+        var targetLength = variant.End - variant.Start;
+        var overlap = 0.9;
+        
+        return dbContext.Set<Variant>()
+            .AsNoTracking()
+            .Where(current => current.TypeId == target.TypeId && current.Loh == target.Loh && current.Del == target.Del)
+            .Where(current => current.End >= target.Start && current.Start <= target.End)
+            .ToArray()
+            .Where(current => {
+                var start = Math.Max(current.Start, target.Start);
+                var end = Math.Min(current.End, target.End);
+                var length = end - start;
+
+                var currentLength = current.End - current.Start;
+                var currentOverlap = (double)length / currentLength;
+                var targetOverlap = (double)length / targetLength;
+                
+                return Math.Min(currentOverlap, targetOverlap) >= overlap;
+            })
+            .ToArray();
     }
 
 

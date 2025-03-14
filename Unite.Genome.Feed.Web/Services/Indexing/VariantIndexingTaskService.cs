@@ -78,7 +78,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
 
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
     {
-        return [];
+        return _variantsRepository.GetRelatedProjects<TV>(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)

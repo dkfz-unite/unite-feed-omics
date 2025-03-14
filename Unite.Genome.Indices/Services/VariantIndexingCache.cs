@@ -28,7 +28,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
     private static readonly object _lock = new();
 
     private readonly HashSet<int> _sampleIds = [];
-    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
+    public readonly IDbContextFactory<DomainDbContext> DbContextFactory;
 
     public IEnumerable<TVariant> Variants { get; private set; }
     public IEnumerable<TVariantEntry> Entries { get; private set; }
@@ -41,7 +41,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     public VariantIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
     {
-        _dbContextFactory = dbContextFactory;
+        DbContextFactory = dbContextFactory;
     }
 
 
@@ -71,7 +71,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadVariants(int[] ids)
     {
-        await using var dbContext = _dbContextFactory.CreateDbContext();
+        await using var dbContext = DbContextFactory.CreateDbContext();
 
         if (typeof(TVariantEntry) == typeof(SSM.VariantEntry))
             Entries = await GetSsmEntries(ids) as IEnumerable<TVariantEntry>;
@@ -101,7 +101,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadExpressions()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var geneIds = Array.Empty<int>();
 
@@ -141,7 +141,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadDonors()
     {
-        await using var dbContext = _dbContextFactory.CreateDbContext();
+        await using var dbContext = DbContextFactory.CreateDbContext();
 
         var donorIds = Specimens
             .Select(specimen => specimen.DonorId)
@@ -160,7 +160,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadImages()
     {
-        await using var dbContext = _dbContextFactory.CreateDbContext();
+        await using var dbContext = DbContextFactory.CreateDbContext();
 
         var predicate = Predicates.IsImageRelatedSpecimen.Compile();
 
@@ -180,7 +180,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadSpecimens()
     {
-        await using var dbContext = _dbContextFactory.CreateDbContext();
+        await using var dbContext = DbContextFactory.CreateDbContext();
 
         var specimenIds = Samples
             .Select(sample => sample.SpecimenId)
@@ -202,7 +202,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadSamples()
     {
-        await using var dbContext = _dbContextFactory.CreateDbContext();
+        await using var dbContext = DbContextFactory.CreateDbContext();
 
         Samples = await dbContext.Set<Data.Entities.Genome.Analysis.Sample>()
             .AsNoTracking()
@@ -215,7 +215,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task<IEnumerable<SSM.VariantEntry>> GetSsmEntries(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         return await dbContext.Set<SSM.VariantEntry>()
             .AsNoTracking()
@@ -225,7 +225,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task<IEnumerable<CNV.VariantEntry>> GetCnvEntries(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         Expression<Func<CNV.VariantEntry, CNV.Variant>> path = entry => entry.Entity;
 
@@ -238,7 +238,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task<IEnumerable<SV.VariantEntry>> GetSvEntries(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         return await dbContext.Set<SV.VariantEntry>()
             .AsNoTracking()
