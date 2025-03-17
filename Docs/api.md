@@ -651,6 +651,18 @@ Supported formats are:
                 "format": "mtx",
                 "archive": "gz",
                 "url": "example.com/mtx/abc"
+            },
+            {
+                "type": "rnasc-exp",
+                "format": "features",
+                "archive": "gz",
+                "url": "example.com/mtx/abc/features"
+            },
+            {
+                "type": "rnasc-exp",
+                "format": "barcodes",
+                "archive": "gz",
+                "url": "example.com/mtx/abc/barcodes"
             }
         ]
     }
