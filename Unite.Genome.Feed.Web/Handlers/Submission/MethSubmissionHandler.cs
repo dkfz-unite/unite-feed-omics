@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Genome.Feed.Data.Writers.RnaSc;
+using Unite.Genome.Feed.Web.Models.Meth.Converters;
 using Unite.Genome.Feed.Web.Services.Indexing;
 using Unite.Genome.Feed.Web.Submissions;
 
@@ -10,17 +11,17 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 public class MethSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly DnaSubmissionService _submissionService;
+    private readonly MethSubmissionService _submissionService;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Dna.Meth.Converters.AnalysisModelConverter _converter = new();
+    private readonly AnalysisModelConverter _converter = new();
 
 
     public MethSubmissionHandler(
         AnalysisWriter dataWriter,
-        DnaSubmissionService submissionService,
+        MethSubmissionService submissionService,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ILogger<MethSubmissionHandler> logger)
@@ -59,12 +60,12 @@ public class MethSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindMethSubmission(submissionId);
+        var submittedData = _submissionService.FindLevelSubmission(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Samples);
-        _submissionService.DeleteMethSubmission(submissionId);
+        _submissionService.DeleteLevelSubmission(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

@@ -4,42 +4,44 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Genome.Feed.Web.Configuration.Constants;
 using Unite.Genome.Feed.Web.Models.Base;
-using Unite.Genome.Feed.Web.Models.Dna.Meth;
-using Unite.Genome.Feed.Web.Models.Dna.Meth.Binders;
+using Unite.Genome.Feed.Web.Models.Meth;
+using Unite.Genome.Feed.Web.Models.Meth.Binders;
 using Unite.Genome.Feed.Web.Submissions;
 
-namespace Unite.Genome.Feed.Web.Controllers.RnaSc;
+namespace Unite.Genome.Feed.Web.Controllers.Meth;
 
-[Route("api/dna/analysis/meth")]
+[Route("api/meth/analysis/levels")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class MethController : Controller
+public class LevelsController : Controller
 {
-    private readonly DnaSubmissionService _submissionService;
+    private readonly MethSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
 
-    public MethController(
-        DnaSubmissionService submissionService,
+
+    public LevelsController(
+        MethSubmissionService submissionService, 
         SubmissionTaskService submissionTaskService)
     {
         _submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
     }
 
+
     [HttpGet("{id}")]
     public IActionResult Get(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
-        var submission = _submissionService.FindMethSubmission(task.Target);
+        var submission = _submissionService.FindSampleSubmission(task.Target);
 
         return Ok(submission);
     }
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
+    public IActionResult Post([FromBody] AnalysisModel<LevelModel> model, [FromQuery] bool review = true)
     {
-        var submissionId = _submissionService.AddMethSubmission(model);
+        var submissionId = _submissionService.AddLevelSubmission(model);
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
@@ -52,7 +54,7 @@ public class MethController : Controller
     [RequestSizeLimit(100_000_000)]
     public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ResourceModel> model, [FromQuery] bool review = true)
     {
-        var analysisModel = new AnalysisModel<ExpressionModel>
+        var analysisModel = new AnalysisModel<LevelModel>
         {
             TargetSample = model.TargetSample,
             MatchedSample = model.MatchedSample,

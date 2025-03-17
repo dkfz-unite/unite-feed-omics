@@ -1,25 +1,29 @@
 ﻿using Unite.Cache.Configuration.Options;
 using Unite.Genome.Feed.Web.Models.Base;
-using Unite.Genome.Feed.Web.Models.Dna.Meth;
 
 namespace Unite.Genome.Feed.Web.Submissions;
 
 public class DnaSubmissionService
 {
+    private readonly Repositories.Dna.SampleSubmissionRepository _sampleRepository;
 	private readonly Repositories.Dna.SsmSubmissionRepository _ssmRepository;
 	private readonly Repositories.Dna.CnvSubmissionRepository _cnvRepository;
 	private readonly Repositories.Dna.SvSubmissionRepository _svRepository;
-	private readonly Repositories.Dna.MethSubmissionRepository _methRepository;
 
 
     public DnaSubmissionService(IMongoOptions options)
 	{
+        _sampleRepository = new Repositories.Dna.SampleSubmissionRepository(options);
 		_ssmRepository = new Repositories.Dna.SsmSubmissionRepository(options);
 		_cnvRepository = new Repositories.Dna.CnvSubmissionRepository(options);
 		_svRepository = new Repositories.Dna.SvSubmissionRepository(options);
-		_methRepository = new Repositories.Dna.MethSubmissionRepository(options);
 	}
 
+
+    public string AddSampleSubmission(SampleModel data)
+    {
+        return _sampleRepository.Add(data);
+    }
 
 	public string AddSsmSubmission(AnalysisModel<Models.Dna.Ssm.VariantModel> data)
 	{
@@ -36,9 +40,9 @@ public class DnaSubmissionService
         return _svRepository.Add(data);
     }
 
-    public string AddMethSubmission(AnalysisModel<ExpressionModel> data)
+    public SampleModel FindSampleSubmission(string id)
     {
-        return _methRepository.Add(data);
+        return _sampleRepository.Find(id)?.Document;
     }
 
 	public AnalysisModel<Models.Dna.Ssm.VariantModel> FindSsmSubmission(string id)
@@ -56,9 +60,9 @@ public class DnaSubmissionService
         return _svRepository.Find(id)?.Document;
     }
 
-    public AnalysisModel<ExpressionModel> FindMethSubmission(string id)
+    public void DeleteSampleSubmission(string id)
     {
-        return _methRepository.Find(id)?.Document;
+        _sampleRepository.Delete(id);
     }
 
     public void DeleteSsmSubmission(string id)
@@ -74,10 +78,5 @@ public class DnaSubmissionService
     public void DeleteSvSubmission(string id)
     {
         _svRepository.Delete(id);
-    }
-
-    public void DeleteMethSubmission(string id)
-    {
-        _methRepository.Delete(id);
     }
 }
