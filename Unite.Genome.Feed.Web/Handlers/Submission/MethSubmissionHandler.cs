@@ -44,7 +44,7 @@ public class MethSubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.DNA_METH, TaskStatusType.Prepared, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.METH_LVL, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

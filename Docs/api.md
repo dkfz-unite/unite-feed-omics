@@ -59,9 +59,22 @@ Supported formats are:
     "genome": "grch37",
     "resources": [
         {
+            "name": "alignment",
             "type": "dna",
             "format": "bam",
-            "url": "example.com/bam/abc"
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "alignment-index",
+            "type": "dna",
+            "format": "bam.bai",
+            "url": "example.com/file/abc2"
+        },
+        {
+            "name": "alignment-index-hash",
+            "type": "dna",
+            "format": "bam.bai.md5",
+            "url": "example.com/file/abc2"
         }
     ]
 }
@@ -75,8 +88,10 @@ Supported formats are:
 # analysis_type: WGS
 # analysis_date: 2023-12-01
 # genome: grch37
-type    format  url
-dna     bam     example.com/bam/abc
+name	type	format	url
+alignment	dna	bam	example.com/file/abc1
+alignment-index	dna	bam.bai	example.com/file/abc2
+alignment-index-hash	dna	bam.bai.md5	example.com/file/abc2
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -388,14 +403,16 @@ Supported formats are:
     "genome": "grch38",
     "resources": [
         {
-            "type": "meth-red",
+            "name": "red",
+            "type": "meth",
             "format": "idat",
-            "url": "example.com/idat/abc/red"
+            "url": "example.com/file/abc1"
         },
         {
-            "type": "meth-green",
+            "name": "green",
+            "type": "meth",
             "format": "idat",
-            "url": "example.com/idat/abc/green"
+            "url": "example.com/file/abc2"
         }
     ]
 }
@@ -409,9 +426,9 @@ Supported formats are:
 # analysis_type: MethArray
 # analysis_date: 2023-12-01
 # genome: grch38
-type    format  url
-meth-red    idat    example.com/idat/abc/red
-meth-green  idat    example.com/idat/abc/green
+name	type	format	url
+red	meth	idat	example.com/file/abc1
+green	meth	idat	example.com/file/abc2
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -497,9 +514,22 @@ Supported formats are:
     "genome": "grch37",
     "resources": [
         {
+            "name": "alignment",
             "type": "rna",
             "format": "bam",
-            "url": "example.com/bam/abc"
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "alignment-index",
+            "type": "rna",
+            "format": "bam.bai",
+            "url": "example.com/file/abc2"
+        },
+        {
+            "name": "alignment-index-hash",
+            "type": "rna",
+            "format": "bam.bai.md5",
+            "url": "example.com/file/abc2"
         }
     ]
 }
@@ -513,8 +543,10 @@ Supported formats are:
 # analysis_type: RNASeq
 # analysis_date: 2023-12-01
 # genome: grch37
-type    format  url
-rna     bam     example.com/bam/abc
+name	type	format	url
+alignment	rna	bam	example.com/file/abc1
+alignment-index	rna	bam.bai	example.com/file/abc2
+alignment-index-hash	rna	bam.bai.md5	example.com/file/abc2
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -603,9 +635,22 @@ Supported formats are:
     "genome": "grch38",
     "resources": [
         {
+            "name": "alignment",
             "type": "rnasc",
             "format": "bam",
-            "url": "example.com/bam/abc"
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "alignment-index",
+            "type": "rnasc",
+            "format": "bam.bai",
+            "url": "example.com/file/abc2"
+        },
+        {
+            "name": "alignment-index-hash",
+            "type": "rnasc",
+            "format": "bam.bai.md5",
+            "url": "example.com/file/abc2"
         }
     ]
 }
@@ -616,10 +661,12 @@ Supported formats are:
 # donor_id: Donor1
 # specimen_id: Material1
 # specimen_type: Material
-# analysis_type: RNASeqSc
+# analysis_type: scRNASeq
 # genome: grch38
-type    format  url
-rnasc   bam     example.com/bam/abc
+name	type	format	url
+alignment	rnasc	bam	example.com/file/abc1
+alignment-index	rnasc	bam.bai	example.com/file/abc2
+alignment-index-hash	rnasc	bam.bai.md5	example.com/file/abc2
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -647,22 +694,25 @@ Supported formats are:
         "cells": 5000,
         "resources": [
             {
+                "name": "matrix",
                 "type": "rnasc-exp",
                 "format": "mtx",
                 "archive": "gz",
-                "url": "example.com/mtx/abc"
+                "url": "example.com/file/abc1"
             },
             {
+                "name": "features",
                 "type": "rnasc-exp",
-                "format": "features",
+                "format": "tsv",
                 "archive": "gz",
-                "url": "example.com/mtx/abc/features"
+                "url": "example.com/file/abc2"
             },
             {
+                "name": "barcodes",
                 "type": "rnasc-exp",
-                "format": "barcodes",
+                "format": "tsv",
                 "archive": "gz",
-                "url": "example.com/mtx/abc/barcodes"
+                "url": "example.com/file/abc3"
             }
         ]
     }
@@ -677,10 +727,12 @@ Supported formats are:
 # tsample_donor_id: Donor1
 # tsample_specimen_id: Material2
 # tsample_specimen_type: Material
-# tsample_analysis_type: RNASeqSc
+# tsample_analysis_type: scRNASeq
 # tsample_cells: 5000
-type    format  archive  url
-rnasc-exp   mtx gz example.com/mtx/abc
+name	type	format	archive	url
+matrix	rnasc-exp	mtx	gz	example.com/file/abc1
+features	rnasc-exp	tsv	gz	example.com/file/abc2
+barcodes	rnasc-exp	tsv	gz	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-rnasc-exp.md).

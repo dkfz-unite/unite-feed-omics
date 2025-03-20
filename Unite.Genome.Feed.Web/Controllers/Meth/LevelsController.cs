@@ -45,7 +45,7 @@ public class LevelsController : Controller
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.DNA_METH, submissionId, taskStatus);
+        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.METH_LVL, submissionId, taskStatus);
 
         return Ok(taskId);
     }
