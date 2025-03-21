@@ -60,6 +60,7 @@ public static class ConfigurationExtensions
 
         // Submission services
         services.AddTransient<DnaSubmissionService>();
+        services.AddTransient<MethSubmissionService>();
         services.AddTransient<RnaSubmissionService>();
         services.AddTransient<RnaScSubmissionService>();
 
