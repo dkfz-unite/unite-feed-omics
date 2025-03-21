@@ -9,6 +9,7 @@ public class AnalysisTsvModelsBinder : AnalysisTsvModelBinder<ResourceModel>
     protected override ClassMap<ResourceModel> CreateMap()
     {
         return new ClassMap<ResourceModel>()
+            .Map(entity => entity.Name, "name")
             .Map(entity => entity.Type, "type")
             .Map(entity => entity.Format, "format")
             .Map(entity => entity.Archive, "archive")
