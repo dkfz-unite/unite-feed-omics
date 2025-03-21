@@ -1,8 +1,8 @@
 # Resource Data Model
 Includes the information about available analysis resource (file).
 
-**`name`*** - Resource name.
-- NOTE: For multi file resources, such as `mtx` or `idat` it's very important to name the files [correctly](#naming). 
+**`name`*** - Resource name (without file extension).
+- NOTE: For multi file resources, such as `mtx` or `idat` it's very important to name the files [correctly](#naming).
 - Type: _String_
 - Limitations: Maximum length 255
 - Example: `"barcodes"`
@@ -54,15 +54,16 @@ Resource format can be of the following types:
 - `"idat"` - [Illumina](https://emea.illumina.com) Infinium Methylation array data
 
 #### Naming
-- For `mtx` resource type
-    - `mtx` file can have any name.
-    - `barcodes` file should be named as `barcodes`.
-    - `features` file should be named as `features`.
-- For `idat` resource type
-    - Red channel file should be named as `red`.
-    - Green channel file should be named as `green`.
+- Do not include file extensions in the `name` field
+- For `rnasc-exp` resource type int `mtx` format keep standard 10xGenomics naming:
+    - `matrix`
+    - `barcodes`
+    - `features`
+- For `meth` resource type in `idat` format keep standard Illumina naming:
+    - `5775041065_R01C02_Grn`
+    - `5775041065_R01C02_Red`
 - For other resource types
-    - Name the files as you like.
+    - Name the files as you like
 
 #### Recommendations
 - Do not compress alignment files (`bam`, `bam.bai`, `bam.bai.md5`) as they can be used for partial data retrieval.

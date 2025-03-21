@@ -65,16 +65,16 @@ Supported formats are:
             "url": "example.com/file/abc1"
         },
         {
-            "name": "alignment-index",
+            "name": "alignment",
             "type": "dna",
             "format": "bam.bai",
             "url": "example.com/file/abc2"
         },
         {
-            "name": "alignment-index-hash",
+            "name": "alignment",
             "type": "dna",
             "format": "bam.bai.md5",
-            "url": "example.com/file/abc2"
+            "url": "example.com/file/abc3"
         }
     ]
 }
@@ -90,8 +90,8 @@ Supported formats are:
 # genome: grch37
 name	type	format	url
 alignment	dna	bam	example.com/file/abc1
-alignment-index	dna	bam.bai	example.com/file/abc2
-alignment-index-hash	dna	bam.bai.md5	example.com/file/abc2
+alignment	dna	bam.bai	example.com/file/abc2
+alignment	dna	bam.bai.md5	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -403,13 +403,13 @@ Supported formats are:
     "genome": "grch38",
     "resources": [
         {
-            "name": "red",
+            "name": "5775041065_R01C02_Grn",
             "type": "meth",
             "format": "idat",
             "url": "example.com/file/abc1"
         },
         {
-            "name": "green",
+            "name": "5775041065_R01C02_Red",
             "type": "meth",
             "format": "idat",
             "url": "example.com/file/abc2"
@@ -427,8 +427,8 @@ Supported formats are:
 # analysis_date: 2023-12-01
 # genome: grch38
 name	type	format	url
-red	meth	idat	example.com/file/abc1
-green	meth	idat	example.com/file/abc2
+5775041065_R01C02_Grn	meth	idat	example.com/file/abc1
+5775041065_R01C02_Red	meth	idat	example.com/file/abc2
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -462,6 +462,7 @@ Supported formats are:
     },
     "resources": [
         {
+            "name": "levels",
             "type": "meth-lvl",
             "format": "tsv",
             "url": "example.com/file/abc"
@@ -479,8 +480,8 @@ Supported formats are:
 # tsample_specimen_id: Material2
 # tsample_specimen_type: Material
 # tsample_analysis_type: MethArray
-type    format  url
-meth-lvl    tsv example.com/file/abc
+name	type	format	url
+levels	meth-lvl	tsv	example.com/file/abc
 ```
 
 Fields description can be found [here](api-models-meth-lvl.md).
@@ -520,16 +521,16 @@ Supported formats are:
             "url": "example.com/file/abc1"
         },
         {
-            "name": "alignment-index",
+            "name": "alignment",
             "type": "rna",
             "format": "bam.bai",
             "url": "example.com/file/abc2"
         },
         {
-            "name": "alignment-index-hash",
+            "name": "alignment",
             "type": "rna",
             "format": "bam.bai.md5",
-            "url": "example.com/file/abc2"
+            "url": "example.com/file/abc3"
         }
     ]
 }
@@ -545,8 +546,8 @@ Supported formats are:
 # genome: grch37
 name	type	format	url
 alignment	rna	bam	example.com/file/abc1
-alignment-index	rna	bam.bai	example.com/file/abc2
-alignment-index-hash	rna	bam.bai.md5	example.com/file/abc2
+alignment	rna	bam.bai	example.com/file/abc2
+alignment	rna	bam.bai.md5	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -641,16 +642,16 @@ Supported formats are:
             "url": "example.com/file/abc1"
         },
         {
-            "name": "alignment-index",
+            "name": "alignment",
             "type": "rnasc",
             "format": "bam.bai",
             "url": "example.com/file/abc2"
         },
         {
-            "name": "alignment-index-hash",
+            "name": "alignment",
             "type": "rnasc",
             "format": "bam.bai.md5",
-            "url": "example.com/file/abc2"
+            "url": "example.com/file/abc3"
         }
     ]
 }
@@ -665,8 +666,8 @@ Supported formats are:
 # genome: grch38
 name	type	format	url
 alignment	rnasc	bam	example.com/file/abc1
-alignment-index	rnasc	bam.bai	example.com/file/abc2
-alignment-index-hash	rnasc	bam.bai.md5	example.com/file/abc2
+alignment	rnasc	bam.bai	example.com/file/abc2
+alignment	rnasc	bam.bai.md5	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -721,7 +722,7 @@ Supported formats are:
 
 #### tsv - text/tab-separated-values
 > [!Note]
-> You can upload only expressions matrix resource in this format.
+> You can upload only expressions matrix resources in this format.
 
 ```tsv
 # tsample_donor_id: Donor1
