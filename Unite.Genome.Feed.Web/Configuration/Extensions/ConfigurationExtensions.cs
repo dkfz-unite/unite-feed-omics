@@ -32,6 +32,8 @@ using BulkExpModel = Unite.Genome.Feed.Web.Models.Rna.ExpressionModel;
 using BulkExpModelValidator = Unite.Genome.Feed.Web.Models.Rna.Validators.ExpressionModelValidator;
 using CellExpModel = Unite.Genome.Feed.Web.Models.RnaSc.ExpressionModel;
 using CellExpModelValidator = Unite.Genome.Feed.Web.Models.RnaSc.Validators.ExpressionModelValidator;
+using MethLevelModel = Unite.Genome.Feed.Web.Models.Meth.LevelModel;
+using MethLevelModelValidator = Unite.Genome.Feed.Web.Models.Meth.Validators.LevelModelValidator;
 
 
 namespace Unite.Genome.Feed.Web.Configuration.Extensions;
@@ -88,6 +90,7 @@ public static class ConfigurationExtensions
         services.AddTransient<SsmsSubmissionHandler>();
         services.AddTransient<CnvsSubmissionHandler>();
         services.AddTransient<SvsSubmissionHandler>();
+        services.AddTransient<MethSubmissionHandler>();
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();
@@ -138,6 +141,7 @@ public static class ConfigurationExtensions
         services.AddTransient<IValidator<AnalysisModel<SvModel>>, AnalysisModelValidator<SvModel, SvModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<BulkExpModel>>, AnalysisModelValidator<BulkExpModel, BulkExpModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<CellExpModel>>, AnalysisModelValidator<CellExpModel, CellExpModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<MethLevelModel>>, AnalysisModelValidator<MethLevelModel, MethLevelModelValidator>>();
 
         return services;
     }
