@@ -8,6 +8,7 @@ using Unite.Indices.Entities;
 using Unite.Data.Entities.Images.Enums;
 using Unite.Data.Entities.Specimens.Enums;
 using Unite.Data.Entities.Genome.Analysis;
+using Unite.Data.Constants;
 
 
 namespace Unite.Genome.Indices.Services;
@@ -243,7 +244,9 @@ public class GeneIndexCreator
     {
         return _cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
-            sample.Resources?.Any(resource => resource.Type == "dna-meth") == true
+            sample.Resources?.Any(resource => 
+                (resource.Type == DataTypes.Genome.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
+                (resource.Type == DataTypes.Genome.Meth.Levels)) == true
         );
     }
 
@@ -256,7 +259,7 @@ public class GeneIndexCreator
     {
         return _cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
-            sample.Resources?.Any(resource => resource.Type == "rnasc-exp") == true
+            sample.Resources?.Any(resource => resource.Type == DataTypes.Genome.Rnasc.Exp) == true
         );
     }
 }
