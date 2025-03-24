@@ -58,10 +58,10 @@ internal class DonorRepository
         if (project == null)
         {
             project = new Project() { Name = name };
-        }
 
-        _dbContext.Add(project);
-        _dbContext.SaveChanges();
+            _dbContext.Add(project);
+            _dbContext.SaveChanges();
+        }
 
         return project;
     }
