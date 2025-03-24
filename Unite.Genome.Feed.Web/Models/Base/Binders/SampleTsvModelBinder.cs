@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Unite.Data.Entities.Genome.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
@@ -47,6 +48,7 @@ public class SampleTsvModelBinder : IModelBinder
     private static ClassMap<ResourceModel> CreateMap()
     {
         return new ClassMap<ResourceModel>()
+            .Map(entity => entity.Name, "name")
             .Map(entity => entity.Type, "type")
             .Map(entity => entity.Format, "format")
             .Map(entity => entity.Archive, "archive")
@@ -103,10 +105,25 @@ public class SampleTsvModelBinder : IModelBinder
         else if (typeof(T) == typeof(DateOnly?))
             return (T)(object)DateOnly.Parse(value, CultureInfo.InvariantCulture);
         else if (typeof(T) == typeof(AnalysisType?))
-            return (T)(object)Enum.Parse<AnalysisType>(value);
+            return (T)(object)ToEnum<AnalysisType>(value);
         else if (typeof(T) == typeof(SpecimenType?))
             return (T)(object)Enum.Parse<SpecimenType>(value);
         else
             return (T)Convert.ChangeType(value, typeof(T));
+    }
+
+    public static T ToEnum<T>(string value)
+    {   
+        var type = typeof(T);
+
+        foreach (var name in Enum.GetNames(type))
+        {
+            var attribute = ((EnumMemberAttribute[])type.GetField(name).GetCustomAttributes(typeof(EnumMemberAttribute), true)).Single();
+            
+            if (attribute.Value == value)
+                return (T)Enum.Parse(type, name);
+        }
+
+        return default;
     }
 }

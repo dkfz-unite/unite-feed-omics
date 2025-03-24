@@ -30,6 +30,13 @@ public abstract class SampleController : Controller
     }
 
 
+    [HttpGet("")]
+    [AllowAnonymous]
+    public IActionResult Get()
+    {
+        return Ok();
+    }
+
     [HttpPost("")]
     public IActionResult Post([FromBody] SampleModel model, [FromQuery] bool review = true)
     {

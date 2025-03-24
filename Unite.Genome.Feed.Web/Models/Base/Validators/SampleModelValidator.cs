@@ -100,12 +100,9 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         var comparison = StringComparison.InvariantCultureIgnoreCase;
 
         var filtered = resources.Where(resource => resource.Type == DataTypes.Genome.Meth.Sample).ToArray();
-        if (filtered.Length != 2)
-            return false;
-
         var red = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name.Contains("red", comparison));
         var green = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name.Contains("grn", comparison));
-        if (red == null || green == null)
+        if (red == null && green == null)
             return false;
 
         return true;
@@ -116,13 +113,10 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         var comparison = StringComparison.InvariantCultureIgnoreCase;
 
         var filtered = resources.Where(resource => resource.Type == DataTypes.Genome.Rnasc.Exp).ToArray();
-        if (filtered.Length != 3)
-            return false;
-
         var mtx = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Mtx && resource.Name.Contains("matrix", comparison));
         var barcodes = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name.Contains("barcodes", comparison));
         var features = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name.Contains("features", comparison));
-        if (mtx == null || barcodes == null || features == null)
+        if (mtx == null && barcodes == null && features == null)
             return false;
 
         return true;
