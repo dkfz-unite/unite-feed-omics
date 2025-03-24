@@ -112,7 +112,7 @@ public class SampleTsvModelBinder : IModelBinder
             return (T)Convert.ChangeType(value, typeof(T));
     }
 
-    public static T ToEnum<T>(string value)
+    private static T ToEnum<T>(string value)
     {   
         var type = typeof(T);
 
