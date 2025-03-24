@@ -1,4 +1,5 @@
 using FluentValidation;
+using Unite.Data.Constants;
 
 namespace Unite.Genome.Feed.Web.Models.Base.Validators;
 
@@ -6,34 +7,49 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
 {
     private static readonly string[] _allowedTypes =
     {
-        "dna", // dna allignment
-        "dna-ssm", // simple somatic mutations
-        "dna-cnv", // copy number variants
-        "dna-sv", // structural variants
-        "rna", // rna allignment
-        "rna-exp", // gene expressions
-        "rnasc", // single cell rna allignment
-        "rnasc-exp", // single cell gene expressions
+        DataTypes.Genome.Dna.Sample,
+        DataTypes.Genome.Dna.Ssm,
+        DataTypes.Genome.Dna.Cnv,
+        DataTypes.Genome.Dna.Sv,
+        DataTypes.Genome.Meth.Sample,
+        DataTypes.Genome.Meth.Levels,
+        DataTypes.Genome.Rna.Sample,
+        DataTypes.Genome.Rna.Exp,
+        DataTypes.Genome.Rnasc.Sample,
+        DataTypes.Genome.Rnasc.Exp
     };
 
     private static readonly string[] _allowedFormats = 
     {
-        "txt",
-        "tsv",
-        "csv",
-        "vcf", // variant call format
-        "bam", // binary alignment map
-        "mtx", // 10x genomics single cell gene expression matrix
+        FileTypes.General.Txt,
+        FileTypes.General.Csv,
+        FileTypes.General.Tsv,
+        FileTypes.Sequence.Fasta,
+        FileTypes.Sequence.Fastq,
+        FileTypes.Sequence.Bam,
+        FileTypes.Sequence.BamBai,
+        FileTypes.Sequence.BamBaiMd5,
+        FileTypes.Sequence.Idat,
+        FileTypes.Sequence.Mtx,
+        FileTypes.Sequence.Vcf
     };
 
     private static readonly string[] _allowedArchives = 
     {
-        "zip",
-        "gz"
+        ArchiveTypes.Zip,
+        ArchiveTypes.Gz
     };
 
     public ResourceModelValidator()
     {
+        RuleFor(model => model.Name)
+            .NotEmpty()
+            .WithMessage("Should not be empty");
+
+        RuleFor(model => model.Name)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
+
         RuleFor(model => model.Type)
             .NotEmpty()
             .WithMessage("Should not be empty");

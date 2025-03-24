@@ -24,8 +24,10 @@ public class ResourceRepository
     {
         return _dbContext.Set<SampleResource>()
             .FirstOrDefault(entity => 
-                entity.SampleId == sampleId && 
-                entity.Type == model.Type
+                entity.SampleId == sampleId &&
+                entity.Name == model.Name && 
+                entity.Type == model.Type &&
+                entity.Format == model.Format
             );
     }
 
@@ -53,6 +55,7 @@ public class ResourceRepository
         return new SampleResource
         {
             SampleId = sampleId,
+            Name = model.Name,
             Type = model.Type,
             Format = model.Format,
             Archive = model.Archive,

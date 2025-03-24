@@ -7,6 +7,7 @@ public class ResourceModelConverter
     {
         return new DataModels.ResourceModel
         {
+            Name = resourceModel.Name,
             Type = resourceModel.Type,
             Format = resourceModel.Format,
             Archive = resourceModel.Archive,

@@ -13,6 +13,8 @@ API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](h
 - post:[api/dna/analysis/ssms/{type?}](#post-apidnaanalysisssmstype) - submit DNA SSMs data.
 - post:[api/dna/analysis/cnvs/{type?}](#post-apidnaanalysiscnvstype) - submit DNA CNVs data.
 - post:[api/dna/analysis/svs/{type?}](#post-apidnaanalysissvstype) - submit DNA SVs data.
+- post:[api/meth/sample/{type?}](#post-apimethsampletype) - submit Methylation sample data.
+- post:[api/meth/analysis/levels/{type?}](#post-apimethanalysislevelstype) - submit Methylation levels data.
 - post:[api/rna/sample/{type?}](#post-apirnasampletype) - submit **bulk** RNA sample data.
 - post:[api/rna/analysis/exps/{type?}](#post-apirnaanalysisexpstype) - submit **bulk** RNA gene expressions data.
 - post:[api/rnasc/sample/{type?}](#post-apirnascsampletype) - submit **single cell** RNA sample data.
@@ -57,9 +59,22 @@ Supported formats are:
     "genome": "grch37",
     "resources": [
         {
+            "name": "alignment",
             "type": "dna",
             "format": "bam",
-            "url": "example.com/bam/abc"
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "alignment",
+            "type": "dna",
+            "format": "bam.bai",
+            "url": "example.com/file/abc2"
+        },
+        {
+            "name": "alignment",
+            "type": "dna",
+            "format": "bam.bai.md5",
+            "url": "example.com/file/abc3"
         }
     ]
 }
@@ -73,8 +88,10 @@ Supported formats are:
 # analysis_type: WGS
 # analysis_date: 2023-12-01
 # genome: grch37
-type    format  url
-dna     bam     example.com/bam/abc
+name	type	format	url
+alignment	dna	bam	example.com/file/abc1
+alignment	dna	bam.bai	example.com/file/abc2
+alignment	dna	bam.bai.md5	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -362,6 +379,118 @@ Fields description can be found [here](api-models-dna-sv.md).
 - `401` - missing JWT token
 - `403` - missing required permissions
 
+## POST: [api/meth/sample/{type?}](http://localhost:5106/api/meth/sample)
+Submit Methylation sample data and it's resources.
+
+Request implements **UPSERT** logic:
+- Missing data will be populated
+- Existing data will be updated
+
+### Body
+Supported formats are:
+
+- `json` (**empty**) - application/json
+- `tsv` - text/tab-separated-values
+
+#### json - application/json
+```json
+{
+    "donor_id": "Donor1",
+    "specimen_id": "Material1",
+    "specimen_type": "Material",
+    "analysis_type": "MethArray",
+    "analysis_date": "2023-12-01",
+    "genome": "grch38",
+    "resources": [
+        {
+            "name": "5775041065_R01C02_Grn",
+            "type": "meth",
+            "format": "idat",
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "5775041065_R01C02_Red",
+            "type": "meth",
+            "format": "idat",
+            "url": "example.com/file/abc2"
+        }
+    ]
+}
+```
+
+#### tsv - text/tab-separated-values
+```tsv
+# donor_id: Donor1
+# specimen_id: Material1
+# specimen_type: Material
+# analysis_type: MethArray
+# analysis_date: 2023-12-01
+# genome: grch38
+name	type	format	url
+5775041065_R01C02_Grn	meth	idat	example.com/file/abc1
+5775041065_R01C02_Red	meth	idat	example.com/file/abc2
+```
+
+Fields description can be found [here](api-models-sample.md).
+
+### Responses
+- `200` - request was processed successfully
+- `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
+
+## POST: [api/meth/analysis/levels/{type?}](http://localhost:5106/api/meth/analysis/levels)
+Submit Methylation levels data (b/m values including sequencing analysis data).
+
+Request implements **OVERRIDE** logic:
+- Missing data will be populated
+- Existing data will be updated
+
+### Body
+Supported formats are:
+- `json` (**empty**) - application/json
+- `tsv` - text/tab-separated-values
+
+#### json - application/json
+```json
+{
+    "target_sample": {
+        "donor_id": "Donor1",
+        "specimen_id": "Material2",
+        "specimen_type": "Material",
+        "analysis_type": "MethArray"
+    },
+    "resources": [
+        {
+            "name": "levels",
+            "type": "meth-lvl",
+            "format": "tsv",
+            "url": "example.com/file/abc"
+        }
+    ]
+}
+```
+
+#### tsv - text/tab-separated-values
+> [!Note]
+> You can upload only methylation levels resource in this format.
+
+```tsv
+# tsample_donor_id: Donor1
+# tsample_specimen_id: Material2
+# tsample_specimen_type: Material
+# tsample_analysis_type: MethArray
+name	type	format	url
+levels	meth-lvl	tsv	example.com/file/abc
+```
+
+Fields description can be found [here](api-models-meth-lvl.md).
+
+### Responses
+- `200` - request was processed successfully
+- `400` - request data didn't pass validation
+- `401` - missing JWT token
+- `403` - missing required permissions
 
 ## POST: [api/rna/sample/{type?}](http://localhost:5106/api/rna/sample)
 Submit Bulk RNA sample data and it's resources.
@@ -386,9 +515,22 @@ Supported formats are:
     "genome": "grch37",
     "resources": [
         {
+            "name": "alignment",
             "type": "rna",
             "format": "bam",
-            "url": "example.com/bam/abc"
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "alignment",
+            "type": "rna",
+            "format": "bam.bai",
+            "url": "example.com/file/abc2"
+        },
+        {
+            "name": "alignment",
+            "type": "rna",
+            "format": "bam.bai.md5",
+            "url": "example.com/file/abc3"
         }
     ]
 }
@@ -402,8 +544,10 @@ Supported formats are:
 # analysis_type: RNASeq
 # analysis_date: 2023-12-01
 # genome: grch37
-type    format  url
-rna     bam     example.com/bam/abc
+name	type	format	url
+alignment	rna	bam	example.com/file/abc1
+alignment	rna	bam.bai	example.com/file/abc2
+alignment	rna	bam.bai.md5	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -488,13 +632,26 @@ Supported formats are:
     "donor_id": "Donor1",
     "specimen_id": "Material1",
     "specimen_type": "Material",
-    "analysis_type": "RNASeqSc",
+    "analysis_type": "scRNASeq",
     "genome": "grch38",
     "resources": [
         {
+            "name": "alignment",
             "type": "rnasc",
             "format": "bam",
-            "url": "example.com/bam/abc"
+            "url": "example.com/file/abc1"
+        },
+        {
+            "name": "alignment",
+            "type": "rnasc",
+            "format": "bam.bai",
+            "url": "example.com/file/abc2"
+        },
+        {
+            "name": "alignment",
+            "type": "rnasc",
+            "format": "bam.bai.md5",
+            "url": "example.com/file/abc3"
         }
     ]
 }
@@ -505,10 +662,12 @@ Supported formats are:
 # donor_id: Donor1
 # specimen_id: Material1
 # specimen_type: Material
-# analysis_type: RNASeqSc
+# analysis_type: scRNASeq
 # genome: grch38
-type    format  url
-rnasc   bam     example.com/bam/abc
+name	type	format	url
+alignment	rnasc	bam	example.com/file/abc1
+alignment	rnasc	bam.bai	example.com/file/abc2
+alignment	rnasc	bam.bai.md5	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-sample.md).
@@ -532,14 +691,29 @@ Supported formats are:
         "donor_id": "Donor1",
         "specimen_id": "Material2",
         "specimen_type": "Material",
-        "analysis_type": "RNASeqSc",
+        "analysis_type": "scRNASeq",
         "cells": 5000,
         "resources": [
             {
+                "name": "matrix",
                 "type": "rnasc-exp",
                 "format": "mtx",
                 "archive": "gz",
-                "url": "example.com/mtx/abc"
+                "url": "example.com/file/abc1"
+            },
+            {
+                "name": "features",
+                "type": "rnasc-exp",
+                "format": "tsv",
+                "archive": "gz",
+                "url": "example.com/file/abc2"
+            },
+            {
+                "name": "barcodes",
+                "type": "rnasc-exp",
+                "format": "tsv",
+                "archive": "gz",
+                "url": "example.com/file/abc3"
             }
         ]
     }
@@ -548,16 +722,18 @@ Supported formats are:
 
 #### tsv - text/tab-separated-values
 > [!Note]
-> You can upload only expressions matrix resource in this format.
+> You can upload only expressions matrix resources in this format.
 
 ```tsv
 # tsample_donor_id: Donor1
 # tsample_specimen_id: Material2
 # tsample_specimen_type: Material
-# tsample_analysis_type: RNASeqSc
+# tsample_analysis_type: scRNASeq
 # tsample_cells: 5000
-type    format  archive  url
-rnasc-exp   mtx gz example.com/mtx/abc
+name	type	format	archive	url
+matrix	rnasc-exp	mtx	gz	example.com/file/abc1
+features	rnasc-exp	tsv	gz	example.com/file/abc2
+barcodes	rnasc-exp	tsv	gz	example.com/file/abc3
 ```
 
 Fields description can be found [here](api-models-rnasc-exp.md).

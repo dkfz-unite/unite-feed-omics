@@ -30,9 +30,17 @@ public abstract class SampleController : Controller
     }
 
 
-    [HttpPost("")]
-    public IActionResult Post([FromBody] SampleModel model)
+    [HttpGet("")]
+    [AllowAnonymous]
+    public IActionResult Get()
     {
+        return Ok();
+    }
+
+    [HttpPost("")]
+    public IActionResult Post([FromBody] SampleModel model, [FromQuery] bool review = true)
+    {
+        // TODO: Add submission process
         var dataModel = _converter.Convert(model);
 
         _dataWriter.SaveData(dataModel, out var audit);
@@ -45,8 +53,8 @@ public abstract class SampleController : Controller
     }
 
     [HttpPost("tsv")]
-    public IActionResult PostTsv([ModelBinder(typeof(SampleTsvModelBinder))] SampleModel model)
+    public IActionResult PostTsv([ModelBinder(typeof(SampleTsvModelBinder))] SampleModel model, [FromQuery] bool review = true)
     {
-        return Post(model);
+        return Post(model, review);
     }
 }

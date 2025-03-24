@@ -2,7 +2,7 @@ using Unite.Essentials.Tsv;
 using Unite.Genome.Feed.Web.Models.Base;
 using Unite.Genome.Feed.Web.Models.Base.Binders;
 
-namespace Unite.Genome.Feed.Web.Models.RnaSc.Binders;
+namespace Unite.Genome.Feed.Web.Models.Meth.Binders;
 
 public class AnalysisTsvModelsBinder : AnalysisTsvModelBinder<ResourceModel>
 {

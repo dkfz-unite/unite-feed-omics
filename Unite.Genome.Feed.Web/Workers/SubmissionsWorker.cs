@@ -10,6 +10,7 @@ public class SubmissionsWorker : BackgroundService
     private readonly SsmsSubmissionHandler _ssmsSubmissionHandler;
     private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
     private readonly SvsSubmissionHandler _svsSubmissionHandler;
+    private readonly MethSubmissionHandler _methSubmissionHandler;
     private readonly ILogger _logger;
 
     public SubmissionsWorker(
@@ -18,6 +19,7 @@ public class SubmissionsWorker : BackgroundService
         SsmsSubmissionHandler ssmsSubmissionHandler,
         CnvsSubmissionHandler cnvsSubmissionHandler,
         SvsSubmissionHandler svsSubmissionHandler,
+        MethSubmissionHandler methSubmissionHandler,
         ILogger<SubmissionsWorker> logger)
     {
         _bulkGeneExpSubmissionHandler = bulkGeneExpSubmissionHandler;
@@ -25,6 +27,7 @@ public class SubmissionsWorker : BackgroundService
         _ssmsSubmissionHandler = ssmsSubmissionHandler;
         _cnvsSubmissionHandler = cnvsSubmissionHandler;
         _svsSubmissionHandler = svsSubmissionHandler;
+        _methSubmissionHandler = methSubmissionHandler;
         _logger = logger;
     }
 
@@ -46,6 +49,7 @@ public class SubmissionsWorker : BackgroundService
                 _ssmsSubmissionHandler.Handle();
                 _cnvsSubmissionHandler.Handle();
                 _svsSubmissionHandler.Handle();
+                _methSubmissionHandler.Handle();
             }
             catch (Exception exception)
             {

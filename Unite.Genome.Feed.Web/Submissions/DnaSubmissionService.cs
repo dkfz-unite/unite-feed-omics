@@ -5,6 +5,7 @@ namespace Unite.Genome.Feed.Web.Submissions;
 
 public class DnaSubmissionService
 {
+    private readonly Repositories.Dna.SampleSubmissionRepository _sampleRepository;
 	private readonly Repositories.Dna.SsmSubmissionRepository _ssmRepository;
 	private readonly Repositories.Dna.CnvSubmissionRepository _cnvRepository;
 	private readonly Repositories.Dna.SvSubmissionRepository _svRepository;
@@ -12,11 +13,17 @@ public class DnaSubmissionService
 
     public DnaSubmissionService(IMongoOptions options)
 	{
+        _sampleRepository = new Repositories.Dna.SampleSubmissionRepository(options);
 		_ssmRepository = new Repositories.Dna.SsmSubmissionRepository(options);
 		_cnvRepository = new Repositories.Dna.CnvSubmissionRepository(options);
 		_svRepository = new Repositories.Dna.SvSubmissionRepository(options);
 	}
 
+
+    public string AddSampleSubmission(SampleModel data)
+    {
+        return _sampleRepository.Add(data);
+    }
 
 	public string AddSsmSubmission(AnalysisModel<Models.Dna.Ssm.VariantModel> data)
 	{
@@ -33,6 +40,11 @@ public class DnaSubmissionService
         return _svRepository.Add(data);
     }
 
+    public SampleModel FindSampleSubmission(string id)
+    {
+        return _sampleRepository.Find(id)?.Document;
+    }
+
 	public AnalysisModel<Models.Dna.Ssm.VariantModel> FindSsmSubmission(string id)
 	{
 		return _ssmRepository.Find(id)?.Document;
@@ -46,6 +58,11 @@ public class DnaSubmissionService
     public AnalysisModel<Models.Dna.Sv.VariantModel> FindSvSubmission(string id)
     {
         return _svRepository.Find(id)?.Document;
+    }
+
+    public void DeleteSampleSubmission(string id)
+    {
+        _sampleRepository.Delete(id);
     }
 
     public void DeleteSsmSubmission(string id)

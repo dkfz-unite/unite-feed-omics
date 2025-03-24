@@ -21,7 +21,7 @@ Includes the information about analysed sample.
 
 **`analysis_type`*** - Type of the analysis performed on the sample.
 - Type: _String_
-- Possible values: `"WGS"`, `"WES"`, `"RNASeq"`, `"RNASeqSc"`
+- Possible values: `"WGS"`, `"WES"`, `"RNASeq"`, `"scRNASeq"`, `"snRNASeq"`, `"ATACSeq"`, `"scATACSeq"`, `"snATACSeq"`, `"MethArray"`, `"WGBS"`, `"RRBS"`
 - Example: `"WES"`
 
 **`analysis_date`** - Date when the analysis was performed.
@@ -78,7 +78,14 @@ Analysis can be of the following types:
 - `"WGS"` - whole genome DNA sequencing
 - `"WES"` - whole exome DNA sequencing
 - `"RNASeq"` - bulk RNA sequencing
-- `"RNASeqSc"` - single cell RNA sequencing
+- `"scRNASeq"` - single cell RNA sequencing
+- `"snRNASeq"` - single nucleus RNA sequencing
+- `"ATACSeq"` - ATAC sequencing
+- `"scATACSeq"` - single cell ATAC sequencing
+- `"snATACSeq"` - single nucleus ATAC sequencing
+- `"MethArray"` - Illumina Methylation Array
+- `"WGBS"` - whole genome bisulfite sequencing
+- `"RRBS"` - reduced representation bisulfite sequencing
 
 ##
 **`*`** - Required fields
