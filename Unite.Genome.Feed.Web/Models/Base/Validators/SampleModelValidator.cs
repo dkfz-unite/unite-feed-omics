@@ -80,17 +80,17 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .SetValidator(_resourceModelValidator);
 
 
-        var methArrayTypes = new AnalysisType[] { AnalysisType.MethArray };
+        var methArrayTypes = new AnalysisType?[] { AnalysisType.MethArray };
         RuleFor(model => model.Resources)
             .Must(HasValidIdatResources)
-            .When(model => methArrayTypes.Contains(model.AnalysisType.Value))
+            .When(model => methArrayTypes.Contains(model.AnalysisType))
             .WithMessage("Should have 'red' and 'grn' idat resources");
 
 
-        var rnascTypes = new AnalysisType[] { AnalysisType.RNASeqSc, AnalysisType.RNASeqSn};
+        var rnascTypes = new AnalysisType?[] { AnalysisType.RNASeqSc, AnalysisType.RNASeqSn};
         RuleFor(model => model.Resources)
             .Must(HasValidMtxResources)
-            .When(model => rnascTypes.Contains(model.AnalysisType.Value))
+            .When(model => rnascTypes.Contains(model.AnalysisType))
             .WithMessage("Should have 'matrix', 'barcodes', and 'features' mtx resources");
             
     }
@@ -100,8 +100,8 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         var comparison = StringComparison.InvariantCultureIgnoreCase;
 
         var filtered = resources.Where(resource => resource.Type == DataTypes.Genome.Meth.Sample).ToArray();
-        var red = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name.Contains("red", comparison));
-        var green = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name.Contains("grn", comparison));
+        var red = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name?.Contains("red", comparison) == true);
+        var green = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name?.Contains("grn", comparison) == true);
         if (red == null && green == null)
             return false;
 
@@ -113,9 +113,9 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         var comparison = StringComparison.InvariantCultureIgnoreCase;
 
         var filtered = resources.Where(resource => resource.Type == DataTypes.Genome.Rnasc.Exp).ToArray();
-        var mtx = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Mtx && resource.Name.Contains("matrix", comparison));
-        var barcodes = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name.Contains("barcodes", comparison));
-        var features = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name.Contains("features", comparison));
+        var mtx = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Mtx && resource.Name?.Contains("matrix", comparison) == true);
+        var barcodes = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name?.Contains("barcodes", comparison) == true);
+        var features = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name?.Contains("features", comparison) == true);
         if (mtx == null && barcodes == null && features == null)
             return false;
 
