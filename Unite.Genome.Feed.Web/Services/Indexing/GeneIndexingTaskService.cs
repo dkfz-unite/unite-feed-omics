@@ -81,7 +81,10 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedProjects(keys).Result;
+        var defaultProjects = LoadDefaultProjects();
+        var relatedProjects = _genesRepository.GetRelatedProjects(keys).Result;
+        
+        return Enumerable.Concat(defaultProjects, relatedProjects);
     }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)

@@ -45,7 +45,7 @@ public class SvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
         index.Stats = CreateStatsIndex(variant.Id);
         index.Data = CreateDataIndex(variant.Id);
 
-        index.Stats.Donors = index.Similars?.Length ?? 1;
+        index.Stats.Donors += index.Similars?.Length ?? 0;
 
         return index;
     }
@@ -72,46 +72,12 @@ public class SvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
     {
         using var dbContext = _cache.DbContextFactory.CreateDbContext();
 
-        var types = new[] { Data.Entities.Genome.Analysis.Dna.Sv.Enums.SvType.ITX, Data.Entities.Genome.Analysis.Dna.Sv.Enums.SvType.CTX };
-        var target = _cache.Variants.First(entity => entity.Id == variantId);
-        
-        if (types.Contains(target.TypeId))
-        {
-            var distance = 5000;
-            var targetStartMin = Math.Max(0, target.End - distance);
-            var targetStartMax = target.End + distance;
-            var targetEndMin = Math.Max(0, target.OtherStart - distance);
-            var targetEndMax = target.OtherStart + distance;
+        var variantIds = _variantsRepository.GetSimilarVariants<Variant>([variantId]).Result;
 
-            return dbContext.Set<Variant>()
-                .AsNoTracking()
-                .Where(current => current.TypeId == target.TypeId && current.ChromosomeId == target.ChromosomeId && current.OtherChromosomeId == target.OtherChromosomeId)
-                .Where(current => current.End >= targetStartMin && current.End <= targetStartMax && current.OtherStart >= targetEndMin && current.OtherStart <= targetEndMax)
-                .ToArray();
-        }
-        else
-        {
-            var targetLength = target.OtherStart - target.End;
-            var overlap = 0.9;
-        
-            return dbContext.Set<Variant>()
-                .AsNoTracking()
-                .Where(current => current.TypeId == target.TypeId)
-                .Where(current => current.OtherEnd >= target.End && current.End <= target.OtherStart)
-                .ToArray()
-                .Where(current => {
-                    var start = Math.Max(current.End, target.End);
-                    var end = Math.Min(current.OtherStart, target.OtherStart);
-                    var length = end - start;
-
-                    var currentLength = current.OtherStart - current.End;
-                    var currentOverlap = (double)length / currentLength;
-                    var targetOverlap = (double)length / targetLength;
-                
-                    return Math.Min(currentOverlap, targetOverlap) >= overlap;
-                })
-                .ToArray();
-        }
+        return dbContext.Set<Variant>()
+            .AsNoTracking()
+            .Where(entity => variantIds.Contains(entity.Id))
+            .ToArray();
     }
 
 
