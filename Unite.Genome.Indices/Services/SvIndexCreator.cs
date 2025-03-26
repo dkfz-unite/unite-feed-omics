@@ -45,7 +45,7 @@ public class SvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
         index.Stats = CreateStatsIndex(variant.Id);
         index.Data = CreateDataIndex(variant.Id);
 
-        index.Stats.Donors = index.Similars?.Length ?? 1;
+        index.Stats.Donors += index.Similars?.Length ?? 0;
 
         return index;
     }
