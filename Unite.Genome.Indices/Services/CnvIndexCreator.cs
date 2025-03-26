@@ -72,28 +72,11 @@ public class CnvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
     {
         using var dbContext = _cache.DbContextFactory.CreateDbContext();
 
-        var variant = _cache.Variants.First(entity => entity.Id == variantId);
+        var variantIds = _variantsRepository.GetSimilarVariants<Variant>([variantId]).Result;
 
-        var target = variant;
-        var targetLength = variant.End - variant.Start;
-        var overlap = 0.9;
-        
         return dbContext.Set<Variant>()
             .AsNoTracking()
-            .Where(current => current.TypeId == target.TypeId && current.Loh == target.Loh && current.Del == target.Del)
-            .Where(current => current.End >= target.Start && current.Start <= target.End)
-            .ToArray()
-            .Where(current => {
-                var start = Math.Max(current.Start, target.Start);
-                var end = Math.Min(current.End, target.End);
-                var length = end - start;
-
-                var currentLength = current.End - current.Start;
-                var currentOverlap = (double)length / currentLength;
-                var targetOverlap = (double)length / targetLength;
-                
-                return Math.Min(currentOverlap, targetOverlap) >= overlap;
-            })
+            .Where(entity => variantIds.Contains(entity.Id))
             .ToArray();
     }
 

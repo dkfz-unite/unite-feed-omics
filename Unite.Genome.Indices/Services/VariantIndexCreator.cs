@@ -7,6 +7,7 @@ using Unite.Indices.Entities;
 using Unite.Data.Entities.Images.Enums;
 using Unite.Data.Entities.Specimens.Enums;
 using Unite.Data.Constants;
+using Unite.Data.Context.Repositories;
 
 namespace Unite.Genome.Indices.Services;
 
@@ -15,10 +16,12 @@ public abstract class VariantIndexCreator<TVariant, TVariantEntry>
     where TVariantEntry : Data.Entities.Genome.Analysis.Dna.VariantEntry<TVariant>
 {
     protected readonly VariantIndexingCache<TVariant, TVariantEntry> _cache;
+    protected readonly VariantsRepository _variantsRepository;
 
     public VariantIndexCreator(VariantIndexingCache<TVariant, TVariantEntry> cache)
     {
         _cache = cache;
+        _variantsRepository = new VariantsRepository(cache.DbContextFactory);
     }
 
 

@@ -45,12 +45,15 @@ public class SampleIndexingTaskService : IndexingTaskService<Sample, int>
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        return dbContext.Set<Sample>()
+        var defaultProjects = LoadDefaultProjects();
+        var relatedProjects = dbContext.Set<Sample>()
             .AsNoTracking()
             .Where(sample => keys.Contains(sample.Id))
             .SelectMany(sample => sample.Specimen.Donor.DonorProjects.Select(donorProject => donorProject.ProjectId))
             .Distinct()
             .ToArray();
+
+        return Enumerable.Concat(defaultProjects, relatedProjects);
     }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)

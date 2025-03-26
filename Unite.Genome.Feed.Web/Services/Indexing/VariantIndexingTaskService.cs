@@ -5,6 +5,10 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Genome.Analysis.Dna;
 using Unite.Essentials.Extensions;
 
+using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
+using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
+
 
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 
@@ -12,7 +16,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
     where TV : Variant
 {
     protected override int BucketSize => 1000;
-    private readonly VariantsRepository _variantsRepository;
+    protected readonly VariantsRepository _variantsRepository;
 
 
     public VariantIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
@@ -78,7 +82,10 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
 
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
     {
-        return _variantsRepository.GetRelatedProjects<TV>(keys).Result;
+        var defaultProjects = LoadDefaultProjects();
+        var relatedProjects = _variantsRepository.GetRelatedProjects<TV>(keys).Result;
+
+        return Enumerable.Concat(defaultProjects, relatedProjects);
     }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)
@@ -103,7 +110,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
 
     protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Ssm.Variant))
+        if (typeof(TV) == typeof(SSM.Variant))
             return keys;
         
         return [];
@@ -111,16 +118,26 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
 
     protected override IEnumerable<int> LoadRelatedCnvs(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Cnv.Variant))
-            return keys;
+        if (typeof(TV) == typeof(CNV.Variant))
+        {
+            var currentVariants = keys;
+            var similarVariants = _variantsRepository.GetSimilarVariants<CNV.Variant>(keys).Result;
+
+            return Enumerable.Concat(currentVariants, similarVariants);
+        }
         
         return [];
     }
 
     protected override IEnumerable<int> LoadRelatedSvs(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Sv.Variant))
-            return keys;
+        if (typeof(TV) == typeof(SV.Variant))
+        {
+            var currentVariants = keys;
+            var similarVariants = _variantsRepository.GetSimilarVariants<SV.Variant>(keys).Result;
+
+            return Enumerable.Concat(currentVariants, similarVariants);
+        }
         
         return [];
     }
