@@ -72,7 +72,6 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
             CreateImageIndexingTasks(genes);
             CreateSpecimenIndexingTasks(genes);
             CreateGeneIndexingTasks(genes);
-            CreateVariantIndexingTasks(genes);
         });
 
         transaction.Commit();
@@ -109,16 +108,16 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
     protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedVariants<SSM.Variant>(keys).Result;
+        return [];
     }
 
     protected override IEnumerable<int> LoadRelatedCnvs(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedVariants<CNV.Variant>(keys).Result;
+        return [];
     }
 
     protected override IEnumerable<int> LoadRelatedSvs(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedVariants<SV.Variant>(keys).Result;
+        return [];
     }
 }
