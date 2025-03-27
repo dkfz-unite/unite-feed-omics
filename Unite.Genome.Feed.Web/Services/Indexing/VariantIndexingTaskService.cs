@@ -60,8 +60,17 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
+        var similarKeys = Enumerable.Empty<int>();
+        var allKeys = Enumerable.Empty<int>();
+        
+        if (typeof(TV) == typeof(CNV.Variant))
+            similarKeys = _variantsRepository.GetSimilarVariants<CNV.Variant>(keys).Result;
+        else if (typeof(TV) == typeof(SV.Variant))
+            similarKeys = _variantsRepository.GetSimilarVariants<SV.Variant>(keys).Result;
 
-        keys.Iterate(BucketSize, (chunk) =>
+        allKeys = Enumerable.Concat(keys, similarKeys);
+
+        allKeys.Iterate(BucketSize, (chunk) =>
         {
             var variants = dbContext.Set<TV>()
                 .Where(variant => chunk.Contains(variant.Id))
@@ -119,12 +128,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
     protected override IEnumerable<int> LoadRelatedCnvs(IEnumerable<int> keys)
     {
         if (typeof(TV) == typeof(CNV.Variant))
-        {
-            var currentVariants = keys;
-            var similarVariants = _variantsRepository.GetSimilarVariants<CNV.Variant>(keys).Result;
-
-            return Enumerable.Concat(currentVariants, similarVariants);
-        }
+            return keys;
         
         return [];
     }
@@ -132,12 +136,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
     protected override IEnumerable<int> LoadRelatedSvs(IEnumerable<int> keys)
     {
         if (typeof(TV) == typeof(SV.Variant))
-        {
-            var currentVariants = keys;
-            var similarVariants = _variantsRepository.GetSimilarVariants<SV.Variant>(keys).Result;
-
-            return Enumerable.Concat(currentVariants, similarVariants);
-        }
+            return keys;
         
         return [];
     }
