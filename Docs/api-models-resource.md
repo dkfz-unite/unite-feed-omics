@@ -29,7 +29,7 @@ Includes the information about available analysis resource (file).
 #### Resource Type
 Resource data can be of the following types:
 - `"dna"` - DNA sample data (fasta, fastq, bam)
-- `"dna-ssm"` - DNA simple somatic mutations
+- `"dna-sm"` - DNA simple mutations
 - `"dna-cnv"` - DNA copy number variants
 - `"dna-sv"` - DNA structural variants
 - `"meth"` - DNA methylation sequencing data (fasta, fastq, bam, idat)

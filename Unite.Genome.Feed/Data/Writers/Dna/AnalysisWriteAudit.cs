@@ -2,15 +2,15 @@
 
 public class AnalysisWriteAudit : DataWriteAudit
 {
-    public int SsmsCreated;
-    public int SsmsAssociated;
+    public int SmsCreated;
+    public int SmsAssociated;
     public int CnvsCreated;
     public int CnvsAssociated;
     public int SvsCreated;
     public int SvsAssociated;
 
-    public HashSet<int> Ssms = [];
-    public HashSet<int> SsmsEntries = [];
+    public HashSet<int> Sms = [];
+    public HashSet<int> SmsEntries = [];
     public HashSet<int> Cnvs = [];
     public HashSet<int> CnvsEntries = [];
     public HashSet<int> Svs = [];
@@ -21,8 +21,8 @@ public class AnalysisWriteAudit : DataWriteAudit
         return string.Join(Environment.NewLine,
         [
             base.ToString(),
-            $"{SsmsCreated} SSMs created",
-            $"{SsmsAssociated} SSMs associated",
+            $"{SmsCreated} SMs created",
+            $"{SmsAssociated} SMs associated",
             $"{CnvsCreated} CNVs created",
             $"{CnvsAssociated} CNVs associated",
             $"{SvsCreated} SVs created",

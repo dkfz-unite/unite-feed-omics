@@ -8,8 +8,8 @@ namespace Unite.Genome.Feed.Data.Writers.Dna;
 
 public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 {
-    private Repositories.Dna.Ssm.VariantRepository _ssmRepository;
-    private Repositories.Dna.Ssm.VariantEntryRepository _ssmEntryRepository;
+    private Repositories.Dna.Sm.VariantRepository _smRepository;
+    private Repositories.Dna.Sm.VariantEntryRepository _smEntryRepository;
     private Repositories.Dna.Cnv.VariantRepository _cnvRepository;
     private Repositories.Dna.Cnv.VariantEntryRepository _cnvEntryRepository;
     private Repositories.Dna.Sv.VariantRepository _svRepository;
@@ -27,8 +27,8 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     protected override void Initialize(DomainDbContext dbContext)
     {
         _sampleRepository = new Repositories.SampleRepository(dbContext);
-        _ssmRepository = new Repositories.Dna.Ssm.VariantRepository(dbContext);
-        _ssmEntryRepository = new Repositories.Dna.Ssm.VariantEntryRepository(dbContext, _ssmRepository);
+        _smRepository = new Repositories.Dna.Sm.VariantRepository(dbContext);
+        _smEntryRepository = new Repositories.Dna.Sm.VariantEntryRepository(dbContext, _smRepository);
         _cnvRepository = new Repositories.Dna.Cnv.VariantRepository(dbContext);
         _cnvEntryRepository = new Repositories.Dna.Cnv.VariantEntryRepository(dbContext, _cnvRepository);
         _svRepository = new Repositories.Dna.Sv.VariantRepository(dbContext);
@@ -40,8 +40,8 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     {
         var sampleId = WriteSample(model, ref audit);
 
-        if (model.Ssms.IsNotEmpty())
-            WriteSsms(sampleId, model.Ssms, ref audit);
+        if (model.Sms.IsNotEmpty())
+            WriteSms(sampleId, model.Sms, ref audit);
 
         if (model.Cnvs.IsNotEmpty())
             WriteCnvs(sampleId, model.Cnvs, ref audit);
@@ -53,17 +53,17 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
             WriteResources(sampleId, model.Resources, ref audit);
     }
 
-    private void WriteSsms(int sampleId, IEnumerable<Models.Dna.Ssm.VariantModel> models, ref AnalysisWriteAudit audit)
+    private void WriteSms(int sampleId, IEnumerable<Models.Dna.Sm.VariantModel> models, ref AnalysisWriteAudit audit)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var variants = _ssmRepository.CreateMissing(models);
-        audit.Ssms.AddRange(variants.Select(variant => variant.Id));
-        audit.SsmsCreated += variants.Count();
+        var variants = _smRepository.CreateMissing(models);
+        audit.Sms.AddRange(variants.Select(variant => variant.Id));
+        audit.SmsCreated += variants.Count();
 
-        var variantEntries = _ssmEntryRepository.CreateMissing(sampleId, models, variants);
-        audit.SsmsEntries.AddRange(variantEntries.Select(entry => entry.EntityId));
-        audit.SsmsAssociated += variantEntries.Count();
+        var variantEntries = _smEntryRepository.CreateMissing(sampleId, models, variants);
+        audit.SmsEntries.AddRange(variantEntries.Select(entry => entry.EntityId));
+        audit.SmsAssociated += variantEntries.Count();
     }
 
     private void WriteCnvs(int sampleId, IEnumerable<Models.Dna.Cnv.VariantModel> models, ref AnalysisWriteAudit audit)

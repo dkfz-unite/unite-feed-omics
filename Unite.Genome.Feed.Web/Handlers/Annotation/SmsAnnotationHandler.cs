@@ -8,21 +8,21 @@ using Unite.Genome.Feed.Web.Services.Indexing;
 
 namespace Unite.Genome.Feed.Web.Handlers.Annotation;
 
-public class SsmsAnnotationHandler
+public class SmsAnnotationHandler
 {
-    private readonly SsmsAnnotationService _annotationService;
-    private readonly EffectsSsmWriter _dataWriter;
-    private readonly SsmIndexingTaskService _indexingTaskService;
+    private readonly SmsAnnotationService _annotationService;
+    private readonly EffectsSmWriter _dataWriter;
+    private readonly SmIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
 
-    public SsmsAnnotationHandler(
-        SsmsAnnotationService annotationService,
-        EffectsSsmWriter dataWriter,
-        SsmIndexingTaskService indexingTaskService,
+    public SmsAnnotationHandler(
+        SmsAnnotationService annotationService,
+        EffectsSmWriter dataWriter,
+        SmIndexingTaskService indexingTaskService,
         TasksProcessingService taskProcessingService,
-        ILogger<SsmsAnnotationHandler> logger)
+        ILogger<SmsAnnotationHandler> logger)
     {
         _annotationService = annotationService;
         _dataWriter = dataWriter;
@@ -47,7 +47,7 @@ public class SsmsAnnotationHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(AnnotationTaskType.DNA_SSM, bucketSize, (tasks) =>
+        _taskProcessingService.Process(AnnotationTaskType.DNA_SM, bucketSize, (tasks) =>
         {
             if (_taskProcessingService.HasTasks(WorkerType.Submission))
                 return false;
@@ -58,7 +58,7 @@ public class SsmsAnnotationHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Annotated {number} SSMs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Annotated {number} SMs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Genome.Annotations.Services.Models.Dna;
@@ -8,13 +8,13 @@ using Unite.Genome.Annotations.Services.Models.Dna;
 namespace Unite.Genome.Annotations.Services.Vep;
 
 
-public class SsmsAnnotationService
+public class SmsAnnotationService
 {
     private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
     private readonly AnnotationsDataLoader _dataLoader;
 
 
-    public SsmsAnnotationService(
+    public SmsAnnotationService(
         IDbContextFactory<DomainDbContext> dbContextFactory,
         IEnsemblDataOptions ensemblOptions,
         IEnsemblVepOptions ensemblVepOptions

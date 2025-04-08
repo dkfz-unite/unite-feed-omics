@@ -91,15 +91,15 @@ public class GeneIndexCreator
 
     private Sample[] LoadSamples(int geneId)
     {
-        var ssms = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
         var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
         var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
-        var ssmSamples = _cache.SsmEntries.Where(entry => ssms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var smSamples = _cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         
-        var sampleIds = ssmSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
+        var sampleIds = smSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
 
         return _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).ToArray();
     }
@@ -107,22 +107,22 @@ public class GeneIndexCreator
 
     private StatsIndex CreateStatsIndex(int geneId)
     {
-        var ssms = _cache.SsmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
         var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
         var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
-        var ssmSamples = _cache.SsmEntries.Where(entry => ssms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var smSamples = _cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
 
-        var sampleIds = ssmSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
+        var sampleIds = smSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
         var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
         var donorIds = _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
         
         return new StatsIndex
         {
             Donors = donorIds.Length,
-            Ssms = ssms.Length,
+            Sms = sms.Length,
             Cnvs = cnvs.Length,
             Svs = svs.Length
         };
@@ -141,7 +141,7 @@ public class GeneIndexCreator
             Donors = true,
             Clinical = CheckClinicalData(donorIds),
             Treatments = CheckTreatments(donorIds),
-            Mris = CheckImages(imageIds, ImageType.MRI),
+            Mrs = CheckImages(imageIds, ImageType.MR),
             Cts = CheckImages(imageIds, ImageType.CT),
             Materials = CheckSpecimens(specimenIds, SpecimenType.Material),
             MaterialsMolecular = CheckMolecularData(specimenIds, SpecimenType.Material),
@@ -157,7 +157,7 @@ public class GeneIndexCreator
             XenograftsMolecular = CheckMolecularData(specimenIds, SpecimenType.Xenograft),
             XenograftsInterventions = CheckInterventions(specimenIds, SpecimenType.Xenograft),
             XenograftsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Xenograft),
-            Ssms = CheckSsms(geneId),
+            Sms = CheckSms(geneId),
             Cnvs = CheckCnvs(geneId),
             Svs = CheckSvs(geneId),
             Meth = CheckMethylation(sampleIds),
@@ -225,9 +225,9 @@ public class GeneIndexCreator
         );
     }
 
-    private bool CheckSsms(int geneId)
+    private bool CheckSms(int geneId)
     {
-        return _cache.SsmTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return _cache.SmTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
     private bool CheckCnvs(int geneId)
@@ -246,7 +246,7 @@ public class GeneIndexCreator
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource => 
                 (resource.Type == DataTypes.Genome.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
-                (resource.Type == DataTypes.Genome.Meth.Levels)) == true
+                (resource.Type == DataTypes.Genome.Meth.Level)) == true
         );
     }
 

@@ -7,7 +7,7 @@ namespace Unite.Genome.Feed.Web.Workers;
 public class VariantsAnnotationWorker : BackgroundService
 {
     private readonly VariantsAnnotationOptions _options;
-    private readonly SsmsAnnotationHandler _ssmsAnnotationHandler;
+    private readonly SmsAnnotationHandler _ssmsAnnotationHandler;
     private readonly CnvsAnnotationHandler _cnvsAnnotationHandler;
     private readonly SvsAnnotationHandler _svsAnnotationHandler;
     private readonly ILogger _logger;
@@ -15,7 +15,7 @@ public class VariantsAnnotationWorker : BackgroundService
 
     public VariantsAnnotationWorker(
         VariantsAnnotationOptions options,
-        SsmsAnnotationHandler ssmsAnnotationHandler,
+        SmsAnnotationHandler ssmsAnnotationHandler,
         CnvsAnnotationHandler cnvsAnnotationHandler,
         SvsAnnotationHandler svsAnnotationHandler,
         ILogger<VariantsAnnotationWorker> logger)

@@ -9,7 +9,7 @@ using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Essentials.Extensions;
 
-using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using SM = Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
 using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 
@@ -73,8 +73,8 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
     {
         await using var dbContext = DbContextFactory.CreateDbContext();
 
-        if (typeof(TVariantEntry) == typeof(SSM.VariantEntry))
-            Entries = await GetSsmEntries(ids) as IEnumerable<TVariantEntry>;
+        if (typeof(TVariantEntry) == typeof(SM.VariantEntry))
+            Entries = await GetSmEntries(ids) as IEnumerable<TVariantEntry>;
         else if (typeof(TVariantEntry) == typeof(CNV.VariantEntry))
             Entries = await GetCnvEntries(ids) as IEnumerable<TVariantEntry>;
         else if (typeof(TVariantEntry) == typeof(SV.VariantEntry))
@@ -105,9 +105,9 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
         var geneIds = Array.Empty<int>();
 
-        if (typeof(TVariant) == typeof(SSM.Variant))
+        if (typeof(TVariant) == typeof(SM.Variant))
         {
-            geneIds = (Variants as IEnumerable<SSM.Variant>)
+            geneIds = (Variants as IEnumerable<SM.Variant>)
                 .SelectMany(variant => variant.AffectedTranscripts)
                 .Where(transcript => transcript.Feature.GeneId != null)
                 .Select(transcript => transcript.Feature.GeneId.Value)
@@ -213,11 +213,11 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
     }
 
 
-    private async Task<IEnumerable<SSM.VariantEntry>> GetSsmEntries(int[] ids)
+    private async Task<IEnumerable<SM.VariantEntry>> GetSmEntries(int[] ids)
     {
         using var dbContext = DbContextFactory.CreateDbContext();
 
-        return await dbContext.Set<SSM.VariantEntry>()
+        return await dbContext.Set<SM.VariantEntry>()
             .AsNoTracking()
             .Where(entry => ids.Contains(entry.EntityId))
             .ToArrayAsync();

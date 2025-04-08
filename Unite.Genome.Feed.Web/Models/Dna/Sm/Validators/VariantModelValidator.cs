@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Unite.Genome.Feed.Web.Models.Dna.Ssm.Validators;
+namespace Unite.Genome.Feed.Web.Models.Dna.Sm.Validators;
 
 public class VariantModelValidator : AbstractValidator<VariantModel>
 {

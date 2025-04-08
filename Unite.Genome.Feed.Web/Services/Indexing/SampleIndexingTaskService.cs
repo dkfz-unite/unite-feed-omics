@@ -93,7 +93,7 @@ public class SampleIndexingTaskService : IndexingTaskService<Sample, int>
         return [];
     }
 
-    protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)
     {
         return [];
     }

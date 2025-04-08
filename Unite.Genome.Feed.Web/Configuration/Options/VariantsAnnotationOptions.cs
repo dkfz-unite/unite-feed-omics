@@ -3,13 +3,13 @@
 public class VariantsAnnotationOptions
 {
     /// <summary>
-    /// SSM annotation bucket size
+    /// SM annotation bucket size
     /// </summary>
     public int SsmBucketSize
     {
         get
         {
-            var option = Environment.GetEnvironmentVariable("UNITE_SSM_ANNOTATION_BUCKET_SIZE");
+            var option = Environment.GetEnvironmentVariable("UNITE_SM_ANNOTATION_BUCKET_SIZE");
             var size = int.Parse(option);
 
             return size;

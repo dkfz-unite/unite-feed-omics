@@ -18,7 +18,7 @@ public record ResourceModel
     public virtual string Name { get => _name?.TrimFormat().ToLower(); set => _name = value; }
 
     /// <summary>
-    /// Resource type (dna, dna-ssm, dna-cnv, dna-sv, meth, meth-lvl, rna, rna-exp, rnasc, rnasc-exp,  etc.).
+    /// Resource type (dna, dna-sm, dna-cnv, dna-sv, meth, meth-lvl, rna, rna-exp, rnasc, rnasc-exp,  etc.).
     /// </summary>
     [JsonPropertyName("type")]
     public virtual string Type { get => _type?.Trim().ToLower(); set => _type = value; }

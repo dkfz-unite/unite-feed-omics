@@ -8,11 +8,11 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
     private static readonly string[] _allowedTypes =
     {
         DataTypes.Genome.Dna.Sample,
-        DataTypes.Genome.Dna.Ssm,
+        DataTypes.Genome.Dna.Sm,
         DataTypes.Genome.Dna.Cnv,
         DataTypes.Genome.Dna.Sv,
         DataTypes.Genome.Meth.Sample,
-        DataTypes.Genome.Meth.Levels,
+        DataTypes.Genome.Meth.Level,
         DataTypes.Genome.Rna.Sample,
         DataTypes.Genome.Rna.Exp,
         DataTypes.Genome.Rnasc.Sample,

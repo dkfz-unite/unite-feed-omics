@@ -10,7 +10,7 @@ API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](h
 ## Overview
 - get:[api](#get-api) - health check.
 - post:[api/dna/sample/{type?}](#post-apidnasampletype) - submit DNA sample data.
-- post:[api/dna/analysis/ssms/{type?}](#post-apidnaanalysisssmstype) - submit DNA SSMs data.
+- post:[api/dna/analysis/sms/{type?}](#post-apidnaanalysissmstype) - submit DNA SMs data.
 - post:[api/dna/analysis/cnvs/{type?}](#post-apidnaanalysiscnvstype) - submit DNA CNVs data.
 - post:[api/dna/analysis/svs/{type?}](#post-apidnaanalysissvstype) - submit DNA SVs data.
 - post:[api/meth/sample/{type?}](#post-apimethsampletype) - submit Methylation sample data.
@@ -97,8 +97,8 @@ alignment	dna	bam.bai.md5	example.com/file/abc3
 Fields description can be found [here](api-models-sample.md).
 
 
-## POST: [api/dna/analysis/ssms/{type?}](http://localhost:5106/api/dna/analysis/ssms)
-Submit mutations (SSM) data (including sequencing analysis data).
+## POST: [api/dna/analysis/sms/{type?}](http://localhost:5106/api/dna/analysis/sms)
+Submit mutations (SM) data (including sequencing analysis data).
 
 Request implements **UPSERT** logic:
 - Missing data will be populated
@@ -168,7 +168,7 @@ chromosome	position	ref	alt
 13	100515267	A	G
 ```
 
-Fields description can be found [here](api-models-dna-ssm.md).
+Fields description can be found [here](api-models-dna-sm.md).
 
 
 ### Responses
