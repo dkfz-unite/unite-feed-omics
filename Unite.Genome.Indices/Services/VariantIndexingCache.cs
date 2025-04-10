@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Unite.Data.Context;
-using Unite.Data.Context.Extensions.Queryable;
 using Unite.Data.Context.Repositories.Constants;
+using Unite.Data.Context.Repositories.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome.Analysis.Rna;
 using Unite.Data.Entities.Images;
@@ -172,7 +172,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
         Images = await dbContext.Set<Image>()
             .AsNoTracking()
-            .IncludeMriImage()
+            .IncludeMrImage()
             .IncludeRadiomicsFeatures()
             .Where(image => donorIds.Contains(image.DonorId))
             .ToArrayAsync();

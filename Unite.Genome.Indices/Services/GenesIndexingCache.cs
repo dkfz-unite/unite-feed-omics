@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Context.Extensions.Queryable;
 using Unite.Data.Context.Repositories.Constants;
+using Unite.Data.Context.Repositories.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Analysis;
@@ -265,7 +265,7 @@ public class GenesIndexingCache
 
         Images = await dbContext.Set<Image>()
             .AsNoTracking()
-            .IncludeMriImage()
+            .IncludeMrImage()
             .IncludeRadiomicsFeatures()
             .Where(image => ids.Contains(image.DonorId))
             .ToArrayAsync();
