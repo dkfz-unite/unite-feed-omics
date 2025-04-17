@@ -6,10 +6,6 @@ using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 
-using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
-using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
-using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
-
 namespace Unite.Genome.Feed.Web.Services.Indexing;
 
 public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
@@ -106,7 +102,7 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
         return keys;
     }
 
-    protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)
     {
         return [];
     }

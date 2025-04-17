@@ -7,7 +7,7 @@ namespace Unite.Genome.Feed.Web.Workers;
 public class VariantsIndexingWorker : BackgroundService
 {
     private readonly VariantsIndexingOptions _options;
-    private readonly SsmsIndexingHandler _ssmsIndexingHandler;
+    private readonly SmsIndexingHandler _ssmsIndexingHandler;
     private readonly CnvsIndexingHandler _cnvsIndexingHandler;
     private readonly SvsIndexingHandler _svsIndexingHandler;
     private readonly ILogger _logger;
@@ -15,7 +15,7 @@ public class VariantsIndexingWorker : BackgroundService
 
     public VariantsIndexingWorker(
         VariantsIndexingOptions options,
-        SsmsIndexingHandler ssmsIndexingHandler,
+        SmsIndexingHandler ssmsIndexingHandler,
         CnvsIndexingHandler cnvsIndexingHandler,
         SvsIndexingHandler svsIndexingHandler,
         ILogger<VariantsIndexingWorker> logger)

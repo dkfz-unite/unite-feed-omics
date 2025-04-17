@@ -26,8 +26,8 @@ public class AffectedTranscriptRepository : AffectedTranscriptRepository<Affecte
         entity.CDNAEnd = model.CDNAEnd;
         entity.CDSStart = model.CDSStart;
         entity.CDSEnd = model.CDSEnd;
-        entity.ProteinStart = model.ProteinStart;
-        entity.ProteinEnd = model.ProteinEnd;
+        entity.AAStart = model.AAStart;
+        entity.AAEnd = model.AAEnd;
 
         return entity;
     }

@@ -42,8 +42,8 @@ To configure the application, change environment variables in either docker or [
 - `UNITE_ENSEMBL_DATA_HOST` - Local Ensembl Data host (`data.ensembl.unite.net`).
 - `UNITE_ENSEMBL_VEP_HOST` - Local Ensembl VEP host (`vep.ensembl.unite.net`).
 - `UNITE_GENES_INDEXING_BUCKET_SIZE` - Genes indexing bucket size (`100`).
-- `UNITE_SSM_ANNOTATION_BUCKET_SIZE` - SSM annotation bucket size (`100`).
-- `UNITE_SSM_INDEXING_BUCKET_SIZE` - SSM indexing bucket size (`300`).
+- `UNITE_SM_ANNOTATION_BUCKET_SIZE` - SM annotation bucket size (`100`).
+- `UNITE_SM_INDEXING_BUCKET_SIZE` - SM indexing bucket size (`300`).
 - `UNITE_CNV_ANNOTATION_BUCKET_SIZE` - CNV annotation bucket size (`10`).
 - `UNITE_CNV_INDEXING_BUCKET_SIZE` - CNV indexing bucket size (`100`).
 - `UNITE_SV_ANNOTATION_BUCKET_SIZE` - SV annotation bucket size (`10`).

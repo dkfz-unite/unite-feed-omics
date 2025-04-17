@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using Unite.Data.Entities.Genome.Enums;
-using Unite.Data.Helpers.Genome.Dna.Ssm;
+using Unite.Data.Helpers.Genome.Dna.Sm;
 
-namespace Unite.Genome.Feed.Web.Models.Dna.Ssm;
+namespace Unite.Genome.Feed.Web.Models.Dna.Sm;
 
 public record VariantModel
 {

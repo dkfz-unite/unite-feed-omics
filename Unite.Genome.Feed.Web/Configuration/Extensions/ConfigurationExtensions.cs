@@ -22,8 +22,8 @@ using Unite.Genome.Indices.Services;
 
 using DnaEntities = Unite.Data.Entities.Genome.Analysis.Dna;
 
-using SsmModel = Unite.Genome.Feed.Web.Models.Dna.Ssm.VariantModel;
-using SsmModelValidator = Unite.Genome.Feed.Web.Models.Dna.Ssm.Validators.VariantModelValidator;
+using SsmModel = Unite.Genome.Feed.Web.Models.Dna.Sm.VariantModel;
+using SsmModelValidator = Unite.Genome.Feed.Web.Models.Dna.Sm.Validators.VariantModelValidator;
 using CnvModel = Unite.Genome.Feed.Web.Models.Dna.Cnv.VariantModel;
 using CnvModelValidator = Unite.Genome.Feed.Web.Models.Dna.Cnv.Validators.VariantModelValidator;
 using SvModel = Unite.Genome.Feed.Web.Models.Dna.Sv.VariantModel;
@@ -52,7 +52,7 @@ public static class ConfigurationExtensions
 
         services.AddTransient<Data.Writers.SampleWriter>();
         services.AddTransient<Data.Writers.Dna.AnalysisWriter>();
-        services.AddTransient<Data.Writers.Dna.EffectsSsmWriter>();
+        services.AddTransient<Data.Writers.Dna.EffectsSmWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsCnvWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();
         services.AddTransient<Data.Writers.Rna.AnalysisWriter>();
@@ -65,7 +65,7 @@ public static class ConfigurationExtensions
         services.AddTransient<RnaScSubmissionService>();
 
         // Annotation services
-        services.AddTransient<SsmsAnnotationService>();
+        services.AddTransient<SmsAnnotationService>();
         services.AddTransient<CnvsAnnotationService>();
         services.AddTransient<SvsAnnotationService>();
         services.AddTransient<ExpressionsAnnotationService>();
@@ -77,8 +77,8 @@ public static class ConfigurationExtensions
         services.AddTransient<SubmissionTaskService>();
         services.AddTransient<SampleIndexingTaskService>();
         services.AddTransient<GeneIndexingTaskService>();
-        services.AddTransient<SsmAnnotationTaskService>();
-        services.AddTransient<SsmIndexingTaskService>();
+        services.AddTransient<SmAnnotationTaskService>();
+        services.AddTransient<SmIndexingTaskService>();
         services.AddTransient<CnvAnnotationTaskService>();
         services.AddTransient<CnvIndexingTaskService>();
         services.AddTransient<SvAnnotationTaskService>();
@@ -96,14 +96,14 @@ public static class ConfigurationExtensions
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();
         services.AddTransient<VariantsAnnotationOptions>();
-        services.AddTransient<SsmsAnnotationHandler>();
+        services.AddTransient<SmsAnnotationHandler>();
         services.AddTransient<CnvsAnnotationHandler>();
         services.AddTransient<SvsAnnotationHandler>();
 
         // Variants indexing hosted service
         services.AddHostedService<VariantsIndexingWorker>();
         services.AddTransient<VariantsIndexingOptions>();
-        services.AddTransient<SsmsIndexingHandler>();
+        services.AddTransient<SmsIndexingHandler>();
         services.AddTransient<CnvsIndexingHandler>();
         services.AddTransient<SvsIndexingHandler>();
 
@@ -113,7 +113,7 @@ public static class ConfigurationExtensions
         services.AddTransient<GenesIndexingHandler>();
 
         // Variant indexing services
-        services.AddTransient<VariantIndexingCache<DnaEntities.Ssm.Variant, DnaEntities.Ssm.VariantEntry>>();
+        services.AddTransient<VariantIndexingCache<DnaEntities.Sm.Variant, DnaEntities.Sm.VariantEntry>>();
         services.AddTransient<VariantIndexingCache<DnaEntities.Cnv.Variant, DnaEntities.Cnv.VariantEntry>>();
         services.AddTransient<VariantIndexingCache<DnaEntities.Sv.Variant, DnaEntities.Sv.VariantEntry>>();
 

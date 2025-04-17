@@ -1,18 +1,18 @@
-using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using Unite.Essentials.Extensions;
 using Unite.Genome.Indices.Services.Mappers;
 using Unite.Indices.Entities.Variants;
 
 namespace Unite.Genome.Indices.Services;
 
-public class SsmIndexCreator : VariantIndexCreator<Variant, VariantEntry>
+public class SmIndexCreator : VariantIndexCreator<Variant, VariantEntry>
 {
-    public SsmIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache) : base(cache)
+    public SmIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache) : base(cache)
     {
     }
 
 
-    public SsmIndex CreateIndex(object key)
+    public SmIndex CreateIndex(object key)
     {
         var variantId = (int)key;
 
@@ -20,7 +20,7 @@ public class SsmIndexCreator : VariantIndexCreator<Variant, VariantEntry>
     }
 
 
-    private SsmIndex CreateVariantIndex(int variantId)
+    private SmIndex CreateVariantIndex(int variantId)
     {
         var variant = LoadVariant(variantId);
 
@@ -30,9 +30,9 @@ public class SsmIndexCreator : VariantIndexCreator<Variant, VariantEntry>
         return CreateVariantIndex(variant);
     }
 
-    private SsmIndex CreateVariantIndex(Variant variant)
+    private SmIndex CreateVariantIndex(Variant variant)
     {
-        var index = SsmIndexMapper.CreateFrom<SsmIndex>(variant);
+        var index = SmIndexMapper.CreateFrom<SmIndex>(variant);
 
         index.Specimens = CreateSpecimenIndices(variant.Id);
 

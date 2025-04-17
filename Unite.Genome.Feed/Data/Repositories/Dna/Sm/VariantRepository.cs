@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
-using Unite.Genome.Feed.Data.Models.Dna.Ssm;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sm;
+using Unite.Genome.Feed.Data.Models.Dna.Sm;
 
-namespace Unite.Genome.Feed.Data.Repositories.Dna.Ssm;
+namespace Unite.Genome.Feed.Data.Repositories.Dna.Sm;
 
 public class VariantRepository : VariantRepository<Variant, VariantModel>
 {

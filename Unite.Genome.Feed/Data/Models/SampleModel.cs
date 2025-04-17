@@ -11,7 +11,7 @@ public class SampleModel
     public AnalysisModel Analysis;
     public SampleModel MatchedSample;
     
-    public IEnumerable<Dna.Ssm.VariantModel> Ssms;
+    public IEnumerable<Dna.Sm.VariantModel> Sms;
     public IEnumerable<Dna.Cnv.VariantModel> Cnvs;
     public IEnumerable<Dna.Sv.VariantModel> Svs;
     public IEnumerable<Rna.GeneExpressionModel> Exps;

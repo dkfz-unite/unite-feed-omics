@@ -6,7 +6,7 @@ namespace Unite.Genome.Feed.Web.Submissions;
 public class DnaSubmissionService
 {
     private readonly Repositories.Dna.SampleSubmissionRepository _sampleRepository;
-	private readonly Repositories.Dna.SsmSubmissionRepository _ssmRepository;
+	private readonly Repositories.Dna.SmSubmissionRepository _smRepository;
 	private readonly Repositories.Dna.CnvSubmissionRepository _cnvRepository;
 	private readonly Repositories.Dna.SvSubmissionRepository _svRepository;
 
@@ -14,7 +14,7 @@ public class DnaSubmissionService
     public DnaSubmissionService(IMongoOptions options)
 	{
         _sampleRepository = new Repositories.Dna.SampleSubmissionRepository(options);
-		_ssmRepository = new Repositories.Dna.SsmSubmissionRepository(options);
+		_smRepository = new Repositories.Dna.SmSubmissionRepository(options);
 		_cnvRepository = new Repositories.Dna.CnvSubmissionRepository(options);
 		_svRepository = new Repositories.Dna.SvSubmissionRepository(options);
 	}
@@ -25,9 +25,9 @@ public class DnaSubmissionService
         return _sampleRepository.Add(data);
     }
 
-	public string AddSsmSubmission(AnalysisModel<Models.Dna.Ssm.VariantModel> data)
+	public string AddSmSubmission(AnalysisModel<Models.Dna.Sm.VariantModel> data)
 	{
-		return _ssmRepository.Add(data);
+		return _smRepository.Add(data);
 	}
 
     public string AddCnvSubmission(AnalysisModel<Models.Dna.Cnv.VariantModel> data)
@@ -45,9 +45,9 @@ public class DnaSubmissionService
         return _sampleRepository.Find(id)?.Document;
     }
 
-	public AnalysisModel<Models.Dna.Ssm.VariantModel> FindSsmSubmission(string id)
+	public AnalysisModel<Models.Dna.Sm.VariantModel> FindSmSubmission(string id)
 	{
-		return _ssmRepository.Find(id)?.Document;
+		return _smRepository.Find(id)?.Document;
 	}
 
     public AnalysisModel<Models.Dna.Cnv.VariantModel> FindCnvSubmission(string id)
@@ -65,9 +65,9 @@ public class DnaSubmissionService
         _sampleRepository.Delete(id);
     }
 
-    public void DeleteSsmSubmission(string id)
+    public void DeleteSmSubmission(string id)
     {
-        _ssmRepository.Delete(id);
+        _smRepository.Delete(id);
     }
 
     public void DeleteCnvSubmission(string id)

@@ -1,7 +1,7 @@
 using Unite.Essentials.Tsv;
 using Unite.Genome.Feed.Web.Models.Base.Binders;
 
-namespace Unite.Genome.Feed.Web.Models.Dna.Ssm.Binders;
+namespace Unite.Genome.Feed.Web.Models.Dna.Sm.Binders;
 
 public class AnalysisTsvModelBinder : AnalysisTsvModelBinder<VariantModel>
 {
