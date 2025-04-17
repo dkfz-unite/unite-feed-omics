@@ -5,7 +5,7 @@ public class VariantsAnnotationOptions
     /// <summary>
     /// SM annotation bucket size
     /// </summary>
-    public int SsmBucketSize
+    public int SmBucketSize
     {
         get
         {

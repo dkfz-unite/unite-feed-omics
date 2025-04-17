@@ -52,7 +52,7 @@ public class VariantsAnnotationWorker : BackgroundService
         {
             try
             {
-                _ssmsAnnotationHandler.Handle(_options.SsmBucketSize);
+                _ssmsAnnotationHandler.Handle(_options.SmBucketSize);
                 _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
                 _svsAnnotationHandler.Handle(_options.SvBucketSize);
             }
