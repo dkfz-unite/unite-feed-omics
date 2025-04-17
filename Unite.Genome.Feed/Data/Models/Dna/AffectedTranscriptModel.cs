@@ -8,8 +8,8 @@ public class AffectedTranscriptModel
     public int? CDNAEnd;
     public int? CDSStart;
     public int? CDSEnd;
-    public int? ProteinStart;
-    public int? ProteinEnd;
+    public int? AAStart;
+    public int? AAEnd;
     public string ProteinChange;
     public string CodonChange;
     public int? OverlapBpNumber;

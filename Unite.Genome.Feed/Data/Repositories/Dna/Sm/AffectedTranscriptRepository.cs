@@ -1,11 +1,11 @@
 ﻿using Unite.Data.Context;
 using Unite.Data.Entities.Genome;
-using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using Unite.Genome.Feed.Data.Models.Dna;
 
-namespace Unite.Genome.Feed.Data.Repositories.Dna.Ssm;
+namespace Unite.Genome.Feed.Data.Repositories.Dna.Sm;
 
-public class AffectedTranscriptRepository : AffectedTranscriptRepository<AffectedTranscript, Variant, Models.Dna.Ssm.VariantModel>
+public class AffectedTranscriptRepository : AffectedTranscriptRepository<AffectedTranscript, Variant, Models.Dna.Sm.VariantModel>
 {
     public AffectedTranscriptRepository(DomainDbContext dbContext, VariantRepository variantRepository) : base(dbContext, variantRepository)
     {
@@ -24,8 +24,8 @@ public class AffectedTranscriptRepository : AffectedTranscriptRepository<Affecte
         entity.CDNAEnd = model.CDNAEnd;
         entity.CDSStart = model.CDSStart;
         entity.CDSEnd = model.CDSEnd;
-        entity.ProteinStart = model.ProteinStart;
-        entity.ProteinEnd = model.ProteinEnd;
+        entity.AAStart = model.AAStart;
+        entity.AAEnd = model.AAEnd;
 
         entity.ProteinChange = model.ProteinChange;
         entity.CodonChange = model.CodonChange;

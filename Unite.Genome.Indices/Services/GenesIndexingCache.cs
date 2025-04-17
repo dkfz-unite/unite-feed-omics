@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Context.Extensions.Queryable;
 using Unite.Data.Context.Repositories.Constants;
+using Unite.Data.Context.Repositories.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Genome;
 using Unite.Data.Entities.Genome.Analysis;
@@ -10,7 +10,7 @@ using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
 using Unite.Essentials.Extensions;
 
-using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using SM = Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
 using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 
@@ -23,15 +23,15 @@ public class GenesIndexingCache
     private readonly HashSet<int> _sampleIds = [];
     private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
     
-    public IEnumerable<SSM.AffectedTranscript> SsmTranscripts { get; private set; }
+    public IEnumerable<SM.AffectedTranscript> SmTranscripts { get; private set; }
     public IEnumerable<CNV.AffectedTranscript> CnvTranscripts { get; private set; }
     public IEnumerable<SV.AffectedTranscript> SvTranscripts { get; private set; }
     public IEnumerable<Gene> Genes { get; private set; }
-    public IEnumerable<SSM.Variant> Ssms { get; private set; }
+    public IEnumerable<SM.Variant> Sms { get; private set; }
     public IEnumerable<CNV.Variant> Cnvs { get; private set; }
     public IEnumerable<SV.Variant> Svs { get; private set; }
     public IEnumerable<GeneExpression> ExpEntries { get; private set; }
-    public IEnumerable<SSM.VariantEntry> SsmEntries { get; private set; }
+    public IEnumerable<SM.VariantEntry> SmEntries { get; private set; }
     public IEnumerable<CNV.VariantEntry> CnvEntries { get; private set; }
     public IEnumerable<SV.VariantEntry> SvEntries { get; private set; }
     public IEnumerable<Donor> Donors { get; private set; }
@@ -51,7 +51,7 @@ public class GenesIndexingCache
         Task.WaitAll
         ([
             LoadExpressions(ids),
-            LoadSsmTranscripts(ids),
+            LoadSmTranscripts(ids),
             LoadCnvTranscripts(ids),
             LoadSvTranscripts(ids)
         ]);
@@ -59,7 +59,7 @@ public class GenesIndexingCache
         Task.WaitAll
         ([
             LoadGenes(ids),
-            LoadSsms(),
+            LoadSms(),
             LoadCnvs(),
             LoadSvs()
         ]);
@@ -74,15 +74,15 @@ public class GenesIndexingCache
     {
         _sampleIds.Clear();
 
-        SsmTranscripts = null;
+        SmTranscripts = null;
         CnvTranscripts = null;
         SvTranscripts = null;
         Genes = null;
-        Ssms = null;
+        Sms = null;
         Cnvs = null;
         Svs = null;
         ExpEntries = null;
-        SsmEntries = null;
+        SmEntries = null;
         CnvEntries = null;
         SvEntries = null;
         Donors = null;
@@ -109,11 +109,11 @@ public class GenesIndexingCache
         // }
     }
 
-    private async Task LoadSsmTranscripts(int[] ids)
+    private async Task LoadSmTranscripts(int[] ids)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        SsmTranscripts = await dbContext.Set<SSM.AffectedTranscript>()
+        SmTranscripts = await dbContext.Set<SM.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
             .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
@@ -155,28 +155,28 @@ public class GenesIndexingCache
             .ToArrayAsync();
     }
 
-    private async Task LoadSsms()
+    private async Task LoadSms()
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var variantIds = SsmTranscripts.Select(affectedTranscript => affectedTranscript.VariantId).Distinct().ToArray();
+        var variantIds = SmTranscripts.Select(affectedTranscript => affectedTranscript.VariantId).Distinct().ToArray();
 
-        SsmEntries = await dbContext.Set<SSM.VariantEntry>()
+        SmEntries = await dbContext.Set<SM.VariantEntry>()
             .AsNoTracking()
             .Include(entry => entry.Entity)
             .Where(entry => variantIds.Contains(entry.EntityId))
             .ToArrayAsync();
 
-        Ssms = SsmEntries
+        Sms = SmEntries
             .Select(entry => entry.Entity)
             .DistinctBy(variant => variant.Id)
             .ToArray();
 
-        SsmEntries.ForEach(entry => entry.Entity = null);
+        SmEntries.ForEach(entry => entry.Entity = null);
 
         lock (_lock)
         {
-            _sampleIds.AddRange(SsmEntries.Select(entry => entry.SampleId));
+            _sampleIds.AddRange(SmEntries.Select(entry => entry.SampleId));
         }
     }
 
@@ -265,7 +265,7 @@ public class GenesIndexingCache
 
         Images = await dbContext.Set<Image>()
             .AsNoTracking()
-            .IncludeMriImage()
+            .IncludeMrImage()
             .IncludeRadiomicsFeatures()
             .Where(image => ids.Contains(image.DonorId))
             .ToArrayAsync();

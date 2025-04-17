@@ -90,9 +90,9 @@ public abstract class VariantAnnotationTaskService<TVariant> : AnnotationTaskSer
     /// <param name="keys">Variants identifiers.</param>
     private void CreateVariantAnnotationTasks(IEnumerable<int> keys)
     {
-        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Ssm.Variant))
+        if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Sm.Variant))
         {
-            CreateTasks(AnnotationTaskType.DNA_SSM, keys);
+            CreateTasks(AnnotationTaskType.DNA_SM, keys);
         }
         else if (typeof(TVariant) == typeof(Unite.Data.Entities.Genome.Analysis.Dna.Cnv.Variant))
         {

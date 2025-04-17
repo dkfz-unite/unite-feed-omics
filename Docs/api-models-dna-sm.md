@@ -1,4 +1,4 @@
-# Simple Somatic Mutations (SSM) Data Model
+# Simple Mutations (SM) Data Model
 
 ## Sequencing Data
 Includes information about analysed samples and variants data.
@@ -19,12 +19,12 @@ Includes information about analysed samples and variants data.
 
 **`entries`*** - Variants found in target sample during the analysis.
 - Type: _Array_
-- Element type: _Object([Variant](api-models-ssm.md#variant))_
+- Element type: _Object([Variant](api-models-sm.md#variant))_
 - Limitations: Should contain at leas one element
 - Example: `[{...}, {...}]`
 
 ## Variant
-Simple somatic mutation (SSM) data.
+Simple mutation (SM) data.
 
 **`chromosome`*** - Chromosome.
 - Type: _String_

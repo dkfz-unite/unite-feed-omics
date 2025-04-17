@@ -90,7 +90,7 @@ public abstract class VariantIndexCreator<TVariant, TVariantEntry>
             Donors = true,
             Clinical = CheckClinicalData(donorIds),
             Treatments = CheckTreatments(donorIds),
-            Mris = CheckImages(donorIds, ImageType.MRI),
+            Mrs = CheckImages(donorIds, ImageType.MR),
             Cts = CheckImages(donorIds, ImageType.CT),
             Materials = CheckSpecimens(specimenIds, SpecimenType.Material),
             MaterialsMolecular = CheckMolecularData(specimenIds, SpecimenType.Material),
@@ -106,7 +106,7 @@ public abstract class VariantIndexCreator<TVariant, TVariantEntry>
             XenograftsMolecular = CheckMolecularData(specimenIds, SpecimenType.Xenograft),
             XenograftsInterventions = CheckInterventions(specimenIds, SpecimenType.Xenograft),
             XenograftsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Xenograft),
-            Ssms = variant is Data.Entities.Genome.Analysis.Dna.Ssm.Variant,
+            Sms = variant is Data.Entities.Genome.Analysis.Dna.Sm.Variant,
             Cnvs = variant is Data.Entities.Genome.Analysis.Dna.Cnv.Variant,
             Svs = variant is Data.Entities.Genome.Analysis.Dna.Sv.Variant,
             Meth = CheckMethylation(sampleIds),
@@ -180,7 +180,7 @@ public abstract class VariantIndexCreator<TVariant, TVariantEntry>
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource =>
                 (resource.Type == DataTypes.Genome.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
-                (resource.Type == DataTypes.Genome.Meth.Levels)) == true
+                (resource.Type == DataTypes.Genome.Meth.Level)) == true
         );
     }
 

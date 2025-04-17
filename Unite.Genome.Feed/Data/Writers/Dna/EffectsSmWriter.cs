@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using Unite.Genome.Feed.Data.Repositories;
-using Unite.Genome.Feed.Data.Repositories.Dna.Ssm;
+using Unite.Genome.Feed.Data.Repositories.Dna.Sm;
 
 namespace Unite.Genome.Feed.Data.Writers.Dna;
 
-public class EffectsSsmWriter : EffectsWriter<AffectedTranscript, Variant, Models.Dna.Ssm.VariantModel>
+public class EffectsSmWriter : EffectsWriter<AffectedTranscript, Variant, Models.Dna.Sm.VariantModel>
 {
-    public EffectsSsmWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public EffectsSmWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
     }
 

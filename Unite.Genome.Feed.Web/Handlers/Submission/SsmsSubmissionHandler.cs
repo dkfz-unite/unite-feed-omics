@@ -11,19 +11,19 @@ namespace Unite.Genome.Feed.Web.Handlers.Submission;
 public class SsmsSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly SsmAnnotationTaskService _annotationTaskService;
-    private readonly SsmIndexingTaskService _indexingTaskService;
+    private readonly SmAnnotationTaskService _annotationTaskService;
+    private readonly SmIndexingTaskService _indexingTaskService;
     private readonly DnaSubmissionService _submissionService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Dna.Ssm.Converters.AnalysisModelConverter _converter;
+    private readonly Models.Dna.Sm.Converters.AnalysisModelConverter _converter;
 
 
     public SsmsSubmissionHandler(
         AnalysisWriter dataWriter,
-        SsmAnnotationTaskService annotationTaskService,
-        SsmIndexingTaskService indexingTaskService,
+        SmAnnotationTaskService annotationTaskService,
+        SmIndexingTaskService indexingTaskService,
         DnaSubmissionService submissionService,
         TasksProcessingService tasksProcessingService,
         ILogger<SsmsSubmissionHandler> logger)
@@ -35,7 +35,7 @@ public class SsmsSubmissionHandler
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
 
-        _converter = new Models.Dna.Ssm.Converters.AnalysisModelConverter();
+        _converter = new Models.Dna.Sm.Converters.AnalysisModelConverter();
     }
 
 
@@ -49,7 +49,7 @@ public class SsmsSubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _taskProcessingService.Process(SubmissionTaskType.DNA_SSM, TaskStatusType.Prepared, 1, (tasks) =>
+        _taskProcessingService.Process(SubmissionTaskType.DNA_SM, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 
@@ -57,7 +57,7 @@ public class SsmsSubmissionHandler
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Processed SSMs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Processed SMs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
@@ -65,13 +65,13 @@ public class SsmsSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindSsmSubmission(submissionId);
+        var submittedData = _submissionService.FindSmSubmission(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
-        _annotationTaskService.PopulateTasks(audit.Ssms);
-        _indexingTaskService.PopulateTasks(audit.SsmsEntries.Except(audit.Ssms));
-        _submissionService.DeleteSsmSubmission(submissionId);
+        _annotationTaskService.PopulateTasks(audit.Sms);
+        _indexingTaskService.PopulateTasks(audit.SmsEntries.Except(audit.Sms));
+        _submissionService.DeleteSmSubmission(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

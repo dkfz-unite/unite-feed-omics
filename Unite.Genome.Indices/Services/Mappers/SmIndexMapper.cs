@@ -1,11 +1,11 @@
-using Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
-using Unite.Data.Helpers.Genome.Dna.Ssm;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sm;
+using Unite.Data.Helpers.Genome.Dna.Sm;
 using Unite.Essentials.Extensions;
 using Unite.Indices.Entities.Basic.Genome.Variants;
 
 namespace Unite.Genome.Indices.Services.Mappers;
 
-public class SsmIndexMapper : VariantIndexMapper
+public class SmIndexMapper : VariantIndexMapper
 {
     /// <summary>
     /// Creates an index from the entity. Returns null if entity is null.
@@ -13,7 +13,7 @@ public class SsmIndexMapper : VariantIndexMapper
     /// <param name="entity">Entity.</param>
     /// <typeparam name="T">Type of the index.</typeparam>
     /// <returns>Index created from the entity.</returns>
-    public static T CreateFrom<T>(in Variant entity) where T : SsmIndex, new()
+    public static T CreateFrom<T>(in Variant entity) where T : SmIndex, new()
     {
         if (entity == null)
         {
@@ -32,7 +32,7 @@ public class SsmIndexMapper : VariantIndexMapper
     /// </summary>
     /// <param name="entity">Entity.</param>
     /// <param name="index">Index.</param>
-    public static void Map(in Variant entity, SsmIndex index)
+    public static void Map(in Variant entity, SmIndex index)
     {
         if (entity == null || index == null)
         {
@@ -82,7 +82,7 @@ public class SsmIndexMapper : VariantIndexMapper
         {
             Feature = CreateFrom(entity.Feature),
             Distance = entity.Distance,
-            ProteinChange = ProteinChangeCodeGenerator.Generate(entity.ProteinStart, entity.ProteinEnd, entity.ProteinChange),
+            ProteinChange = ProteinChangeCodeGenerator.Generate(entity.AAStart, entity.AAEnd, entity.ProteinChange),
             CodonChange = CodonChangeCodeGenerator.Generate(entity.CDSStart, entity.CDSEnd, entity.CodonChange)
         };
     }

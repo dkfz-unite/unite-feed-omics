@@ -5,7 +5,7 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Genome.Analysis.Dna;
 using Unite.Essentials.Extensions;
 
-using SSM = Unite.Data.Entities.Genome.Analysis.Dna.Ssm;
+using SM = Unite.Data.Entities.Genome.Analysis.Dna.Sm;
 using CNV = Unite.Data.Entities.Genome.Analysis.Dna.Cnv;
 using SV = Unite.Data.Entities.Genome.Analysis.Dna.Sv;
 
@@ -117,9 +117,9 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         return _variantsRepository.GetRelatedGenes<TV>(keys).Result;
     }
 
-    protected override IEnumerable<int> LoadRelatedSsms(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)
     {
-        if (typeof(TV) == typeof(SSM.Variant))
+        if (typeof(TV) == typeof(SM.Variant))
             return keys;
         
         return [];

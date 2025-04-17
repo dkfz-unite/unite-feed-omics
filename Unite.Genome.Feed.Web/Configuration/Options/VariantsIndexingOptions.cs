@@ -3,13 +3,13 @@
 public class VariantsIndexingOptions
 {
     /// <summary>
-    /// SSM indexing bucket size
+    /// SM indexing bucket size
     /// </summary>
     public int SsmBucketSize
     {
         get
         {
-            var option = Environment.GetEnvironmentVariable("UNITE_SSM_INDEXING_BUCKET_SIZE");
+            var option = Environment.GetEnvironmentVariable("UNITE_SM_INDEXING_BUCKET_SIZE");
             var size = int.Parse(option);
 
             return size;

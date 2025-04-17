@@ -1,11 +1,11 @@
-﻿using Unite.Data.Entities.Genome.Analysis.Dna.Ssm.Enums;
-using Unite.Data.Helpers.Genome.Dna.Ssm;
+﻿using Unite.Data.Entities.Genome.Analysis.Dna.Sm.Enums;
+using Unite.Data.Helpers.Genome.Dna.Sm;
 
-namespace Unite.Genome.Feed.Web.Models.Dna.Ssm.Mappers;
+namespace Unite.Genome.Feed.Web.Models.Dna.Sm.Mappers;
 
 public class VariantModelMapper
 {
-    public void Map(in VariantModel source, Data.Models.Dna.Ssm.VariantModel target)
+    public void Map(in VariantModel source, Data.Models.Dna.Sm.VariantModel target)
     {
         target.Type = TypeDetector.Detect(source.Ref, source.Alt);
         target.Chromosome = source.Chromosome.Value;
@@ -14,11 +14,11 @@ public class VariantModelMapper
         target.Ref = source.Ref;
         target.Alt = source.Alt;
 
-        if (target.Type == SsmType.INS)
+        if (target.Type == SmType.INS)
         {
             target.Length = target.Alt.Length;
         }
-        else if (target.Type == SsmType.DEL)
+        else if (target.Type == SmType.DEL)
         {
             target.Length = target.Ref.Length;
         }

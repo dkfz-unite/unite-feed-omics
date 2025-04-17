@@ -55,8 +55,8 @@ public static class EffectsDataConverter
     {
         model.CDSStart = resource.CDSStart;
         model.CDSEnd = resource.CDSEnd;
-        model.ProteinStart = resource.ProteinStart;
-        model.ProteinEnd = resource.ProteinEnd;
+        model.AAStart = resource.ProteinStart;
+        model.AAEnd = resource.ProteinEnd;
         model.CDNAStart = resource.CDNAStart;
         model.CDNAEnd = resource.CDNAEnd;
         model.ProteinChange = resource.AminoAcidChange;
