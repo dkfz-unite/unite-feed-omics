@@ -22,8 +22,8 @@ using Unite.Genome.Indices.Services;
 
 using DnaEntities = Unite.Data.Entities.Genome.Analysis.Dna;
 
-using SsmModel = Unite.Genome.Feed.Web.Models.Dna.Sm.VariantModel;
-using SsmModelValidator = Unite.Genome.Feed.Web.Models.Dna.Sm.Validators.VariantModelValidator;
+using SmModel = Unite.Genome.Feed.Web.Models.Dna.Sm.VariantModel;
+using SmModelValidator = Unite.Genome.Feed.Web.Models.Dna.Sm.Validators.VariantModelValidator;
 using CnvModel = Unite.Genome.Feed.Web.Models.Dna.Cnv.VariantModel;
 using CnvModelValidator = Unite.Genome.Feed.Web.Models.Dna.Cnv.Validators.VariantModelValidator;
 using SvModel = Unite.Genome.Feed.Web.Models.Dna.Sv.VariantModel;
@@ -88,7 +88,7 @@ public static class ConfigurationExtensions
         services.AddHostedService<SubmissionsWorker>();
         services.AddTransient<BulkGeneExpSubmissionHandler>();
         services.AddTransient<CellGeneExpSubmissionHandler>();
-        services.AddTransient<SsmsSubmissionHandler>();
+        services.AddTransient<SmsSubmissionHandler>();
         services.AddTransient<CnvsSubmissionHandler>();
         services.AddTransient<SvsSubmissionHandler>();
         services.AddTransient<MethSubmissionHandler>();
@@ -137,7 +137,7 @@ public static class ConfigurationExtensions
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
         services.AddTransient<IValidator<SampleModel>, SampleModelValidator>();
-        services.AddTransient<IValidator<AnalysisModel<SsmModel>>, AnalysisModelValidator<SsmModel, SsmModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<SmModel>>, AnalysisModelValidator<SmModel, SmModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<CnvModel>>, AnalysisModelValidator<CnvModel, CnvModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<SvModel>>, AnalysisModelValidator<SvModel, SvModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<BulkExpModel>>, AnalysisModelValidator<BulkExpModel, BulkExpModelValidator>>();

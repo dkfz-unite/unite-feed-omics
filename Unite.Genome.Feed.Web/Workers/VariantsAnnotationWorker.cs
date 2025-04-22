@@ -7,7 +7,7 @@ namespace Unite.Genome.Feed.Web.Workers;
 public class VariantsAnnotationWorker : BackgroundService
 {
     private readonly VariantsAnnotationOptions _options;
-    private readonly SmsAnnotationHandler _ssmsAnnotationHandler;
+    private readonly SmsAnnotationHandler _smsAnnotationHandler;
     private readonly CnvsAnnotationHandler _cnvsAnnotationHandler;
     private readonly SvsAnnotationHandler _svsAnnotationHandler;
     private readonly ILogger _logger;
@@ -15,13 +15,13 @@ public class VariantsAnnotationWorker : BackgroundService
 
     public VariantsAnnotationWorker(
         VariantsAnnotationOptions options,
-        SmsAnnotationHandler ssmsAnnotationHandler,
+        SmsAnnotationHandler smsAnnotationHandler,
         CnvsAnnotationHandler cnvsAnnotationHandler,
         SvsAnnotationHandler svsAnnotationHandler,
         ILogger<VariantsAnnotationWorker> logger)
     {
         _options = options;
-        _ssmsAnnotationHandler = ssmsAnnotationHandler;
+        _smsAnnotationHandler = smsAnnotationHandler;
         _cnvsAnnotationHandler = cnvsAnnotationHandler;
         _svsAnnotationHandler = svsAnnotationHandler;
         _logger = logger;
@@ -39,7 +39,7 @@ public class VariantsAnnotationWorker : BackgroundService
 
         try
         {
-            _ssmsAnnotationHandler.Prepare();
+            _smsAnnotationHandler.Prepare();
             _cnvsAnnotationHandler.Prepare();
             _svsAnnotationHandler.Prepare();
         }
@@ -52,7 +52,7 @@ public class VariantsAnnotationWorker : BackgroundService
         {
             try
             {
-                _ssmsAnnotationHandler.Handle(_options.SmBucketSize);
+                _smsAnnotationHandler.Handle(_options.SmBucketSize);
                 _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
                 _svsAnnotationHandler.Handle(_options.SvBucketSize);
             }

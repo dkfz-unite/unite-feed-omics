@@ -7,7 +7,7 @@ public class SubmissionsWorker : BackgroundService
 {
     private readonly BulkGeneExpSubmissionHandler _bulkGeneExpSubmissionHandler;
     private readonly CellGeneExpSubmissionHandler _cellGeneExpSubmissionHandler;
-    private readonly SsmsSubmissionHandler _ssmsSubmissionHandler;
+    private readonly SmsSubmissionHandler _smsSubmissionHandler;
     private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
     private readonly SvsSubmissionHandler _svsSubmissionHandler;
     private readonly MethSubmissionHandler _methSubmissionHandler;
@@ -16,7 +16,7 @@ public class SubmissionsWorker : BackgroundService
     public SubmissionsWorker(
         BulkGeneExpSubmissionHandler bulkGeneExpSubmissionHandler,
         CellGeneExpSubmissionHandler cellGeneExpSubmissionHandler,
-        SsmsSubmissionHandler ssmsSubmissionHandler,
+        SmsSubmissionHandler smsSubmissionHandler,
         CnvsSubmissionHandler cnvsSubmissionHandler,
         SvsSubmissionHandler svsSubmissionHandler,
         MethSubmissionHandler methSubmissionHandler,
@@ -24,7 +24,7 @@ public class SubmissionsWorker : BackgroundService
     {
         _bulkGeneExpSubmissionHandler = bulkGeneExpSubmissionHandler;
         _cellGeneExpSubmissionHandler = cellGeneExpSubmissionHandler;
-        _ssmsSubmissionHandler = ssmsSubmissionHandler;
+        _smsSubmissionHandler = smsSubmissionHandler;
         _cnvsSubmissionHandler = cnvsSubmissionHandler;
         _svsSubmissionHandler = svsSubmissionHandler;
         _methSubmissionHandler = methSubmissionHandler;
@@ -46,7 +46,7 @@ public class SubmissionsWorker : BackgroundService
             {
                 _cellGeneExpSubmissionHandler.Handle();
                 _bulkGeneExpSubmissionHandler.Handle();
-                _ssmsSubmissionHandler.Handle();
+                _smsSubmissionHandler.Handle();
                 _cnvsSubmissionHandler.Handle();
                 _svsSubmissionHandler.Handle();
                 _methSubmissionHandler.Handle();
