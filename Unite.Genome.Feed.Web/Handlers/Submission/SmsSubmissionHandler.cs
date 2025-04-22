@@ -8,7 +8,7 @@ using Unite.Genome.Feed.Web.Submissions;
 
 namespace Unite.Genome.Feed.Web.Handlers.Submission;
 
-public class SsmsSubmissionHandler
+public class SmsSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly SmAnnotationTaskService _annotationTaskService;
@@ -20,13 +20,13 @@ public class SsmsSubmissionHandler
     private readonly Models.Dna.Sm.Converters.AnalysisModelConverter _converter;
 
 
-    public SsmsSubmissionHandler(
+    public SmsSubmissionHandler(
         AnalysisWriter dataWriter,
         SmAnnotationTaskService annotationTaskService,
         SmIndexingTaskService indexingTaskService,
         DnaSubmissionService submissionService,
         TasksProcessingService tasksProcessingService,
-        ILogger<SsmsSubmissionHandler> logger)
+        ILogger<SmsSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;

@@ -17,7 +17,7 @@ public class IndexingController : Controller
     private readonly IIndexService<CnvIndex> _cnvsIndexService;
     private readonly IIndexService<SvIndex> _svsIndexService;
     private readonly GeneIndexingTaskService _geneTasksService;
-    private readonly SmIndexingTaskService _ssmTasksService;
+    private readonly SmIndexingTaskService _smTasksService;
     private readonly CnvIndexingTaskService _cnvTasksService;
     private readonly SvIndexingTaskService _svTasksService;
    
@@ -29,7 +29,7 @@ public class IndexingController : Controller
         IIndexService<CnvIndex> cnvsIndexService,
         IIndexService<SvIndex> svsIndexService,
         GeneIndexingTaskService geneTasksService,
-        SmIndexingTaskService ssmTasksService,
+        SmIndexingTaskService smTasksService,
         CnvIndexingTaskService cnvTasksService,
         SvIndexingTaskService svTasksService)
     {
@@ -38,7 +38,7 @@ public class IndexingController : Controller
         _cnvsIndexService = cnvsIndexService;
         _svsIndexService = svsIndexService;
         _geneTasksService = geneTasksService;
-        _ssmTasksService = ssmTasksService;
+        _smTasksService = smTasksService;
         _cnvTasksService = cnvTasksService;
         _svTasksService = svTasksService;
     }
@@ -59,7 +59,7 @@ public class IndexingController : Controller
         _smsIndexService.DeleteIndex().Wait();
         _cnvsIndexService.DeleteIndex().Wait();
         _svsIndexService.DeleteIndex().Wait();
-        _ssmTasksService.CreateTasks();
+        _smTasksService.CreateTasks();
         _cnvTasksService.CreateTasks();
         _svTasksService.CreateTasks();
 

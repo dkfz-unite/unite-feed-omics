@@ -5,7 +5,7 @@ public class VariantsIndexingOptions
     /// <summary>
     /// SM indexing bucket size
     /// </summary>
-    public int SsmBucketSize
+    public int SmBucketSize
     {
         get
         {

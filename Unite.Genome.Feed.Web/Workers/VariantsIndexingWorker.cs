@@ -7,7 +7,7 @@ namespace Unite.Genome.Feed.Web.Workers;
 public class VariantsIndexingWorker : BackgroundService
 {
     private readonly VariantsIndexingOptions _options;
-    private readonly SmsIndexingHandler _ssmsIndexingHandler;
+    private readonly SmsIndexingHandler _smsIndexingHandler;
     private readonly CnvsIndexingHandler _cnvsIndexingHandler;
     private readonly SvsIndexingHandler _svsIndexingHandler;
     private readonly ILogger _logger;
@@ -15,13 +15,13 @@ public class VariantsIndexingWorker : BackgroundService
 
     public VariantsIndexingWorker(
         VariantsIndexingOptions options,
-        SmsIndexingHandler ssmsIndexingHandler,
+        SmsIndexingHandler smsIndexingHandler,
         CnvsIndexingHandler cnvsIndexingHandler,
         SvsIndexingHandler svsIndexingHandler,
         ILogger<VariantsIndexingWorker> logger)
     {
         _options = options;
-        _ssmsIndexingHandler = ssmsIndexingHandler;
+        _smsIndexingHandler = smsIndexingHandler;
         _cnvsIndexingHandler = cnvsIndexingHandler;
         _svsIndexingHandler = svsIndexingHandler;
         _logger = logger;
@@ -39,7 +39,7 @@ public class VariantsIndexingWorker : BackgroundService
 
         try
         {
-            await _ssmsIndexingHandler.Prepare();
+            await _smsIndexingHandler.Prepare();
             await _cnvsIndexingHandler.Prepare();
             await _svsIndexingHandler.Prepare();
         }
@@ -52,7 +52,7 @@ public class VariantsIndexingWorker : BackgroundService
         {
             try
             {
-                await _ssmsIndexingHandler.Handle(_options.SsmBucketSize);
+                await _smsIndexingHandler.Handle(_options.SmBucketSize);
                 await _cnvsIndexingHandler.Handle(_options.CnvBucketSize);
                 await _svsIndexingHandler.Handle(_options.SvBucketSize);
             }
