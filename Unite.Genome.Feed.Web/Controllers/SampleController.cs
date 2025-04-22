@@ -55,6 +55,6 @@ public abstract class SampleController : Controller
     [HttpPost("tsv")]
     public IActionResult PostTsv([ModelBinder(typeof(SampleTsvModelBinder))] SampleModel model, [FromQuery] bool review = true)
     {
-        return Post(model, review);
+        return TryValidateModel(model) ? Post(model, review) : BadRequest(ModelState);
     }
 }
