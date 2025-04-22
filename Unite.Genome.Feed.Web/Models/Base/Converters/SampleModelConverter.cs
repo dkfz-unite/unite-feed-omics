@@ -24,7 +24,6 @@ public class SampleModelConverter
 
     private DataModels.SpecimenModel ConvertSpecimen(SampleModel sampleModel)
     {
-        Console.WriteLine($"Converting Specimen: {sampleModel.SpecimenId}, {sampleModel.SpecimenType}");
         return new DataModels.SpecimenModel
         {
             ReferenceId = sampleModel.SpecimenId,
@@ -35,7 +34,6 @@ public class SampleModelConverter
 
     private DataModels.AnalysisModel ConvertAnalysis(SampleModel sampleModel)
     {
-        Console.WriteLine($"Converting Analysis: {sampleModel.AnalysisType}, {sampleModel.AnalysisDate}, {sampleModel.AnalysisDay}");
         return new DataModels.AnalysisModel
         {
             Type = sampleModel.AnalysisType.Value,
@@ -46,7 +44,6 @@ public class SampleModelConverter
 
     private DataModels.ResourceModel[] ConvertResources(ResourceModel[] resourceModels)
     {
-        Console.WriteLine($"Converting Resources: {resourceModels?.Length}");
         return resourceModels?.Select(_resourceModelConverter.Convert).ToArray();
     }
 }
