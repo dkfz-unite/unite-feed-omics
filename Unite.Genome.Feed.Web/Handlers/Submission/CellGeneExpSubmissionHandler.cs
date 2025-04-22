@@ -60,20 +60,12 @@ public class CellGeneExpSubmissionHandler
     private void ProcessSubmission(string submissionId)
     {
         var submittedData = _submissionService.FindExpSubmission(submissionId);
-        try
-        {
-            var convertedData = _converter.Convert(submittedData);
+        var convertedData = _converter.Convert(submittedData);
 
-            _dataWriter.SaveData(convertedData, out var audit);
-            _indexingTaskService.PopulateTasks(audit.Samples);
-            _submissionService.DeleteExpSubmission(submissionId);
+        _dataWriter.SaveData(convertedData, out var audit);
+        _indexingTaskService.PopulateTasks(audit.Samples);
+        _submissionService.DeleteExpSubmission(submissionId);
 
-            _logger.LogInformation("{audit}", audit.ToString());
-        }
-        catch
-        {
-            _logger.LogError(submittedData.ToString());
-            throw;
-        }
+        _logger.LogInformation("{audit}", audit.ToString());
     }
 }
