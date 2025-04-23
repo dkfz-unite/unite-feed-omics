@@ -44,72 +44,12 @@ public class SubmissionsWorker : BackgroundService
         {
             try
             {
-                try
-                {
-                    _cellGeneExpSubmissionHandler.Handle();
-                }
-                catch
-                {
-                    _logger.LogError("CellGeneExpSubmissionHandler failed");
-                    throw;
-                }
-
-                try
-                {
-                    _bulkGeneExpSubmissionHandler.Handle();
-                }
-                catch
-                {
-                    _logger.LogError("BulkGeneExpSubmissionHandler failed");
-                    throw;
-                }
-
-                try
-                {
-                    _smsSubmissionHandler.Handle();
-                }
-                catch
-                {
-                    _logger.LogError("SmsSubmissionHandler failed");
-                    throw;
-                }
-
-                try
-                {
-                    _cnvsSubmissionHandler.Handle();
-                }
-                catch
-                {
-                    _logger.LogError("CnvsSubmissionHandler failed");
-                    throw;
-                }
-
-                try
-                {
-                    _svsSubmissionHandler.Handle();
-                }
-                catch
-                {
-                    _logger.LogError("SvsSubmissionHandler failed");
-                    throw;
-                }
-
-                try
-                {
-                    _methSubmissionHandler.Handle();
-                }
-                catch
-                {
-                    _logger.LogError("MethSubmissionHandler failed");
-                    throw;
-                }
-                
-                // _cellGeneExpSubmissionHandler.Handle();
-                // _bulkGeneExpSubmissionHandler.Handle();
-                // _smsSubmissionHandler.Handle();
-                // _cnvsSubmissionHandler.Handle();
-                // _svsSubmissionHandler.Handle();
-                // _methSubmissionHandler.Handle();
+                _cellGeneExpSubmissionHandler.Handle();
+                _bulkGeneExpSubmissionHandler.Handle();
+                _smsSubmissionHandler.Handle();
+                _cnvsSubmissionHandler.Handle();
+                _svsSubmissionHandler.Handle();
+                _methSubmissionHandler.Handle();
             }
             catch (Exception exception)
             {
