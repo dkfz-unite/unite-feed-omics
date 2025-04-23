@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
@@ -17,16 +16,13 @@ public class CnvsController : Controller
 {
     private readonly DnaSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
-    private readonly IValidator<AnalysisModel<VariantModel>> _validator;
 
     public CnvsController(
         DnaSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService,
-        IValidator<AnalysisModel<VariantModel>> validator)
+        SubmissionTaskService submissionTaskService)
     {
         _submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
-        _validator = validator;
     }
 
 
@@ -57,8 +53,6 @@ public class CnvsController : Controller
     [RequestSizeLimit(100_000_000)]
     public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
     {
-        _validator.ValidateAndThrow(model);
-
-        return Post(model, review);
+        return TryValidateModel(model) ? Post(model, review) : BadRequest(ModelState);
     }
 }

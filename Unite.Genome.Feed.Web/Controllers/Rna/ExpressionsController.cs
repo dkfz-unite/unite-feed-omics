@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
@@ -17,16 +16,13 @@ public class ExpressionsController : Controller
 {
     private readonly RnaSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
-    private readonly IValidator<AnalysisModel<ExpressionModel>> _validator;
 
 	public ExpressionsController(
         RnaSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService,
-        IValidator<AnalysisModel<ExpressionModel>> validator)
+        SubmissionTaskService submissionTaskService)
 	{
 		_submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
-        _validator = validator;
     }
 
     [HttpGet("{id}")]
@@ -55,9 +51,7 @@ public class ExpressionsController : Controller
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
     public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
-    {
-        _validator.ValidateAndThrow(model);
-        
-        return Post(model, review);
+    {   
+        return TryValidateModel(model) ? Post(model, review) : BadRequest(ModelState);
     }
 }

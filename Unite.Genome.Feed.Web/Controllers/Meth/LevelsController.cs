@@ -1,4 +1,3 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
@@ -17,17 +16,14 @@ public class LevelsController : Controller
 {
     private readonly MethSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
-    private readonly IValidator<AnalysisModel<LevelModel>> _validator;
 
 
     public LevelsController(
         MethSubmissionService submissionService, 
-        SubmissionTaskService submissionTaskService,
-        IValidator<AnalysisModel<LevelModel>> validator)
+        SubmissionTaskService submissionTaskService)
     {
         _submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
-        _validator = validator;
     }
 
 
@@ -65,8 +61,6 @@ public class LevelsController : Controller
             Resources = model.Entries
         };
 
-        _validator.ValidateAndThrow(analysisModel);
-
-        return Post(analysisModel, review);
+        return TryValidateModel(analysisModel) ? Post(analysisModel, review) : BadRequest(ModelState);
     }
 }
