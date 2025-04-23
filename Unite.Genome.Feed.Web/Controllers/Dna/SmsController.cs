@@ -51,7 +51,7 @@ public class SmsController : Controller
     [HttpPost("tsv")]
     [RequestSizeLimit(100_000_000)]
     public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
-    {
+    {        
         return TryValidateModel(model) ? Post(model, review) : BadRequest(ModelState);
     }
 }

@@ -59,6 +59,6 @@ public class ExpressionsController : Controller
             Resources = model.Entries
         };
 
-        return Post(analysisModel, review);
+        return TryValidateModel(analysisModel) ? Post(analysisModel, review) : BadRequest(ModelState);
     }
 }

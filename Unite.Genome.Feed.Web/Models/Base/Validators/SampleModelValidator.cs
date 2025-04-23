@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Unite.Data.Constants;
 using Unite.Data.Entities.Genome.Analysis.Enums;
+using Unite.Essentials.Extensions;
 
 namespace Unite.Genome.Feed.Web.Models.Base.Validators;
 
@@ -83,16 +84,8 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         var methArrayTypes = new AnalysisType?[] { AnalysisType.MethArray };
         RuleFor(model => model.Resources)
             .Must(HasValidIdatResources)
-            .When(model => methArrayTypes.Contains(model.AnalysisType))
+            .When(model => methArrayTypes.Contains(model.AnalysisType) && model.Resources.IsNotEmpty())
             .WithMessage("Should have 'red' and 'grn' idat resources");
-
-
-        var rnascTypes = new AnalysisType?[] { AnalysisType.RNASeqSc, AnalysisType.RNASeqSn};
-        RuleFor(model => model.Resources)
-            .Must(HasValidMtxResources)
-            .When(model => rnascTypes.Contains(model.AnalysisType))
-            .WithMessage("Should have 'matrix', 'barcodes', and 'features' mtx resources");
-            
     }
 
     private static bool HasValidIdatResources(ResourceModel[] resources)
@@ -103,20 +96,6 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         var red = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name?.Contains("red", comparison) == true);
         var green = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name?.Contains("grn", comparison) == true);
         if (red == null && green == null)
-            return false;
-
-        return true;
-    }
-
-    private static bool HasValidMtxResources(ResourceModel[] resources)
-    {
-        var comparison = StringComparison.InvariantCultureIgnoreCase;
-
-        var filtered = resources.Where(resource => resource.Type == DataTypes.Genome.Rnasc.Exp).ToArray();
-        var mtx = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Mtx && resource.Name?.Contains("matrix", comparison) == true);
-        var barcodes = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name?.Contains("barcodes", comparison) == true);
-        var features = filtered.FirstOrDefault(resource => resource.Format == FileTypes.General.Tsv && resource.Name?.Contains("features", comparison) == true);
-        if (mtx == null && barcodes == null && features == null)
             return false;
 
         return true;

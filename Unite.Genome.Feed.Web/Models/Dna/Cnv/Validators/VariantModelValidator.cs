@@ -17,6 +17,10 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
             .NotEmpty().WithMessage("Should not be empty")
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
+        RuleFor(model => model)
+            .Must(model => model.End > model.Start)
+            .WithMessage("'end' should be greater than 'start'");
+
         RuleFor(model => model.Type)
             .NotEmpty()
             .WithMessage("Should not be empty");
