@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
@@ -16,13 +17,16 @@ public class ExpressionsController : Controller
 {
     private readonly RnaScSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
+    private readonly IValidator<AnalysisModel<ExpressionModel>> _validator;
 
     public ExpressionsController(
         RnaScSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService)
+        SubmissionTaskService submissionTaskService,
+        IValidator<AnalysisModel<ExpressionModel>> validator)
     {
         _submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
+        _validator = validator;
     }
 
     [HttpGet("{id}")]
@@ -58,6 +62,8 @@ public class ExpressionsController : Controller
             MatchedSample = model.MatchedSample,
             Resources = model.Entries
         };
+
+        _validator.ValidateAndThrow(analysisModel);
 
         return Post(analysisModel, review);
     }

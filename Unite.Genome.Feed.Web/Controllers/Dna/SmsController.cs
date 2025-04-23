@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
@@ -16,13 +17,16 @@ public class SmsController : Controller
 {
     private readonly DnaSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
+    private readonly IValidator<AnalysisModel<VariantModel>> _validator;
 
     public SmsController(
         DnaSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService)
+        SubmissionTaskService submissionTaskService,
+        IValidator<AnalysisModel<VariantModel>> validator)
     {
         _submissionService = submissionService;
         _submissionTaskService = submissionTaskService;
+        _validator = validator;
     }
 
     [HttpGet("{id}")]
@@ -52,6 +56,8 @@ public class SmsController : Controller
     [RequestSizeLimit(100_000_000)]
     public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelBinder))] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
     {
-        return TryValidateModel(model) ? Post(model, review) : BadRequest(ModelState);
+        _validator.ValidateAndThrow(model);
+        
+        return Post(model, review);
     }
 }
