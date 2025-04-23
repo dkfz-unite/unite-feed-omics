@@ -18,7 +18,7 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
             .Must(value => value > 0).WithMessage("Should be greater than 0");
 
         RuleFor(model => model)
-            .Must(model => model.End - model.Start > 0)
+            .Must(model => model.End > model.Start)
             .WithMessage("'end' should be greater than 'start'");
 
         RuleFor(model => model.Type)
