@@ -52,9 +52,39 @@ public class VariantsAnnotationWorker : BackgroundService
         {
             try
             {
-                _smsAnnotationHandler.Handle(_options.SmBucketSize);
-                _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
-                _svsAnnotationHandler.Handle(_options.SvBucketSize);
+                try
+                {
+                    _smsAnnotationHandler.Handle(_options.SmBucketSize);
+                }
+                catch
+                {
+                    _logger.LogError("SmsAnnotationHandler failed");
+                    throw;
+                }
+
+                try
+                {
+                    _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
+                }
+                catch
+                {
+                    _logger.LogError("CnvsAnnotationHandler failed");
+                    throw;
+                }
+
+                try
+                {
+                    _svsAnnotationHandler.Handle(_options.SvBucketSize);
+                }
+                catch
+                {
+                    _logger.LogError("SvsAnnotationHandler failed");
+                    throw;
+                }
+
+                // _smsAnnotationHandler.Handle(_options.SmBucketSize);
+                // _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
+                // _svsAnnotationHandler.Handle(_options.SvBucketSize);
             }
             catch (Exception exception)
             {
