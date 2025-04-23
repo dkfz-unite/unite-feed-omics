@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Unite.Data.Entities.Genome.Analysis.Dna.Sv.Enums;
 
 namespace Unite.Genome.Feed.Web.Models.Dna.Sv.Validators;
 
@@ -25,6 +26,11 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
 
         RuleFor(model => model.OtherEnd)
             .Must(value => value > 0).WithMessage("Should be greater than 0");
+
+        RuleFor(model => model)
+            .Must(model => model.OtherStart - model.End > 0)
+            .When(model => model.Type != SvType.ITX && model.Type != SvType.CTX)
+            .WithMessage("'start_2' should be greater than 'end_1'");
 
         RuleFor(model => model.Type)
             .NotEmpty().WithMessage("Should not be empty");

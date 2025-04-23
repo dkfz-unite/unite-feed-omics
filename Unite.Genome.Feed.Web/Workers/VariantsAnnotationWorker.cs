@@ -58,8 +58,7 @@ public class VariantsAnnotationWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                //GetShortMessage()
-                _logger.LogError(exception, "Something went wrong");
+                _logger.LogError("{error}", exception.GetShortMessage());
             }
             finally
             {
