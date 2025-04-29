@@ -12,18 +12,10 @@ public record ResourceModel
 
 
     /// <summary>
-    /// Resource name.
+    /// Resource name(case sensitive)
     /// </summary>
     [JsonPropertyName("name")]
-    public virtual string Name {  get
-    {
-        if (_type.Trim().ToLower() != "meth")
-        {
-            return _name?.TrimFormat().ToLower();
-        }
-        return _name?.TrimFormat();
-    }
-    set => _name = value; }
+    public virtual string Name {  get => _name?.TrimFormat(); set => _name = value;  }
 
     /// <summary>
     /// Resource type (dna, dna-sm, dna-cnv, dna-sv, meth, meth-lvl, rna, rna-exp, rnasc, rnasc-exp,  etc.).
