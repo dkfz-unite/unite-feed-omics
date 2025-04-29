@@ -12,7 +12,7 @@ public record ResourceModel
 
 
     /// <summary>
-    /// Resource name(case sensitive)
+    /// Resource name(case sensitive).
     /// </summary>
     [JsonPropertyName("name")]
     public virtual string Name {  get => _name?.TrimFormat(); set => _name = value;  }
