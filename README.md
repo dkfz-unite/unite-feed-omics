@@ -1,8 +1,8 @@
-# Genome Data Feed Service
+# Omics Data Feed Service
 
 ## General
-Genome data feed service provides the following functionality:
-- [Genome data feed web API](Docs/api.md) - REST API for uploading sequencing data to the portal (including input data validation).
+Omics data feed service provides the following functionality:
+- [Omics data feed web API](Docs/api.md) - REST API for uploading sequencing data to the portal (including input data validation).
 - Gene expressions annotation service - background service responsible for gene expressions annotation.
   - Gene expressions are annotated with local installation of Ensembl Data service.
 - Genes data indexing service - background service responsible for gene-centric data index creation.
@@ -21,10 +21,10 @@ Genome data feed service provides the following functionality:
 Environment|Address|Port
 -----------|-------|----
 Host|http://localhost:5106|5106
-Docker|http://feed.genome.unite.net|80
+Docker|http://feed.omics.unite.net|80
 
 ## Configuration
-To configure the application, change environment variables in either docker or [launchSettings.json](./Unite.Genome.Feed.Web/Properties/launchSettings.json) file (if running locally):
+To configure the application, change environment variables in either docker or [launchSettings.json](./Unite.Omics.Feed.Web/Properties/launchSettings.json) file (if running locally):
 
 - `ASPNETCORE_ENVIRONMENT` - ASP.NET environment (`Release`).
 - `UNITE_API_KEY` - API key for decription of JWT token and user authorization.
@@ -55,15 +55,15 @@ To configure the application, change environment variables in either docker or [
 ### Docker Compose
 The easiest way to install the application is to use docker-compose:
 - Environment configuration and installation scripts: https://github.com/dkfz-unite/unite-environment
-- Genome data feed service configuration and installation scripts: https://github.com/dkfz-unite/unite-environment/tree/main/applications/unite-genome-feed
+- Omics data feed service configuration and installation scripts: https://github.com/dkfz-unite/unite-environment/tree/main/applications/unite-omics-feed
 
 ### Docker
-The image of the service is available in our [registry](https://github.com/dkfz-unite/unite-genome-feed/pkgs/container/unite-genome-feed).
+The image of the service is available in our [registry](https://github.com/dkfz-unite/unite-omics-feed/pkgs/container/unite-omics-feed).
 
 [Dockerfile](./Dockerfile) is used to build an image of the application.
 To build an image run the following command:
 ```
-docker build -t unite.genome.feed:latest .
+docker build -t unite.omics.feed:latest .
 ```
 
 All application components should run in the same docker network.
@@ -75,10 +75,10 @@ docker network create unite
 To run application in docker run the following command:
 ```bash
 docker run \
---name unite.genome.feed \
+--name unite.omics.feed \
 --restart unless-stopped \
 --net unite \
---net-alias feed.genome.unite.net \
+--net-alias feed.omics.unite.net \
 -p 127.0.0.1:5106:80 \
 -e ASPNETCORE_ENVIRONMENT=Release \
 -e UNITE_API_KEY=[api_key] \
@@ -103,5 +103,5 @@ docker run \
 -e UNITE_SV_ANNOTATION_BUCKET_SIZE=10 \
 -e UNITE_SV_INDEXING_BUCKET_SIZE=100 \
 -d \
-unite.genome.feed:latest
+unite.omics.feed:latest
 ```

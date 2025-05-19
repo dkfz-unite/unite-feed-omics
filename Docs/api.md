@@ -1,10 +1,10 @@
-# Genome Data Feed API
-API for uploading genome data to the repository.
+# Omics Data Feed API
+API for uploading omics data to the repository.
 
 > [!Note]
 > API is accessible for authorized users only and requires `JWT` token as `Authorization` header (read more about [Identity Service](https://github.com/dkfz-unite/unite-identity)).
 
-API is **proxied** to main API and can be accessed at [[host]/api/genome-feed](http://localhost/api/genome-feed) (**without** `api` prefix).
+API is **proxied** to main API and can be accessed at [[host]/api/omics-feed](http://localhost/api/omics-feed) (**without** `api` prefix).
 
 
 ## Overview
