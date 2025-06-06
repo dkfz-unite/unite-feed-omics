@@ -48,6 +48,12 @@ To configure the application, change environment variables in either docker or [
 - `UNITE_CNV_INDEXING_BUCKET_SIZE` - CNV indexing bucket size (`100`).
 - `UNITE_SV_ANNOTATION_BUCKET_SIZE` - SV annotation bucket size (`10`).
 - `UNITE_SV_INDEXING_BUCKET_SIZE` - SV indexing bucket size (`100`).
+- `UNITE_GENOME_BUILD` - Reference genome build (`GRCh37`).
+
+> [!Note]
+> Reference genome build defines, which version of Ensembl VEP and Ensembl Data services to use in the system.  
+> All the data uploaded to the system should be in this genome build.  
+> It's not possible to mix the data from different versions of the genome build in the system.
 
 
 ## Installation
@@ -102,6 +108,7 @@ docker run \
 -e UNITE_CNV_INDEXING_BUCKET_SIZE=100 \
 -e UNITE_SV_ANNOTATION_BUCKET_SIZE=10 \
 -e UNITE_SV_INDEXING_BUCKET_SIZE=100 \
+-e UNITE_GENOME_BUILD=GRCh37
 -d \
 unite.omics.feed:latest
 ```

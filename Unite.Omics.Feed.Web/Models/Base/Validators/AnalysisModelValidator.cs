@@ -2,6 +2,7 @@ using FluentValidation;
 using Unite.Data.Constants;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
+using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
@@ -49,12 +50,12 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
 
         RuleFor(model => model)
             .Must(model => HaveValidGenome(model.TargetSample))
-            .WithMessage($"Only '{SampleModel.DefaultGenome}' reference genome is supported for DNA samples")
+            .WithMessage($"Only '{GenomeOptions.Build}' reference genome is supported for DNA and bulk RNA samples")
             .When(model => model.TargetSample != null && model.TargetSample.Genome != null);
 
         RuleFor(model => model)
             .Must(model => HaveValidGenome(model.MatchedSample))
-            .WithMessage($"Only '{SampleModel.DefaultGenome}' reference genome is supported for DNA samples")
+            .WithMessage($"Only '{GenomeOptions.Build}' reference genome is supported for DNA and bulk RNA samples")
             .When(model => model.MatchedSample != null && model.MatchedSample.Genome != null);
 
         var rnascTypes = new AnalysisType?[] { AnalysisType.RNASeqSc, AnalysisType.RNASeqSn};
@@ -67,8 +68,10 @@ public class AnalysisModelValidator<T, TValidator> : AbstractValidator<AnalysisM
 
     private static bool HaveValidGenome(SampleModel model)
     {
-        if (model.AnalysisType == AnalysisType.WGS || model.AnalysisType == AnalysisType.WES)
-            return model.Genome == SampleModel.DefaultGenome;
+        var analyses = new AnalysisType?[] { AnalysisType.WGS, AnalysisType.WES, AnalysisType.RNASeq };
+
+        if (analyses.Contains(model.AnalysisType))
+            return string.Equals(model.Genome, GenomeOptions.Build, StringComparison.InvariantCultureIgnoreCase);
         else
             return true;
     }

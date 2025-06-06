@@ -25,13 +25,13 @@ public class SmsAnnotationService
     }
 
 
-    public EffectsDataModel[] Annotate(int[] variantIds)
+    public EffectsDataModel[] Annotate(int[] variantIds, int grch)
     {
         var variants = LoadVariants(variantIds);
 
         var codes = variants.Select(GetVepVariantCode).ToArray();
 
-        var annotations = _dataLoader.LoadData(codes).Result;
+        var annotations = _dataLoader.LoadData(codes, grch).Result;
 
         return annotations;
     }

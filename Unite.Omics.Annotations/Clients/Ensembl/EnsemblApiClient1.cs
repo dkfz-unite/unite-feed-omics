@@ -5,6 +5,7 @@ namespace Unite.Omics.Annotations.Clients.Ensembl;
 
 public class EnsemblApiClient1
 {
+    private const int _defaultGrch = 37;
     private const int _threadsNumber = 5;
     private const int _bucketSize = 200;
 
@@ -27,14 +28,15 @@ public class EnsemblApiClient1
     /// <typeparam name="T">Object type for deserialization</typeparam>
     /// <param name="ensemblId">Ensembl object identifier</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
+    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl object mapped to given type if was found.</returns>
-    public async Task<T> Find<T>(string ensemblId, bool length = true, bool expand = false) where T : LookupResource
+    public async Task<T> Find<T>(string ensemblId, bool length = true, bool expand = false, int grch = _defaultGrch) where T : LookupResource
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
         var url = $"{GetUrl<T>()}/id/{ensemblId}";
 
-        url += GetArguments(length, expand);
+        url += GetArguments(length, expand, grch);
 
         var resource = await httpClient.GetAsync<T>(url);
 
@@ -47,14 +49,15 @@ public class EnsemblApiClient1
     /// <typeparam name="T">Object type for deserialization</typeparam>
     /// <param name="ensemblIds">Ensembl object identifiers</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
+    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
-    public async Task<T[]> Find<T>(IEnumerable<string> ensemblIds, bool length = true, bool expand = false) where T : LookupResource
+    public async Task<T[]> Find<T>(IEnumerable<string> ensemblIds, bool length = true, bool expand = false, int grch = _defaultGrch) where T : LookupResource
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
         var url = $"{GetUrl<T>()}/id";
 
-        url += GetArguments(length, expand);
+        url += GetArguments(length, expand, grch);
 
         var queue = new Queue<string>(ensemblIds);
 
@@ -89,14 +92,15 @@ public class EnsemblApiClient1
     /// <typeparam name="T">Object type for deserialization</typeparam>
     /// <param name="ensemblId">Ensembl object symbol</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
+    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl object mapped to given type if was found.</returns>
-    public async Task<T> FindByName<T>(string symbol, bool length = true, bool expand = false) where T : LookupResource
+    public async Task<T> FindByName<T>(string symbol, bool length = true, bool expand = false, int grch = _defaultGrch) where T : LookupResource
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
         var url = $"{GetUrl<T>()}/symbol/{symbol}";
 
-        url += GetArguments(length, expand);
+        url += GetArguments(length, expand, grch);
 
         var resource = await httpClient.GetAsync<T>(url);
 
@@ -109,14 +113,15 @@ public class EnsemblApiClient1
     /// <typeparam name="T">Object type for deserialization</typeparam>
     /// <param name="symbols">Ensembl object symbols</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
+    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
-    public async Task<T[]> FindByName<T>(IEnumerable<string> symbols, bool length = true, bool expand = false) where T : LookupResource
+    public async Task<T[]> FindByName<T>(IEnumerable<string> symbols, bool length = true, bool expand = false, int grch = _defaultGrch) where T : LookupResource
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
         var url = $"{GetUrl<T>()}/symbol";
 
-        url += GetArguments(length, expand);
+        url += GetArguments(length, expand, grch);
 
         var queue = new Queue<string>(symbols);
 
@@ -146,12 +151,13 @@ public class EnsemblApiClient1
     }
 
 
-    private static string GetArguments(bool length, bool expand)
+    private static string GetArguments(bool length, bool expand, int grch)
     {
         var arguments = new string[]
         {
             $"length={length}",
-            $"expand={expand}"
+            $"expand={expand}",
+            $"grch={grch}"
         };
 
         return $"?{string.Join('&', arguments)}";

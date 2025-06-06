@@ -11,7 +11,7 @@ public class SampleModelConverter
     {
         return new DataModels.SampleModel
         {
-            Genome = sampleModel.Genome ?? SampleModel.DefaultGenome,
+            Genome = sampleModel.Genome,
             Purity = sampleModel.Purity,
             Ploidy = sampleModel.Ploidy ?? SampleModel.DefaultPloidy,
             Cells = sampleModel.Cells,

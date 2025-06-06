@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
+using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
 public record SampleModel
 {
     public const double DefaultPloidy = 2.0;
-    public const string DefaultGenome = "grch37";
 
     protected string _donorId;
     protected string _specimenId;
@@ -61,7 +61,7 @@ public record SampleModel
     /// Sample reference genome (e.g. grch37)
     /// </summary>
     [JsonPropertyName("genome")]
-    public virtual string Genome { get => _genome?.Trim().ToLower(); set => _genome = value; }
+    public virtual string Genome { get => _genome?.Trim().ToLower() ?? GenomeOptions.Build; set => _genome = value; }
 
     /// <summary>
     /// Sample purity (TCC)
