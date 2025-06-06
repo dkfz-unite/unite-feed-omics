@@ -1,10 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
-using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
+// Do not assigne default values to properties!
+// Otherwise, empty model for matched samples will be created and fail to be validated.
 public record SampleModel
 {
     public const double DefaultPloidy = 2.0;
@@ -19,7 +20,7 @@ public record SampleModel
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
-    
+
 
     /// <summary>
     /// Sample donor identifier
@@ -61,7 +62,7 @@ public record SampleModel
     /// Sample reference genome (e.g. grch37)
     /// </summary>
     [JsonPropertyName("genome")]
-    public virtual string Genome { get => _genome?.Trim().ToLower() ?? GenomeOptions.Build; set => _genome = value; }
+    public virtual string Genome { get => _genome?.Trim().ToLower(); set => _genome = value; }
 
     /// <summary>
     /// Sample purity (TCC)

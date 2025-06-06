@@ -1,3 +1,4 @@
+using Unite.Omics.Feed.Web.Configuration.Options;
 using DataModels = Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Converters;
@@ -11,7 +12,7 @@ public class SampleModelConverter
     {
         return new DataModels.SampleModel
         {
-            Genome = sampleModel.Genome,
+            Genome = sampleModel.Genome ?? GenomeOptions.Build,
             Purity = sampleModel.Purity,
             Ploidy = sampleModel.Ploidy ?? SampleModel.DefaultPloidy,
             Cells = sampleModel.Cells,
