@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Unite.Data.Context" Version="12.0.0" />
+    <PackageReference Include="Unite.Indices.Context" Version="12.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- <ProjectReference Include="../../unite-data/Unite.Data.Context/Unite.Data.Context.csproj" /> -->
+    <!-- <ProjectReference Include="../../unite-indices/Unite.Indices.Context/Unite.Indices.Context.csproj" /> -->
+  </ItemGroup>
+</Project>

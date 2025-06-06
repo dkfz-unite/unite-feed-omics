@@ -23,7 +23,7 @@ Includes information about analysed sample and expression data.
 Gene expression data.
 
 > [!Note]
-> System supports only [Ensembl](https://www.ensembl.org/index.html) gene and transcript [identifiers](https://www.ensembl.org/info/genome/stable_ids/index.html). If such are unavailable, provide gene or transcript symbols.
+> System supports only [Ensembl](https://www.ensembl.org/index.html) gene and transcript [identifiers](https://www.ensembl.org/info/omics/stable_ids/index.html). If such are unavailable, provide gene or transcript symbols.
 
 The data can be submitted by only one of the following strategies (one of this fields should be set):
 - `gene_id` - fastest
