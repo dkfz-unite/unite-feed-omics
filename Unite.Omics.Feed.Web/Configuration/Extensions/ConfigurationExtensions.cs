@@ -144,6 +144,8 @@ public static class ConfigurationExtensions
         services.AddTransient<IValidator<AnalysisModel<CellExpModel>>, AnalysisModelValidator<CellExpModel, CellExpModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<MethLevelModel>>, AnalysisModelValidator<MethLevelModel, MethLevelModelValidator>>();
 
+        services.AddTransient<IValidator<AnalysisForm<SmModel>>, AnalysisFormValidator<SmModel>>();
+
         return services;
     }
 }

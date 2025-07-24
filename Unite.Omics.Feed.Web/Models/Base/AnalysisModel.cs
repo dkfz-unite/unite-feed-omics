@@ -2,8 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
-public record AnalysisModel<TEntryModel>
-    where TEntryModel : class, new()
+public record AnalysisModel<TEntryModel> where TEntryModel : class, new()
 {
     protected ResourceModel[] _resources;
     protected TEntryModel[] _entries;

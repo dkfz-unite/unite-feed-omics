@@ -1,9 +1,12 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Models.Base.Readers;
+using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Models.RnaSc;
 using Unite.Omics.Feed.Web.Models.RnaSc.Binders;
 using Unite.Omics.Feed.Web.Submissions;
@@ -12,10 +15,15 @@ namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 
 [Route("api/rnasc/analysis/exp")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class ExpressionsController : Controller
+public class ExpressionsController : AnalysisController<ExpressionModel>
 {
     private readonly RnaScSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
+
+    protected override IValidator<ExpressionModel> EntryModelValidator => null;
+    protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
+    protected override IReader<ExpressionModel>[] Readers => null;
+
 
     public ExpressionsController(
         RnaScSubmissionService submissionService,
@@ -25,8 +33,9 @@ public class ExpressionsController : Controller
         _submissionTaskService = submissionTaskService;
     }
 
+
     [HttpGet("{id}")]
-    public IActionResult Get(long id)
+    public override IActionResult Get(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
@@ -37,7 +46,7 @@ public class ExpressionsController : Controller
 
     [HttpPost("")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
+    public override IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
     {
         var submissionId = _submissionService.AddExpSubmission(model);
 
