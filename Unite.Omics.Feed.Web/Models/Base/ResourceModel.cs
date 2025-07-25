@@ -17,7 +17,7 @@ public record ResourceModel
     /// </summary>
     [JsonPropertyName("name")]
     [Column("name")]
-    public virtual string Name { get => _name?.TrimFormat(); set => _name = value; }
+    public virtual string Name { get => _name?.Trim().ToLower(); set => _name = value; }
 
     /// <summary>
     /// Resource type (dna, dna-sm, dna-cnv, dna-sv, meth, meth-lvl, rna, rna-exp, rnasc, rnasc-exp,  etc.).
@@ -46,13 +46,4 @@ public record ResourceModel
     [JsonPropertyName("url")]
     [Column("url")]
     public virtual string Url { get => _url?.Trim().ToLower(); set => _url = value; }
-}
-
-internal static class NameExtensions
-{
-    public static string TrimFormat(this string value)
-    {
-        var index = value.IndexOf('.');
-        return index > 0 ? value[..index] : value;
-    }
 }
