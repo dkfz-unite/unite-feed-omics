@@ -1,4 +1,5 @@
 ﻿using Unite.Essentials.Extensions;
+
 using DataModels = Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Converters;

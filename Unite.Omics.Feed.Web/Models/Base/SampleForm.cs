@@ -1,14 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
-using Unite.Essentials.Tsv;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
 public record SampleForm
 {
-    public const double DefaultPloidy = 2.0;
-
     protected string _donorId;
     protected string _specimenId;
     protected SpecimenType? _specimenType;
@@ -16,11 +13,7 @@ public record SampleForm
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
     protected string _genome;
-    protected double? _purity;
-    protected double? _ploidy;
-    protected int? _cells;
     protected IFormFile _resourcesFile;
-    protected ResourceModel[] _resources;
 
 
     /// <summary>
@@ -60,37 +53,16 @@ public record SampleForm
     public int? AnalysisDay { get => _analysisDay; set => _analysisDay = value; }
 
     /// <summary>
-    /// Sample reference genome (e.g. grch37)
+    /// Genome version (GRCh37 or GRCh38)
     /// </summary>
     [FromForm(Name = "genome")]
-    public string Genome { get => _genome?.Trim().ToLower(); set => _genome = value; }
-
-    /// <summary>
-    /// Sample purity (TCC)
-    /// </summary>
-    [FromForm(Name = "purity")]
-    public double? Purity { get => _purity; set => _purity = value; }
-
-    /// <summary>
-    /// Sample ploidy
-    /// </summary>
-    [FromForm(Name = "ploidy")]
-    public double? Ploidy { get => _ploidy ?? DefaultPloidy; set => _ploidy = value; }
-
-    /// <summary>
-    /// Sample cells number (if it's single cell sequencing)
-    /// </summary>
-    [FromForm(Name = "cells")]
-    public int? Cells { get => _cells; set => _cells = value; }
+    public string Genome { get => _genome?.Trim(); set => _genome = value; }
 
     /// <summary>
     /// Tsv file with resources metadata.
     /// </summary>
     [FromForm(Name = "resources")]
     public IFormFile ResourcesFile { get => _resourcesFile; init => _resourcesFile = value; }
-
-    
-    // public ResourceModel[] Resources { get => _resources ?? ParseResources(); }
 
 
     public SampleModel Convert()
@@ -103,30 +75,7 @@ public record SampleForm
             AnalysisType = AnalysisType,
             AnalysisDate = AnalysisDate,
             AnalysisDay = AnalysisDay,
-            Genome = Genome,
-            Purity = Purity,
-            Ploidy = Ploidy,
-            Cells = Cells,
-            // Resources = Resources
+            Genome = Genome
         };
     }
-
-
-    // private ResourceModel[] ParseResources()
-    // {
-    //     try
-    //     {
-    //         using var reader = new StreamReader(ResourcesFile.OpenReadStream());
-
-    //         var tsv = reader.ReadToEnd();
-
-    //         _resources = TsvReader.Read<ResourceModel>(tsv).ToArray();
-
-    //         return _resources;
-    //     }
-    //     catch
-    //     {
-    //         return null;
-    //     }
-    // }
 }

@@ -1,25 +1,27 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.Meth;
-using Unite.Omics.Feed.Web.Models.Meth.Binders;
 using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers.Meth;
 
 [Route("api/meth/analysis/levels")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class LevelsController : Controller
+public class LevelsController : AnalysisController
 {
     private readonly MethSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
 
+    protected override string DataType => DataTypes.Omics.Meth.Level;
+
 
     public LevelsController(
-        MethSubmissionService submissionService, 
+        MethSubmissionService submissionService,
         SubmissionTaskService submissionTaskService)
     {
         _submissionService = submissionService;
@@ -27,8 +29,7 @@ public class LevelsController : Controller
     }
 
 
-    [HttpGet("{id}")]
-    public IActionResult Get(long id)
+    public override IActionResult Get(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
@@ -37,10 +38,10 @@ public class LevelsController : Controller
         return Ok(submission);
     }
 
-    [HttpPost("")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<LevelModel> model, [FromQuery] bool review = true)
+    public override IActionResult PostJson([FromBody] AnalysisModel<EmptyModel> model, [FromQuery] bool review = true)
     {
+        model.Resources?.ForEach(resource => resource.Type = DataType);
+
         var submissionId = _submissionService.AddLevelSubmission(model);
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
@@ -48,19 +49,5 @@ public class LevelsController : Controller
         var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.METH_LVL, submissionId, taskStatus);
 
         return Ok(taskId);
-    }
-
-    [HttpPost("tsv")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ResourceModel> model, [FromQuery] bool review = true)
-    {
-        var analysisModel = new AnalysisModel<LevelModel>
-        {
-            TargetSample = model.TargetSample,
-            MatchedSample = model.MatchedSample,
-            Resources = model.Entries
-        };
-
-        return TryValidateModel(analysisModel) ? Post(analysisModel, review) : BadRequest(ModelState);
     }
 }

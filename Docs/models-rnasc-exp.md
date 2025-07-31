@@ -35,11 +35,15 @@ The model is used to upload the data of single cell gene expressions calling res
 - Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
 - Example: `22`
 
-**`genome`** - Reference genome.
+**`genome`*** - Reference genome.
 - Type: _String_
 - Possible values: `GRCh37`, `GRCh38`
-- Limitations: Maximum length 100
-- Example: `GRCh37`
+- Example: `GRCh38`
+
+**`cells`** - Cells number.
+- Type: _Integer_
+- Limitations: Greater than 0.
+- Example: `4700`
 
 **`resources`*** - file with cell expressions files metadata.
 - Type: _File_

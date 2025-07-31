@@ -35,7 +35,7 @@ The model is used to upload the data of DNA sample metadata and files.
 - Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
 - Example: `22`
 
-**`genome`** - Reference genome.
+**`genome`*** - Reference genome.
 - Type: _String_
 - Possible values: `GRCh37`, `GRCh38`
 - Limitations: Maximum length 100
@@ -44,7 +44,6 @@ The model is used to upload the data of DNA sample metadata and files.
 **`resources`*** - file with the sample resources metadata.
 - Type: _File_
 - Supported formats: [tsv](#resources)
-- Limitations: Should be set, should contain at least one element
 - Example: `resources.tsv`
 
 **`*`** - Required fields

@@ -6,7 +6,7 @@ namespace Unite.Omics.Feed.Web.Models.Dna.Sv.Readers.DkfzSophia;
 
 public class Reader : IReader<VariantModel>
 {
-    public string Format => "dkfz/sophia";
+    public string Format => "dkfz-sophia";
 
     public VariantModel[] Read(StreamReader reader)
     {

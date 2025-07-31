@@ -8,7 +8,6 @@ public record ResourceModel
     private string _name;
     private string _type;
     private string _format;
-    private string _archive;
     private string _url;
 
 
@@ -32,13 +31,6 @@ public record ResourceModel
     [JsonPropertyName("format")]
     [Column("format")]
     public virtual string Format { get => _format?.Trim().ToLower(); set => _format = value; }
-
-    /// <summary>
-    /// Resource archive (zip, gz, etc.).
-    /// </summary>
-    [JsonPropertyName("archive")]
-    [Column("archive")]
-    public virtual string Archive { get => _archive?.Trim().ToLower(); set => _archive = value; }
 
     /// <summary>
     /// Resource URL.

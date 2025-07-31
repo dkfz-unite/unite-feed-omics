@@ -257,7 +257,7 @@ Request body should be in `multipart/form-data` format for [single cell RNA samp
 - `specimen_type` - Material
 - `analysis_type` - scRNASeq
 - `analysis_date` - 2023-12-01
-- `genome` - GRCh37
+- `genome` - GRCh38
 - `resources` - resources.tsv ([Resources](./models-rnasc.md#resources) metadata file)
 
 ### Responses

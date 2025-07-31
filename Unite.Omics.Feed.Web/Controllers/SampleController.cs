@@ -6,7 +6,6 @@ using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Data.Writers;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.Base.Binders;
 using Unite.Omics.Feed.Web.Models.Base.Converters;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Validators;
@@ -23,6 +22,8 @@ public abstract class SampleController : Controller
 
     private readonly SampleModelConverter _converter = new();
     private readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
+
+    protected abstract string DataType { get; }
 
 
     public SampleController(
@@ -44,8 +45,12 @@ public abstract class SampleController : Controller
     }
 
     [HttpPost("")]
-    public IActionResult Post([FromBody] SampleModel model, [FromQuery] bool review = true)
+    [Consumes("application/json")]
+    [RequestSizeLimit(100_000_000)]
+    public IActionResult PostJson([FromBody] SampleModel model, [FromQuery] bool review = true)
     {
+        model.Resources?.ForEach(resource => resource.Type = DataType);
+
         // TODO: Add submission process
         var dataModel = _converter.Convert(model);
 
@@ -58,25 +63,20 @@ public abstract class SampleController : Controller
         return Ok();
     }
 
-    [HttpPost("tsv")]
-    public IActionResult PostTsv([ModelBinder(typeof(SampleTsvModelBinder))] SampleModel model, [FromQuery] bool review = true)
-    {
-        return TryValidateModel(model) ? Post(model, review) : BadRequest(ModelState);
-    }
-
-    [HttpPost("file")]
+    [HttpPost("")]
+    [Consumes("multipart/form-data")]
     [RequestSizeLimit(100_000_000)]
-    public IActionResult PostFile([FromForm] SampleForm form, [FromQuery] bool review = true)
+    public IActionResult PostForm([FromForm] SampleForm form, [FromQuery] bool review = true)
     {
         var model = form.Convert();
 
         if (!form.ResourcesFile.IsEmpty())
         {
             model.Resources = ParseResources(form.ResourcesFile);
-            ValidateItems(model.Resources, _resourceModelValidator, "Resources");
+            ValidateResources(model.Resources);
         }
 
-        return Post(model, review);
+        return PostJson(model, review);
     }
 
 
@@ -90,6 +90,11 @@ public abstract class SampleController : Controller
         return TsvReader.Read<ResourceModel>(tsv).ToArrayOrNull();
     }
 
+    protected virtual void ValidateResources(ResourceModel[] resources)
+    {
+        ValidateItems(resources, _resourceModelValidator, "Resources");
+    }
+
     protected virtual void ValidateItems<T>(T[] items, IValidator<T> validator, string prefix)
     {
         if (items.IsEmpty())
@@ -99,16 +104,16 @@ public abstract class SampleController : Controller
         }
 
         for (int i = 0; i < items.Length; i++)
-            {
-                var result = validator.Validate(items[i]);
+        {
+            var result = validator.Validate(items[i]);
 
-                if (!result.IsValid)
+            if (!result.IsValid)
+            {
+                foreach (var error in result.Errors)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError($"{prefix}[{i}].{error.PropertyName}", error.ErrorMessage);
-                    }
+                    ModelState.AddModelError($"{prefix}[{i}].{error.PropertyName}", error.ErrorMessage);
                 }
             }
+        }
     }
 }

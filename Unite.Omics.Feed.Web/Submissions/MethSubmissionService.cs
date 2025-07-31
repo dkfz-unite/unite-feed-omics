@@ -1,19 +1,19 @@
 using Unite.Cache.Configuration.Options;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.Meth;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Submissions;
 
 public class MethSubmissionService
 {
-    private readonly Repositories.Meth.SampleSubmissionRepository _sampleRepository;
-    private readonly Repositories.Meth.LevelSubmissionRepository _levelRepository;
+    private readonly SampleSubmissionRepository _sampleRepository;
+    private readonly LevelSubmissionRepository _levelRepository;
 
 
     public MethSubmissionService(IMongoOptions options)
     {
-        _sampleRepository = new Repositories.Meth.SampleSubmissionRepository(options);
-        _levelRepository = new Repositories.Meth.LevelSubmissionRepository(options);   
+        _sampleRepository = new SampleSubmissionRepository(options);
+        _levelRepository = new LevelSubmissionRepository(options);   
     }
 
 
@@ -22,7 +22,7 @@ public class MethSubmissionService
         return _sampleRepository.Add(model);
     }
 
-    public string AddLevelSubmission(AnalysisModel<LevelModel> model)
+    public string AddLevelSubmission(AnalysisModel<EmptyModel> model)
     {
         return _levelRepository.Add(model);
     }
@@ -32,7 +32,7 @@ public class MethSubmissionService
         return _sampleRepository.Find(id)?.Document;
     }
 
-    public AnalysisModel<LevelModel> FindLevelSubmission(string id)
+    public AnalysisModel<EmptyModel> FindLevelSubmission(string id)
     {
         return _levelRepository.Find(id)?.Document;
     }

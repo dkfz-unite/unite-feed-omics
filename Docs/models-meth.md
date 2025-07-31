@@ -35,11 +35,10 @@ The model is used to upload the data of DNA methylation sample metadata and file
 - Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
 - Example: `22`
 
-**`genome`** - Reference genome.
+**`genome`*** - Reference genome.
 - Type: _String_
 - Possible values: `GRCh37`, `GRCh38`
-- Limitations: Maximum length 100
-- Example: `GRCh37`
+- Example: `GRCh38`
 
 **`resources`*** - file with the sample resources metadata.
 - Type: _File_

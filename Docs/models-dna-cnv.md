@@ -45,10 +45,9 @@ The model is used to upload the data of copy number variants (CNV) calling resul
 - Limitations: Integet, greater than or equal to 1, either 'date' or 'day' should be set.
 - Example: `22`
 
-**`genome`** - Reference genome.
+**`genome`*** - Reference genome.
 - Type: _String_
 - Possible values: `GRCh37`, `GRCh38`
-- Limitations: Maximum length 100
 - Example: `GRCh37`
 
 **`purity`** - Estimated sample purity (TCC) percentage of tumor cells in the tissue.

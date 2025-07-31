@@ -6,7 +6,7 @@ namespace Unite.Omics.Feed.Web.Models.Rna.Readers.DkfzRnaseq;
 
 public class Reader : IReader<ExpressionModel>
 {
-    public string Format => "dkfz/rnaseq";
+    public string Format => "dkfz-rnaseq";
 
     public ExpressionModel[] Read(StreamReader reader)
     {

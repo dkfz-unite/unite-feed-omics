@@ -4,7 +4,7 @@ using Unite.Data.Entities.Specimens.Enums;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
-public record AnalysisForm<TEntryModel> where TEntryModel : class, new()
+public record AnalysisForm
 {
     public const double DefaultPloidy = 2.0;
 
@@ -22,7 +22,6 @@ public record AnalysisForm<TEntryModel> where TEntryModel : class, new()
     protected int? _cells;
     protected string _format;
     protected IFormFile _resourcesFile;
-    protected IFormFile _entriesFile;
 
 
     [FromForm(Name = "donor_id")]
@@ -61,53 +60,74 @@ public record AnalysisForm<TEntryModel> where TEntryModel : class, new()
     [FromForm(Name = "cells")]
     public int? Cells { get => _cells; set => _cells = value; }
 
-    [FromForm(Name = "format")]
-    public string Format { get => _format?.Trim(); set => _format = value; }
-
     [FromForm(Name = "resources")]
     public IFormFile ResourcesFile { get => _resourcesFile; set => _resourcesFile = value; }
+
+
+    protected virtual SampleModel ConvertSample()
+    {
+        return new SampleModel
+        {
+            DonorId = DonorId,
+            SpecimenId = SpecimenId,
+            SpecimenType = SpecimenType,
+            AnalysisType = AnalysisType,
+            AnalysisDate = AnalysisDate,
+            AnalysisDay = AnalysisDay,
+            Genome = Genome,
+            Purity = Purity,
+            Ploidy = Ploidy,
+            Cells = Cells
+        };
+    }
+
+    protected virtual SampleModel ConvertMatchedSample()
+    {
+        if (!HasMatchedSample())
+            return null;
+
+        return new SampleModel
+        {
+            DonorId = DonorId,
+            SpecimenId = MatchedSpecimenId,
+            SpecimenType = MatchedSpecimenType,
+            AnalysisType = AnalysisType,
+            Genome = Genome
+        };
+    }
+
+
+    public virtual AnalysisModel Convert()
+    {
+        return new AnalysisModel
+        {
+            TargetSample = ConvertSample(),
+            MatchedSample = ConvertMatchedSample()
+        };
+    }
+
+
+    protected bool HasMatchedSample()
+    {
+        return !string.IsNullOrWhiteSpace(MatchedSpecimenId) && MatchedSpecimenType.HasValue;
+    }
+}
+
+public record AnalysisForm<TEntryModel> : AnalysisForm where TEntryModel : class, new()
+{
+    protected IFormFile _entriesFile;
+
 
     [FromForm(Name = "entries")]
     public IFormFile EntriesFile { get => _entriesFile; set => _entriesFile = value; }
 
 
-    public AnalysisModel<TEntryModel> Convert()
+    public override AnalysisModel<TEntryModel> Convert()
     {
-        var analysis = new AnalysisModel<TEntryModel>
+        return new AnalysisModel<TEntryModel>
         {
-            TargetSample = new SampleModel
-            {
-                DonorId = DonorId,
-                SpecimenId = SpecimenId,
-                SpecimenType = SpecimenType,
-                AnalysisType = AnalysisType,
-                AnalysisDate = AnalysisDate,
-                AnalysisDay = AnalysisDay,
-                Genome = Genome,
-                Purity = Purity,
-                Ploidy = Ploidy,
-                Cells = Cells
-            }
+            TargetSample = ConvertSample(),
+            MatchedSample = ConvertMatchedSample()
         };
-
-        if (HasMatchedSample())
-        {
-            analysis.MatchedSample = new SampleModel
-            {
-                DonorId = DonorId,
-                SpecimenId = MatchedSpecimenId,
-                SpecimenType = MatchedSpecimenType,
-                AnalysisType = AnalysisType,
-                Genome = Genome
-            };
-        }
-
-        return analysis;
-    }
-
-
-    private bool HasMatchedSample()
-    {
-        return !string.IsNullOrWhiteSpace(MatchedSpecimenId) && MatchedSpecimenType.HasValue;
     }
 }

@@ -34,12 +34,6 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         FileTypes.Sequence.Vcf
     };
 
-    private static readonly string[] _allowedArchives = 
-    {
-        ArchiveTypes.Zip,
-        ArchiveTypes.Gz
-    };
-
     public ResourceModelValidator()
     {
         RuleFor(model => model.Name)
@@ -65,11 +59,6 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         RuleFor(model => model.Format)
             .Must(format => _allowedFormats.Contains(format))
             .WithMessage("Format is not allowed");
-
-        RuleFor(model => model.Archive)
-            .Must(format => _allowedArchives.Contains(format))
-            .When(model => model.Archive != null)
-            .WithMessage("Archive is not allowed");
 
         RuleFor(model => model.Url)
             .NotEmpty()

@@ -30,10 +30,6 @@ using SvModel = Unite.Omics.Feed.Web.Models.Dna.Sv.VariantModel;
 using SvModelValidator = Unite.Omics.Feed.Web.Models.Dna.Sv.Validators.VariantModelValidator;
 using BulkExpModel = Unite.Omics.Feed.Web.Models.Rna.ExpressionModel;
 using BulkExpModelValidator = Unite.Omics.Feed.Web.Models.Rna.Validators.ExpressionModelValidator;
-using CellExpModel = Unite.Omics.Feed.Web.Models.RnaSc.ExpressionModel;
-using CellExpModelValidator = Unite.Omics.Feed.Web.Models.RnaSc.Validators.ExpressionModelValidator;
-using MethLevelModel = Unite.Omics.Feed.Web.Models.Meth.LevelModel;
-using MethLevelModelValidator = Unite.Omics.Feed.Web.Models.Meth.Validators.LevelModelValidator;
 
 
 namespace Unite.Omics.Feed.Web.Configuration.Extensions;
@@ -141,8 +137,7 @@ public static class ConfigurationExtensions
         services.AddTransient<IValidator<AnalysisModel<CnvModel>>, AnalysisModelValidator<CnvModel, CnvModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<SvModel>>, AnalysisModelValidator<SvModel, SvModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<BulkExpModel>>, AnalysisModelValidator<BulkExpModel, BulkExpModelValidator>>();
-        services.AddTransient<IValidator<AnalysisModel<CellExpModel>>, AnalysisModelValidator<CellExpModel, CellExpModelValidator>>();
-        services.AddTransient<IValidator<AnalysisModel<MethLevelModel>>, AnalysisModelValidator<MethLevelModel, MethLevelModelValidator>>();
+        services.AddTransient<IValidator<AnalysisModel<EmptyModel>>, AnalysisModelValidator<EmptyModel, EmptyModelValidator>>();
 
         services.AddTransient<IValidator<AnalysisForm<SmModel>>, AnalysisFormValidator<SmModel>>();
 
