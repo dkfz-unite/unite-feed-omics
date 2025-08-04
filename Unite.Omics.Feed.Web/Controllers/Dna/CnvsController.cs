@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
@@ -25,6 +25,7 @@ public class CnvsController : AnalysisDataController<VariantModel>
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
     protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Cnv;
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
     protected override IReader<VariantModel>[] Readers =>
     [
         new Models.Dna.Cnv.Readers.Tsv.Reader(),
@@ -40,25 +41,20 @@ public class CnvsController : AnalysisDataController<VariantModel>
         _submissionTaskService = submissionTaskService;
     }
 
-    public override IActionResult Get(long id)
+
+    protected override AnalysisModel<VariantModel> GetSubmission(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
-        var submission = _submissionService.FindCnvSubmission(task.Target);
-
-        return Ok(submission);
+        return _submissionService.FindCnvSubmission(task.Target);
     }
 
-    public override IActionResult PostJson([FromBody] AnalysisModel<VariantModel> model, [FromQuery] bool review = true)
+    protected override long AddSubmission(AnalysisModel<VariantModel> model, bool review)
     {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        
         var submissionId = _submissionService.AddCnvSubmission(model);
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId, taskStatus);
-
-        return Ok(taskId);
+        return _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId, taskStatus);
     }
 }

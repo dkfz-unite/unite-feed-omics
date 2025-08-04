@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
@@ -17,6 +18,7 @@ public class ExpressionsController : AnalysisController
     private readonly RnaScSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
     protected override string DataType => DataTypes.Omics.Rnasc.Exp;
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 
 
     public ExpressionsController(
@@ -27,16 +29,15 @@ public class ExpressionsController : AnalysisController
         _submissionTaskService = submissionTaskService;
     }
 
-    public override IActionResult Get(long id)
+
+    protected override AnalysisModel<EmptyModel> GetSubmission(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
-        var submission = _submissionService.FindExpSubmission(task.Target);
-
-        return Ok(submission);
+        return _submissionService.FindExpSubmission(task.Target);
     }
 
-    public override IActionResult PostJson([FromBody] AnalysisModel<EmptyModel> model, [FromQuery] bool review = true)
+    protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)
     {
         model.Resources?.ForEach(resource => resource.Type = DataType);
 
@@ -44,8 +45,27 @@ public class ExpressionsController : AnalysisController
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
+        return _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
+    }
 
-        return Ok(taskId);
+
+    protected override void ValidateResources(ResourceModel[] resources, AnalysisModel<EmptyModel> model)
+    {
+        base.ValidateResources(resources, model);
+
+        var barcodes = resources.FirstOrDefault(resource =>
+            resource.Format == FileTypes.General.Tsv &&
+            resource.Name.Equals("barcodes.tsv.gz", StringComparison.InvariantCultureIgnoreCase));
+
+        var features = resources.FirstOrDefault(resource =>
+            resource.Format == FileTypes.General.Tsv &&
+            resource.Name.Equals("features.tsv.gz", StringComparison.InvariantCultureIgnoreCase));
+
+        var matrix = resources.FirstOrDefault(resource =>
+            resource.Format == FileTypes.Sequence.Mtx &&
+            resource.Name.Equals("matrix.mtx.gz", StringComparison.InvariantCultureIgnoreCase));
+
+        if (barcodes == null || features == null || matrix == null)
+            ModelState.AddModelError("Resources", "barcodes.tsv.gz, features.tsv.gz, and matrix.mtx.gz files are required");
     }
 }

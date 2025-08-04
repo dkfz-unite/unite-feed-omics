@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
@@ -25,6 +25,7 @@ public class ExpressionsController : AnalysisDataController<ExpressionModel>
     protected override IValidator<ExpressionModel> EntryModelValidator => new ExpressionModelValidator();
     protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
     protected override string DataType => DataTypes.Omics.Rna.Exp;
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeq];
     protected override IReader<ExpressionModel>[] Readers =>
     [
         new Models.Rna.Readers.Tsv.Reader(),
@@ -41,26 +42,19 @@ public class ExpressionsController : AnalysisDataController<ExpressionModel>
     }
 
 
-    [HttpGet("{id}")]
-    public override IActionResult Get(long id)
+    protected override AnalysisModel<ExpressionModel> GetSubmission(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
-        var submission = _submissionService.FindExpSubmission(task.Target);
-
-        return Ok(submission);
+        return _submissionService.FindExpSubmission(task.Target);
     }
 
-    public override IActionResult PostJson([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
+    protected override long AddSubmission(AnalysisModel<ExpressionModel> model, bool review)
     {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        
         var submissionId = _submissionService.AddExpSubmission(model);
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.RNA_EXP, submissionId, taskStatus);
-
-        return Ok(taskId);
+        return _submissionTaskService.CreateTask(SubmissionTaskType.RNA_EXP, submissionId, taskStatus);
     }
 }

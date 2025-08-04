@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Submissions;
@@ -18,6 +18,7 @@ public class LevelsController : AnalysisController
     private readonly SubmissionTaskService _submissionTaskService;
 
     protected override string DataType => DataTypes.Omics.Meth.Level;
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
 
 
     public LevelsController(
@@ -29,25 +30,19 @@ public class LevelsController : AnalysisController
     }
 
 
-    public override IActionResult Get(long id)
+    protected override AnalysisModel<EmptyModel> GetSubmission(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
-        var submission = _submissionService.FindSampleSubmission(task.Target);
-
-        return Ok(submission);
+        return _submissionService.FindLevelSubmission(task.Target);
     }
 
-    public override IActionResult PostJson([FromBody] AnalysisModel<EmptyModel> model, [FromQuery] bool review = true)
+    protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)
     {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-
         var submissionId = _submissionService.AddLevelSubmission(model);
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.METH_LVL, submissionId, taskStatus);
-
-        return Ok(taskId);
+        return _submissionTaskService.CreateTask(SubmissionTaskType.METH_LVL, submissionId, taskStatus);
     }
 }

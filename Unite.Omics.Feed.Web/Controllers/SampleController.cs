@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Data.Writers;
@@ -24,6 +25,7 @@ public abstract class SampleController : Controller
     private readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
     protected abstract string DataType { get; }
+    protected abstract AnalysisType[] AnalysisTypes { get; }
 
 
     public SampleController(
@@ -37,11 +39,13 @@ public abstract class SampleController : Controller
     }
 
 
-    [HttpGet("")]
+    [HttpGet("{id}")]
     [AllowAnonymous]
-    public IActionResult Get()
+    public IActionResult Get(long id)
     {
-        return Ok();
+        var submission = GetSubmission(id);
+
+        return Ok(submission);
     }
 
     [HttpPost("")]
@@ -50,7 +54,38 @@ public abstract class SampleController : Controller
     public IActionResult PostJson([FromBody] SampleModel model, [FromQuery] bool review = true)
     {
         model.Resources?.ForEach(resource => resource.Type = DataType);
+        ValidateSample(model);
 
+        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+    }
+
+    [HttpPost("")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(100_000_000)]
+    public IActionResult PostForm([FromForm] SampleForm form, [FromQuery] bool review = true)
+    {
+        var model = form.Convert();
+        ValidateSample(model);
+
+        if (!form.ResourcesFile.IsEmpty())
+        {
+            model.Resources = ParseResources(form.ResourcesFile);
+            model.Resources?.ForEach(resource => resource.Type = DataType);
+            ValidateResources(model.Resources);
+        }
+
+        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+    }
+
+
+    protected virtual SampleModel GetSubmission(long id)
+    {
+        // TODO: Return submission
+        return null;
+    }
+
+    protected virtual long AddSubmission(SampleModel model, bool review)
+    {
         // TODO: Add submission process
         var dataModel = _converter.Convert(model);
 
@@ -60,23 +95,7 @@ public abstract class SampleController : Controller
 
         _logger.LogInformation("{audit}", audit.ToString());
 
-        return Ok();
-    }
-
-    [HttpPost("")]
-    [Consumes("multipart/form-data")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult PostForm([FromForm] SampleForm form, [FromQuery] bool review = true)
-    {
-        var model = form.Convert();
-
-        if (!form.ResourcesFile.IsEmpty())
-        {
-            model.Resources = ParseResources(form.ResourcesFile);
-            ValidateResources(model.Resources);
-        }
-
-        return PostJson(model, review);
+        return 0;
     }
 
 
@@ -88,6 +107,15 @@ public abstract class SampleController : Controller
         var tsv = streamReader.ReadToEnd();
 
         return TsvReader.Read<ResourceModel>(tsv).ToArrayOrNull();
+    }
+
+    protected virtual void ValidateSample(SampleModel model)
+    {
+        if (!AnalysisTypes.Contains(model.AnalysisType.Value))
+        {
+            var allowedValues = string.Join(", ", AnalysisTypes.Select(analysis => analysis.ToDefinitionString()));
+            ModelState.AddModelError("AnalysisType", $"Allowed values are [{allowedValues}]");
+        }
     }
 
     protected virtual void ValidateResources(ResourceModel[] resources)

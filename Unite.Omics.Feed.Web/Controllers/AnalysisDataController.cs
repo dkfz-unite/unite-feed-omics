@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Web.Models.Base;
@@ -13,16 +14,28 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
     protected abstract IValidator<ResourceModel> ResourceModelValidator { get; }
     protected abstract string DataType { get; }
+    protected abstract AnalysisType[] AnalysisTypes { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
-    
+
 
     [HttpGet("{id}")]
-    public abstract IActionResult Get(long id);
+    public virtual IActionResult Get(long id)
+    {
+        var submission = GetSubmission(id);
+
+        return Ok(submission);
+    }
 
     [HttpPost("")]
     [Consumes("application/json")]
     [RequestSizeLimit(100_000_000)]
-    public abstract IActionResult PostJson([FromBody] AnalysisModel<TEntry> model, [FromQuery] bool review = true);
+    public virtual IActionResult PostJson([FromBody] AnalysisModel<TEntry> model, [FromQuery] bool review = true)
+    {
+        model.Resources?.ForEach(resource => resource.Type = DataType);
+        ValidateAnalysis(model);
+
+        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+    }
     
     [HttpPost("")]
     [Consumes("multipart/form-data")]
@@ -30,11 +43,13 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
     public virtual IActionResult PostForm([FromForm] AnalysisForm<TEntry> form, [FromQuery] bool review = true, [FromQuery] string format = null)
     {
         var model = form.Convert();
+        ValidateAnalysis(model);
 
         if (!form.ResourcesFile.IsEmpty())
         {
             model.Resources = ParseResources(form.ResourcesFile);
-            ValidateResources(model.Resources);
+            model.Resources?.ForEach(resource => resource.Type = DataType);
+            ValidateResources(model.Resources, model);
         }
 
         if (!form.EntriesFile.IsEmpty())
@@ -44,11 +59,16 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
                 return BadRequest($"Unsupported file format: {format}");
 
             model.Entries = ParseEntries(form.EntriesFile, reader);
-            ValidateEntries(model.Entries);
+            ValidateEntries(model.Entries, model);
         }
 
-        return ModelState.IsValid ? PostJson(model, review) : BadRequest(ModelState);
+        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
+
+
+    protected abstract AnalysisModel<TEntry> GetSubmission(long id);
+
+    protected abstract long AddSubmission(AnalysisModel<TEntry> model, bool review);
 
 
     protected virtual ResourceModel[] ParseResources(IFormFile file)
@@ -69,12 +89,27 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
         return reader.Read(streamReader);
     }
 
-    protected virtual void ValidateResources(ResourceModel[] resources)
+    protected virtual void ValidateAnalysis(AnalysisModel<TEntry> model)
+    {
+        if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))
+        {
+            var allowedValues = string.Join(", ", AnalysisTypes.Select(analysis => analysis.ToDefinitionString()));
+            ModelState.AddModelError("TargetSample.AnalysisType", $"Allowed values are: {allowedValues}");
+        }
+
+        if (model.MatchedSample != null && !AnalysisTypes.Contains(model.MatchedSample.AnalysisType.Value))
+        {
+            var allowedValues = string.Join(", ", AnalysisTypes.Select(analysis => analysis.ToDefinitionString()));
+            ModelState.AddModelError("MatchedSample.AnalysisType", $"Allowed values are [{allowedValues}]");
+        }
+    }
+
+    protected virtual void ValidateResources(ResourceModel[] resources, AnalysisModel<TEntry> model)
     {
         ValidateItems(resources, ResourceModelValidator, "Resources");
     }
 
-    protected virtual void ValidateEntries(TEntry[] entries)
+    protected virtual void ValidateEntries(TEntry[] entries, AnalysisModel<TEntry> model)
     {
         ValidateItems(entries, EntryModelValidator, "Entries");
     }

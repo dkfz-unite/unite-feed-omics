@@ -6,7 +6,7 @@ namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 public class ResourceModelValidator : AbstractValidator<ResourceModel>
 {
     private static readonly string[] _allowedTypes =
-    {
+    [
         DataTypes.Omics.Dna.Sample,
         DataTypes.Omics.Dna.Sm,
         DataTypes.Omics.Dna.Cnv,
@@ -17,10 +17,10 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         DataTypes.Omics.Rna.Exp,
         DataTypes.Omics.Rnasc.Sample,
         DataTypes.Omics.Rnasc.Exp
-    };
+    ];
 
     private static readonly string[] _allowedFormats = 
-    {
+    [
         FileTypes.General.Txt,
         FileTypes.General.Csv,
         FileTypes.General.Tsv,
@@ -32,7 +32,7 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         FileTypes.Sequence.Idat,
         FileTypes.Sequence.Mtx,
         FileTypes.Sequence.Vcf
-    };
+    ];
 
     public ResourceModelValidator()
     {
