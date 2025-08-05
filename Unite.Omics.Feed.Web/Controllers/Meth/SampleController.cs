@@ -17,22 +17,28 @@ public class SampleController : Controllers.SampleController
     {
     }
 
-    protected override void ValidateResources(ResourceModel[] resources)
-    {
-        base.ValidateResources(resources);
+    // Temporarly commented as data source service submits resources one by one, not all together, so validation fails.
+    // protected override void ValidateResources(ResourceModel[] resources)
+    // {
+    //     base.ValidateResources(resources);
 
-        if (resources.Any(resource => resource.Format == FileTypes.Sequence.Idat))
-        {
-            var red = resources.FirstOrDefault(resource =>
-                resource.Format == FileTypes.Sequence.Idat &&
-                resource.Name.EndsWith("Red.idat", StringComparison.InvariantCultureIgnoreCase));
+    //     if (resources.Any(resource => resource.Format == FileTypes.Sequence.Idat))
+    //     {
+    //         var comparison = StringComparison.InvariantCultureIgnoreCase;
 
-            var grn = resources.FirstOrDefault(resource =>
-                resource.Format == FileTypes.Sequence.Idat &&
-                resource.Name.EndsWith("Grn.idat", StringComparison.InvariantCultureIgnoreCase));
+    //         var red = resources.FirstOrDefault(resource =>
+    //             resource.Format.Equals(FileTypes.Sequence.Idat, comparison) &&
+    //             resource.Name.EndsWith("Red.idat", comparison));
 
-            if (red == null || grn == null)
-                ModelState.AddModelError("Resources", "Red.idat and Grn.idat files are required");
-        }
-    }
+    //         var grn = resources.FirstOrDefault(resource =>
+    //             resource.Format.Equals(FileTypes.Sequence.Idat, comparison) &&
+    //             resource.Name.EndsWith("Red.idat", comparison));
+
+    //         if (red == null || grn == null)
+    //         {
+    //             ModelState.AddModelError("Resources", "Red.idat and Grn.idat files are required");
+    //             Console.WriteLine(string.Join(Environment.NewLine, resources.Select(r => r.ToString())));
+    //         }       
+    //     }
+    // }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Unite.Essentials.Tsv.Attributes;
 
 namespace Unite.Omics.Feed.Web.Models.Rna;
 
@@ -13,21 +14,27 @@ public record ExpressionModel
 
 
     [JsonPropertyName("gene_id")]
+    [Column("gene_id")]
     public string GeneId { get => ParseId(_geneId)?.Trim(); set => _geneId = value; }
 
     [JsonPropertyName("gene_symbol")]
+    [Column("gene_symbol")]
     public string GeneSymbol { get => _geneSymbol?.Trim(); set => _geneSymbol = value; }
 
     [JsonPropertyName("transcript_id")]
+    [Column("transcript_id")]
     public string TranscriptId { get => ParseId(_transcriptId)?.Trim(); set => _transcriptId = value; }
 
     [JsonPropertyName("transcript_symbol")]
+    [Column("transcript_symbol")]
     public string TranscriptSymbol { get => _transcriptSymbol?.Trim(); set => _transcriptSymbol = value; }
 
     [JsonPropertyName("exonic_length")]
+    [Column("exonic_length")]
     public int? ExonicLength { get => _exonicLength; set => _exonicLength = value; }
 
     [JsonPropertyName("reads")]
+    [Column("reads")]
     public int? Reads { get => _reads; set => _reads = value; }
 
 

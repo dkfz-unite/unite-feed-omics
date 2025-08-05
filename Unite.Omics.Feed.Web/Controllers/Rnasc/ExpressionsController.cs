@@ -48,24 +48,29 @@ public class ExpressionsController : AnalysisController
         return _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
     }
 
+    // Temporarly commented as data source service submits resources one by one, not all together, so validation fails.
+    // protected override void ValidateResources(ResourceModel[] resources, AnalysisModel<EmptyModel> model)
+    // {
+    //     base.ValidateResources(resources, model);
 
-    protected override void ValidateResources(ResourceModel[] resources, AnalysisModel<EmptyModel> model)
-    {
-        base.ValidateResources(resources, model);
+    //     var comparison = StringComparison.InvariantCultureIgnoreCase;
 
-        var barcodes = resources.FirstOrDefault(resource =>
-            resource.Format == FileTypes.General.Tsv &&
-            resource.Name.Equals("barcodes.tsv.gz", StringComparison.InvariantCultureIgnoreCase));
+    //     var barcodes = resources.FirstOrDefault(resource =>
+    //         resource.Format.Equals(FileTypes.General.Tsv, comparison) &&
+    //         resource.Name.Equals("barcodes.tsv.gz", comparison));
 
-        var features = resources.FirstOrDefault(resource =>
-            resource.Format == FileTypes.General.Tsv &&
-            resource.Name.Equals("features.tsv.gz", StringComparison.InvariantCultureIgnoreCase));
+    //     var features = resources.FirstOrDefault(resource =>
+    //         resource.Format.Equals(FileTypes.General.Tsv, comparison) &&
+    //         resource.Name.Equals("features.tsv.gz", comparison));
 
-        var matrix = resources.FirstOrDefault(resource =>
-            resource.Format == FileTypes.Sequence.Mtx &&
-            resource.Name.Equals("matrix.mtx.gz", StringComparison.InvariantCultureIgnoreCase));
+    //     var matrix = resources.FirstOrDefault(resource =>
+    //         resource.Format.Equals(FileTypes.Sequence.Mtx, comparison) &&
+    //         resource.Name.Equals("matrix.mtx.gz", comparison));
 
-        if (barcodes == null || features == null || matrix == null)
-            ModelState.AddModelError("Resources", "barcodes.tsv.gz, features.tsv.gz, and matrix.mtx.gz files are required");
-    }
+    //     if (barcodes == null || features == null || matrix == null)
+    //     {
+    //         ModelState.AddModelError("Resources", "barcodes.tsv.gz, features.tsv.gz, and matrix.mtx.gz files are required");
+    //         Console.WriteLine(string.Join(Environment.NewLine, resources.Select(r => r.ToString())));
+    //     }
+    // }
 }
