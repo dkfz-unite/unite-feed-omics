@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
+using Unite.Omics.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
@@ -8,8 +9,8 @@ public record SampleForm
 {
     protected string _donorId;
     protected string _specimenId;
-    protected SpecimenType? _specimenType;
-    protected AnalysisType? _analysisType;
+    protected string _specimenType;
+    protected string _analysisType;
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
     protected string _genome;
@@ -32,13 +33,13 @@ public record SampleForm
     /// Specimen type
     /// </summary>
     [FromForm(Name = "specimen_type")]
-    public SpecimenType? SpecimenType { get => _specimenType; set => _specimenType = value; }
+    public string SpecimenType { get => _specimenType?.Trim(); set => _specimenType = value; }
 
     /// <summary>
     /// Analysis type (WGS, WES, RNASeq, RNASeqSc)
     /// </summary>
     [FromForm(Name = "analysis_type")]
-    public AnalysisType? AnalysisType { get => _analysisType; set => _analysisType = value; }
+    public string AnalysisType { get => _analysisType?.Trim(); set => _analysisType = value; }
 
     /// <summary>
     /// Analysis date
@@ -71,8 +72,8 @@ public record SampleForm
         {
             DonorId = DonorId,
             SpecimenId = SpecimenId,
-            SpecimenType = SpecimenType,
-            AnalysisType = AnalysisType,
+            SpecimenType = EnumBinder.Bind<SpecimenType>(SpecimenType).Value,
+            AnalysisType = EnumBinder.Bind<AnalysisType>(AnalysisType).Value,
             AnalysisDate = AnalysisDate,
             AnalysisDay = AnalysisDay,
             Genome = Genome

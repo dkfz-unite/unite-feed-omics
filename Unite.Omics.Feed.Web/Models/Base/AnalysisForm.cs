@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
+using Unite.Omics.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
@@ -10,10 +11,10 @@ public record AnalysisForm
 
     protected string _donorId;
     protected string _specimenId;
-    protected SpecimenType? _specimenType;
+    protected string _specimenType;
     protected string _matchedSpecimenId;
-    protected SpecimenType? _matchedSpecimenType;
-    protected AnalysisType? _analysisType;
+    protected string _matchedSpecimenType;
+    protected string _analysisType;
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
     protected string _genome;
@@ -31,16 +32,16 @@ public record AnalysisForm
     public string SpecimenId { get => _specimenId?.Trim(); set => _specimenId = value; }
 
     [FromForm(Name = "specimen_type")]
-    public SpecimenType? SpecimenType { get => _specimenType; set => _specimenType = value; }
+    public string SpecimenType { get => _specimenType?.Trim(); set => _specimenType = value; }
 
     [FromForm(Name = "matched_specimen_id")]
     public string MatchedSpecimenId { get => _matchedSpecimenId?.Trim(); set => _matchedSpecimenId = value; }
 
     [FromForm(Name = "matched_specimen_type")]
-    public SpecimenType? MatchedSpecimenType { get => _matchedSpecimenType; set => _matchedSpecimenType = value; }
+    public string MatchedSpecimenType { get => _matchedSpecimenType?.Trim(); set => _matchedSpecimenType = value; }
 
     [FromForm(Name = "analysis_type")]
-    public AnalysisType? AnalysisType { get => _analysisType; set => _analysisType = value; }
+    public string AnalysisType { get => _analysisType?.Trim(); set => _analysisType = value; }
 
     [FromForm(Name = "analysis_date")]
     public DateOnly? AnalysisDate { get => _analysisDate; set => _analysisDate = value; }
@@ -70,8 +71,8 @@ public record AnalysisForm
         {
             DonorId = DonorId,
             SpecimenId = SpecimenId,
-            SpecimenType = SpecimenType,
-            AnalysisType = AnalysisType,
+            SpecimenType = EnumBinder.Bind<SpecimenType>(SpecimenType).Value,
+            AnalysisType = EnumBinder.Bind<AnalysisType>(AnalysisType).Value,
             AnalysisDate = AnalysisDate,
             AnalysisDay = AnalysisDay,
             Genome = Genome,
@@ -90,8 +91,8 @@ public record AnalysisForm
         {
             DonorId = DonorId,
             SpecimenId = MatchedSpecimenId,
-            SpecimenType = MatchedSpecimenType,
-            AnalysisType = AnalysisType,
+            SpecimenType = EnumBinder.Bind<SpecimenType>(MatchedSpecimenType).Value,
+            AnalysisType = EnumBinder.Bind<AnalysisType>(AnalysisType).Value,
             Genome = Genome
         };
     }
@@ -109,7 +110,8 @@ public record AnalysisForm
 
     protected bool HasMatchedSample()
     {
-        return !string.IsNullOrWhiteSpace(MatchedSpecimenId) && MatchedSpecimenType.HasValue;
+        return !string.IsNullOrWhiteSpace(MatchedSpecimenId) &&
+               !string.IsNullOrWhiteSpace(MatchedSpecimenType);
     }
 }
 

@@ -139,7 +139,12 @@ public static class ConfigurationExtensions
         services.AddTransient<IValidator<AnalysisModel<BulkExpModel>>, AnalysisModelValidator<BulkExpModel, BulkExpModelValidator>>();
         services.AddTransient<IValidator<AnalysisModel<EmptyModel>>, AnalysisModelValidator<EmptyModel, EmptyModelValidator>>();
 
+        services.AddTransient<IValidator<SampleForm>, SampleFormValidator>();
         services.AddTransient<IValidator<AnalysisForm<SmModel>>, AnalysisFormValidator<SmModel>>();
+        services.AddTransient<IValidator<AnalysisForm<CnvModel>>, AnalysisFormValidator<CnvModel>>();
+        services.AddTransient<IValidator<AnalysisForm<SvModel>>, AnalysisFormValidator<SvModel>>();
+        services.AddTransient<IValidator<AnalysisForm<BulkExpModel>>, AnalysisFormValidator<BulkExpModel>>();
+        services.AddTransient<IValidator<AnalysisForm<EmptyModel>>, AnalysisFormValidator<EmptyModel>>();
 
         return services;
     }

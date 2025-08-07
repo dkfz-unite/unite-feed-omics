@@ -1,4 +1,7 @@
 using FluentValidation;
+using Unite.Data.Entities.Omics.Analysis.Enums;
+using Unite.Data.Entities.Specimens.Enums;
+using Unite.Omics.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
@@ -30,10 +33,18 @@ public class SampleFormValidator : AbstractValidator<SampleForm>
             .NotEmpty()
             .WithMessage("Should not be empty");
 
+        RuleFor(model => model.SpecimenType)
+            .Must(value => EnumBinder.Bind<SpecimenType>(value) != null)
+            .WithMessage($"Invalid value");
+
 
         RuleFor(model => model.AnalysisType)
             .NotEmpty()
             .WithMessage("Should not be empty");
+
+        RuleFor(model => model.AnalysisType)
+            .Must(value => EnumBinder.Bind<AnalysisType>(value) != null)
+            .WithMessage($"Invalid value");
 
 
         RuleFor(model => model.AnalysisDate)
