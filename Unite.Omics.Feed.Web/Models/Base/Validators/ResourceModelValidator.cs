@@ -6,7 +6,7 @@ namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 public class ResourceModelValidator : AbstractValidator<ResourceModel>
 {
     private static readonly string[] _allowedTypes =
-    {
+    [
         DataTypes.Omics.Dna.Sample,
         DataTypes.Omics.Dna.Sm,
         DataTypes.Omics.Dna.Cnv,
@@ -17,10 +17,10 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         DataTypes.Omics.Rna.Exp,
         DataTypes.Omics.Rnasc.Sample,
         DataTypes.Omics.Rnasc.Exp
-    };
+    ];
 
     private static readonly string[] _allowedFormats = 
-    {
+    [
         FileTypes.General.Txt,
         FileTypes.General.Csv,
         FileTypes.General.Tsv,
@@ -32,13 +32,7 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         FileTypes.Sequence.Idat,
         FileTypes.Sequence.Mtx,
         FileTypes.Sequence.Vcf
-    };
-
-    private static readonly string[] _allowedArchives = 
-    {
-        ArchiveTypes.Zip,
-        ArchiveTypes.Gz
-    };
+    ];
 
     public ResourceModelValidator()
     {
@@ -65,11 +59,6 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         RuleFor(model => model.Format)
             .Must(format => _allowedFormats.Contains(format))
             .WithMessage("Format is not allowed");
-
-        RuleFor(model => model.Archive)
-            .Must(format => _allowedArchives.Contains(format))
-            .When(model => model.Archive != null)
-            .WithMessage("Archive is not allowed");
 
         RuleFor(model => model.Url)
             .NotEmpty()

@@ -1,21 +1,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.RnaSc;
-using Unite.Omics.Feed.Web.Models.RnaSc.Binders;
 using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 
 [Route("api/rnasc/analysis/exp")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class ExpressionsController : Controller
+public class ExpressionsController : AnalysisController
 {
     private readonly RnaScSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
+    protected override string DataType => DataTypes.Omics.Rnasc.Exp;
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
+
 
     public ExpressionsController(
         RnaScSubmissionService submissionService,
@@ -25,40 +29,48 @@ public class ExpressionsController : Controller
         _submissionTaskService = submissionTaskService;
     }
 
-    [HttpGet("{id}")]
-    public IActionResult Get(long id)
+
+    protected override AnalysisModel<EmptyModel> GetSubmission(long id)
     {
         var task = _submissionTaskService.GetTask(id);
 
-        var submission = _submissionService.FindExpSubmission(task.Target);
-
-        return Ok(submission);
+        return _submissionService.FindExpSubmission(task.Target);
     }
 
-    [HttpPost("")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult Post([FromBody] AnalysisModel<ExpressionModel> model, [FromQuery] bool review = true)
+    protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)
     {
+        model.Resources?.ForEach(resource => resource.Type = DataType);
+
         var submissionId = _submissionService.AddExpSubmission(model);
 
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        var taskId = _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
-
-        return Ok(taskId);
+        return _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
     }
 
-    [HttpPost("tsv")]
-    [RequestSizeLimit(100_000_000)]
-    public IActionResult PostTsv([ModelBinder(typeof(AnalysisTsvModelsBinder))] AnalysisModel<ResourceModel> model, [FromQuery] bool review = true)
-    {
-        var analysisModel = new AnalysisModel<ExpressionModel>
-        {
-            TargetSample = model.TargetSample,
-            MatchedSample = model.MatchedSample,
-            Resources = model.Entries
-        };
+    // Temporarly commented as data source service submits resources one by one, not all together, so validation fails.
+    // protected override void ValidateResources(ResourceModel[] resources, AnalysisModel<EmptyModel> model)
+    // {
+    //     base.ValidateResources(resources, model);
 
-        return TryValidateModel(analysisModel) ? Post(analysisModel, review) : BadRequest(ModelState);
-    }
+    //     var comparison = StringComparison.InvariantCultureIgnoreCase;
+
+    //     var barcodes = resources.FirstOrDefault(resource =>
+    //         resource.Format.Equals(FileTypes.General.Tsv, comparison) &&
+    //         resource.Name.Equals("barcodes.tsv.gz", comparison));
+
+    //     var features = resources.FirstOrDefault(resource =>
+    //         resource.Format.Equals(FileTypes.General.Tsv, comparison) &&
+    //         resource.Name.Equals("features.tsv.gz", comparison));
+
+    //     var matrix = resources.FirstOrDefault(resource =>
+    //         resource.Format.Equals(FileTypes.Sequence.Mtx, comparison) &&
+    //         resource.Name.Equals("matrix.mtx.gz", comparison));
+
+    //     if (barcodes == null || features == null || matrix == null)
+    //     {
+    //         ModelState.AddModelError("Resources", "barcodes.tsv.gz, features.tsv.gz, and matrix.mtx.gz files are required");
+    //         Console.WriteLine(string.Join(Environment.NewLine, resources.Select(r => r.ToString())));
+    //     }
+    // }
 }
