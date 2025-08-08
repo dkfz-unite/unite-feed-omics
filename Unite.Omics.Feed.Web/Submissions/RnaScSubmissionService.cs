@@ -1,6 +1,5 @@
 using Unite.Cache.Configuration.Options;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.RnaSc;
 using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Submissions;
@@ -23,7 +22,7 @@ public class RnaScSubmissionService
 		return _sampleRepository.Add(data);
 	}
 
-	public string AddExpSubmission(AnalysisModel<ExpressionModel> data)
+	public string AddExpSubmission(AnalysisModel<EmptyModel> data)
 	{
 		return _expRepository.Add(data);
 	}
@@ -33,7 +32,7 @@ public class RnaScSubmissionService
 		return _sampleRepository.Find(id)?.Document;
 	}
 
-	public AnalysisModel<ExpressionModel> FindExpSubmission(string id)
+	public AnalysisModel<EmptyModel> FindExpSubmission(string id)
 	{
 		return _expRepository.Find(id)?.Document;
 	}

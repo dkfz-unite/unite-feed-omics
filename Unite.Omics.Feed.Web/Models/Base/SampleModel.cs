@@ -16,7 +16,7 @@ public record SampleModel
     protected AnalysisType? _analysisType;
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
-    protected string _genome;
+    private string _genome;
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
@@ -59,10 +59,10 @@ public record SampleModel
     public virtual int? AnalysisDay { get => _analysisDay; set => _analysisDay = value; }
 
     /// <summary>
-    /// Sample reference genome (e.g. grch37)
+    /// Genome version (GRCh37 or GRCh38)
     /// </summary>
     [JsonPropertyName("genome")]
-    public virtual string Genome { get => _genome?.Trim().ToLower(); set => _genome = value; }
+    public virtual string Genome { get => _genome?.Trim(); set => _genome = value; }
 
     /// <summary>
     /// Sample purity (TCC)

@@ -1,12 +1,10 @@
 ﻿using FluentValidation;
-using Unite.Data.Constants;
-using Unite.Data.Entities.Omics.Analysis.Enums;
-using Unite.Essentials.Extensions;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
 public class SampleModelValidator : AbstractValidator<SampleModel> 
 {
+    private readonly StringComparison _comparison = StringComparison.InvariantCultureIgnoreCase;
     private readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
     public SampleModelValidator()
@@ -57,8 +55,11 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
 
 
         RuleFor(model => model.Genome)
-            .MaximumLength(100)
-            .WithMessage("Maximum length is 100");
+            .NotEmpty()
+            .WithMessage("Should not be empty");
+
+        RuleFor(model => model.Genome)
+            .Must(genome => genome.Equals("GRCh37", _comparison) || genome.Equals("GRCh38", _comparison));
 
         
         RuleFor(model => model.Purity)
@@ -79,25 +80,5 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
 
         RuleForEach(model => model.Resources)
             .SetValidator(_resourceModelValidator);
-
-
-        var methArrayTypes = new AnalysisType?[] { AnalysisType.MethArray };
-        RuleFor(model => model.Resources)
-            .Must(HasValidIdatResources)
-            .When(model => methArrayTypes.Contains(model.AnalysisType) && model.Resources.IsNotEmpty())
-            .WithMessage("Should have 'red' and 'grn' idat resources");
-    }
-
-    private static bool HasValidIdatResources(ResourceModel[] resources)
-    {
-        var comparison = StringComparison.InvariantCultureIgnoreCase;
-
-        var filtered = resources.Where(resource => resource.Type == DataTypes.Omics.Meth.Sample).ToArray();
-        var red = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name?.Contains("red", comparison) == true);
-        var green = filtered.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Idat && resource.Name?.Contains("grn", comparison) == true);
-        if (red == null && green == null)
-            return false;
-
-        return true;
     }
 }
