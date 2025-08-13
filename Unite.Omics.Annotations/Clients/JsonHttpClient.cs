@@ -78,7 +78,7 @@ internal class JsonHttpClient : IDisposable
         else
         {
             var message = await response.Content?.ReadAsStringAsync();
-            throw new HttpRequestException($"{response.StatusCode} - {response.ReasonPhrase} - {message}");
+            throw new HttpRequestException($"{response.StatusCode} - {response.ReasonPhrase} - {message}{Environment.NewLine}{contentJson}");
         }
     }
 
