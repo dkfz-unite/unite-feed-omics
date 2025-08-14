@@ -58,7 +58,7 @@ public class VariantsIndexingWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogError("{error}", exception.GetShortMessage());
+                _logger.LogError(exception,"Variants indexing process failed");
             }
             finally
             {

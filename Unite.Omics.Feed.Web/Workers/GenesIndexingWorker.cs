@@ -48,7 +48,7 @@ public class GenesIndexingWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogError("{error}", exception.GetShortMessage());
+                _logger.LogError(exception, "Genes indexing process failed");
             }
             finally
             {

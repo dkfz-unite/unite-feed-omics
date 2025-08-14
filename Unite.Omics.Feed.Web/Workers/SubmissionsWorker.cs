@@ -53,7 +53,7 @@ public class SubmissionsWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                _logger.LogError("{error}", exception.GetShortMessage());
+                _logger.LogError(exception, "Submissions processing failed");
             }
             finally
             {
