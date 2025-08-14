@@ -116,6 +116,12 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
 
     protected void ValidateItems<T>(T[] items, IValidator<T> validator, string prefix)
     {
+        if (items.IsEmpty())
+        {
+            ModelState.AddModelError(prefix, "No records found.");
+            return;
+        }
+
         for (int i = 0; i < items.Length; i++)
         {
             var result = validator.Validate(items[i]);

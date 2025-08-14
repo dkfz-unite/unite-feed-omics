@@ -19,7 +19,7 @@ public record VariantModel
     private int? _c1;
     private int? _c2;
     private int? _tcn;
-    private double? _dhMax;
+    // private double? _dhMax;
 
     /// <summary>
     /// Chromosome
@@ -108,9 +108,9 @@ public record VariantModel
     /// <summary>
     /// Estimated maximum decrease of heterozygosity
     /// </summary>
-    [JsonPropertyName("dh_max")]
-    [Column("dh_max")]
-    public double? DhMax { get => GetDouble(_dhMax); set => _dhMax = value; }
+    // [JsonPropertyName("dh_max")]
+    // [Column("dh_max")]
+    // public double? DhMax { get => GetDouble(_dhMax); set => _dhMax = value; }
 
 
     private static bool? GetDel(int? c1, int? c2)
