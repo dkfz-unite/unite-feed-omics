@@ -56,15 +56,23 @@ internal class AnnotationsDataLoader
             .Distinct()
             .ToArray();
 
+        Console.Error.WriteLine($"Genes: {string.Join(", ", allIdentifiers)}");
+
         //return await _ensemblApiClient.Find<GeneResource>(allIdentifiers, expand: false);
 
         var existingIdentifiers = allIdentifiers
             .Where(id => dbContext.Set<Gene>().AsNoTracking().Any(entity => entity.StableId == id))
             .ToArray();
 
+        Console.Error.WriteLine($"Existing Genes: {string.Join(", ", existingIdentifiers)}");
+
         var newIdentifiers = allIdentifiers
-            .Where(id => !existingIdentifiers.Contains(id))
+            .Except(existingIdentifiers)
             .ToArray();
+        // .Where(id => !existingIdentifiers.Contains(id))
+        // .ToArray();
+            
+        Console.Error.WriteLine($"New Genes: {string.Join(", ", newIdentifiers)}");
 
         var existingResources = existingIdentifiers
             .Select(id => new GeneResource { Id = id })
