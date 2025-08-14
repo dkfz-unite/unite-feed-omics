@@ -48,11 +48,11 @@ public class SvsAnnotationHandler
     {
         var stopwatch = new Stopwatch();
 
+        if (_taskProcessingService.HasTasks(WorkerType.Submission))
+            return;
+
         _taskProcessingService.Process(AnnotationTaskType.DNA_SV, bucketSize, (tasks) =>
         {
-            if (_taskProcessingService.HasTasks(WorkerType.Submission))
-                return false;
-
             stopwatch.Restart();
 
             ProcessAnnotationTasks(tasks);
