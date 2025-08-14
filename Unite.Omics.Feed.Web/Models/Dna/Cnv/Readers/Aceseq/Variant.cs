@@ -40,8 +40,8 @@ public record Variant
     [Column("TCN")]
     public string Tcn { get; set; }
     
-    [Column("dhMax")]
-    public string DhMax { get; set; }
+    // [Column("dhMax")]
+    // public string DhMax { get; set; }
     
 
     public VariantModel Convert()
@@ -62,7 +62,7 @@ public record Variant
                 C1 = GetInteger(C1),
                 C2 = GetInteger(C2),
                 Tcn = GetInteger(Tcn),
-                DhMax = GetDouble(DhMax)
+                // DhMax = GetDouble(DhMax)
             };
 
             if (variant.Start == variant.End)

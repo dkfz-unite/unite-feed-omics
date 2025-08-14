@@ -17,7 +17,7 @@ public class VariantModelMapper : VariantModelBaseMapper
         target.Tcn = source.Tcn;
         target.TcnRatio = GetTcnRatio(target.Tcn, target.TcnMean, ploidy);
 
-        target.DhMax = source.DhMax;
+        // target.DhMax = source.DhMax;
 
         target.Type = source.Type.Value;
         target.Loh = source.Loh;

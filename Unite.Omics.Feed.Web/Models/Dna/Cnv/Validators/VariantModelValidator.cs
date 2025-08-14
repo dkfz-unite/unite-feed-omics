@@ -55,9 +55,9 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
             .When(model => model.Tcn != null)
             .WithMessage("Should be greater than or equal to 0 or -1 if subclonal");
 
-        RuleFor(model => model.DhMax)
-            .Must(value => value > 0)
-            .When(model => model.DhMax != null)
-            .WithMessage("Should be greater than or equal to 0");
+        // RuleFor(model => model.DhMax)
+        //     .Must(value => value > 0)
+        //     .When(model => model.DhMax != null)
+        //     .WithMessage("Should be greater than or equal to 0");
     }
 }
