@@ -58,8 +58,7 @@ public class VariantsAnnotationWorker : BackgroundService
             }
             catch (Exception exception)
             {
-                // _logger.LogError("{error}", exception.GetShortMessage());
-                _logger.LogError(exception, exception.Message);
+                _logger.LogError(exception, "Variants annotation processing failed");
             }
             finally
             {

@@ -43,13 +43,13 @@ public class CnvsIndexingHandler
 
     private async Task ProcessIndexingTasks(int bucketSize)
     {
+        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+            return;
+                
         var stopwatch = new Stopwatch();
 
         await _taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, async (tasks) =>
         {
-            if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-                return false;
-
             stopwatch.Restart();
 
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());

@@ -46,13 +46,13 @@ public class SmsAnnotationHandler
 
     private void ProcessAnnotationTasks(int bucketSize)
     {
+        if (_taskProcessingService.HasTasks(WorkerType.Submission))
+            return;
+
         var stopwatch = new Stopwatch();
 
         _taskProcessingService.Process(AnnotationTaskType.DNA_SM, bucketSize, (tasks) =>
         {
-            if (_taskProcessingService.HasTasks(WorkerType.Submission))
-                return false;
-
             stopwatch.Restart();
 
             ProcessAnnotationTasks(tasks);
