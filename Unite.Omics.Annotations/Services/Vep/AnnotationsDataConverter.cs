@@ -35,7 +35,7 @@ internal static class AnnotationsDataConverter
                 {
                     var geneResource = geneResources.FirstOrDefault(gene => gene.Id == affectedTranscript.GeneId);
                     if (geneResource == null)
-                        throw new KeyNotFoundException($"Gene '{affectedTranscript.GeneId}' not found cache of {geneResources.Length} elements long.");
+                        throw new KeyNotFoundException($"Gene '{affectedTranscript.GeneId}' not found in cache.");
                     
                     affectedTranscriptModel.Gene = new GeneModel();
                     Map(geneResource, affectedTranscriptModel.Gene);
@@ -45,7 +45,7 @@ internal static class AnnotationsDataConverter
                 {
                     var transcriptResource = transcriptResources.FirstOrDefault(transcript => transcript.Id == affectedTranscript.TranscriptId);
                     if (transcriptResource == null)
-                        throw new KeyNotFoundException($"Transcript '{affectedTranscript.TranscriptId}' not found cache of {transcriptResources.Length} elements long.");
+                        throw new KeyNotFoundException($"Transcript '{affectedTranscript.TranscriptId}' not found in cache.");
 
                     affectedTranscriptModel.Transcript = new TranscriptModel();
 
