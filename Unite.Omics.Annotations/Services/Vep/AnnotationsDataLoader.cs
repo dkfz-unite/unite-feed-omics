@@ -64,9 +64,8 @@ internal class AnnotationsDataLoader
 
         var newIdentifiers = allIdentifiers
             .Except(existingIdentifiers)
+            // .Where(id => !existingIdentifiers.Contains(id))
             .ToArray();
-        // .Where(id => !existingIdentifiers.Contains(id))
-        // .ToArray();
             
         var existingResources = existingIdentifiers
             .Select(id => new GeneResource { Id = id })
@@ -95,7 +94,8 @@ internal class AnnotationsDataLoader
             .ToArray();
 
         var newIdentifiers = allIdentifiers
-            .Where(id => !existingIdentifiers.Contains(id))
+            .Except(existingIdentifiers)
+            // .Where(id => !existingIdentifiers.Contains(id))
             .ToArray();
 
         var existingResources = existingIdentifiers

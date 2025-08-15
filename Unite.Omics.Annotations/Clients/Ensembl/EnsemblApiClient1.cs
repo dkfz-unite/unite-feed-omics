@@ -83,12 +83,6 @@ public class EnsemblApiClient1
             }
         }
 
-        if (resources.Count != ensemblIds.Count())
-        {
-            var missingIds = ensemblIds.Except(resources.Select(r => r.Id));
-            throw new KeyNotFoundException($"Some identifiers were not found in Ensembl: {string.Join(", ", missingIds)}");
-        }
-
         return resources.ToArray();
     }
 
