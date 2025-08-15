@@ -33,9 +33,7 @@ internal static class AnnotationsDataConverter
 
                 if (!string.IsNullOrWhiteSpace(affectedTranscript.GeneId))
                 {
-                    var geneResource = geneResources.FirstOrDefault(gene => gene.Id == affectedTranscript.GeneId);
-                    if (geneResource == null)
-                        throw new KeyNotFoundException($"Gene '{affectedTranscript.GeneId}' not found in cache.");
+                    var geneResource = geneResources.First(gene => gene.Id == affectedTranscript.GeneId);
                     
                     affectedTranscriptModel.Gene = new GeneModel();
                     Map(geneResource, affectedTranscriptModel.Gene);
@@ -43,9 +41,7 @@ internal static class AnnotationsDataConverter
 
                 if (!string.IsNullOrWhiteSpace(affectedTranscript.TranscriptId))
                 {
-                    var transcriptResource = transcriptResources.FirstOrDefault(transcript => transcript.Id == affectedTranscript.TranscriptId);
-                    if (transcriptResource == null)
-                        throw new KeyNotFoundException($"Transcript '{affectedTranscript.TranscriptId}' not found in cache.");
+                    var transcriptResource = transcriptResources.First(transcript => transcript.Id == affectedTranscript.TranscriptId);
 
                     affectedTranscriptModel.Transcript = new TranscriptModel();
 
