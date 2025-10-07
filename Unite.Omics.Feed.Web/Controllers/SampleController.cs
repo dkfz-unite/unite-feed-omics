@@ -1,40 +1,36 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv;
-using Unite.Omics.Feed.Data.Writers;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Converters;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Validators;
-using Unite.Omics.Feed.Web.Services.Indexing;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
 [Authorize(Policy = Policies.Data.Writer)]
 public abstract class SampleController : Controller
 {
-    private readonly SampleWriter _dataWriter;
-    private readonly SampleIndexingTaskService _taskService;
-    private readonly ILogger _logger;
+    protected readonly SubmissionTaskService _submissionTaskService;
+    protected readonly ILogger _logger;
 
-    private readonly SampleModelConverter _converter = new();
-    private readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
+    protected readonly SampleModelConverter _converter = new();
+    protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
     protected abstract string DataType { get; }
     protected abstract AnalysisType[] AnalysisTypes { get; }
 
 
     public SampleController(
-        SampleWriter dataWriter,
-        SampleIndexingTaskService taskService,
+        SubmissionTaskService submissionTaskService,
         ILogger<SampleController> logger)
     {
-        _dataWriter = dataWriter;
-        _taskService = taskService;
+        _submissionTaskService = submissionTaskService;
         _logger = logger;
     }
 
@@ -78,25 +74,9 @@ public abstract class SampleController : Controller
     }
 
 
-    protected virtual SampleModel GetSubmission(long id)
-    {
-        // TODO: Return submission
-        return null;
-    }
+    protected abstract SampleModel GetSubmission(long id);
 
-    protected virtual long AddSubmission(SampleModel model, bool review)
-    {
-        // TODO: Add submission process
-        var dataModel = _converter.Convert(model);
-
-        _dataWriter.SaveData(dataModel, out var audit);
-
-        _taskService.PopulateTasks(audit.Samples);
-
-        _logger.LogInformation("{audit}", audit.ToString());
-
-        return 0;
-    }
+    protected abstract long AddSubmission(SampleModel model, bool review);
 
 
     protected virtual ResourceModel[] ParseResources(IFormFile file)

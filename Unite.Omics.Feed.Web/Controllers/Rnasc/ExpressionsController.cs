@@ -15,14 +15,14 @@ namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 [Authorize(Policy = Policies.Data.Writer)]
 public class ExpressionsController : AnalysisController
 {
-    private readonly RnaScSubmissionService _submissionService;
+    private readonly RnascSubmissionService _submissionService;
     private readonly SubmissionTaskService _submissionTaskService;
     protected override string DataType => DataTypes.Omics.Rnasc.Exp;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 
 
     public ExpressionsController(
-        RnaScSubmissionService submissionService,
+        RnascSubmissionService submissionService,
         SubmissionTaskService submissionTaskService)
     {
         _submissionService = submissionService;

@@ -1,3 +1,4 @@
+using System;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers;
@@ -6,19 +7,19 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class MethSubmissionHandler : SampleSubmissionHandler
+public class RnascSubmissionHandler : SampleSubmissionHandler
 {
-    private readonly MethSubmissionService _submissionService;
+    private readonly RnascSubmissionService _submissionService;
 
-    protected override SubmissionTaskType TaskType => SubmissionTaskType.METH;
+    protected override SubmissionTaskType TaskType => SubmissionTaskType.RNASC;
 
 
-    public MethSubmissionHandler(
+    public RnascSubmissionHandler(
         SampleWriter dataWriter,
-        MethSubmissionService submissionService,
+        RnascSubmissionService submissionService,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
-        ILogger<MethSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
+        ILogger<RnascSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
     {
         _submissionService = submissionService;
     }

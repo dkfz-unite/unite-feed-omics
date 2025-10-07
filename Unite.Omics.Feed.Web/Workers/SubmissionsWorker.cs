@@ -1,33 +1,45 @@
-﻿using Unite.Essentials.Extensions;
-using Unite.Omics.Feed.Web.Handlers.Submission;
+﻿using Unite.Omics.Feed.Web.Handlers.Submission;
 
 namespace Unite.Omics.Feed.Web.Workers;
 
 public class SubmissionsWorker : BackgroundService
 {
-    private readonly BulkGeneExpSubmissionHandler _bulkGeneExpSubmissionHandler;
-    private readonly CellGeneExpSubmissionHandler _cellGeneExpSubmissionHandler;
-    private readonly SmsSubmissionHandler _smsSubmissionHandler;
-    private readonly CnvsSubmissionHandler _cnvsSubmissionHandler;
-    private readonly SvsSubmissionHandler _svsSubmissionHandler;
+    private readonly RnaSubmissionHandler _rnaSubmissionHandler;
+    private readonly RnaExpSubmissionHandler _rnaExpSubmissionHandler;
+    private readonly RnascSubmissionHandler _rnascSubmissionHandler;
+    private readonly RnascExpSubmissionHandler _rnascExpSubmissionHandler;
+    private readonly DnaSubmissionHandler _dnaSubmissionHandler;
+    private readonly DnaSmSubmissionHandler _dnaSmSubmissionHandler;
+    private readonly DnaCnvSubmissionHandler _dnaCnvSubmissionHandler;
+    private readonly DnaSvSubmissionHandler _dnaSvSubmissionHandler;
     private readonly MethSubmissionHandler _methSubmissionHandler;
+    private readonly MethLvlSubmissionHandler _methLvlSubmissionHandler;
     private readonly ILogger _logger;
 
+
     public SubmissionsWorker(
-        BulkGeneExpSubmissionHandler bulkGeneExpSubmissionHandler,
-        CellGeneExpSubmissionHandler cellGeneExpSubmissionHandler,
-        SmsSubmissionHandler smsSubmissionHandler,
-        CnvsSubmissionHandler cnvsSubmissionHandler,
-        SvsSubmissionHandler svsSubmissionHandler,
+        RnaSubmissionHandler rnaSubmissionHandler,
+        RnaExpSubmissionHandler rnaExpSubmissionHandler,
+        RnascSubmissionHandler rnascSubmissionHandler,
+        RnascExpSubmissionHandler rnascExpSubmissionHandler,
+        DnaSubmissionHandler dnaSubmissionHandler,
+        DnaSmSubmissionHandler dnaSmSubmissionHandler,
+        DnaCnvSubmissionHandler dnaCnvSubmissionHandler,
+        DnaSvSubmissionHandler dnaSvSubmissionHandler,
         MethSubmissionHandler methSubmissionHandler,
+        MethLvlSubmissionHandler methLvlSubmissionHandler,
         ILogger<SubmissionsWorker> logger)
     {
-        _bulkGeneExpSubmissionHandler = bulkGeneExpSubmissionHandler;
-        _cellGeneExpSubmissionHandler = cellGeneExpSubmissionHandler;
-        _smsSubmissionHandler = smsSubmissionHandler;
-        _cnvsSubmissionHandler = cnvsSubmissionHandler;
-        _svsSubmissionHandler = svsSubmissionHandler;
+        _rnaSubmissionHandler = rnaSubmissionHandler;
+        _rnaExpSubmissionHandler = rnaExpSubmissionHandler;
+        _rnascSubmissionHandler = rnascSubmissionHandler;
+        _rnascExpSubmissionHandler = rnascExpSubmissionHandler;
+        _dnaSubmissionHandler = dnaSubmissionHandler;
+        _dnaSmSubmissionHandler = dnaSmSubmissionHandler;
+        _dnaCnvSubmissionHandler = dnaCnvSubmissionHandler;
+        _dnaSvSubmissionHandler = dnaSvSubmissionHandler;
         _methSubmissionHandler = methSubmissionHandler;
+        _methLvlSubmissionHandler = methLvlSubmissionHandler;
         _logger = logger;
     }
 
@@ -44,12 +56,16 @@ public class SubmissionsWorker : BackgroundService
         {
             try
             {
-                _cellGeneExpSubmissionHandler.Handle();
-                _bulkGeneExpSubmissionHandler.Handle();
-                _smsSubmissionHandler.Handle();
-                _cnvsSubmissionHandler.Handle();
-                _svsSubmissionHandler.Handle();
+                _rnaSubmissionHandler.Handle();
+                _rnaExpSubmissionHandler.Handle();
+                _rnascSubmissionHandler.Handle();
+                _rnascExpSubmissionHandler.Handle();
+                _dnaSubmissionHandler.Handle();
+                _dnaSmSubmissionHandler.Handle();
+                _dnaCnvSubmissionHandler.Handle();
+                _dnaSvSubmissionHandler.Handle();
                 _methSubmissionHandler.Handle();
+                _methLvlSubmissionHandler.Handle();
             }
             catch (Exception exception)
             {

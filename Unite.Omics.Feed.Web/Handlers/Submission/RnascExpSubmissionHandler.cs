@@ -7,10 +7,10 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class CellGeneExpSubmissionHandler
+public class RnascExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly RnaScSubmissionService _submissionService;
+    private readonly RnascSubmissionService _submissionService;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -18,12 +18,12 @@ public class CellGeneExpSubmissionHandler
     private readonly Models.RnaSc.Converters.AnalysisModelConverter _converter = new();
 
 
-    public CellGeneExpSubmissionHandler(
+    public RnascExpSubmissionHandler(
         AnalysisWriter dataWriter,
-        RnaScSubmissionService submissionService,
+        RnascSubmissionService submissionService,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ILogger<CellGeneExpSubmissionHandler> logger)
+        ILogger<RnascExpSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;
         _submissionService = submissionService;
