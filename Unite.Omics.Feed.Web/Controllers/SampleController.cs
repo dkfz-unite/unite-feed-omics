@@ -13,7 +13,6 @@ using Unite.Omics.Feed.Web.Models.Base.Validators;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-[Authorize(Policy = Policies.Data.Writer)]
 public abstract class SampleController : Controller
 {
     protected readonly SubmissionTaskService _submissionTaskService;
@@ -36,17 +35,33 @@ public abstract class SampleController : Controller
 
 
     [HttpGet("{id}")]
-    [AllowAnonymous]
+    [Authorize]
     public IActionResult Get(long id)
     {
-        var submission = GetSubmission(id);
+        var task = _submissionTaskService.GetTask(id);
+        if (task == null)
+            return NotFound();
+
+        var submission = FindSubmission(task.Target);
 
         return Ok(submission);
+    }
+
+    [HttpGet("{id}/status")]
+    [Authorize]
+    public IActionResult GetStatus(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+        if (task == null)
+            return NotFound();
+
+        return Ok(task.StatusTypeId);
     }
 
     [HttpPost("")]
     [Consumes("application/json")]
     [RequestSizeLimit(100_000_000)]
+    [Authorize(Policy = Policies.Data.Writer)]
     public IActionResult PostJson([FromBody] SampleModel model, [FromQuery] bool review = true)
     {
         model.Resources?.ForEach(resource => resource.Type = DataType);
@@ -58,6 +73,7 @@ public abstract class SampleController : Controller
     [HttpPost("")]
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(100_000_000)]
+    [Authorize(Policy = Policies.Data.Writer)]
     public IActionResult PostForm([FromForm] SampleForm form, [FromQuery] bool review = true)
     {
         var model = form.Convert();
@@ -74,7 +90,12 @@ public abstract class SampleController : Controller
     }
 
 
-    protected abstract SampleModel GetSubmission(long id);
+    /// <summary>
+    /// Find existing submission by its identifier.
+    /// </summary>
+    /// <param name="id">Submission identifier (Task.Target)</param>
+    /// <returns>Submission if was found.</returns>
+    protected abstract SampleModel FindSubmission(string id);
 
     protected abstract long AddSubmission(SampleModel model, bool review);
 

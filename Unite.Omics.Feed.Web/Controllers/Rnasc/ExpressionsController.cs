@@ -16,25 +16,22 @@ namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 public class ExpressionsController : AnalysisController
 {
     private readonly RnascSubmissionService _submissionService;
-    private readonly SubmissionTaskService _submissionTaskService;
     protected override string DataType => DataTypes.Omics.Rnasc.Exp;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 
 
     public ExpressionsController(
         RnascSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService)
+        SubmissionTaskService submissionTaskService,
+        ILogger<ExpressionsController> logger) : base(submissionTaskService, logger)
     {
         _submissionService = submissionService;
-        _submissionTaskService = submissionTaskService;
     }
 
 
-    protected override AnalysisModel<EmptyModel> GetSubmission(long id)
+    protected override AnalysisModel<EmptyModel> FindSubmission(string id)
     {
-        var task = _submissionTaskService.GetTask(id);
-
-        return _submissionService.FindExpSubmission(task.Target);
+        return _submissionService.FindExpSubmission(id);
     }
 
     protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)

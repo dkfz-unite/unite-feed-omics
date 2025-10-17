@@ -15,7 +15,6 @@ namespace Unite.Omics.Feed.Web.Controllers.Meth;
 public class LevelsController : AnalysisController
 {
     private readonly MethSubmissionService _submissionService;
-    private readonly SubmissionTaskService _submissionTaskService;
 
     protected override string DataType => DataTypes.Omics.Meth.Level;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
@@ -23,18 +22,16 @@ public class LevelsController : AnalysisController
 
     public LevelsController(
         MethSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService)
+        SubmissionTaskService submissionTaskService,
+        ILogger<LevelsController> logger) : base(submissionTaskService, logger)
     {
         _submissionService = submissionService;
-        _submissionTaskService = submissionTaskService;
     }
 
 
-    protected override AnalysisModel<EmptyModel> GetSubmission(long id)
+    protected override AnalysisModel<EmptyModel> FindSubmission(string id)
     {
-        var task = _submissionTaskService.GetTask(id);
-
-        return _submissionService.FindLevelSubmission(task.Target);
+        return _submissionService.FindLevelSubmission(id);
     }
 
     protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)

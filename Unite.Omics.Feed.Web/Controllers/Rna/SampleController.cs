@@ -22,11 +22,9 @@ public class SampleController : Controllers.SampleController
     }
 
 
-    protected override SampleModel GetSubmission(long id)
+    protected override SampleModel FindSubmission(string id)
     {
-        var task = _submissionTaskService.GetTask(id);
-
-        return _submissionService.FindSampleSubmission(task.Target);
+        return _submissionService.FindSampleSubmission(id);
     }
     
     protected override long AddSubmission(SampleModel model, bool review)

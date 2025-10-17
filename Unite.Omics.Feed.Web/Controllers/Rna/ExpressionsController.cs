@@ -20,7 +20,6 @@ namespace Unite.Omics.Feed.Web.Controllers.Rna;
 public class ExpressionsController : AnalysisDataController<ExpressionModel>
 {
     private readonly RnaSubmissionService _submissionService;
-    private readonly SubmissionTaskService _submissionTaskService;
 
     protected override IValidator<ExpressionModel> EntryModelValidator => new ExpressionModelValidator();
     protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
@@ -33,20 +32,19 @@ public class ExpressionsController : AnalysisDataController<ExpressionModel>
     ]; 
 
 
+
 	public ExpressionsController(
         RnaSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService)
+        SubmissionTaskService submissionTaskService,
+        ILogger<ExpressionsController> logger) : base(submissionTaskService, logger)
     {
         _submissionService = submissionService;
-        _submissionTaskService = submissionTaskService;
     }
 
 
-    protected override AnalysisModel<ExpressionModel> GetSubmission(long id)
+    protected override AnalysisModel<ExpressionModel> FindSubmission(string id)
     {
-        var task = _submissionTaskService.GetTask(id);
-
-        return _submissionService.FindExpSubmission(task.Target);
+        return _submissionService.FindExpSubmission(id);
     }
 
     protected override long AddSubmission(AnalysisModel<ExpressionModel> model, bool review)
