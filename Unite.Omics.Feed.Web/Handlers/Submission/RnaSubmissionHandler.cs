@@ -6,19 +6,19 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class MethSubmissionHandler : SampleSubmissionHandler
+public class RnaSubmissionHandler : SampleSubmissionHandler
 {
-    private readonly MethSubmissionService _submissionService;
+    private readonly RnaSubmissionService _submissionService;
 
-    protected override SubmissionTaskType TaskType => SubmissionTaskType.METH;
+    protected override SubmissionTaskType TaskType => SubmissionTaskType.RNA;
 
 
-    public MethSubmissionHandler(
+    public RnaSubmissionHandler(
         SampleWriter dataWriter,
-        MethSubmissionService submissionService,
+        RnaSubmissionService submissionService,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
-        ILogger<MethSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
+        ILogger<RnaSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
     {
         _submissionService = submissionService;
     }

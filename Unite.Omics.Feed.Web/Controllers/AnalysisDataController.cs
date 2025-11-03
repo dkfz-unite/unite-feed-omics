@@ -1,8 +1,11 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv;
+using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
@@ -11,6 +14,9 @@ namespace Unite.Omics.Feed.Web.Controllers;
 
 public abstract class AnalysisDataController<TEntry> : Controller where TEntry : class, new()
 {
+    protected readonly SubmissionTaskService _submissionTaskService;
+    protected readonly ILogger _logger;
+
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
     protected abstract IValidator<ResourceModel> ResourceModelValidator { get; }
     protected abstract string DataType { get; }
@@ -18,17 +24,43 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
     protected abstract IReader<TEntry>[] Readers { get; }
 
 
+    public AnalysisDataController(
+        SubmissionTaskService submissionTaskService,
+        ILogger<AnalysisDataController<TEntry>> logger)
+    {
+        _submissionTaskService = submissionTaskService;
+        _logger = logger;
+    }
+
+
     [HttpGet("{id}")]
+    [Authorize]
     public virtual IActionResult Get(long id)
     {
-        var submission = GetSubmission(id);
+        var task = _submissionTaskService.GetTask(id);
+        if (task == null)
+            return NotFound();
+
+        var submission = FindSubmission(task.Target);
 
         return Ok(submission);
+    }
+
+    [HttpGet("{id}/status")]
+    [Authorize]
+    public virtual IActionResult GetStatus(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+        if (task == null)
+            return NotFound();
+        
+        return Ok(task.StatusTypeId);
     }
 
     [HttpPost("")]
     [Consumes("application/json")]
     [RequestSizeLimit(100_000_000)]
+    [Authorize(Policy = Policies.Data.Writer)]
     public virtual IActionResult PostJson([FromBody] AnalysisModel<TEntry> model, [FromQuery] bool review = true)
     {
         model.Resources?.ForEach(resource => resource.Type = DataType);
@@ -36,10 +68,11 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
 
         return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
-    
+
     [HttpPost("")]
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(100_000_000)]
+    [Authorize(Policy = Policies.Data.Writer)]
     public virtual IActionResult PostForm([FromForm] AnalysisForm<TEntry> form, [FromQuery] bool review = true, [FromQuery] string format = null)
     {
         var model = form.Convert();
@@ -66,7 +99,7 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
     }
 
 
-    protected abstract AnalysisModel<TEntry> GetSubmission(long id);
+    protected abstract AnalysisModel<TEntry> FindSubmission(string id);
 
     protected abstract long AddSubmission(AnalysisModel<TEntry> model, bool review);
 

@@ -58,7 +58,7 @@ public static class ConfigurationExtensions
         services.AddTransient<DnaSubmissionService>();
         services.AddTransient<MethSubmissionService>();
         services.AddTransient<RnaSubmissionService>();
-        services.AddTransient<RnaScSubmissionService>();
+        services.AddTransient<RnascSubmissionService>();
 
         // Annotation services
         services.AddTransient<SmsAnnotationService>();
@@ -82,12 +82,16 @@ public static class ConfigurationExtensions
 
         // Submissions hosted services
         services.AddHostedService<SubmissionsWorker>();
-        services.AddTransient<BulkGeneExpSubmissionHandler>();
-        services.AddTransient<CellGeneExpSubmissionHandler>();
-        services.AddTransient<SmsSubmissionHandler>();
-        services.AddTransient<CnvsSubmissionHandler>();
-        services.AddTransient<SvsSubmissionHandler>();
+        services.AddTransient<RnaSubmissionHandler>();
+        services.AddTransient<RnaExpSubmissionHandler>();
+        services.AddTransient<RnascSubmissionHandler>();
+        services.AddTransient<RnascExpSubmissionHandler>();
+        services.AddTransient<DnaSubmissionHandler>();
+        services.AddTransient<DnaSmSubmissionHandler>();
+        services.AddTransient<DnaCnvSubmissionHandler>();
+        services.AddTransient<DnaSvSubmissionHandler>();
         services.AddTransient<MethSubmissionHandler>();
+        services.AddTransient<MethLvlSubmissionHandler>();
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();

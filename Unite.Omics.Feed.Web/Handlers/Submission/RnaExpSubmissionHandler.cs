@@ -8,7 +8,7 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class BulkGeneExpSubmissionHandler
+public class RnaExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionsAnnotationService _annotationService;
@@ -20,13 +20,13 @@ public class BulkGeneExpSubmissionHandler
     private readonly Models.Rna.Converters.AnalysisModelConverter _converter;
 
 
-	public BulkGeneExpSubmissionHandler(
+	public RnaExpSubmissionHandler(
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
         RnaSubmissionService submissionService,
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ILogger<BulkGeneExpSubmissionHandler> logger)
+        ILogger<RnaExpSubmissionHandler> logger)
 	{
         _dataWriter = dataWriter;
         _annotationService = annotationService;

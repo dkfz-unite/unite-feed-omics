@@ -4,13 +4,13 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Submissions;
 
-public class RnaScSubmissionService
+public class RnascSubmissionService
 {
 	private readonly SampleSubmissionRepository _sampleRepository;
     private readonly ExpSubmissionRepository _expRepository;
 
 
-    public RnaScSubmissionService(IMongoOptions options)
+    public RnascSubmissionService(IMongoOptions options)
 	{
 		_sampleRepository = new SampleSubmissionRepository(options);
 		_expRepository = new ExpSubmissionRepository(options);
