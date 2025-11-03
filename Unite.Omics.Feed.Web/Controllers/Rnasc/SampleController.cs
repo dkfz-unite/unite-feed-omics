@@ -1,18 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Constants;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
-using Unite.Omics.Feed.Data.Writers;
-using Unite.Omics.Feed.Web.Services.Indexing;
+using Unite.Data.Entities.Tasks.Enums;
+using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 
 [Route("api/rnasc/sample")]
 public class SampleController : Controllers.SampleController
 {
+    private readonly RnascSubmissionService _submissionService;
     protected override string DataType => DataTypes.Omics.Rnasc.Sample;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 
-    public SampleController(SampleWriter dataWriter, SampleIndexingTaskService taskService, ILogger<SampleController> logger) : base(dataWriter, taskService, logger)
+
+    public SampleController(RnascSubmissionService submissionService, SubmissionTaskService submissionTaskService, ILogger<SampleController> logger) : base(submissionTaskService, logger)
     {
+        _submissionService = submissionService;
+    }
+
+
+    protected override SampleModel FindSubmission(string id)
+    {
+        return _submissionService.FindSampleSubmission(id);
+    }
+
+    protected override long AddSubmission(SampleModel model, bool review)
+    {
+        var submissionId = _submissionService.AddSampleSubmission(model);
+
+        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
+
+        return _submissionTaskService.CreateTask(SubmissionTaskType.RNASC, submissionId, taskStatus);
     }
 }
