@@ -45,24 +45,39 @@ public class IndexingController : Controller
 
 
     [HttpPost("genes")]
-    public IActionResult Genes()
+    public async Task<IActionResult> Genes()
     {
-        _genesIndexService.DeleteIndex().Wait();
+        await DeleteIndex(_smsIndexService.DeleteIndex());
+        
         _geneTasksService.CreateTasks();
 
         return Ok();
     }
 
     [HttpPost("variants")]
-    public IActionResult Variants()
+    public async Task<IActionResult> Variants()
     {
-        _smsIndexService.DeleteIndex().Wait();
-        _cnvsIndexService.DeleteIndex().Wait();
-        _svsIndexService.DeleteIndex().Wait();
+        await DeleteIndex(_smsIndexService.DeleteIndex());
+        await DeleteIndex(_cnvsIndexService.DeleteIndex());
+        await DeleteIndex(_svsIndexService.DeleteIndex());
+
         _smTasksService.CreateTasks();
         _cnvTasksService.CreateTasks();
         _svTasksService.CreateTasks();
 
         return Ok();
+    }
+
+
+    private static async Task DeleteIndex(Task task)
+    {
+        try
+        {
+            await task;
+        }
+        catch
+        {
+            // Ignore errors
+        }
     }
 }
