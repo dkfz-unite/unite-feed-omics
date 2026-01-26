@@ -22,7 +22,6 @@ public class SmsController : AnalysisDataController<VariantModel>
     private readonly DnaSubmissionService _submissionService;
 
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
-    protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Sm;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
     protected override IReader<VariantModel>[] Readers =>

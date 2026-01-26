@@ -6,7 +6,8 @@ using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
-using Unite.Omics.Feed.Web.Models.Dna.Cnvp;
+using Unite.Omics.Feed.Web.Models.Dna.CnvProfile;
+using Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Validators;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
@@ -14,8 +15,7 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 [Authorize(Policy = Policies.Data.Writer)]
 public class CnvProfileController: AnalysisDataController<CnvProfileModel>
 {
-    protected override IValidator<CnvProfileModel> EntryModelValidator { get; }
-    protected override IValidator<ResourceModel> ResourceModelValidator { get; }
+    protected override IValidator<CnvProfileModel> EntryModelValidator => new CnvProfileModelValidator();
     protected override string DataType { get; }
     protected override AnalysisType[] AnalysisTypes { get; }
     protected override IReader<CnvProfileModel>[] Readers { get; }

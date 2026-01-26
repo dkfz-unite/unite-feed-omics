@@ -9,6 +9,7 @@ using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
+using Unite.Omics.Feed.Web.Models.Base.Validators;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
@@ -16,9 +17,9 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
 {
     protected readonly SubmissionTaskService _submissionTaskService;
     protected readonly ILogger _logger;
+    protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
-    protected abstract IValidator<ResourceModel> ResourceModelValidator { get; }
     protected abstract string DataType { get; }
     protected abstract AnalysisType[] AnalysisTypes { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
@@ -139,7 +140,7 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
 
     protected virtual void ValidateResources(ResourceModel[] resources, AnalysisModel<TEntry> model)
     {
-        ValidateItems(resources, ResourceModelValidator, "Resources");
+        ValidateItems(resources, _resourceModelValidator, "Resources");
     }
 
     protected virtual void ValidateEntries(TEntry[] entries, AnalysisModel<TEntry> model)

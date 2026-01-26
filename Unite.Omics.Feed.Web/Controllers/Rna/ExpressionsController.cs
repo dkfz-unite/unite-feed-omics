@@ -22,7 +22,6 @@ public class ExpressionsController : AnalysisDataController<ExpressionModel>
     private readonly RnaSubmissionService _submissionService;
 
     protected override IValidator<ExpressionModel> EntryModelValidator => new ExpressionModelValidator();
-    protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
     protected override string DataType => DataTypes.Omics.Rna.Exp;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeq];
     protected override IReader<ExpressionModel>[] Readers =>
