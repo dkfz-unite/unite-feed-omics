@@ -1,0 +1,36 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Omics.Analysis.Enums;
+using Unite.Omics.Feed.Web.Configuration.Constants;
+using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Models.Base.Readers;
+using Unite.Omics.Feed.Web.Models.Dna.Cnvp;
+
+namespace Unite.Omics.Feed.Web.Controllers.Dna;
+
+[Route("api/dna/analysis/cnv-profile")]
+[Authorize(Policy = Policies.Data.Writer)]
+public class CnvProfileController: AnalysisDataController<CnvProfileModel>
+{
+    protected override IValidator<CnvProfileModel> EntryModelValidator { get; }
+    protected override IValidator<ResourceModel> ResourceModelValidator { get; }
+    protected override string DataType { get; }
+    protected override AnalysisType[] AnalysisTypes { get; }
+    protected override IReader<CnvProfileModel>[] Readers { get; }
+    
+    public CnvProfileController(SubmissionTaskService submissionTaskService, ILogger<AnalysisDataController<CnvProfileModel>> logger) : base(submissionTaskService, logger)
+    {
+    }
+    
+    protected override AnalysisModel<CnvProfileModel> FindSubmission(string id)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override long AddSubmission(AnalysisModel<CnvProfileModel> model, bool review)
+    {
+        throw new NotImplementedException();
+    }
+}
