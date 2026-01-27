@@ -26,7 +26,7 @@ public class ExpressionsController : AnalysisDataController<ExpressionModel>
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeq];
     protected override IReader<ExpressionModel>[] Readers =>
     [
-        new Models.Rna.Readers.Tsv.Reader(),
+        new TsvReader<ExpressionModel>(),
         new Models.Rna.Readers.DkfzRnaseq.Reader()
     ]; 
 

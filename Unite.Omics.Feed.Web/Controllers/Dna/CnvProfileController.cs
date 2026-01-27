@@ -1,8 +1,10 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
+using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
@@ -16,9 +18,12 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 public class CnvProfileController: AnalysisDataController<CnvProfileModel>
 {
     protected override IValidator<CnvProfileModel> EntryModelValidator => new CnvProfileModelValidator();
-    protected override string DataType { get; }
-    protected override AnalysisType[] AnalysisTypes { get; }
-    protected override IReader<CnvProfileModel>[] Readers { get; }
+    protected override string DataType => DataTypes.Omics.Dna.CnvProfile;
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
+    protected override IReader<CnvProfileModel>[] Readers => 
+    [
+        new TsvReader<CnvProfileModel>()
+    ];
     
     public CnvProfileController(SubmissionTaskService submissionTaskService, ILogger<AnalysisDataController<CnvProfileModel>> logger) : base(submissionTaskService, logger)
     {
@@ -32,5 +37,6 @@ public class CnvProfileController: AnalysisDataController<CnvProfileModel>
     protected override long AddSubmission(AnalysisModel<CnvProfileModel> model, bool review)
     {
         throw new NotImplementedException();
+        
     }
 }

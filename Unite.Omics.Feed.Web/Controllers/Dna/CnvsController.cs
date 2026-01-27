@@ -26,7 +26,7 @@ public class CnvsController : AnalysisDataController<VariantModel>
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
     protected override IReader<VariantModel>[] Readers =>
     [
-        new Models.Dna.Cnv.Readers.Tsv.Reader(),
+        new TsvReader<VariantModel>(),
         new Models.Dna.Cnv.Readers.Aceseq.Reader()
     ];
 

@@ -26,7 +26,7 @@ public class SmsController : AnalysisDataController<VariantModel>
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
     protected override IReader<VariantModel>[] Readers =>
     [
-        new Models.Dna.Sm.Readers.Tsv.Reader(),
+        new TsvReader<VariantModel>(),
         new Models.Dna.Sm.Readers.Vcf.Reader()
     ];
 

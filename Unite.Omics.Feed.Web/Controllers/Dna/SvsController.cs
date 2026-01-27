@@ -26,7 +26,7 @@ public class SvsController : AnalysisDataController<VariantModel>
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
     protected override IReader<VariantModel>[] Readers =>
     [
-        new Models.Dna.Sv.Readers.Tsv.Reader(),
+        new TsvReader<VariantModel>(),
         new Models.Dna.Sv.Readers.DkfzSophia.Reader()
     ];
 
