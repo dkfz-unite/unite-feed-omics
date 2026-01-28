@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
+using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Web.Configuration.Constants;
@@ -10,6 +11,7 @@ using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
 using Unite.Omics.Feed.Web.Models.Base.Validators;
+using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
@@ -23,6 +25,8 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
     protected abstract string DataType { get; }
     protected abstract AnalysisType[] AnalysisTypes { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
+    protected abstract SubmissionTaskType  SubmissionTaskType { get; }
+    protected abstract SubmissionRepository SubmissionRepository { get; }
 
 
     public AnalysisDataController(
@@ -101,9 +105,16 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
 
 
     protected abstract AnalysisModel<TEntry> FindSubmission(string id);
+    
+    protected virtual long AddSubmission(AnalysisModel<TEntry> model, bool review)
+    {
+        var submissionRepository = SubmissionRepository;
+        string submissionId = submissionRepository.Add(model);
+        
+        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-    protected abstract long AddSubmission(AnalysisModel<TEntry> model, bool review);
-
+        return _submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
+    }
 
     protected virtual ResourceModel[] ParseResources(IFormFile file)
     {

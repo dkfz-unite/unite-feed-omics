@@ -5,12 +5,8 @@ using Unite.Omics.Feed.Web.Models.Dna.Sv;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
-public class SvSubmissionRepository : CacheRepository<AnalysisModel<VariantModel>>
+public class SvSubmissionRepository(IMongoOptions options) : SubmissionRepository(options)
 {
-    public override string DatabaseName => "submissions";
-    public override string CollectionName => "dna_svs";
-
-    public SvSubmissionRepository(IMongoOptions options) : base(options)
-    {
-    }
+    protected override string CollectionName => "dna_svs";
 }
+

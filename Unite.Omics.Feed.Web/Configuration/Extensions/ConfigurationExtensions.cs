@@ -18,6 +18,7 @@ using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 using Unite.Omics.Indices.Services;
 
 using DnaEntities = Unite.Data.Entities.Omics.Analysis.Dna;
@@ -119,6 +120,9 @@ public static class ConfigurationExtensions
 
         // Gene indexing services
         services.AddTransient<GenesIndexingCache>();
+        
+        //Submission repositories
+        services.AddTransient<CnvProfileSubmissionRepository>();
     }
 
 

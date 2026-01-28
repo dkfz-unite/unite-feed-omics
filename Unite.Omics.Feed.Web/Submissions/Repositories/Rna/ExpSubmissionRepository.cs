@@ -5,12 +5,7 @@ using Unite.Omics.Feed.Web.Models.Rna;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
-public class ExpSubmissionRepository : CacheRepository<AnalysisModel<ExpressionModel>>
+public class ExpSubmissionRepository(IMongoOptions options) : SubmissionRepository(options)
 {
-    public override string DatabaseName => "submissions";
-    public override string CollectionName => "rna_expressions";
-
-    public ExpSubmissionRepository(IMongoOptions options) : base(options)
-    {
-    }
+    protected override string CollectionName => "rna_expressions";
 }

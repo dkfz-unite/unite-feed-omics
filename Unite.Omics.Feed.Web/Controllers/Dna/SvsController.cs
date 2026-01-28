@@ -12,6 +12,7 @@ using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Models.Dna.Sv;
 using Unite.Omics.Feed.Web.Models.Dna.Sv.Validators;
 using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
@@ -20,6 +21,7 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 public class SvsController : AnalysisDataController<VariantModel>
 {
     private readonly DnaSubmissionService _submissionService;
+    private readonly SvSubmissionRepository _submissionRepository;
 
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Sv;
@@ -30,27 +32,22 @@ public class SvsController : AnalysisDataController<VariantModel>
         new Models.Dna.Sv.Readers.DkfzSophia.Reader()
     ];
 
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_SV;
+    protected override SubmissionRepository SubmissionRepository => _submissionRepository;
 
     public SvsController(
         DnaSubmissionService submissionService,
         SubmissionTaskService submissionTaskService,
-        ILogger<SvsController> logger) : base(submissionTaskService, logger)
+        ILogger<SvsController> logger, 
+        SvSubmissionRepository submissionRepository) : base(submissionTaskService, logger)
     {
         _submissionService = submissionService;
+        _submissionRepository = submissionRepository;
     }
 
 
     protected override AnalysisModel<VariantModel> FindSubmission(string id)
     {
         return _submissionService.FindSvSubmission(id);
-    }
-
-    protected override long AddSubmission(AnalysisModel<VariantModel> model, bool review)
-    {
-        var submissionId = _submissionService.AddSvSubmission(model);
-
-        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
-
-        return _submissionTaskService.CreateTask(SubmissionTaskType.DNA_SV, submissionId, taskStatus);
     }
 }

@@ -1,22 +1,26 @@
 ﻿using Unite.Cache.Configuration.Options;
 using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Models.Dna.CnvProfile;
+using Unite.Omics.Feed.Web.Models.Dna.Sm;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Submissions;
 
 public class DnaSubmissionService
 {
-    private readonly Repositories.Dna.SampleSubmissionRepository _sampleRepository;
-	private readonly Repositories.Dna.SmSubmissionRepository _smRepository;
-	private readonly Repositories.Dna.CnvSubmissionRepository _cnvRepository;
-	private readonly Repositories.Dna.SvSubmissionRepository _svRepository;
-
-
+    private readonly SampleSubmissionRepository _sampleRepository;
+	private readonly SmSubmissionRepository _smRepository;
+	private readonly CnvSubmissionRepository _cnvRepository;
+	private readonly SvSubmissionRepository _svRepository;
+	private readonly CnvProfileSubmissionRepository _cnvProfileRepository;
+    
     public DnaSubmissionService(IMongoOptions options)
 	{
-        _sampleRepository = new Repositories.Dna.SampleSubmissionRepository(options);
-		_smRepository = new Repositories.Dna.SmSubmissionRepository(options);
-		_cnvRepository = new Repositories.Dna.CnvSubmissionRepository(options);
-		_svRepository = new Repositories.Dna.SvSubmissionRepository(options);
+        _cnvProfileRepository = new CnvProfileSubmissionRepository(options);
+        _sampleRepository = new SampleSubmissionRepository(options);
+		_smRepository = new SmSubmissionRepository(options);
+		_cnvRepository = new CnvSubmissionRepository(options);
+		_svRepository = new SvSubmissionRepository(options);
 	}
 
 
@@ -25,7 +29,7 @@ public class DnaSubmissionService
         return _sampleRepository.Add(data);
     }
 
-	public string AddSmSubmission(AnalysisModel<Models.Dna.Sm.VariantModel> data)
+	public string AddSmSubmission(AnalysisModel<VariantModel> data)
 	{
 		return _smRepository.Add(data);
 	}
@@ -39,13 +43,18 @@ public class DnaSubmissionService
     {
         return _svRepository.Add(data);
     }
+    
+    public string AddCnvProfileSubmission(AnalysisModel<CnvProfileModel> data)
+    {
+        return _cnvProfileRepository.Add(data);
+    }
 
     public SampleModel FindSampleSubmission(string id)
     {
         return _sampleRepository.Find(id)?.Document;
     }
 
-	public AnalysisModel<Models.Dna.Sm.VariantModel> FindSmSubmission(string id)
+	public AnalysisModel<VariantModel> FindSmSubmission(string id)
 	{
 		return _smRepository.Find(id)?.Document;
 	}

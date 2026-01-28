@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Components;
 using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
+using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
 using Unite.Omics.Feed.Web.Models.Dna.CnvProfile;
 using Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Validators;
+using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
@@ -17,6 +20,8 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 [Authorize(Policy = Policies.Data.Writer)]
 public class CnvProfileController: AnalysisDataController<CnvProfileModel>
 {
+    private readonly CnvProfileSubmissionRepository _submissionRepository;
+    
     protected override IValidator<CnvProfileModel> EntryModelValidator => new CnvProfileModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.CnvProfile;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
@@ -24,19 +29,20 @@ public class CnvProfileController: AnalysisDataController<CnvProfileModel>
     [
         new TsvReader<CnvProfileModel>()
     ];
-    
-    public CnvProfileController(SubmissionTaskService submissionTaskService, ILogger<AnalysisDataController<CnvProfileModel>> logger) : base(submissionTaskService, logger)
+
+    //TODO: change to CNV_PROFILE task type
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_SM;
+    protected override SubmissionRepository SubmissionRepository => _submissionRepository;
+
+    public CnvProfileController(SubmissionTaskService submissionTaskService, 
+        ILogger<AnalysisDataController<CnvProfileModel>> logger, 
+        CnvProfileSubmissionRepository submissionRepository) : base(submissionTaskService, logger)
     {
+        _submissionRepository = submissionRepository;
     }
     
     protected override AnalysisModel<CnvProfileModel> FindSubmission(string id)
     {
         throw new NotImplementedException();
-    }
-
-    protected override long AddSubmission(AnalysisModel<CnvProfileModel> model, bool review)
-    {
-        throw new NotImplementedException();
-        
     }
 }
