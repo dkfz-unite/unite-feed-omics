@@ -6,7 +6,7 @@ using Unite.Omics.Feed.Web.Models.Base.Extensions;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
-public class AnalysisFormValidator<T> : AbstractValidator<AnalysisForm<T>>
+public class AnalysisFormValidator<T> : AbstractValidator<AnalysisForm>
     where T : class, new()
 {
     private readonly StringComparison _comparison = StringComparison.InvariantCultureIgnoreCase;

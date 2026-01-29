@@ -1,57 +1,23 @@
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
-using Unite.Essentials.Tsv;
-using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.Base.Extensions;
-using Unite.Omics.Feed.Web.Models.Base.Validators;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
 public abstract class AnalysisController(
     SubmissionTaskService submissionTaskService,
     ILogger<AnalysisController> logger)
-    : SubmissionController<AnalysisModel<EmptyModel>>(submissionTaskService)
+    : SubmissionController<AnalysisModel<EmptyModel>, AnalysisForm>(submissionTaskService, logger)
 {
-    protected readonly ILogger _logger = logger;
     protected abstract AnalysisType[] AnalysisTypes { get; }
-
-    protected IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
-
-    [HttpPost("")]
-    [Consumes("multipart/form-data")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public virtual IActionResult PostForm([FromForm] AnalysisForm<EmptyModel> form, [FromQuery] bool review = true)
+    
+    protected override AnalysisModel<EmptyModel> Convert(AnalysisForm form)
     {
-        var model = form.Convert();
-        ValidateAnalysis(model);
-
-        if (!form.ResourcesFile.IsEmpty())
-        {
-            model.Resources = ParseResources(form.ResourcesFile);
-            model.Resources?.ForEach(resource => resource.Type = DataType);
-            ValidateResources(model.Resources, model);
-        }
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+        return AnalysisFormConverter<EmptyModel>.Convert(form);
     }
 
-    protected virtual ResourceModel[] ParseResources(IFormFile file)
-    {
-        using var stream = file.OpenReadStream();
-        using var streamReader = new StreamReader(stream);
-
-        var tsv = streamReader.ReadToEnd();
-
-        return TsvReader.Read<ResourceModel>(tsv).ToArrayOrNull();
-    }
-
-    protected virtual void ValidateAnalysis(AnalysisModel<EmptyModel> model)
+    protected override void ValidateModel(AnalysisModel<EmptyModel> model)
     {
         if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))
         {
@@ -63,27 +29,6 @@ public abstract class AnalysisController(
         {
             var allowedValues = string.Join(", ", AnalysisTypes.Select(analysis => analysis.ToDefinitionString()));
             ModelState.AddModelError("MatchedSample.AnalysisType", $"Allowed values are [{allowedValues}]");
-        }
-    }
-
-    protected virtual void ValidateResources(ResourceModel[] resources, AnalysisModel<EmptyModel> model)
-    {
-        ValidateItems(resources, ResourceModelValidator, "Resources");
-    }
-
-    protected void ValidateItems<T>(T[] items, IValidator<T> validator, string prefix)
-    {
-        for (int i = 0; i < items.Length; i++)
-        {
-            var result = validator.Validate(items[i]);
-
-            if (!result.IsValid)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError($"{prefix}[{i}].{error.PropertyName}", error.ErrorMessage);
-                }
-            }
         }
     }
 }

@@ -1,80 +1,44 @@
 using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
-using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
-using Unite.Essentials.Tsv;
-using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
-using Unite.Omics.Feed.Web.Models.Base.Validators;
-using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
 public abstract class AnalysisDataController<TEntry>(
     SubmissionTaskService submissionTaskService,
     ILogger<AnalysisDataController<TEntry>> logger)
-    : SubmissionController<AnalysisModel<TEntry>>(submissionTaskService)
+    : SubmissionController<AnalysisModel<TEntry>, AnalysisForm>(submissionTaskService, logger)
     where TEntry : class, new()
 {
-    protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
-
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
     protected abstract AnalysisType[] AnalysisTypes { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
 
-    [HttpPost("")]
-    [Consumes("multipart/form-data")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public virtual IActionResult PostForm([FromForm] AnalysisForm<TEntry> form, [FromQuery] bool review = true, [FromQuery] string format = null)
+    protected override AnalysisModel<TEntry> Convert(AnalysisForm form)
     {
-        var model = form.Convert();
-        ValidateAnalysis(model);
-
-        if (!form.ResourcesFile.IsEmpty())
-        {
-            model.Resources = ParseResources(form.ResourcesFile);
-            model.Resources?.ForEach(resource => resource.Type = DataType);
-            ValidateResources(model.Resources, model);
-        }
-
+        return AnalysisFormConverter<TEntry>.Convert(form);
+    }
+    
+    protected override void ReadSubmissionForm(AnalysisForm form, AnalysisModel<TEntry> model, string format = null)
+    {
+        base.ReadSubmissionForm(form, model);
+        
         if (!form.EntriesFile.IsEmpty())
         {
             var reader = GetReader(format);
             if (reader == null)
-                return BadRequest($"Unsupported file format: {format}");
+                throw new InvalidOperationException($"Unsupported file format: {format}");
 
             model.Entries = ParseEntries(form.EntriesFile, reader);
             ValidateEntries(model.Entries, model);
         }
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
 
-    protected virtual ResourceModel[] ParseResources(IFormFile file)
-    {
-        using var stream = file.OpenReadStream();
-        using var streamReader = new StreamReader(stream);
-
-        var tsv = streamReader.ReadToEnd();
-
-        return TsvReader.Read<ResourceModel>(tsv).ToArrayOrNull();
-    }
-
-    protected virtual TEntry[] ParseEntries(IFormFile file, IReader<TEntry> reader)
-    {
-        using var stream = file.OpenReadStream();
-        using var streamReader = new StreamReader(stream);
-
-        return reader.Read(streamReader);
-    }
-
-    protected virtual void ValidateAnalysis(AnalysisModel<TEntry> model)
+    protected override void ValidateModel(AnalysisModel<TEntry> model)
     {
         if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))
         {
@@ -89,36 +53,17 @@ public abstract class AnalysisDataController<TEntry>(
         }
     }
 
-    protected virtual void ValidateResources(ResourceModel[] resources, AnalysisModel<TEntry> model)
+    protected virtual TEntry[] ParseEntries(IFormFile file, IReader<TEntry> reader)
     {
-        ValidateItems(resources, _resourceModelValidator, "Resources");
+        using var stream = file.OpenReadStream();
+        using var streamReader = new StreamReader(stream);
+
+        return reader.Read(streamReader);
     }
 
     protected virtual void ValidateEntries(TEntry[] entries, AnalysisModel<TEntry> model)
     {
         ValidateItems(entries, EntryModelValidator, "Entries");
-    }
-
-    protected void ValidateItems<T>(T[] items, IValidator<T> validator, string prefix)
-    {
-        if (items.IsEmpty())
-        {
-            ModelState.AddModelError(prefix, "No records found.");
-            return;
-        }
-
-        for (int i = 0; i < items.Length; i++)
-        {
-            var result = validator.Validate(items[i]);
-
-            if (!result.IsValid)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError($"{prefix}[{i}].{error.PropertyName}", error.ErrorMessage);
-                }
-            }
-        }
     }
 
     private IReader<TEntry> GetReader(string format)
