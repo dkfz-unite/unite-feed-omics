@@ -17,6 +17,7 @@ public abstract class AnalysisController(
         return AnalysisFormConverter<EmptyModel>.Convert(form);
     }
 
+    //TODO: move validation to s separate class
     protected override void ValidateModel(AnalysisModel<EmptyModel> model)
     {
         if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))

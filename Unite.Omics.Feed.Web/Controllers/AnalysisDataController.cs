@@ -38,6 +38,7 @@ public abstract class AnalysisDataController<TEntry>(
         }
     }
 
+    //TODO: move validation to s separate class
     protected override void ValidateModel(AnalysisModel<TEntry> model)
     {
         if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))

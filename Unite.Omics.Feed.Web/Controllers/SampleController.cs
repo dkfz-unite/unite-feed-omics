@@ -13,8 +13,6 @@ public abstract class SampleController(
     ILogger<SampleController> logger)
     : SubmissionController<SampleModel, SampleForm>(submissionTaskService, logger)
 {
-    protected readonly SampleModelConverter _converter = new();
-    
     protected abstract AnalysisType[] AnalysisTypes { get; }
 
     protected override SampleModel Convert(SampleForm form)

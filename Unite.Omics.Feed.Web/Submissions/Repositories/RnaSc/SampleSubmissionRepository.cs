@@ -4,12 +4,8 @@ using Unite.Omics.Feed.Web.Models.Base;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
-public class SampleSubmissionRepository : CacheRepository<SampleModel>
+//SampleModel
+public class SampleSubmissionRepository(IMongoOptions options) : SubmissionRepository(options)
 {
-    public override string DatabaseName => "submissions";
-    public override string CollectionName => "rnasc";
-
-    public SampleSubmissionRepository(IMongoOptions options) : base(options)
-    {
-    }
+    protected override string CollectionName => "rnasc";
 }
