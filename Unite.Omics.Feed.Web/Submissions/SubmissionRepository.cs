@@ -3,7 +3,7 @@ using Unite.Cache.Repositories;
 
 namespace Unite.Omics.Feed.Web.Submissions;
 
-public abstract class SubmissionRepository(IMongoOptions options) : CacheRepository2(options)
+public abstract class SubmissionRepository(IMongoOptions options) : CacheRepositoryGenericPerMethod(options)
 {
     protected override string DatabaseName => "submissions";
 }

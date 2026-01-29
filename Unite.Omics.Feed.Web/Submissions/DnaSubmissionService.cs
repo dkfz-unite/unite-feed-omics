@@ -56,17 +56,17 @@ public class DnaSubmissionService
 
 	public AnalysisModel<VariantModel> FindSmSubmission(string id)
 	{
-		return _smRepository.Find(id)?.Document;
+		return _smRepository.Find<AnalysisModel<VariantModel>>(id)?.Document;
 	}
 
     public AnalysisModel<Models.Dna.Cnv.VariantModel> FindCnvSubmission(string id)
     {
-        return _cnvRepository.Find(id)?.Document;
+        return _cnvRepository.Find<AnalysisModel<Models.Dna.Cnv.VariantModel>>(id)?.Document;
     }
 
     public AnalysisModel<Models.Dna.Sv.VariantModel> FindSvSubmission(string id)
     {
-        return _svRepository.Find(id)?.Document;
+        return _svRepository.Find<AnalysisModel<Models.Dna.Sv.VariantModel>>(id)?.Document;
     }
 
     public void DeleteSampleSubmission(string id)
@@ -76,16 +76,16 @@ public class DnaSubmissionService
 
     public void DeleteSmSubmission(string id)
     {
-        _smRepository.Delete(id);
+        _smRepository.Delete<AnalysisModel<VariantModel>>(id);
     }
 
     public void DeleteCnvSubmission(string id)
     {
-        _cnvRepository.Delete(id);
+        _cnvRepository.Delete<AnalysisModel<Models.Dna.Cnv.VariantModel>>(id);
     }
 
     public void DeleteSvSubmission(string id)
     {
-        _svRepository.Delete(id);
+        _svRepository.Delete<AnalysisModel<Models.Dna.Sv.VariantModel>>(id);
     }
 }

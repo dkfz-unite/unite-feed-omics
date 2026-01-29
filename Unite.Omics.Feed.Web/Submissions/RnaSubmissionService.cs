@@ -35,7 +35,7 @@ public class RnaSubmissionService
 
 	public AnalysisModel<ExpressionModel> FindExpSubmission(string id)
 	{
-		return _expRepository.Find(id)?.Document;
+		return _expRepository.Find<AnalysisModel<ExpressionModel>>(id)?.Document;
 	}
 
 	public void DeleteSampleSubmission(string id)
@@ -45,6 +45,6 @@ public class RnaSubmissionService
 
 	public void DeleteExpSubmission(string id)
 	{
-		_expRepository.Delete(id);
+		_expRepository.Delete<AnalysisModel<ExpressionModel>>(id);
 	}
 }
