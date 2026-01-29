@@ -2,9 +2,11 @@
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.Dna;
+using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
@@ -13,7 +15,7 @@ public class DnaCnvSubmissionHandler
     private readonly AnalysisWriter _dataWriter;
     private readonly CnvAnnotationTaskService _annotationTaskService;
     private readonly CnvIndexingTaskService _indexingTaskService;
-    private readonly DnaSubmissionService _submissionService;
+    private readonly CnvSubmissionRepository _submissionRepository;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
@@ -24,16 +26,16 @@ public class DnaCnvSubmissionHandler
         AnalysisWriter dataWriter,
         CnvAnnotationTaskService annotationTaskService,
         CnvIndexingTaskService indexingTaskService,
-        DnaSubmissionService submissionService,
         TasksProcessingService tasksProcessingService,
+        CnvSubmissionRepository submissionRepository,
         ILogger<DnaCnvSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
         _indexingTaskService = indexingTaskService;
-        _submissionService = submissionService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
 
         _converter = new Models.Dna.Cnv.Converters.AnalysisModelConverter();
     }
@@ -65,13 +67,13 @@ public class DnaCnvSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindCnvSubmission(submissionId);
+        var submittedData = _submissionRepository.Find<AnalysisModel<Models.Dna.Cnv.VariantModel>>(submissionId)?.Document;
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _annotationTaskService.PopulateTasks(audit.Cnvs);
         _indexingTaskService.PopulateTasks(audit.CnvsEntries.Except(audit.Cnvs));
-        _submissionService.DeleteCnvSubmission(submissionId);
+        _submissionRepository.Delete<AnalysisModel<Models.Dna.Cnv.VariantModel>>(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

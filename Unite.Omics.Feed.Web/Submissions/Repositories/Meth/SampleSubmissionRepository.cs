@@ -4,12 +4,8 @@ using Unite.Omics.Feed.Web.Models.Base;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
-public class SampleSubmissionRepository : CacheRepository<SampleModel>
+//SampleModel
+public class SampleSubmissionRepository(IMongoOptions options) : SubmissionRepository(options)
 {
-    public override string DatabaseName => "submissions";
-    public override string CollectionName => "meth";
-
-    public SampleSubmissionRepository(IMongoOptions options) : base(options)
-    {
-    }
+    protected override string CollectionName => "meth";
 }

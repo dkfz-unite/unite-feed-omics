@@ -12,61 +12,15 @@ using Unite.Omics.Feed.Web.Models.Base.Validators;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class AnalysisController : Controller
+public abstract class AnalysisController(
+    SubmissionTaskService submissionTaskService,
+    ILogger<AnalysisController> logger)
+    : SubmissionController<AnalysisModel<EmptyModel>>(submissionTaskService)
 {
-    protected readonly SubmissionTaskService _submissionTaskService;
-    protected readonly ILogger _logger;
-
-    protected abstract string DataType { get; }
+    protected readonly ILogger _logger = logger;
     protected abstract AnalysisType[] AnalysisTypes { get; }
 
     protected IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
-
-
-    public AnalysisController(
-        SubmissionTaskService submissionTaskService,
-        ILogger<AnalysisController> logger)
-    {
-        _submissionTaskService = submissionTaskService;
-        _logger = logger;
-    }
-
-
-    [HttpGet("{id}")]
-    [Authorize]
-    public virtual IActionResult Get(long id)
-    {
-        var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        var submission = FindSubmission(task.Target);
-
-        return Ok(submission);
-    }
-
-    [HttpGet("{id}/status")]
-    [Authorize]
-    public virtual IActionResult GetStatus(long id)
-    {
-        var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        return Ok(task.StatusTypeId);
-    }
-
-    [HttpPost("")]
-    [Consumes("application/json")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public virtual IActionResult PostJson([FromBody] AnalysisModel<EmptyModel> model, [FromQuery] bool review = true)
-    {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        ValidateAnalysis(model);
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
-    }
 
     [HttpPost("")]
     [Consumes("multipart/form-data")]
@@ -86,17 +40,6 @@ public abstract class AnalysisController : Controller
 
         return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
-
-
-    /// <summary>
-    /// Find existing submission by its identifier.
-    /// </summary>
-    /// <param name="id">Submission identifier (Task.Target)</param>
-    /// <returns>Submission if was found.</returns>
-    protected abstract AnalysisModel<EmptyModel> FindSubmission(string id);
-    
-    protected abstract long AddSubmission(AnalysisModel<EmptyModel> model, bool review);
-
 
     protected virtual ResourceModel[] ParseResources(IFormFile file)
     {

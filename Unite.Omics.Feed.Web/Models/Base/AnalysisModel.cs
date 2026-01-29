@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
-public record AnalysisModel
+public record AnalysisModel: SubmissionModel
 {
     protected ResourceModel[] _resources;
 
@@ -23,7 +23,7 @@ public record AnalysisModel
     /// Resources data.
     /// </summary>
     [JsonPropertyName("resources")]
-    public virtual ResourceModel[] Resources { get => _resources?.Distinct().ToArray(); set => _resources = value; }
+    public override ResourceModel[] Resources { get => _resources?.Distinct().ToArray(); set => _resources = value; }
 }
 
 public record AnalysisModel<TEntryModel> : AnalysisModel where TEntryModel : class, new()

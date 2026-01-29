@@ -51,7 +51,7 @@ public class DnaSubmissionService
 
     public SampleModel FindSampleSubmission(string id)
     {
-        return _sampleRepository.Find(id)?.Document;
+        return _sampleRepository.Find<SampleModel>(id)?.Document;
     }
 
 	public AnalysisModel<VariantModel> FindSmSubmission(string id)
@@ -71,7 +71,7 @@ public class DnaSubmissionService
 
     public void DeleteSampleSubmission(string id)
     {
-        _sampleRepository.Delete(id);
+        _sampleRepository.Delete<SampleModel>(id);
     }
 
     public void DeleteSmSubmission(string id)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
+using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Web.Configuration.Constants;
@@ -10,65 +11,21 @@ using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Converters;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
 using Unite.Omics.Feed.Web.Models.Base.Validators;
+using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class SampleController : Controller
+public abstract class SampleController(
+    SubmissionTaskService submissionTaskService,
+    ILogger<SampleController> logger)
+    : SubmissionController<SampleModel>(submissionTaskService)
 {
-    protected readonly SubmissionTaskService _submissionTaskService;
-    protected readonly ILogger _logger;
+    protected readonly ILogger _logger = logger;
 
     protected readonly SampleModelConverter _converter = new();
     protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
-
-    protected abstract string DataType { get; }
+    
     protected abstract AnalysisType[] AnalysisTypes { get; }
-
-
-    public SampleController(
-        SubmissionTaskService submissionTaskService,
-        ILogger<SampleController> logger)
-    {
-        _submissionTaskService = submissionTaskService;
-        _logger = logger;
-    }
-
-
-    [HttpGet("{id}")]
-    [Authorize]
-    public IActionResult Get(long id)
-    {
-        var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        var submission = FindSubmission(task.Target);
-
-        return Ok(submission);
-    }
-
-    [HttpGet("{id}/status")]
-    [Authorize]
-    public IActionResult GetStatus(long id)
-    {
-        var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        return Ok(task.StatusTypeId);
-    }
-
-    [HttpPost("")]
-    [Consumes("application/json")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public IActionResult PostJson([FromBody] SampleModel model, [FromQuery] bool review = true)
-    {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        ValidateSample(model);
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
-    }
 
     [HttpPost("")]
     [Consumes("multipart/form-data")]
@@ -88,17 +45,6 @@ public abstract class SampleController : Controller
 
         return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
-
-
-    /// <summary>
-    /// Find existing submission by its identifier.
-    /// </summary>
-    /// <param name="id">Submission identifier (Task.Target)</param>
-    /// <returns>Submission if was found.</returns>
-    protected abstract SampleModel FindSubmission(string id);
-
-    protected abstract long AddSubmission(SampleModel model, bool review);
-
 
     protected virtual ResourceModel[] ParseResources(IFormFile file)
     {

@@ -15,64 +15,17 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class AnalysisDataController<TEntry> : Controller where TEntry : class, new()
+public abstract class AnalysisDataController<TEntry>(
+    SubmissionTaskService submissionTaskService,
+    ILogger<AnalysisDataController<TEntry>> logger)
+    : SubmissionController<AnalysisModel<TEntry>>(submissionTaskService)
+    where TEntry : class, new()
 {
-    protected readonly SubmissionTaskService _submissionTaskService;
-    protected readonly ILogger _logger;
     protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
-    protected abstract string DataType { get; }
     protected abstract AnalysisType[] AnalysisTypes { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
-    protected abstract SubmissionTaskType  SubmissionTaskType { get; }
-    protected abstract SubmissionRepository SubmissionRepository { get; }
-
-
-    public AnalysisDataController(
-        SubmissionTaskService submissionTaskService,
-        ILogger<AnalysisDataController<TEntry>> logger)
-    {
-        _submissionTaskService = submissionTaskService;
-        _logger = logger;
-    }
-
-
-    [HttpGet("{id}")]
-    [Authorize]
-    public virtual IActionResult Get(long id)
-    {
-        var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        var submission = FindSubmission(task.Target);
-
-        return Ok(submission);
-    }
-
-    [HttpGet("{id}/status")]
-    [Authorize]
-    public virtual IActionResult GetStatus(long id)
-    {
-        var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-        
-        return Ok(task.StatusTypeId);
-    }
-
-    [HttpPost("")]
-    [Consumes("application/json")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public virtual IActionResult PostJson([FromBody] AnalysisModel<TEntry> model, [FromQuery] bool review = true)
-    {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        ValidateAnalysis(model);
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
-    }
 
     [HttpPost("")]
     [Consumes("multipart/form-data")]
@@ -101,21 +54,6 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
         }
 
         return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
-    }
-    
-    
-    protected virtual AnalysisModel<TEntry> FindSubmission(string id)
-    {
-        return SubmissionRepository.Find<AnalysisModel<TEntry>>(id)?.Document;
-    }
-    
-    protected virtual long AddSubmission(AnalysisModel<TEntry> model, bool review)
-    {
-        string submissionId = SubmissionRepository.Add(model);
-        
-        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
-
-        return _submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
     }
 
     protected virtual ResourceModel[] ParseResources(IFormFile file)

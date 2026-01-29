@@ -14,6 +14,8 @@ public class SampleController : Controllers.SampleController
     private readonly MethSubmissionService _submissionService;
     protected override string DataType => DataTypes.Omics.Meth.Sample;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH;
+    protected override SubmissionRepository SubmissionRepository => 
 
 
     public SampleController(MethSubmissionService submissionService, SubmissionTaskService submissionTaskService, ILogger<SampleController> logger) : base(submissionTaskService, logger)
