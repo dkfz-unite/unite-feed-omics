@@ -20,7 +20,6 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 [Authorize(Policy = Policies.Data.Writer)]
 public class CnvsController : AnalysisDataController<VariantModel>
 {
-    private readonly DnaSubmissionService _submissionService;
     private readonly CnvSubmissionRepository _submissionRepository;
 
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
@@ -37,18 +36,10 @@ public class CnvsController : AnalysisDataController<VariantModel>
 
 
     public CnvsController(
-        DnaSubmissionService submissionService,
         SubmissionTaskService submissionTaskService,
         ILogger<CnvsController> logger, 
         CnvSubmissionRepository submissionRepository) : base(submissionTaskService, logger)
     {
-        _submissionService = submissionService;
         _submissionRepository = submissionRepository;
-    }
-
-
-    protected override AnalysisModel<VariantModel> FindSubmission(string id)
-    {
-        return _submissionService.FindCnvSubmission(id);
     }
 }

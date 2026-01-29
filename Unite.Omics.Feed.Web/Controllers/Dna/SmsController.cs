@@ -20,7 +20,6 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 [Authorize(Policy = Policies.Data.Writer)]
 public class SmsController : AnalysisDataController<VariantModel>
 {
-    private readonly DnaSubmissionService _submissionService;
     private readonly SmSubmissionRepository _submissionRepository;
 
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
@@ -36,18 +35,10 @@ public class SmsController : AnalysisDataController<VariantModel>
     protected override SubmissionRepository SubmissionRepository => _submissionRepository;
     
     public SmsController(
-        DnaSubmissionService submissionService,
         SubmissionTaskService submissionTaskService,
         ILogger<SmsController> logger, 
         SmSubmissionRepository submissionRepository) : base(submissionTaskService, logger)
     {
-        _submissionService = submissionService;
         _submissionRepository = submissionRepository;
-    }
-
-
-    protected override AnalysisModel<VariantModel> FindSubmission(string id)
-    {
-        return _submissionService.FindSmSubmission(id);
     }
 }

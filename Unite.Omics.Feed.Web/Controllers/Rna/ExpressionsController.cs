@@ -19,7 +19,6 @@ namespace Unite.Omics.Feed.Web.Controllers.Rna;
 [Authorize(Policy = Policies.Data.Writer)]
 public class ExpressionsController : AnalysisDataController<ExpressionModel>
 {
-    private readonly RnaSubmissionService _submissionService;
     private readonly Unite.Omics.Feed.Web.Submissions.Repositories.Rna.ExpSubmissionRepository _submissionRepository;
 
     protected override IValidator<ExpressionModel> EntryModelValidator => new ExpressionModelValidator();
@@ -36,18 +35,10 @@ public class ExpressionsController : AnalysisDataController<ExpressionModel>
 
 
     public ExpressionsController(
-        RnaSubmissionService submissionService,
         SubmissionTaskService submissionTaskService,
         ILogger<ExpressionsController> logger, 
         Unite.Omics.Feed.Web.Submissions.Repositories.Rna.ExpSubmissionRepository submissionRepository) : base(submissionTaskService, logger)
     {
-        _submissionService = submissionService;
         _submissionRepository = submissionRepository;
-    }
-
-
-    protected override AnalysisModel<ExpressionModel> FindSubmission(string id)
-    {
-        return _submissionService.FindExpSubmission(id);
     }
 }

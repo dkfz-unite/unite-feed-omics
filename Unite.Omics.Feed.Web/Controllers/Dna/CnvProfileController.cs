@@ -40,9 +40,4 @@ public class CnvProfileController: AnalysisDataController<CnvProfileModel>
     {
         _submissionRepository = submissionRepository;
     }
-    
-    protected override AnalysisModel<CnvProfileModel> FindSubmission(string id)
-    {
-        throw new NotImplementedException();
-    }
 }

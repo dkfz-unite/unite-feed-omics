@@ -102,14 +102,16 @@ public abstract class AnalysisDataController<TEntry> : Controller where TEntry :
 
         return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
-
-
-    protected abstract AnalysisModel<TEntry> FindSubmission(string id);
+    
+    
+    protected virtual AnalysisModel<TEntry> FindSubmission(string id)
+    {
+        return SubmissionRepository.Find<AnalysisModel<TEntry>>(id)?.Document;
+    }
     
     protected virtual long AddSubmission(AnalysisModel<TEntry> model, bool review)
     {
-        var submissionRepository = SubmissionRepository;
-        string submissionId = submissionRepository.Add(model);
+        string submissionId = SubmissionRepository.Add(model);
         
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
