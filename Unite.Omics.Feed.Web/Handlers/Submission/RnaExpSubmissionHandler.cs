@@ -3,16 +3,20 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Feed.Data.Writers.Rna;
+using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Models.Rna;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
+
+using ModelType = AnalysisModel<ExpressionModel>;
 
 public class RnaExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionsAnnotationService _annotationService;
-    private readonly RnaSubmissionService _submissionService;
+    private readonly ExpSubmissionRepository _submissionRepository;
     private readonly GeneIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -23,17 +27,17 @@ public class RnaExpSubmissionHandler
 	public RnaExpSubmissionHandler(
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
-        RnaSubmissionService submissionService,
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
+        ExpSubmissionRepository submissionRepository,
         ILogger<RnaExpSubmissionHandler> logger)
 	{
         _dataWriter = dataWriter;
         _annotationService = annotationService;
-        _submissionService = submissionService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
 
         _converter = new Models.Rna.Converters.AnalysisModelConverter();
 	}
@@ -65,7 +69,7 @@ public class RnaExpSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindExpSubmission(submissionId);
+        var submittedData = _submissionRepository.FindDocument<ModelType>(submissionId);
         var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
         var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedData = _converter.Convert(submittedData);
@@ -73,7 +77,7 @@ public class RnaExpSubmissionHandler
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Genes);
-        _submissionService.DeleteExpSubmission(submissionId);
+        _submissionRepository.Delete<ModelType>(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

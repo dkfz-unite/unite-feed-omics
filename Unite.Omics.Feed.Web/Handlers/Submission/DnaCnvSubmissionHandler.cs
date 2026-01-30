@@ -5,7 +5,6 @@ using Unite.Omics.Feed.Data.Writers.Dna;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;

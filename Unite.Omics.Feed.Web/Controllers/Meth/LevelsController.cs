@@ -5,6 +5,7 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Web.Configuration.Constants;
+using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
@@ -16,7 +17,7 @@ public class LevelsController(
     SubmissionTaskService submissionTaskService,
     ILogger<LevelsController> logger,
     LevelSubmissionRepository submissionRepository)
-    : AnalysisController(submissionTaskService, logger)
+    : AnalysisController<EmptyModel>(submissionTaskService, logger)
 {
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH_LVL;
     protected override SubmissionRepository SubmissionRepository => submissionRepository;

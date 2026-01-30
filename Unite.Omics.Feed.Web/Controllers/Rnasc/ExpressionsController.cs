@@ -18,7 +18,7 @@ public class ExpressionsController(
     SubmissionTaskService submissionTaskService,
     ILogger<ExpressionsController> logger,
     ExpSubmissionRepository submissionRepository)
-    : AnalysisController(submissionTaskService, logger)
+    : AnalysisController<EmptyModel>(submissionTaskService, logger)
 {
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.RNASC_EXP;
     protected override SubmissionRepository SubmissionRepository => submissionRepository;

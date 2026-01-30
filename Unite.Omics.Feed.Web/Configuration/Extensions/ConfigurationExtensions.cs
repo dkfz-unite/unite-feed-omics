@@ -5,6 +5,7 @@ using Unite.Indices.Context.Configuration.Extensions;
 using Unite.Indices.Context.Configuration.Options;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
+using Unite.Data.Constants;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Annotations.Services.Vep;
@@ -54,12 +55,6 @@ public static class ConfigurationExtensions
         services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();
         services.AddTransient<Data.Writers.Rna.AnalysisWriter>();
         services.AddTransient<Data.Writers.RnaSc.AnalysisWriter>();
-
-        // Submission services
-        services.AddTransient<DnaSubmissionService>();
-        services.AddTransient<MethSubmissionService>();
-        services.AddTransient<RnaSubmissionService>();
-        services.AddTransient<RnascSubmissionService>();
 
         // Annotation services
         services.AddTransient<SmsAnnotationService>();
@@ -123,6 +118,19 @@ public static class ConfigurationExtensions
         
         //Submission repositories
         services.AddTransient<CnvProfileSubmissionRepository>();
+        services.AddTransient<CnvSubmissionRepository>();
+        services.AddTransient<SampleSubmissionRepository>();
+        services.AddTransient<SmSubmissionRepository>();
+        services.AddTransient<SvSubmissionRepository>();
+        
+        services.AddTransient<Submissions.Repositories.Meth.LevelSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.Meth.SampleSubmissionRepository>();
+        
+        services.AddTransient<Submissions.Repositories.Rna.ExpSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.Rna.SampleSubmissionRepository>();
+        
+        services.AddTransient<Submissions.Repositories.RnaSc.ExpSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.RnaSc.SampleSubmissionRepository>();
     }
 
 

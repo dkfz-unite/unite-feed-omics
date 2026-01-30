@@ -5,20 +5,20 @@ using Unite.Omics.Feed.Web.Models.Base;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class AnalysisController(
+public abstract class AnalysisController<TEntry>(
     SubmissionTaskService submissionTaskService,
-    ILogger<AnalysisController> logger)
-    : SubmissionController<AnalysisModel<EmptyModel>, AnalysisForm>(submissionTaskService, logger)
+    ILogger<AnalysisController<TEntry>> logger)
+    : SubmissionController<AnalysisModel<TEntry>, AnalysisForm>(submissionTaskService, logger) 
+        where TEntry : class, new()
 {
     protected abstract AnalysisType[] AnalysisTypes { get; }
     
-    protected override AnalysisModel<EmptyModel> Convert(AnalysisForm form)
+    protected override AnalysisModel<TEntry> Convert(AnalysisForm form)
     {
-        return AnalysisFormConverter<EmptyModel>.Convert(form);
+        return AnalysisFormConverter<TEntry>.Convert(form);
     }
-
-    //TODO: move validation to s separate class
-    protected override void ValidateModel(AnalysisModel<EmptyModel> model)
+    
+    protected override void ValidateModel(AnalysisModel<TEntry> model)
     {
         if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))
         {

@@ -1,6 +1,5 @@
 using FluentValidation;
 using Unite.Data.Context.Services.Tasks;
-using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Extensions;
@@ -11,21 +10,15 @@ namespace Unite.Omics.Feed.Web.Controllers;
 public abstract class AnalysisDataController<TEntry>(
     SubmissionTaskService submissionTaskService,
     ILogger<AnalysisDataController<TEntry>> logger)
-    : SubmissionController<AnalysisModel<TEntry>, AnalysisForm>(submissionTaskService, logger)
+    : AnalysisController<TEntry>(submissionTaskService, logger)
     where TEntry : class, new()
 {
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
-    protected abstract AnalysisType[] AnalysisTypes { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
-
-    protected override AnalysisModel<TEntry> Convert(AnalysisForm form)
-    {
-        return AnalysisFormConverter<TEntry>.Convert(form);
-    }
     
     protected override void ReadSubmissionForm(AnalysisForm form, AnalysisModel<TEntry> model, string format = null)
     {
-        base.ReadSubmissionForm(form, model);
+        base.ReadSubmissionForm(form, model, format);
         
         if (!form.EntriesFile.IsEmpty())
         {
@@ -35,22 +28,6 @@ public abstract class AnalysisDataController<TEntry>(
 
             model.Entries = ParseEntries(form.EntriesFile, reader);
             ValidateEntries(model.Entries, model);
-        }
-    }
-
-    //TODO: move validation to s separate class
-    protected override void ValidateModel(AnalysisModel<TEntry> model)
-    {
-        if (model.TargetSample != null && !AnalysisTypes.Contains(model.TargetSample.AnalysisType.Value))
-        {
-            var allowedValues = string.Join(", ", AnalysisTypes.Select(analysis => analysis.ToDefinitionString()));
-            ModelState.AddModelError("TargetSample.AnalysisType", $"Allowed values are: {allowedValues}");
-        }
-
-        if (model.MatchedSample != null && !AnalysisTypes.Contains(model.MatchedSample.AnalysisType.Value))
-        {
-            var allowedValues = string.Join(", ", AnalysisTypes.Select(analysis => analysis.ToDefinitionString()));
-            ModelState.AddModelError("MatchedSample.AnalysisType", $"Allowed values are [{allowedValues}]");
         }
     }
 

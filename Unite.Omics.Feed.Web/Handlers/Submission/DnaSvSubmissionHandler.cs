@@ -26,7 +26,6 @@ public class DnaSvSubmissionHandler
         AnalysisWriter dataWriter,
         SvAnnotationTaskService annotationTaskService,
         SvIndexingTaskService indexingTaskService,
-        DnaSubmissionService submissionService,
         TasksProcessingService taskProcessingService,
         SvSubmissionRepository submissionRepository,
         ILogger<DnaSvSubmissionHandler> logger)

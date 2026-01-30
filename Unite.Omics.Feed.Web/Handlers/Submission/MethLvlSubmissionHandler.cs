@@ -2,16 +2,20 @@ using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.RnaSc;
+using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Meth.Converters;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
+
+using ModelType = AnalysisModel<EmptyModel>;
 
 public class MethLvlSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly MethSubmissionService _submissionService;
+    private readonly LevelSubmissionRepository _submissionRepository;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -21,16 +25,16 @@ public class MethLvlSubmissionHandler
 
     public MethLvlSubmissionHandler(
         AnalysisWriter dataWriter,
-        MethSubmissionService submissionService,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
+        LevelSubmissionRepository submissionRepository,
         ILogger<MethLvlSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;
-        _submissionService = submissionService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
     }
 
 
@@ -60,12 +64,12 @@ public class MethLvlSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindLevelSubmission(submissionId);
+        var submittedData = _submissionRepository.FindDocument<ModelType>(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Samples);
-        _submissionService.DeleteLevelSubmission(submissionId);
+        _submissionRepository.Delete<ModelType>(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

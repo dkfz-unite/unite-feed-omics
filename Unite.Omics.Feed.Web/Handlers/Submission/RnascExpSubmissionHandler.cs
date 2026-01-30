@@ -2,15 +2,18 @@ using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.RnaSc;
+using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
+
+using ModelType = AnalysisModel<EmptyModel>;
 
 public class RnascExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly RnascSubmissionService _submissionService;
+    private readonly ExpSubmissionRepository _submissionRepository;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -20,16 +23,16 @@ public class RnascExpSubmissionHandler
 
     public RnascExpSubmissionHandler(
         AnalysisWriter dataWriter,
-        RnascSubmissionService submissionService,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
+        ExpSubmissionRepository submissionRepository,
         ILogger<RnascExpSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;
-        _submissionService = submissionService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
     }
 
 
@@ -59,12 +62,12 @@ public class RnascExpSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindExpSubmission(submissionId);
+        var submittedData = _submissionRepository.FindDocument<ModelType>(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Samples);
-        _submissionService.DeleteExpSubmission(submissionId);
+        _submissionRepository.Delete<ModelType>(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }
