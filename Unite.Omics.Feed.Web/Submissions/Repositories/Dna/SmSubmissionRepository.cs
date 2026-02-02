@@ -2,7 +2,4 @@
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
-public class SmSubmissionRepository(IMongoOptions options) : SubmissionRepository(options)
-{
-    protected override string CollectionName => "dna_sms";
-}
+public class SmSubmissionRepository(IMongoOptions options) : SubmissionRepository(options, "dna_sms");

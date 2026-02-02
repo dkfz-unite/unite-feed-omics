@@ -19,6 +19,7 @@ public record SampleForm: SubmissionForm
     /// <summary>
     /// Sample donor identifier
     /// </summary>
+    /// //TODO: move to base class
     [FromForm(Name = "donor_id")]
     public string DonorId { get => _donorId?.Trim(); set => _donorId = value; }
 

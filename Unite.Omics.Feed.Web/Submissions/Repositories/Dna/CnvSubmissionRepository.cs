@@ -2,7 +2,4 @@
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
-public class CnvSubmissionRepository(IMongoOptions options) : SubmissionRepository(options)
-{
-    protected override string CollectionName => "dna_cnvs";
-}
+public class CnvSubmissionRepository(IMongoOptions options) : SubmissionRepository(options, "dna_cnvs");
