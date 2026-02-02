@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Unite.Data.Entities.Omics.Analysis.Enums;
-using Unite.Data.Entities.Specimens.Enums;
-using Unite.Omics.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
-public record AnalysisForm
+public record AnalysisForm: SubmissionForm
 {
     public const double DefaultPloidy = 2.0;
 
@@ -22,7 +19,7 @@ public record AnalysisForm
     protected double? _ploidy;
     protected int? _cells;
     protected string _format;
-    protected IFormFile _resourcesFile;
+    protected IFormFile _entriesFile;
 
 
     [FromForm(Name = "donor_id")]
@@ -60,76 +57,7 @@ public record AnalysisForm
 
     [FromForm(Name = "cells")]
     public int? Cells { get => _cells; set => _cells = value; }
-
-    [FromForm(Name = "resources")]
-    public IFormFile ResourcesFile { get => _resourcesFile; set => _resourcesFile = value; }
-
-
-    protected virtual SampleModel ConvertSample()
-    {
-        return new SampleModel
-        {
-            DonorId = DonorId,
-            SpecimenId = SpecimenId,
-            SpecimenType = EnumBinder.Bind<SpecimenType>(SpecimenType).Value,
-            AnalysisType = EnumBinder.Bind<AnalysisType>(AnalysisType).Value,
-            AnalysisDate = AnalysisDate,
-            AnalysisDay = AnalysisDay,
-            Genome = Genome,
-            Purity = Purity,
-            Ploidy = Ploidy,
-            Cells = Cells
-        };
-    }
-
-    protected virtual SampleModel ConvertMatchedSample()
-    {
-        if (!HasMatchedSample())
-            return null;
-
-        return new SampleModel
-        {
-            DonorId = DonorId,
-            SpecimenId = MatchedSpecimenId,
-            SpecimenType = EnumBinder.Bind<SpecimenType>(MatchedSpecimenType).Value,
-            AnalysisType = EnumBinder.Bind<AnalysisType>(AnalysisType).Value,
-            Genome = Genome
-        };
-    }
-
-
-    public virtual AnalysisModel Convert()
-    {
-        return new AnalysisModel
-        {
-            TargetSample = ConvertSample(),
-            MatchedSample = ConvertMatchedSample()
-        };
-    }
-
-
-    protected bool HasMatchedSample()
-    {
-        return !string.IsNullOrWhiteSpace(MatchedSpecimenId) &&
-               !string.IsNullOrWhiteSpace(MatchedSpecimenType);
-    }
-}
-
-public record AnalysisForm<TEntryModel> : AnalysisForm where TEntryModel : class, new()
-{
-    protected IFormFile _entriesFile;
-
-
+    
     [FromForm(Name = "entries")]
     public IFormFile EntriesFile { get => _entriesFile; set => _entriesFile = value; }
-
-
-    public override AnalysisModel<TEntryModel> Convert()
-    {
-        return new AnalysisModel<TEntryModel>
-        {
-            TargetSample = ConvertSample(),
-            MatchedSample = ConvertMatchedSample()
-        };
-    }
 }

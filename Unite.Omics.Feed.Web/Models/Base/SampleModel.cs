@@ -6,7 +6,7 @@ namespace Unite.Omics.Feed.Web.Models.Base;
 
 // Do not assigne default values to properties!
 // Otherwise, empty model for matched samples will be created and fail to be validated.
-public record SampleModel
+public record SampleModel: SubmissionModel
 {
     public const double DefaultPloidy = 2.0;
 
@@ -86,5 +86,5 @@ public record SampleModel
     /// Sample resources
     /// </summary>
     [JsonPropertyName("resources")]
-    public virtual ResourceModel[] Resources { get; set; }
+    public override ResourceModel[] Resources { get; set; }
 }

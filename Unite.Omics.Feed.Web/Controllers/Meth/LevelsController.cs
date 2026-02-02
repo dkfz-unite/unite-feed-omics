@@ -6,40 +6,19 @@ using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Controllers.Meth;
 
 [Route("api/meth/analysis/levels")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class LevelsController : AnalysisController
+public class LevelsController(
+    SubmissionTaskService submissionTaskService,
+    ILogger<LevelsController> logger,
+    LevelSubmissionRepository submissionRepository)
+    : AnalysisController<EmptyModel>(submissionTaskService, submissionRepository, logger)
 {
-    private readonly MethSubmissionService _submissionService;
-
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH_LVL;
     protected override string DataType => DataTypes.Omics.Meth.Level;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
-
-
-    public LevelsController(
-        MethSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService,
-        ILogger<LevelsController> logger) : base(submissionTaskService, logger)
-    {
-        _submissionService = submissionService;
-    }
-
-
-    protected override AnalysisModel<EmptyModel> FindSubmission(string id)
-    {
-        return _submissionService.FindLevelSubmission(id);
-    }
-
-    protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)
-    {
-        var submissionId = _submissionService.AddLevelSubmission(model);
-
-        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
-
-        return _submissionTaskService.CreateTask(SubmissionTaskType.METH_LVL, submissionId, taskStatus);
-    }
 }

@@ -17,7 +17,7 @@ using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 using Unite.Omics.Indices.Services;
 
 using DnaEntities = Unite.Data.Entities.Omics.Analysis.Dna;
@@ -53,12 +53,6 @@ public static class ConfigurationExtensions
         services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();
         services.AddTransient<Data.Writers.Rna.AnalysisWriter>();
         services.AddTransient<Data.Writers.RnaSc.AnalysisWriter>();
-
-        // Submission services
-        services.AddTransient<DnaSubmissionService>();
-        services.AddTransient<MethSubmissionService>();
-        services.AddTransient<RnaSubmissionService>();
-        services.AddTransient<RnascSubmissionService>();
 
         // Annotation services
         services.AddTransient<SmsAnnotationService>();
@@ -119,6 +113,22 @@ public static class ConfigurationExtensions
 
         // Gene indexing services
         services.AddTransient<GenesIndexingCache>();
+        
+        //Submission repositories
+        services.AddTransient<CnvProfileSubmissionRepository>();
+        services.AddTransient<CnvSubmissionRepository>();
+        services.AddTransient<SampleSubmissionRepository>();
+        services.AddTransient<SmSubmissionRepository>();
+        services.AddTransient<SvSubmissionRepository>();
+        
+        services.AddTransient<Submissions.Repositories.Meth.LevelSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.Meth.SampleSubmissionRepository>();
+        
+        services.AddTransient<Submissions.Repositories.Rna.ExpSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.Rna.SampleSubmissionRepository>();
+        
+        services.AddTransient<Submissions.Repositories.RnaSc.ExpSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.RnaSc.SampleSubmissionRepository>();
     }
 
 
@@ -144,11 +154,11 @@ public static class ConfigurationExtensions
         services.AddTransient<IValidator<AnalysisModel<EmptyModel>>, AnalysisModelValidator<EmptyModel, EmptyModelValidator>>();
 
         services.AddTransient<IValidator<SampleForm>, SampleFormValidator>();
-        services.AddTransient<IValidator<AnalysisForm<SmModel>>, AnalysisFormValidator<SmModel>>();
-        services.AddTransient<IValidator<AnalysisForm<CnvModel>>, AnalysisFormValidator<CnvModel>>();
-        services.AddTransient<IValidator<AnalysisForm<SvModel>>, AnalysisFormValidator<SvModel>>();
-        services.AddTransient<IValidator<AnalysisForm<BulkExpModel>>, AnalysisFormValidator<BulkExpModel>>();
-        services.AddTransient<IValidator<AnalysisForm<EmptyModel>>, AnalysisFormValidator<EmptyModel>>();
+        services.AddTransient<IValidator<AnalysisForm>, AnalysisFormValidator<SmModel>>();
+        services.AddTransient<IValidator<AnalysisForm>, AnalysisFormValidator<CnvModel>>();
+        services.AddTransient<IValidator<AnalysisForm>, AnalysisFormValidator<SvModel>>();
+        services.AddTransient<IValidator<AnalysisForm>, AnalysisFormValidator<BulkExpModel>>();
+        services.AddTransient<IValidator<AnalysisForm>, AnalysisFormValidator<EmptyModel>>();
 
         return services;
     }

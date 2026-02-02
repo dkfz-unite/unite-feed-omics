@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Unite.Essentials.Extensions;
+﻿using Unite.Essentials.Extensions;
 using Unite.Data.Entities.Specimens;
 using Unite.Indices.Entities.Variants;
 using Unite.Omics.Indices.Services.Mappers;

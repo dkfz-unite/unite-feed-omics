@@ -6,52 +6,29 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Web.Configuration.Constants;
-using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
-using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Models.Dna.Cnv;
 using Unite.Omics.Feed.Web.Models.Dna.Cnv.Validators;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
 [Route("api/dna/analysis/cnv")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class CnvsController : AnalysisDataController<VariantModel>
+public class CnvsController(
+    SubmissionTaskService submissionTaskService,
+    ILogger<CnvsController> logger,
+    CnvSubmissionRepository submissionRepository)
+    : AnalysisDataController<VariantModel>(submissionTaskService, submissionRepository, logger)
 {
-    private readonly DnaSubmissionService _submissionService;
-
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
-    protected override IValidator<ResourceModel> ResourceModelValidator => new ResourceModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Cnv;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
     protected override IReader<VariantModel>[] Readers =>
     [
-        new Models.Dna.Cnv.Readers.Tsv.Reader(),
+        new TsvReader<VariantModel>(),
         new Models.Dna.Cnv.Readers.Aceseq.Reader()
     ];
 
-
-    public CnvsController(
-        DnaSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService,
-        ILogger<CnvsController> logger) : base(submissionTaskService, logger)
-    {
-        _submissionService = submissionService;
-    }
-
-
-    protected override AnalysisModel<VariantModel> FindSubmission(string id)
-    {
-        return _submissionService.FindCnvSubmission(id);
-    }
-
-    protected override long AddSubmission(AnalysisModel<VariantModel> model, bool review)
-    {
-        var submissionId = _submissionService.AddCnvSubmission(model);
-
-        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
-
-        return _submissionTaskService.CreateTask(SubmissionTaskType.DNA_CNV, submissionId, taskStatus);
-    }
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_CNV;
 }
