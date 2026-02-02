@@ -10,8 +10,6 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-using ModelType = AnalysisModel<ExpressionModel>;
-
 public class RnaExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
@@ -69,7 +67,7 @@ public class RnaExpSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionRepository.FindDocument<ModelType>(submissionId);
+        var submittedData = _submissionRepository.FindDocument(submissionId);
         var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
         var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedData = _converter.Convert(submittedData);
@@ -77,7 +75,7 @@ public class RnaExpSubmissionHandler
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Genes);
-        _submissionRepository.Delete<ModelType>(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

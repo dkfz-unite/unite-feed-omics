@@ -9,7 +9,6 @@ using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
 using Unite.Omics.Feed.Web.Models.Dna.Cnv;
 using Unite.Omics.Feed.Web.Models.Dna.Cnv.Validators;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
@@ -19,8 +18,8 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 public class CnvsController(
     SubmissionTaskService submissionTaskService,
     ILogger<CnvsController> logger,
-    CnvSubmissionRepository _submissionRepository)
-    : AnalysisDataController<VariantModel>(submissionTaskService, logger)
+    CnvSubmissionRepository submissionRepository)
+    : AnalysisDataController<VariantModel>(submissionTaskService, submissionRepository, logger)
 {
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Cnv;
@@ -32,5 +31,4 @@ public class CnvsController(
     ];
 
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_CNV;
-    protected override SubmissionRepository SubmissionRepository => _submissionRepository;
 }

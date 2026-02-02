@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +14,7 @@ using Unite.Omics.Feed.Web.Submissions;
 namespace Unite.Omics.Feed.Web.Controllers;
 
 public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTaskService submissionTaskService, 
+    SubmissionRepository<TModel> submissionRepository,
     ILogger logger) : Controller
     where TModel : SubmissionModel, new()
     where TSubmissionForm : SubmissionForm
@@ -22,19 +22,18 @@ public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTa
     protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
     
     protected abstract SubmissionTaskType  SubmissionTaskType { get; }
-    protected abstract SubmissionRepository SubmissionRepository { get; }
     protected abstract string DataType { get; }
 
     protected abstract void ValidateModel(TModel model);
     
     protected virtual TModel FindSubmission(string id)
     {
-        return SubmissionRepository.Find<TModel>(id)?.Document;
+        return submissionRepository.Find(id)?.Document;
     }
     
     protected virtual long AddSubmission(TModel model, bool review)
     {
-        string submissionId = SubmissionRepository.Add(model);
+        string submissionId = submissionRepository.Add(model);
         
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 

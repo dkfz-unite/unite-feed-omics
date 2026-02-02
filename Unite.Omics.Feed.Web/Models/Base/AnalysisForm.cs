@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Unite.Data.Entities.Omics.Analysis.Enums;
-using Unite.Data.Entities.Specimens.Enums;
-using Unite.Omics.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 

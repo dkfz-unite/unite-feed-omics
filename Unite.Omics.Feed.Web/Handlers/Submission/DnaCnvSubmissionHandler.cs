@@ -2,7 +2,6 @@
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.Dna;
-using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
@@ -66,13 +65,13 @@ public class DnaCnvSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionRepository.Find<AnalysisModel<Models.Dna.Cnv.VariantModel>>(submissionId)?.Document;
+        var submittedData = _submissionRepository.Find(submissionId)?.Document;
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _annotationTaskService.PopulateTasks(audit.Cnvs);
         _indexingTaskService.PopulateTasks(audit.CnvsEntries.Except(audit.Cnvs));
-        _submissionRepository.Delete<AnalysisModel<Models.Dna.Cnv.VariantModel>>(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

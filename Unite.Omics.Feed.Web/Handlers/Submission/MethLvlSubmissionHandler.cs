@@ -5,12 +5,9 @@ using Unite.Omics.Feed.Data.Writers.RnaSc;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Meth.Converters;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
-
-using ModelType = AnalysisModel<EmptyModel>;
 
 public class MethLvlSubmissionHandler
 {
@@ -64,12 +61,12 @@ public class MethLvlSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionRepository.FindDocument<ModelType>(submissionId);
+        var submittedData = _submissionRepository.FindDocument(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Samples);
-        _submissionRepository.Delete<ModelType>(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

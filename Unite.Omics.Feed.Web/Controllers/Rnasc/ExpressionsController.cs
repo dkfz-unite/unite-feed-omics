@@ -7,7 +7,6 @@ using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
@@ -18,10 +17,9 @@ public class ExpressionsController(
     SubmissionTaskService submissionTaskService,
     ILogger<ExpressionsController> logger,
     ExpSubmissionRepository submissionRepository)
-    : AnalysisController<EmptyModel>(submissionTaskService, logger)
+    : AnalysisController<EmptyModel>(submissionTaskService, submissionRepository, logger)
 {
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.RNASC_EXP;
-    protected override SubmissionRepository SubmissionRepository => submissionRepository;
     protected override string DataType => DataTypes.Omics.Rnasc.Exp;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 

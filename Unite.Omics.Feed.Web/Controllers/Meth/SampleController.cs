@@ -3,7 +3,6 @@ using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Controllers.Meth;
@@ -13,12 +12,11 @@ public class SampleController(
     SubmissionTaskService submissionTaskService,
     ILogger<SampleController> logger,
     SampleSubmissionRepository submissionRepository)
-    : Controllers.SampleController(submissionTaskService, logger)
+    : Controllers.SampleController(submissionTaskService, submissionRepository, logger)
 {
     protected override string DataType => DataTypes.Omics.Meth.Sample;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH;
-    protected override SubmissionRepository SubmissionRepository => submissionRepository;
 
     // Temporarly commented as data source service submits resources one by one, not all together, so validation fails.
     // protected override void ValidateResources(ResourceModel[] resources)

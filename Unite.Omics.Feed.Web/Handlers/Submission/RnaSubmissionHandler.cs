@@ -27,11 +27,11 @@ public class RnaSubmissionHandler : SampleSubmissionHandler
 
     protected override SampleModel FindSubmission(string submissionId)
     {
-        return _submissionRepository.FindDocument<SampleModel>(submissionId);
+        return _submissionRepository.FindDocument(submissionId);
     }
 
     protected override void DeleteSubmission(string submissionId)
     {
-        _submissionRepository.Delete<SampleModel>(submissionId);
+        _submissionRepository.Delete(submissionId);
     }
 }

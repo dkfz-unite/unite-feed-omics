@@ -6,22 +6,21 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Web.Configuration.Constants;
-using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
-using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Models.Dna.Sm;
 using Unite.Omics.Feed.Web.Models.Dna.Sm.Validators;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
 [Route("api/dna/analysis/sm")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class SmsController : AnalysisDataController<VariantModel>
-{
-    private readonly SmSubmissionRepository _submissionRepository;
-
+public class SmsController(
+    SubmissionTaskService submissionTaskService,
+    ILogger<SmsController> logger,
+    SmSubmissionRepository submissionRepository)
+    : AnalysisDataController<VariantModel>(submissionTaskService, submissionRepository, logger)
+{ 
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Sm;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
@@ -32,13 +31,4 @@ public class SmsController : AnalysisDataController<VariantModel>
     ];
 
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_SM;
-    protected override SubmissionRepository SubmissionRepository => _submissionRepository;
-    
-    public SmsController(
-        SubmissionTaskService submissionTaskService,
-        ILogger<SmsController> logger, 
-        SmSubmissionRepository submissionRepository) : base(submissionTaskService, logger)
-    {
-        _submissionRepository = submissionRepository;
-    }
 }

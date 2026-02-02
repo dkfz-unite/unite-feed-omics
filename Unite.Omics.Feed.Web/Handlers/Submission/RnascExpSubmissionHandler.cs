@@ -8,8 +8,6 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-using ModelType = AnalysisModel<EmptyModel>;
-
 public class RnascExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
@@ -62,12 +60,12 @@ public class RnascExpSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionRepository.FindDocument<ModelType>(submissionId);
+        var submittedData = _submissionRepository.FindDocument(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Samples);
-        _submissionRepository.Delete<ModelType>(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

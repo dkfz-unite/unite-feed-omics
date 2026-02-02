@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Unite.Omics.Feed.Web.Configuration.Filters;
 
 namespace Unite.Omics.Feed.Web.Configuration.Extensions;

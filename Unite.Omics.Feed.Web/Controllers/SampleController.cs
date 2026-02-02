@@ -4,14 +4,15 @@ using Unite.Data.Entities.Specimens.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Binders;
-using Unite.Omics.Feed.Web.Models.Base.Converters;
+using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
 public abstract class SampleController(
     SubmissionTaskService submissionTaskService,
+    SubmissionRepository<SampleModel> submissionRepository,
     ILogger<SampleController> logger)
-    : SubmissionController<SampleModel, SampleForm>(submissionTaskService, logger)
+    : SubmissionController<SampleModel, SampleForm>(submissionTaskService, submissionRepository, logger)
 {
     protected abstract AnalysisType[] AnalysisTypes { get; }
 

@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Specimens;
 using Unite.Essentials.Extensions;

@@ -3,8 +3,6 @@ using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Rna;
@@ -14,10 +12,9 @@ public class SampleController(
     SubmissionTaskService submissionTaskService,
     ILogger<SampleController> logger,
     SampleSubmissionRepository submissionRepository)
-    : Controllers.SampleController(submissionTaskService, logger)
+    : Controllers.SampleController(submissionTaskService, submissionRepository, logger)
 {
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.RNA;
-    protected override SubmissionRepository SubmissionRepository => submissionRepository;
     protected override string DataType => DataTypes.Omics.Rna.Sample;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeq];
 }

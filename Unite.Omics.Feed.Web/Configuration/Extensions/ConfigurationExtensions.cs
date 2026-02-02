@@ -5,7 +5,6 @@ using Unite.Indices.Context.Configuration.Extensions;
 using Unite.Indices.Context.Configuration.Options;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
-using Unite.Data.Constants;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Annotations.Services.Vep;
@@ -18,7 +17,6 @@ using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Validators;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 using Unite.Omics.Indices.Services;
 

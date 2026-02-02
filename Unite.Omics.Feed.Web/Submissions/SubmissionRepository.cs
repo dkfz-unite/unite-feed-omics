@@ -3,8 +3,9 @@ using Unite.Cache.Repositories;
 
 namespace Unite.Omics.Feed.Web.Submissions;
 
-public abstract class SubmissionRepository(IMongoOptions options, string collectionName) : CacheRepositoryGenericPerMethod(options)
+public abstract class SubmissionRepository<TModel>(IMongoOptions options, string collectionName) : CacheRepository<TModel>(options) 
+    where TModel : class
 {
-    protected override string DatabaseName => "submissions";
-    protected override string CollectionName => collectionName;
+    public override string DatabaseName => "submissions";
+    public override string CollectionName => collectionName;
 }

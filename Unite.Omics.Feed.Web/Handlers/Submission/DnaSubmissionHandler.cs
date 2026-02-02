@@ -2,7 +2,6 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
@@ -27,11 +26,11 @@ public class DnaSubmissionHandler : SampleSubmissionHandler
 
     protected override Models.Base.SampleModel FindSubmission(string submissionId)
     {
-        return _submissionRepository.FindDocument<Models.Base.SampleModel>(submissionId);
+        return _submissionRepository.FindDocument(submissionId);
     }
 
     protected override void DeleteSubmission(string submissionId)
     {
-        _submissionRepository.Delete<Models.Base.SampleModel>(submissionId);
+        _submissionRepository.Delete(submissionId);
     }
 }

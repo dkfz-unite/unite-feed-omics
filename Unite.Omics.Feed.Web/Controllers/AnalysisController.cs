@@ -2,13 +2,15 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
 public abstract class AnalysisController<TEntry>(
     SubmissionTaskService submissionTaskService,
+    SubmissionRepository<AnalysisModel<TEntry>> submissionRepository,
     ILogger<AnalysisController<TEntry>> logger)
-    : SubmissionController<AnalysisModel<TEntry>, AnalysisForm>(submissionTaskService, logger) 
+    : SubmissionController<AnalysisModel<TEntry>, AnalysisForm>(submissionTaskService, submissionRepository, logger) 
         where TEntry : class, new()
 {
     protected abstract AnalysisType[] AnalysisTypes { get; }
