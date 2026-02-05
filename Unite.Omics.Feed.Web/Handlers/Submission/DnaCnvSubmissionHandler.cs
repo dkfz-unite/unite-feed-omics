@@ -8,7 +8,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class DnaCnvSubmissionHandler
+public class DnaCnvSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly CnvAnnotationTaskService _annotationTaskService;
@@ -21,12 +21,13 @@ public class DnaCnvSubmissionHandler
 
 
     public DnaCnvSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         CnvAnnotationTaskService annotationTaskService,
         CnvIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         CnvSubmissionRepository submissionRepository,
-        ILogger<DnaCnvSubmissionHandler> logger)
+        ILogger<DnaCnvSubmissionHandler> logger): base(priority)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
@@ -38,8 +39,7 @@ public class DnaCnvSubmissionHandler
         _converter = new Models.Dna.Cnv.Converters.AnalysisModelConverter();
     }
 
-
-    public void Handle()
+    public override void Handle()
     {
         ProcessSubmissionTasks();
     }

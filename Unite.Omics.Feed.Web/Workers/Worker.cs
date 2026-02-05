@@ -12,7 +12,7 @@ public abstract class Worker<THandlerInterface>: BackgroundService
     protected virtual int CyclePauseTimeMs { get; } = 10000;
     protected abstract string WorkerType { get; }
 
-    protected Worker(IEnumerable<THandlerInterface> handlers,
+    public Worker(IEnumerable<THandlerInterface> handlers,
         IHostApplicationLifetime lifetime,
         ILogger<SubmissionsWorker> logger)
     {

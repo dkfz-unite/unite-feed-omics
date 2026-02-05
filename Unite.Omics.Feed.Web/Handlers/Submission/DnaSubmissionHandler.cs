@@ -14,11 +14,12 @@ public class DnaSubmissionHandler : SampleSubmissionHandler
 
 
     public DnaSubmissionHandler(
+        HandlerPriority priority,
         SampleWriter dataWriter,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
         SampleSubmissionRepository submissionRepository,
-        ILogger<DnaSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
+        ILogger<DnaSubmissionHandler> logger) : base(priority, dataWriter, taskProcessingService, indexingTaskService, logger)
     {
         _submissionRepository = submissionRepository;
     }

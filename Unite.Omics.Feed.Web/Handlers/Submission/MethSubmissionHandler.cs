@@ -15,11 +15,12 @@ public class MethSubmissionHandler : SampleSubmissionHandler
 
 
     public MethSubmissionHandler(
+        HandlerPriority priority,
         SampleWriter dataWriter,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
         SampleSubmissionRepository submissionRepository,
-        ILogger<MethSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
+        ILogger<MethSubmissionHandler> logger) : base(priority, dataWriter, taskProcessingService, indexingTaskService, logger)
     {
         _submissionRepository = submissionRepository;
     }
