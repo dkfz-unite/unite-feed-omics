@@ -7,7 +7,7 @@ public abstract class Worker<THandlerInterface>: BackgroundService
 {
     private readonly ILogger _logger;
     private readonly IHostApplicationLifetime _lifetime;
-    private readonly IReadOnlyList<THandlerInterface> _handlers;
+    private readonly THandlerInterface[] _handlers;
     
     protected virtual int CyclePauseTimeMs { get; } = 10000;
     protected abstract string WorkerType { get; }
@@ -20,7 +20,7 @@ public abstract class Worker<THandlerInterface>: BackgroundService
         _lifetime = lifetime;
         _handlers = handlers
             .OrderBy(h => h.Priority)
-            .ToList();
+            .ToArray();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
