@@ -28,7 +28,6 @@ public class CnvProfileController(
     [
         new TsvReader<CnvProfileModel>()
     ];
-
-    //TODO: change to CNV_PROFILE task type
-    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_SM;
+    
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.DNA_CNV_PROFILE;
 }
