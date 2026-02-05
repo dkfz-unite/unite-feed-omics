@@ -7,6 +7,18 @@ public record ProteinResource : LookupResource
     [JsonPropertyName("transcriptId")]
     public string TranscriptId { get; set; }
 
+    [JsonPropertyName("accession")]
+    public string Accession { get; set; }
+
+    [JsonPropertyName("symbol")]
+    public string Symbol { get; set; }
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; }
+
+    [JsonPropertyName("database")]
+    public string Database { get; set; }
+
     [JsonPropertyName("start")]
     public int Start { get; set; }
 

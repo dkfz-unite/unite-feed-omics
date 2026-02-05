@@ -14,7 +14,7 @@ public class RnaExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionsAnnotationService _annotationService;
-    private readonly ExpSubmissionRepository _submissionRepository;
+    private readonly ExpressionSubmissionRepository _submissionRepository;
     private readonly GeneIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -27,7 +27,7 @@ public class RnaExpSubmissionHandler
         ExpressionsAnnotationService annotationService,
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ExpSubmissionRepository submissionRepository,
+        ExpressionSubmissionRepository submissionRepository,
         ILogger<RnaExpSubmissionHandler> logger)
 	{
         _dataWriter = dataWriter;

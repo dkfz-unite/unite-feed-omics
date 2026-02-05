@@ -11,12 +11,14 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         DataTypes.Omics.Dna.Sm,
         DataTypes.Omics.Dna.Cnv,
         DataTypes.Omics.Dna.Sv,
-        DataTypes.Omics.Meth.Sample,
-        DataTypes.Omics.Meth.Level,
+        DataTypes.Omics.Methylation.Sample,
+        DataTypes.Omics.Methylation.Level,
         DataTypes.Omics.Rna.Sample,
-        DataTypes.Omics.Rna.Exp,
+        DataTypes.Omics.Rna.Expression,
         DataTypes.Omics.Rnasc.Sample,
-        DataTypes.Omics.Rnasc.Exp
+        DataTypes.Omics.Rnasc.Expression,
+        DataTypes.Omics.Proteomics.Sample,
+        DataTypes.Omics.Proteomics.Expression
     ];
 
     private static readonly string[] _allowedFormats = 
@@ -30,6 +32,7 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         FileTypes.Sequence.BamBai,
         FileTypes.Sequence.BamBaiMd5,
         FileTypes.Sequence.Idat,
+        FileTypes.Sequence.Mzml,
         FileTypes.Sequence.Mtx,
         FileTypes.Sequence.Vcf
     ];

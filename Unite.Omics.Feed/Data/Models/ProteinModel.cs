@@ -3,6 +3,10 @@
 public class ProteinModel
 {
     public string Id;
+    public string Accession;
+    public string Symbol;
+    public string Description;
+    public string Database;
     public int Start;
     public int End;
     public int Length;

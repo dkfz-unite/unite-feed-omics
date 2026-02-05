@@ -16,11 +16,11 @@ namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 public class ExpressionsController(
     SubmissionTaskService submissionTaskService,
     ILogger<ExpressionsController> logger,
-    ExpSubmissionRepository submissionRepository)
+    ExpressionSubmissionRepository submissionRepository)
     : AnalysisController<EmptyModel>(submissionTaskService, submissionRepository, logger)
 {
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.RNASC_EXP;
-    protected override string DataType => DataTypes.Omics.Rnasc.Exp;
+    protected override string DataType => DataTypes.Omics.Rnasc.Expression;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 
     protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)

@@ -4,4 +4,4 @@ using Unite.Omics.Feed.Web.Models.Base;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
-public class SampleSubmissionRepository(IMongoOptions options) : SubmissionRepository<SampleModel>(options, DataTypes.Omics.Rnasc.Sample);
+public class ExpressionSubmissionRepository(IMongoOptions options) : SubmissionRepository<AnalysisModel<EmptyModel>>(options, DataTypes.Omics.Rnasc.Expression);

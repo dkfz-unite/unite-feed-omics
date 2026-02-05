@@ -244,8 +244,8 @@ public class GeneIndexCreator
         return _cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource => 
-                (resource.Type == DataTypes.Omics.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
-                (resource.Type == DataTypes.Omics.Meth.Level)) == true
+                (resource.Type == DataTypes.Omics.Methylation.Sample && resource.Format == FileTypes.Sequence.Idat) ||
+                (resource.Type == DataTypes.Omics.Methylation.Level)) == true
         );
     }
 
@@ -258,7 +258,7 @@ public class GeneIndexCreator
     {
         return _cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
-            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Exp) == true
+            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Expression) == true
         );
     }
 }

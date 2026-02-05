@@ -11,7 +11,7 @@ namespace Unite.Omics.Feed.Web.Handlers.Submission;
 public class RnascExpSubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly ExpSubmissionRepository _submissionRepository;
+    private readonly ExpressionSubmissionRepository _submissionRepository;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -23,7 +23,7 @@ public class RnascExpSubmissionHandler
         AnalysisWriter dataWriter,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ExpSubmissionRepository submissionRepository,
+        ExpressionSubmissionRepository submissionRepository,
         ILogger<RnascExpSubmissionHandler> logger)
     {
         _dataWriter = dataWriter;

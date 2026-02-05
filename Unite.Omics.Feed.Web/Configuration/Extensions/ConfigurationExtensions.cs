@@ -124,10 +124,10 @@ public static class ConfigurationExtensions
         services.AddTransient<Submissions.Repositories.Meth.LevelSubmissionRepository>();
         services.AddTransient<Submissions.Repositories.Meth.SampleSubmissionRepository>();
         
-        services.AddTransient<Submissions.Repositories.Rna.ExpSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.Rna.ExpressionSubmissionRepository>();
         services.AddTransient<Submissions.Repositories.Rna.SampleSubmissionRepository>();
         
-        services.AddTransient<Submissions.Repositories.RnaSc.ExpSubmissionRepository>();
+        services.AddTransient<Submissions.Repositories.RnaSc.ExpressionSubmissionRepository>();
         services.AddTransient<Submissions.Repositories.RnaSc.SampleSubmissionRepository>();
     }
 
