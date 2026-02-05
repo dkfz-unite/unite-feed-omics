@@ -29,7 +29,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ExpressionSubmissionRepository submissionRepository,
-        ILogger<RnaExpSubmissionHandler> logger)
+        ILogger<RnaExpSubmissionHandler> logger): base(priority)
 	{
         _dataWriter = dataWriter;
         _annotationService = annotationService;

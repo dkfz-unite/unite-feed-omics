@@ -25,7 +25,7 @@ public class RnascExpSubmissionHandler: SubmissionHandler
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ExpressionSubmissionRepository submissionRepository,
-        ILogger<RnascExpSubmissionHandler> logger)
+        ILogger<RnascExpSubmissionHandler> logger) : base(priority)
     {
         _dataWriter = dataWriter;
         _indexingTaskService = indexingTaskService;
