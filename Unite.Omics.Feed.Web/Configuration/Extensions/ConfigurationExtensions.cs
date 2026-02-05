@@ -9,6 +9,7 @@ using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Annotations.Services.Vep;
 using Unite.Omics.Feed.Web.Configuration.Options;
+using Unite.Omics.Feed.Web.Handlers;
 using Unite.Omics.Feed.Web.Handlers.Annotation;
 using Unite.Omics.Feed.Web.Handlers.Indexing;
 using Unite.Omics.Feed.Web.Handlers.Submission;
@@ -76,16 +77,16 @@ public static class ConfigurationExtensions
 
         // Submissions hosted services
         services.AddHostedService<SubmissionsWorker>();
-        services.AddTransient<RnaSubmissionHandler>();
-        services.AddTransient<RnaExpSubmissionHandler>();
-        services.AddTransient<RnascSubmissionHandler>();
-        services.AddTransient<RnascExpSubmissionHandler>();
-        services.AddTransient<DnaSubmissionHandler>();
-        services.AddTransient<DnaSmSubmissionHandler>();
-        services.AddTransient<DnaCnvSubmissionHandler>();
-        services.AddTransient<DnaSvSubmissionHandler>();
-        services.AddTransient<MethSubmissionHandler>();
-        services.AddTransient<MethLvlSubmissionHandler>();
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaSubmissionHandler>(sp, HandlerPriority.Highest));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaExpSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnascSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnascExpSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSmSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaCnvSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSvSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethLvlSubmissionHandler>(sp, HandlerPriority.Normal));
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();

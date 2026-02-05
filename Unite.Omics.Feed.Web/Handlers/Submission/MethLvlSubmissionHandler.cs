@@ -9,7 +9,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class MethLvlSubmissionHandler
+public class MethLvlSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly LevelSubmissionRepository _submissionRepository;
@@ -21,11 +21,12 @@ public class MethLvlSubmissionHandler
 
 
     public MethLvlSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         LevelSubmissionRepository submissionRepository,
-        ILogger<MethLvlSubmissionHandler> logger)
+        ILogger<MethLvlSubmissionHandler> logger): base(priority)
     {
         _dataWriter = dataWriter;
         _indexingTaskService = indexingTaskService;
@@ -35,7 +36,7 @@ public class MethLvlSubmissionHandler
     }
 
 
-    public void Handle()
+    public override void Handle()
     {
         ProcessSubmissionTasks();
     }

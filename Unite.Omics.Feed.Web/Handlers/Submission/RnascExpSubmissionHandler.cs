@@ -8,7 +8,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class RnascExpSubmissionHandler
+public class RnascExpSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionSubmissionRepository _submissionRepository;
@@ -20,6 +20,7 @@ public class RnascExpSubmissionHandler
 
 
     public RnascExpSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
@@ -34,7 +35,7 @@ public class RnascExpSubmissionHandler
     }
 
 
-    public void Handle()
+    public override void Handle()
     {
         ProcessSubmissionTasks();
     }

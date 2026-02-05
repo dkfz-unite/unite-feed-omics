@@ -15,11 +15,12 @@ public class RnaSubmissionHandler : SampleSubmissionHandler
 
 
     public RnaSubmissionHandler(
+        HandlerPriority priority,
         SampleWriter dataWriter,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
         SampleSubmissionRepository submissionRepository,
-        ILogger<RnaSubmissionHandler> logger) : base(dataWriter, taskProcessingService, indexingTaskService, logger)
+        ILogger<RnaSubmissionHandler> logger) : base(priority, dataWriter, taskProcessingService, indexingTaskService, logger)
     {
         _submissionRepository = submissionRepository;
     }

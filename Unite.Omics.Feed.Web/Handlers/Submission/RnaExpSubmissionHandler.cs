@@ -10,7 +10,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class RnaExpSubmissionHandler
+public class RnaExpSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionsAnnotationService _annotationService;
@@ -23,6 +23,7 @@ public class RnaExpSubmissionHandler
 
 
 	public RnaExpSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
         GeneIndexingTaskService indexingTaskService,
@@ -41,7 +42,7 @@ public class RnaExpSubmissionHandler
 	}
 
 
-	public void Handle()
+	public override void Handle()
 	{
 		ProcessSubmissionTasks();
 	}

@@ -10,8 +10,4 @@
   <ItemGroup>
     <ProjectReference Include="../../unite-data/Unite.Data.Context/Unite.Data.Context.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services/Models/Prot/" />
-    <Folder Include="Services/Prot/" />
-  </ItemGroup>
 </Project>

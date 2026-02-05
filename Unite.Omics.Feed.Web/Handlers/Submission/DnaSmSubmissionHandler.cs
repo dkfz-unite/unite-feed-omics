@@ -8,7 +8,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class DnaSmSubmissionHandler
+public class DnaSmSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly SmAnnotationTaskService _annotationTaskService;
@@ -21,12 +21,13 @@ public class DnaSmSubmissionHandler
 
 
     public DnaSmSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SmAnnotationTaskService annotationTaskService,
         SmIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         SmSubmissionRepository submissionRepository,
-        ILogger<DnaSmSubmissionHandler> logger)
+        ILogger<DnaSmSubmissionHandler> logger): base(priority)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
@@ -39,7 +40,7 @@ public class DnaSmSubmissionHandler
     }
 
 
-    public void Handle()
+    public override void Handle()
     {
         ProcessSubmissionTasks();
     }
