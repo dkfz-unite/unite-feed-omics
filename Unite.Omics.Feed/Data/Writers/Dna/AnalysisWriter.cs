@@ -55,6 +55,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 
     private void WriteSms(int sampleId, IEnumerable<Models.Dna.Sm.VariantModel> models, ref AnalysisWriteAudit audit)
     {
+        //TODO: this DbContext is not used?
         using var dbContext = _dbContextFactory.CreateDbContext();
 
         var variants = _smRepository.CreateMissing(models);

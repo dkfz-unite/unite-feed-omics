@@ -54,6 +54,7 @@ public static class ConfigurationExtensions
         services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();
         services.AddTransient<Data.Writers.Rna.AnalysisWriter>();
         services.AddTransient<Data.Writers.RnaSc.AnalysisWriter>();
+        services.AddTransient<Data.Writers.CnvProfile.CnvProfileWriter>();
 
         // Annotation services
         services.AddTransient<SmsAnnotationService>();
