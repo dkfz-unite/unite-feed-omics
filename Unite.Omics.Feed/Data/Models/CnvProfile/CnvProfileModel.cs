@@ -1,6 +1,6 @@
 using Unite.Data.Entities.Omics.Enums;
 
-namespace Unite.Omics.Feed.Data.Models.Dna;
+namespace Unite.Omics.Feed.Data.Models;
 
 public class CnvProfileModel
 {
