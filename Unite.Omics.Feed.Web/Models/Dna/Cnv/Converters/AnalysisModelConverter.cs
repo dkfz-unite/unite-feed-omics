@@ -4,6 +4,7 @@ namespace Unite.Omics.Feed.Web.Models.Dna.Cnv.Converters;
 
 public class AnalysisModelConverter : Base.Converters.AnalysisModelConverter<VariantModel>
 {
+    //TODO: the mapper does a very straight forward mapping and used only in this converter, consider to merge them into a single class
     private readonly VariantModelMapper _variantsModelMapper;
 
 

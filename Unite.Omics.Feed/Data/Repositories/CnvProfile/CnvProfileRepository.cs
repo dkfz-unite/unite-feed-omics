@@ -1,5 +1,6 @@
 using Unite.Data.Context;
 using Unite.Omics.Feed.Data.Models;
+using Unite.Omics.Feed.Data.Models.CnvProfile;
 
 namespace Unite.Omics.Feed.Data.Repositories.CnvProfile;
 

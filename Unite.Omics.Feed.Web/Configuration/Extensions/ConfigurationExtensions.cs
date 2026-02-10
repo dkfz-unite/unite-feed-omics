@@ -88,6 +88,7 @@ public static class ConfigurationExtensions
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSvSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethLvlSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<CnvProfileSubmissionHandler>(sp, HandlerPriority.Normal));
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();

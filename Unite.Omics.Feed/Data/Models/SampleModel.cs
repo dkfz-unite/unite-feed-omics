@@ -1,4 +1,6 @@
-﻿namespace Unite.Omics.Feed.Data.Models;
+﻿using Unite.Omics.Feed.Data.Models.CnvProfile;
+
+namespace Unite.Omics.Feed.Data.Models;
 
 public class SampleModel
 {

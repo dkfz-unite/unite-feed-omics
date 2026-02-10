@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Omics.Feed.Data.Models;
 using Unite.Omics.Feed.Data.Writers.CnvProfile;
+using Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Converters;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
@@ -13,6 +13,8 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
     CnvProfileSubmissionRepository submissionRepository,
     ILogger<CnvProfileSubmissionHandler> logger) : SubmissionHandler(priority)
 {
+    private readonly CnvProfileModelConverter _converter = new CnvProfileModelConverter();
+    
     public override void Handle()
     {
         ProcessSubmissionTasks();
@@ -39,9 +41,7 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
     private void ProcessSubmission(string submissionId)
     {
         var submittedData = submissionRepository.Find(submissionId)?.Document;
-        //TODO: create a converter from submission data to domain data(SampleModel)
-        //var convertedData = _converter.Convert(submittedData);
-        var convertedData = new SampleModel();
+        var convertedData = _converter.Convert(submittedData);
 
         dataWriter.SaveData(convertedData, out var audit);
         //TODO: create indexing tasks for CNV profiles
