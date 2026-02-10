@@ -5,26 +5,51 @@ namespace Unite.Omics.Feed.Data.Repositories.CnvProfile;
 
 public class CnvProfileRepository(DomainDbContext dbContext)
 {
-    private readonly DomainDbContext _dbContext = dbContext;
-
     public IEnumerable<StubEntities.CnvProfile> CreateAll(int sampleId, IEnumerable<CnvProfileModel> models)
     {
         var entitiesToAdd = new List<StubEntities.CnvProfile>();
 
         foreach (var model in models)
         {
-            //TODO: create entity properly
-            var entity = new StubEntities.CnvProfile();
-            
+            var entity = CreateOrUpdate(sampleId, model);
             entitiesToAdd.Add(entity);
         }
         
         if (entitiesToAdd.Any())
         {
-            _dbContext.AddRange(entitiesToAdd);
-            _dbContext.SaveChanges();
+            dbContext.AddRange(entitiesToAdd);
+            dbContext.SaveChanges();
         }
         
         return entitiesToAdd;
+    }
+
+    public StubEntities.CnvProfile CreateOrUpdate(int sampleId, CnvProfileModel model)
+    {
+        var entity = Find(sampleId, model);
+        if (entity == null)
+        {
+            entity = new StubEntities.CnvProfile
+            {
+                SampleId = sampleId,
+                Chromosome = model.Chromosome,
+                ChromosomeArm = model.ChromosomeArm,
+            };
+        }
+            
+        entity.Gain = model.Gain;
+        entity.Loss = model.Loss;
+        entity.Neutral = model.Neutral;
+        
+        return entity;
+    }
+    
+    public StubEntities.CnvProfile Find(int sampleId, CnvProfileModel model)
+    {
+        return dbContext.Set<StubEntities.CnvProfile>()
+            .FirstOrDefault(e => 
+                e.SampleId == sampleId 
+                && e.Chromosome == model.Chromosome 
+                && e.ChromosomeArm == model.ChromosomeArm);
     }
 }

@@ -25,6 +25,7 @@ public class GeneRepository
     {
         Expression<Func<Gene, bool>> predicate = (entity) => entity.StableId == model.Id;
 
+        //TODO: do not compile predicate on each call
         return cache?.FirstOrDefault(predicate.Compile()) ?? _dbContext.Set<Gene>().FirstOrDefault(predicate);
     }
 
