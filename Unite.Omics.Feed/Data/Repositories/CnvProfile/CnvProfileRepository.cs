@@ -5,7 +5,7 @@ namespace Unite.Omics.Feed.Data.Repositories.CnvProfile;
 
 public class CnvProfileRepository(DomainDbContext dbContext)
 {
-    public IEnumerable<StubEntities.CnvProfile> CreateAll(int sampleId, IEnumerable<CnvProfileModel> models)
+    public IEnumerable<StubEntities.CnvProfile> CreateOrUpdate(int sampleId, IEnumerable<CnvProfileModel> models)
     {
         var entitiesToAdd = new List<StubEntities.CnvProfile>();
 

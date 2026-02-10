@@ -25,7 +25,7 @@ public class CnvProfileWriter(
 
         if (model.CnvProfiles.IsNotEmpty())
         {
-           var cnvProfiles = _cnvProfileRepository.CreateAll(sampleId, model.CnvProfiles);
+           var cnvProfiles = _cnvProfileRepository.CreateOrUpdate(sampleId, model.CnvProfiles);
             audit.CnvProfilesCreated += cnvProfiles.Count();
         }
     }
