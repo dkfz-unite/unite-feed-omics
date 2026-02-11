@@ -9,7 +9,7 @@ public class CnvProfileModelConverter: Base.Converters.AnalysisModelConverter<Cn
     {
         sampleModel.CnvProfiles = cnvProfileSubmission.Entries.Distinct().Select(submissionEntry =>
         {
-            var model = new Unite.Omics.Feed.Data.Models.CnvProfile.CnvProfileModel
+            var model = new Data.Models.Dna.Cnv.ProfileModel
             {
                 Chromosome =  submissionEntry.Chromosome,
                 ChromosomeArm =  submissionEntry.ChromosomeArm,

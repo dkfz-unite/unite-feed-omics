@@ -1,19 +1,19 @@
 using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Omics.Feed.Data.Writers.CnvProfile;
+using Unite.Omics.Feed.Data.Writers.Dna;
 using Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Converters;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
 public class CnvProfileSubmissionHandler(HandlerPriority priority,
-    CnvProfileWriter dataWriter,
+    AnalysisWriter dataWriter,
     TasksProcessingService tasksProcessingService,
     CnvProfileSubmissionRepository submissionRepository,
     ILogger<CnvProfileSubmissionHandler> logger) : SubmissionHandler(priority)
 {
-    private readonly CnvProfileModelConverter _converter = new CnvProfileModelConverter();
+    private readonly CnvProfileModelConverter _converter = new();
     
     public override void Handle()
     {

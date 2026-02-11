@@ -8,6 +8,7 @@ using Unite.Cache.Configuration.Options;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Annotations.Services.Vep;
+using Unite.Omics.Feed.Data.Writers.Dna;
 using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers;
 using Unite.Omics.Feed.Web.Handlers.Annotation;
@@ -54,7 +55,6 @@ public static class ConfigurationExtensions
         services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();
         services.AddTransient<Data.Writers.Rna.AnalysisWriter>();
         services.AddTransient<Data.Writers.RnaSc.AnalysisWriter>();
-        services.AddTransient<Data.Writers.CnvProfile.CnvProfileWriter>();
 
         // Annotation services
         services.AddTransient<SmsAnnotationService>();

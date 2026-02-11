@@ -8,6 +8,7 @@ public class AnalysisWriteAudit : DataWriteAudit
     public int CnvsAssociated;
     public int SvsCreated;
     public int SvsAssociated;
+    public int CnvProfilesCreated = 0;
 
     public HashSet<int> Sms = [];
     public HashSet<int> SmsEntries = [];
@@ -26,7 +27,8 @@ public class AnalysisWriteAudit : DataWriteAudit
             $"{CnvsCreated} CNVs created",
             $"{CnvsAssociated} CNVs associated",
             $"{SvsCreated} SVs created",
-            $"{SvsAssociated} SVs associated"
+            $"{SvsAssociated} SVs associated",
+            $"{CnvProfilesCreated} CNV Profiles created",
         ]);
     }
 }

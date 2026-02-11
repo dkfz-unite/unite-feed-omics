@@ -1,8 +1,8 @@
 using Unite.Data.Entities.Omics.Enums;
 
-namespace Unite.Omics.Feed.Data.Models.CnvProfile;
+namespace Unite.Omics.Feed.Data.Models.Dna.Cnv;
 
-public class CnvProfileModel
+public class ProfileModel
 {
     public Chromosome Chromosome { get; set; }
     public ChromosomeArm ChromosomeArm { get; set; }

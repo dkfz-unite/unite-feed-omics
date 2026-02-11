@@ -14,7 +14,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     private Repositories.Dna.Cnv.VariantEntryRepository _cnvEntryRepository;
     private Repositories.Dna.Sv.VariantRepository _svRepository;
     private Repositories.Dna.Sv.VariantEntryRepository _svEntryRepository;
-
+    private Repositories.Dna.Cnv.ProfileRepository _cnvProfileRepository;
 
     public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
@@ -34,6 +34,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         _svRepository = new Repositories.Dna.Sv.VariantRepository(dbContext);
         _svEntryRepository = new Repositories.Dna.Sv.VariantEntryRepository(dbContext, _svRepository);
         _resourceRepository = new Repositories.ResourceRepository(dbContext);
+        _cnvProfileRepository = new Repositories.Dna.Cnv.ProfileRepository(dbContext);
     }
 
     protected override void ProcessModel(SampleModel model, ref AnalysisWriteAudit audit)
@@ -51,6 +52,9 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 
         if (model.Resources.IsNotEmpty())
             WriteResources(sampleId, model.Resources, ref audit);
+        
+        if (model.CnvProfiles.IsNotEmpty())
+            WriteCnvProfiles(sampleId, model.CnvProfiles, ref audit);
     }
 
     private void WriteSms(int sampleId, IEnumerable<Models.Dna.Sm.VariantModel> models, ref AnalysisWriteAudit audit)
@@ -88,5 +92,11 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         var variantEntries = _svEntryRepository.CreateMissing(sampleId, models, variants);
         audit.SvsEntries.AddRange(variantEntries.Select(entry => entry.EntityId));
         audit.SvsAssociated += variantEntries.Count();
+    }
+    
+    protected void WriteCnvProfiles(int sampleId, IEnumerable<Models.Dna.Cnv.ProfileModel> models, ref AnalysisWriteAudit audit)
+    {
+        var cnvProfiles = _cnvProfileRepository.CreateOrUpdate(sampleId, models);
+        audit.CnvProfilesCreated += cnvProfiles.Count();
     }
 }

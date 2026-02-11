@@ -1,4 +1,4 @@
-﻿using Unite.Omics.Feed.Data.Models.CnvProfile;
+﻿using Unite.Omics.Feed.Data.Models.Dna.Cnv;
 
 namespace Unite.Omics.Feed.Data.Models;
 
@@ -18,5 +18,5 @@ public class SampleModel
     public IEnumerable<Dna.Sv.VariantModel> Svs;
     public IEnumerable<Rna.GeneExpressionModel> Exps;
     public IEnumerable<ResourceModel> Resources;
-    public IEnumerable<CnvProfileModel> CnvProfiles;
+    public IEnumerable<ProfileModel> CnvProfiles;
 }

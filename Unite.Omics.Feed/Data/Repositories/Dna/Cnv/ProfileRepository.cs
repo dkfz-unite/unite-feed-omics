@@ -1,12 +1,11 @@
 using Unite.Data.Context;
-using Unite.Omics.Feed.Data.Models;
-using Unite.Omics.Feed.Data.Models.CnvProfile;
+using Unite.Omics.Feed.Data.Models.Dna.Cnv;
 
-namespace Unite.Omics.Feed.Data.Repositories.CnvProfile;
+namespace Unite.Omics.Feed.Data.Repositories.Dna.Cnv;
 
-public class CnvProfileRepository(DomainDbContext dbContext)
+public class ProfileRepository(DomainDbContext dbContext)
 {
-    public IEnumerable<StubEntities.CnvProfile> CreateOrUpdate(int sampleId, IEnumerable<CnvProfileModel> models)
+    public IEnumerable<StubEntities.CnvProfile> CreateOrUpdate(int sampleId, IEnumerable<ProfileModel> models)
     {
         var entitiesToAdd = new List<StubEntities.CnvProfile>();
 
@@ -25,7 +24,7 @@ public class CnvProfileRepository(DomainDbContext dbContext)
         return entitiesToAdd;
     }
 
-    public StubEntities.CnvProfile CreateOrUpdate(int sampleId, CnvProfileModel model)
+    public StubEntities.CnvProfile CreateOrUpdate(int sampleId, ProfileModel model)
     {
         var entity = Find(sampleId, model);
         if (entity == null)
@@ -45,7 +44,7 @@ public class CnvProfileRepository(DomainDbContext dbContext)
         return entity;
     }
     
-    public StubEntities.CnvProfile Find(int sampleId, CnvProfileModel model)
+    public StubEntities.CnvProfile Find(int sampleId, ProfileModel model)
     {
         return dbContext.Set<StubEntities.CnvProfile>()
             .FirstOrDefault(e => 

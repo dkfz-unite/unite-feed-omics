@@ -4,6 +4,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Unite.Data.Context" Version="12.4.3" />
+    <PackageReference Include="Unite.Data.Context" Version="12.4.8" />
   </ItemGroup>
 </Project>
