@@ -1,5 +1,4 @@
-﻿using Unite.Omics.Feed.Web.Handlers;
-using Unite.Omics.Feed.Web.Handlers.Submission;
+﻿using Unite.Omics.Feed.Web.Handlers.Submission;
 
 namespace Unite.Omics.Feed.Web.Workers;
 

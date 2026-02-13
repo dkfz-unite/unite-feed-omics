@@ -5,63 +5,59 @@ namespace Unite.Omics.Feed.Web.Models.Prot;
 
 public record class ExpressionModel
 {
-    private string _geneId;
-    private string _geneSymbol;
-    private string _transcriptId;
-    private string _transcriptSymbol;
-    private string _proteinId;
-    private string _proteinAccession;
-    private string _proteinSymbol;
+    private string _id;
+    private string _accession;
+    private string _symbol;
     private double? _intensity;
 
 
-    [JsonPropertyName("gene_id")]
-    [Column("gene_id")]
-    public string GeneId { get => ParseId(_geneId)?.Trim(); set => _geneId = value; }
+    [JsonPropertyName("id")]
+    [Column("id")]
+    public string Id { get => ParseId(_id)?.Trim(); set => _id = value; }
 
-    [JsonPropertyName("gene_symbol")]
-    [Column("gene_symbol")]
-    public string GeneSymbol { get => _geneSymbol?.Trim(); set => _geneSymbol = value; }
+    [JsonPropertyName("accession")]
+    [Column("accession")]
+    public string Accession { get => _accession?.Trim(); set => _accession = value; }
 
-    [JsonPropertyName("transcript_id")]
-    [Column("transcript_id")]
-    public string TranscriptId { get => ParseId(_transcriptId)?.Trim(); set => _transcriptId = value; }
-
-    [JsonPropertyName("transcript_symbol")]
-    [Column("transcript_symbol")]
-    public string TranscriptSymbol { get => _transcriptSymbol?.Trim(); set => _transcriptSymbol = value; }
-
-    [JsonPropertyName("protein_id")]
-    [Column("protein_id")]
-    public string ProteinId { get => ParseId(_proteinId)?.Trim(); set => _proteinId = value; }
-
-    [JsonPropertyName("protein_accession")]
-    [Column("protein_accession")]
-    public string ProteinAccession { get => _proteinAccession?.Trim(); set => _proteinAccession = value; }
-
-    [JsonPropertyName("protein_symbol")]
-    [Column("protein_symbol")]
-    public string ProteinSymbol { get => _proteinSymbol?.Trim(); set => _proteinSymbol = value; }
+    [JsonPropertyName("symbol")]
+    [Column("symbol")]
+    public string Symbol { get => _symbol?.Trim(); set => _symbol = value; }
 
     [JsonPropertyName("intensity")]
     [Column("intensity")]
     public double? Intensity { get => _intensity; set => _intensity = value; }
 
+
     /// <summary>
-    /// Gets the type of the protein identification (1: gene id, 2: gene symbol, 3: transcript id, 4: transcript symbol, 5: protein id, 6: protein accession, 7: protein symbol, 0: undefined).
+    /// Retrieves key type of the expression : id (1), accession (2), symbol (3) or undefined(0).
     /// </summary>
-    /// <returns>Type of the protein identification.</returns>
+    /// <returns>Expression key type.</returns>
     public byte GetKeyType()
     {
-        return !string.IsNullOrEmpty(GeneId) ? (byte)1
-             : !string.IsNullOrEmpty(GeneSymbol) ? (byte)2
-             : !string.IsNullOrEmpty(TranscriptId) ? (byte)3
-             : !string.IsNullOrEmpty(TranscriptSymbol) ? (byte)4
-             : !string.IsNullOrEmpty(ProteinId) ? (byte)5
-             : !string.IsNullOrEmpty(ProteinAccession) ? (byte)6
-             : !string.IsNullOrEmpty(ProteinSymbol) ? (byte)7
+        return !string.IsNullOrEmpty(Id) ? (byte)1
+             : !string.IsNullOrEmpty(Accession) ? (byte)2
+             : !string.IsNullOrEmpty(Symbol) ? (byte)3
              : (byte)0;
     }
+
+    /// <summary>
+    /// Retrieves expression data corresponding to the key type.
+    /// </summary>
+    /// <returns>Expression data.</returns>
+    public KeyValuePair<string, double> GetData()
+    {
+        var keyType = GetKeyType();
+        var intensity = Intensity.Value;
+
+        return keyType switch
+        {
+            1 => new KeyValuePair<string, double>(Id, intensity),
+            2 => new KeyValuePair<string, double>(Accession, intensity),
+            3 => new KeyValuePair<string, double>(Symbol, intensity),
+            _ => default
+        }; 
+    }
+
 
     private static string ParseId(string id)
     {

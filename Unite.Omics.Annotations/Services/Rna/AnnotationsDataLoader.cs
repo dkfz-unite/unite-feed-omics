@@ -79,11 +79,9 @@ public class AnnotationsDataLoader
 
         var existingIdentifiers = existingGenes.Select(gene => gene.Id).ToArray();
 
-        // TODO: existing ientifiers are always Gene.Id, but identifiers are Gene.StableId.
-        // This code will not work as intended and will always pull all new genes from the database.
         var newIdentifiers = identifiers.Except(existingIdentifiers).ToArray();
 
-        var newGenes = await _ensemblApiClient.Find<GeneResource>(newIdentifiers, length: true, expand: false);
+        var newGenes = await _ensemblApiClient.FindById<GeneResource>(newIdentifiers, length: true, expand: false);
 
         return Enumerable.Concat(existingGenes, newGenes).ToArray();
     }
@@ -113,7 +111,7 @@ public class AnnotationsDataLoader
 
         var newIdentifiers = identifiers.Except(existingIdentifiers).ToArray();
 
-        var newTranscripts = await _ensemblApiClient.Find<TranscriptResource>(newIdentifiers, length: true, expand: true);
+        var newTranscripts = await _ensemblApiClient.FindById<TranscriptResource>(newIdentifiers, length: true, expand: true);
 
         return Enumerable.Concat(existingTranscripts, newTranscripts).ToArray();
     }
@@ -152,7 +150,7 @@ public class AnnotationsDataLoader
     {
         return new GeneModel
         {
-            Id = resource.Id,
+            StableId = resource.Id,
             Symbol = resource.Symbol,
             Description = resource.Description,
             Chromosome = resource.Chromosome,

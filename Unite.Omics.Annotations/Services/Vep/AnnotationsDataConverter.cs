@@ -90,7 +90,7 @@ internal static class AnnotationsDataConverter
 
     private static void Map(GeneResource resource, GeneModel model)
     {
-        model.Id = resource.Id;
+        model.StableId = resource.Id;
         model.Symbol = resource.Symbol;
         model.Description = resource.Description;
         model.Biotype = resource.Biotype;
@@ -103,7 +103,7 @@ internal static class AnnotationsDataConverter
 
     private static void Map(TranscriptResource resource, TranscriptModel model)
     {
-        model.Id = resource.Id;
+        model.StableId = resource.Id;
         model.Symbol = resource.Symbol;
         model.Description = resource.Description;
         model.Biotype = resource.Biotype;
@@ -117,7 +117,7 @@ internal static class AnnotationsDataConverter
 
     private static void Map(ProteinResource resource, ProteinModel model)
     {
-        model.Id = resource.Id;
+        model.StableId = resource.Id;
         model.Start = resource.Start;
         model.End = resource.End;
         model.Length = resource.Length;

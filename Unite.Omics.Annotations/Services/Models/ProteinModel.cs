@@ -2,7 +2,9 @@
 
 public class ProteinModel
 {
-    public string Id;
+    public int? Id;
+
+    public string StableId;
     public string Accession;
     public string Symbol;
     public string Description;

@@ -25,7 +25,8 @@ public class ExpressionsController(
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MS];
     protected override IReader<ExpressionModel>[] Readers =>
     [
-        new TsvReader<ExpressionModel>()
+        new TsvReader<ExpressionModel>(),
+        new Models.Prot.Readers.DiaNN.Reader()
     ];
 
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.PROT_EXP;

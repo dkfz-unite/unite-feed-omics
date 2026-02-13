@@ -17,8 +17,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers/Prot/" />
-    <Folder Include="Models/Prot/" />
     <Folder Include="Models/Prot/Converters/" />
+    <Folder Include="Models/Prot/Readers/" />
+    <Folder Include="Models/Prot/Readers/DiaNN/" />
     <Folder Include="Models/Prot/Validators/" />
     <Folder Include="Submissions/Repositories/Prot/" />
   </ItemGroup>

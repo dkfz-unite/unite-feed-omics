@@ -6,7 +6,7 @@ public class ExpressionModelValidator : AbstractValidator<ExpressionModel>
 {
     public ExpressionModelValidator()
     {
-        RuleFor(model => model.GetDataType())
+        RuleFor(model => model.GetKeyType())
             .Must(value => value != 0)
             .WithMessage("Either 'gene_id', 'gene_symbol', 'transcript_id' or 'transcript_symbol' has to be specified");
 

@@ -3,8 +3,6 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Feed.Data.Writers.Rna;
-using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.Rna;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
@@ -72,7 +70,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
         var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
         var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedData = _converter.Convert(submittedData);
-        convertedData.Exps = convertedExpressions;
+        convertedData.GeneExpressions = convertedExpressions;
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Genes);
@@ -83,7 +81,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
 
 	private Annotations.Services.Models.Rna.GeneExpressionModel[] AnnotateExpressions(ExpressionsAnnotationService annotationService, Models.Rna.ExpressionModel[] expressions)
 	{
-        var dataType = expressions.First().GetDataType();
+        var dataType = expressions.First().GetKeyType();
 
         var data = expressions
             .Select(expression => expression.GetData())
@@ -108,7 +106,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
             {
                 Gene = new Data.Models.GeneModel
                 {
-                    Id = model.Gene.Id,
+                    Id = model.Gene.StableId,
                     Symbol = model.Gene.Symbol,
                     Description = model.Gene.Description,
                     Biotype = model.Gene.Biotype,

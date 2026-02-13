@@ -1,138 +1,80 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
-using Unite.Data.Entities.Omics;
-using Unite.Omics.Annotations.Clients.Ensembl;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Omics.Annotations.Clients.Ensembl.Resources;
 using Unite.Omics.Annotations.Services.Models;
-using Unite.Omics.Annotations.Services.Models.Prot;
 
 namespace Unite.Omics.Annotations.Services.Prot;
 
 public class AnnotationsDataLoader
 {
-    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
-    private readonly EnsemblApiClient1 _ensemblApiClient;
+    private readonly GeneDataLoader _geneDataLoader;
+    private readonly TranscriptDataLoader _transcriptDataLoader;
+    private readonly ProteinDataLoader _proteinDataLoader;
 
 
     public AnnotationsDataLoader(IEnsemblDataOptions ensemblOptions, IDbContextFactory<DomainDbContext> dbContextFactory)
     {
-        _ensemblApiClient = new EnsemblApiClient1(ensemblOptions);
-        _dbContextFactory = dbContextFactory;
+        _geneDataLoader = new GeneDataLoader(ensemblOptions, dbContextFactory);
+        _transcriptDataLoader = new TranscriptDataLoader(ensemblOptions, dbContextFactory);
+        _proteinDataLoader = new ProteinDataLoader(ensemblOptions, dbContextFactory);
     }
 
 
-    // public async Task<ProteinModel[]> LoadByProteinId(string[] proteinIds)
-    // {
-    //     var proteins = await LoadProteinsById(proteinIds);
-
-    //     return proteins.Select(protein => Convert(protein)).ToArray();
-    // }
-
-
-    private async Task<ProteinResource[]> LoadProteinsById(string[] identifiers)
+    public async Task<ProteinModel[]> LoadById(string[] keys)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        var proteins = await _proteinDataLoader.LoadById(keys);
+        
+        await LoadMissingData(proteins);
 
-        var existingProteins = dbContext.Set<Protein>().AsNoTracking().Where(protein => identifiers.Contains(protein.StableId)).Select(Convert).ToArray();
-
-        var existingIdentifiers = existingProteins.Select(protein => protein.Id).ToArray();
-
-        // TODO: Wrong IDs are compared
-        var newIdentifiers = identifiers.Except(existingIdentifiers).ToArray();
-
-        var newProteins = await _ensemblApiClient.Find<ProteinResource>(newIdentifiers, length: true, expand: false);
-
-        return Enumerable.Concat(existingProteins, newProteins).ToArray();
+        return proteins;
     }
 
-    private async Task<ProteinResource[]> LoadProteinsByAccession(string[] identifiers)
+    public async Task<ProteinModel[]> LoadByAccession(string[] keys)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        var proteins = await _proteinDataLoader.LoadByAccession(keys);
+        Console.WriteLine("Loaded {0}/{1} proteins ({2} missing).", proteins.Length, keys.Length, keys.Length - proteins.Length);
 
-        var existingProteins = dbContext.Set<Protein>().AsNoTracking().Where(protein => identifiers.Contains(protein.AccessionId)).Select(Convert).ToArray();
+        await LoadMissingData(proteins);
 
-        var existingIdentifiers = existingProteins.Select(protein => protein.Id).ToArray();
+        return proteins;
+    }
 
-        var newIdentifiers = identifiers.Except(existingIdentifiers).ToArray();
+    public async Task<ProteinModel[]> LoadBySymbol(string[] keys)
+    {
+        var proteins = await _proteinDataLoader.LoadBySymbol(keys);
 
-        var newProteins = await _ensemblApiClient.Find<ProteinResource>(newIdentifiers, length: true, expand: false);
+        await LoadMissingData(proteins);
 
-        return Enumerable.Concat(existingProteins, newProteins).ToArray();
+        return proteins;
     }
 
 
-    private static ProteinExpressionModel Convert(ProteinResource resource, double expression)
+    private async Task LoadMissingData(ProteinModel[] proteins)
     {
-        return new ProteinExpressionModel
+        var transcriptIds = proteins
+            .Select(protein => protein.Transcript.StableId)
+            .Distinct()
+            .ToArray();
+
+        var transcripts = await _transcriptDataLoader.LoadById(transcriptIds);
+        var transcriptsMap = transcripts.ToDictionary(transcript => transcript.StableId);
+
+        var geneIds = transcripts
+            .Select(transcript => transcript.Gene.StableId)
+            .Distinct()
+            .ToArray();
+
+        var genes = await _geneDataLoader.LoadById(geneIds);
+        var genesMap = genes.ToDictionary(gene => gene.StableId);
+
+        foreach (var protein in proteins)
         {
-            Protein = Convert(resource),
-            Intensity = expression
-        };
-    }
+            if (protein.Id != null)
+                continue;
 
-    private static ProteinModel Convert(ProteinResource resource)
-    {
-        return new ProteinModel
-        {
-            Id = resource.Id,
-            Accession = resource.Accession,
-            Symbol = resource.Symbol,
-            Description = resource.Description,
-            Database = resource.Database,
-            Start = resource.Start,
-            End = resource.End,
-            Length = resource.Length,
-            IsCanonical = resource.IsCanonical
-        };
-    }
-
-    private static GeneResource Convert(Gene entity)
-    {
-        return new GeneResource
-        {
-            Id = entity.StableId,
-            Symbol = entity.Symbol,
-            Description = entity.Description,
-            Biotype = entity.Biotype,
-            Chromosome = entity.ChromosomeId.Value,
-            Start = entity.Start.Value,
-            End = entity.End.Value,
-            Strand = entity.Strand.Value,
-            ExonicLength = entity.ExonicLength
-        };
-    }
-
-    private static TranscriptResource Convert(Transcript entity)
-    {
-        return new TranscriptResource
-        {
-            Id = entity.StableId,
-            Symbol = entity.Symbol,
-            Description = entity.Description,
-            Biotype = entity.Biotype,
-            IsCanonical = entity.IsCanonical.Value,
-            Chromosome = entity.ChromosomeId.Value,
-            Start = entity.Start.Value,
-            End = entity.End.Value,
-            Strand = entity.Strand.Value,
-            ExonicLength = entity.ExonicLength
-        };
-    }
-
-    private static ProteinResource Convert(Protein entity)
-    {
-        return new ProteinResource
-        {
-            Id = entity.StableId,
-            Accession = entity.AccessionId,
-            Symbol = entity.Symbol,
-            Description = entity.Description,
-            Database = entity.Database,
-            Start = entity.Start.Value,
-            End = entity.End.Value,
-            Length = entity.Length.Value,
-            IsCanonical = entity.IsCanonical.Value
-        };
+            // If this fails, then the data is inconsistent
+            protein.Transcript = transcriptsMap[protein.Transcript.StableId];
+            protein.Transcript.Gene = genesMap[protein.Transcript.Gene.StableId];
+        }
     }
 }

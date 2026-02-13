@@ -4,7 +4,9 @@ namespace Unite.Omics.Annotations.Services.Models;
 
 public class GeneModel
 {
-    public string Id;
+    public int? Id;
+
+    public string StableId;
     public string Symbol;
     public string Description;
     public string Biotype;
