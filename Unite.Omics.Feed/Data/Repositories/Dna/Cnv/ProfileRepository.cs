@@ -8,21 +8,17 @@ public class ProfileRepository(DomainDbContext dbContext)
 {
     public IEnumerable<Profile> CreateOrUpdate(int sampleId, IEnumerable<ProfileModel> models)
     {
-        var entitiesToAdd = new List<Profile>();
+        var entities = new List<Profile>();
 
         foreach (var model in models)
         {
             var entity = CreateOrUpdate(sampleId, model);
-            entitiesToAdd.Add(entity);
+            entities.Add(entity);
         }
         
-        if (entitiesToAdd.Any())
-        {
-            dbContext.AddRange(entitiesToAdd);
-            dbContext.SaveChanges();
-        }
+        dbContext.SaveChanges();
         
-        return entitiesToAdd;
+        return entities;
     }
 
     public Profile CreateOrUpdate(int sampleId, ProfileModel model)
@@ -36,6 +32,8 @@ public class ProfileRepository(DomainDbContext dbContext)
                 Chromosome = model.Chromosome,
                 ChromosomeArm = model.ChromosomeArm,
             };
+            
+            dbContext.Add(entity);
         }
             
         entity.Gain = model.Gain;
