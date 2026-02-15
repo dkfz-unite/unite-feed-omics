@@ -78,7 +78,7 @@ public static class ConfigurationExtensions
 
         // Submissions hosted services
         services.AddHostedService<SubmissionsWorker>();
-        /*services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaSubmissionHandler>(sp, HandlerPriority.Highest));
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaSubmissionHandler>(sp, HandlerPriority.Highest));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaExpSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnascSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnascExpSubmissionHandler>(sp, HandlerPriority.Normal));
@@ -87,7 +87,7 @@ public static class ConfigurationExtensions
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaCnvSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSvSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethLvlSubmissionHandler>(sp, HandlerPriority.Normal));*/
+        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethLvlSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<CnvProfileSubmissionHandler>(sp, HandlerPriority.Normal));
 
         // Variants annotation hosted service
