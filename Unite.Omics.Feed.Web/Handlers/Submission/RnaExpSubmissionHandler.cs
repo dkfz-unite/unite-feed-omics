@@ -57,7 +57,6 @@ public class RnaExpSubmissionHandler: SubmissionHandler
             stopwatch.Restart();
 
             ProcessSubmission(tasks[0].Target);
-
             stopwatch.Stop();
 
             _logger.LogInformation("Processed bulk transcriptomics data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
