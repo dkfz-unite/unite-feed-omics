@@ -91,6 +91,8 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
             audit.ProteinsCreated += createdProteins.Length;
 
             audit.ExpressionsCreated += expressions.Length;
+
+            audit.Proteins.AddRange(expressions.Select(entity => entity.EntityId));
         }
     }
 }
