@@ -1,113 +1,110 @@
-using Unite.Data.Entities.Omics;
-using Unite.Data.Entities.Specimens;
-using Unite.Essentials.Extensions;
-using Unite.Indices.Entities.Genes;
-using Unite.Omics.Indices.Services.Mappers;
-using Unite.Indices.Entities;
-using Unite.Data.Entities.Images.Enums;
-using Unite.Data.Entities.Omics.Analysis;
-using Unite.Data.Entities.Specimens.Enums;
 using Unite.Data.Constants;
-
+using Unite.Data.Entities.Images.Enums;
+using Unite.Data.Entities.Omics;
+using Unite.Data.Entities.Omics.Analysis;
+using Unite.Data.Entities.Specimens;
+using Unite.Data.Entities.Specimens.Enums;
+using Unite.Essentials.Extensions;
+using Unite.Indices.Entities;
+using Unite.Indices.Entities.Proteins;
+using Unite.Omics.Indices.Services.Mappers;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GeneIndexCreator
+public class ProteinIndexCreator
 {
-    private readonly GenesIndexingCache _cache;
+    private readonly ProteinsIndexingCache _cache;
 
 
-    public GeneIndexCreator(GenesIndexingCache cache)
+    public ProteinIndexCreator(ProteinsIndexingCache cache)
     {
         _cache = cache;
     }
 
 
-    public GeneIndex CreateIndex(object key)
+    public ProteinIndex CreateIndex(object key)
     {
-        var geneId = (int)key;
+        var proteinId = (int)key;
 
-        return CreateGeneIndex(geneId);
+        return CreateProteinIndex(proteinId);
     }
 
 
-    private GeneIndex CreateGeneIndex(int geneId)
+    private ProteinIndex CreateProteinIndex(int proteinId)
     {
-        var gene = LoadGene(geneId);
+        var protein = LoadProtein(proteinId);
 
-        if (gene == null)
+        if (protein == null)
             return null;
 
-        return CreateGeneIndex(gene);
+        return CreateProteinIndex(protein);
     }
 
-    private GeneIndex CreateGeneIndex(Gene gene)
+    private ProteinIndex CreateProteinIndex(Protein protein)
     {
-        var index = GeneIndexMapper.CreateFrom<GeneIndex>(gene);
+        var index = ProteinIndexMapper.CreateFrom<ProteinIndex>(protein);
 
-        index.Specimens = CreateSpecimenIndices(gene.Id);
+        index.Specimens = CreateSpecimenIndices(protein.Id);
 
         var hasSpecimens = index.Specimens?.Any();
 
-        var proteinIds = _cache.Proteins.Where(protein => protein.Transcript.GeneId == gene.Id).Select(protein => protein.Id).ToArray();
-        var hasGeneExpressions = _cache.GeneExpressions?.Any(entry => entry.EntityId == gene.Id);
-        var hasProteinExpressions = _cache.ProteinExpressions?.Any(entry => proteinIds.Contains(entry.EntityId));
+        var genes = _cache.Proteins.Where(protein => protein.Transcript.GeneId == protein.Transcript.GeneId).Select(protein => protein.Transcript.GeneId).Distinct().ToArray();
+        var hasGeneExpressions = _cache.GeneExpressions?.Any(entry => genes.Contains(entry.EntityId));
+        var hasProteinExpressions = _cache.ProteinExpressions?.Any(entry => entry.EntityId == protein.Id);
 
         // If gene is not affected by any variant and has no expression data, it should be removed.
         if (hasSpecimens != true && hasGeneExpressions != true && hasProteinExpressions != true)
             return null;
 
-        index.Stats = CreateStatsIndex(gene.Id);
-        index.Data = CreateDataIndex(gene.Id);
+        index.Stats = CreateStatsIndex(protein.Id);
+        index.Data = CreateDataIndex(protein.Id);
 
         return index;
     }
 
-    private Gene LoadGene(int geneId)
+    private Protein LoadProtein(int proteinId)
     {
-        return _cache.Genes.FirstOrDefault(gene => gene.Id == geneId);
+        return _cache.Proteins.FirstOrDefault(protein => protein.Id == proteinId);
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(int geneId)
+    private SpecimenIndex[] CreateSpecimenIndices(int proteinId)
     {
-        var specimens = LoadSpecimens(geneId);
+        var specimens = LoadSpecimens(proteinId);
 
-        return specimens.Select(specimen => CreateSpecimenIndex(geneId, specimen)).ToArrayOrNull();
+        return specimens.Select(specimen => CreateSpecimenIndex(proteinId, specimen)).ToArrayOrNull();
     }
 
-    private SpecimenIndex CreateSpecimenIndex(int geneId, Specimen specimen)
+    private SpecimenIndex CreateSpecimenIndex(int proteinId, Specimen specimen)
     {
         var index = SpecimenIndexMapper.CreateFrom<SpecimenIndex>(specimen, null);
 
         var sampleId = _cache.Samples.FirstOrDefault(sample => sample.SpecimenId == specimen.Id)?.Id;
-
-        index.TPM = _cache.GeneExpressions.FirstOrDefault(entry => entry.EntityId == geneId && entry.SampleId == sampleId)?.TPM;
-        index.FPKM = _cache.GeneExpressions.FirstOrDefault(entry => entry.EntityId == geneId && entry.SampleId == sampleId)?.FPKM;
+        index.Intensity = _cache.ProteinExpressions.FirstOrDefault(entry => entry.EntityId == proteinId && entry.SampleId == sampleId)?.Intensity;
         
         return index;
     }
 
-    private Specimen[] LoadSpecimens(int geneId)
+    private Specimen[] LoadSpecimens(int proteinId)
     {
-        var sampleIds = LoadSamples(geneId).Select(sample => sample.Id).ToArray();
+        var sampleIds = LoadSamples(proteinId).Select(sample => sample.Id).ToArray();
         var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
 
         return _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).ToArray();
     }
 
-    private Sample[] LoadSamples(int geneId)
+    private Sample[] LoadSamples(int proteinId)
     {
-        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var proteins = _cache.Proteins.Where(protein => protein.Transcript.GeneId == geneId).Select(protein => protein.Id).ToArray();
+        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.Protein.Id == proteinId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.Protein.Id == proteinId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.Protein.Id == proteinId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var genes = _cache.Proteins.Where(protein => protein.Id == proteinId).Select(protein => protein.Transcript.GeneId).Distinct().ToArray();
 
         var smSamples = _cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
-        var geneExpSamples = _cache.GeneExpressions.Where(entry => entry.EntityId == geneId).Select(entry => entry.SampleId).ToArray();
-        var proteinExpSamples = _cache.ProteinExpressions.Where(entry => proteins.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var geneExpSamples = _cache.GeneExpressions.Where(entry => genes.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var proteinExpSamples = _cache.ProteinExpressions.Where(entry => entry.EntityId == proteinId).Select(entry => entry.SampleId).ToArray();
         
         var sampleIds = smSamples.Union(cnvSamples).Union(svSamples).Union(geneExpSamples).Union(proteinExpSamples).ToArray();
 
@@ -115,11 +112,11 @@ public class GeneIndexCreator
     }
 
 
-    private StatsIndex CreateStatsIndex(int geneId)
+    private StatsIndex CreateStatsIndex(int proteinId)
     {
-        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.Protein.Id == proteinId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.Protein.Id == proteinId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.Protein.Id == proteinId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
         var smSamples = _cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
@@ -139,9 +136,9 @@ public class GeneIndexCreator
     }
 
 
-    private DataIndex CreateDataIndex(int geneId)
+    private DataIndex CreateDataIndex(int proteinId)
     {
-        var sampleIds = LoadSamples(geneId).Select(sample => sample.Id).ToArray();
+        var sampleIds = LoadSamples(proteinId).Select(sample => sample.Id).ToArray();
         var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
         var donorIds = _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
         var imageIds = _cache.Images.Where(image => donorIds.Contains(image.DonorId)).Select(image => image.Id).Distinct().ToArray();
@@ -167,13 +164,13 @@ public class GeneIndexCreator
             XenograftsMolecular = CheckMolecularData(specimenIds, SpecimenType.Xenograft),
             XenograftsInterventions = CheckInterventions(specimenIds, SpecimenType.Xenograft),
             XenograftsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Xenograft),
-            Sms = CheckSms(geneId),
-            Cnvs = CheckCnvs(geneId),
-            Svs = CheckSvs(geneId),
+            Sms = CheckSms(proteinId),
+            Cnvs = CheckCnvs(proteinId),
+            Svs = CheckSvs(proteinId),
             Meth = CheckMethylation(sampleIds),
-            Exp = CheckGeneExp(geneId),
+            Exp = CheckGeneExp(proteinId),
             ExpSc = CheckGeneExpSc(sampleIds),
-            Prot = CheckProteinExp(geneId)
+            Prot = CheckProteinExp(proteinId)
         };
     }
 
@@ -236,19 +233,19 @@ public class GeneIndexCreator
         );
     }
 
-    private bool CheckSms(int geneId)
+    private bool CheckSms(int proteinId)
     {
-        return _cache.SmTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return _cache.SmTranscripts.Any(transcript => transcript.Feature.Protein.Id == proteinId);
     }
 
-    private bool CheckCnvs(int geneId)
+    private bool CheckCnvs(int proteinId)
     {
-        return _cache.CnvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return _cache.CnvTranscripts.Any(transcript => transcript.Feature.Protein.Id == proteinId);
     }
 
-    private bool CheckSvs(int geneId)
+    private bool CheckSvs(int proteinId)
     {
-        return _cache.SvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return _cache.SvTranscripts.Any(transcript => transcript.Feature.Protein.Id == proteinId);
     }
 
     private bool CheckMethylation(int[] sampleIds)
@@ -261,9 +258,9 @@ public class GeneIndexCreator
         );
     }
 
-    private bool CheckGeneExp(int geneId)
+    private bool CheckGeneExp(int proteinId)
     {
-        return _cache.GeneExpressions?.Any(entry => entry.EntityId == geneId) == true;
+        return _cache.GeneExpressions?.Any(entry => entry.EntityId == proteinId) == true;
     }
 
     private bool CheckGeneExpSc(int[] sampleIds)
@@ -274,10 +271,8 @@ public class GeneIndexCreator
         );
     }
 
-    private bool CheckProteinExp(int geneId)
+    private bool CheckProteinExp(int proteinId)
     {
-        var proteinIds = _cache.Proteins.Where(protein => protein.Transcript.GeneId == geneId).Select(protein => protein.Id).ToArray();
-
-        return _cache.ProteinExpressions?.Any(entry => proteinIds.Contains(entry.EntityId)) == true;
+        return _cache.ProteinExpressions?.Any(entry => entry.EntityId == proteinId) == true;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Unite.Omics.Annotations.Services.Models;
+﻿using Unite.Data.Entities.Omics.Enums;
+
+namespace Unite.Omics.Annotations.Services.Models;
 
 public class ProteinModel
 {
@@ -9,6 +11,7 @@ public class ProteinModel
     public string Symbol;
     public string Description;
     public string Database;
+    public Chromosome Chromosome;
     public int Start;
     public int End;
     public int Length;

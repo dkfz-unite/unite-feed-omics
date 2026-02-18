@@ -6,6 +6,7 @@ using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis;
+using Unite.Data.Entities.Omics.Analysis.Prot;
 using Unite.Data.Entities.Omics.Analysis.Rna;
 using Unite.Data.Entities.Specimens;
 using Unite.Essentials.Extensions;
@@ -13,17 +14,17 @@ using Unite.Essentials.Extensions;
 using SM = Unite.Data.Entities.Omics.Analysis.Dna.Sm;
 using CNV = Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
 using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
-using Unite.Data.Entities.Omics.Analysis.Prot;
+
 
 namespace Unite.Omics.Indices.Services;
 
-public class GenesIndexingCache
+public class ProteinsIndexingCache
 {
     private static readonly object _lock = new();
 
     private readonly HashSet<int> _sampleIds = [];
     private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
-    
+
     public IEnumerable<SM.AffectedTranscript> SmTranscripts { get; private set; }
     public IEnumerable<CNV.AffectedTranscript> CnvTranscripts { get; private set; }
     public IEnumerable<SV.AffectedTranscript> SvTranscripts { get; private set; }
@@ -41,9 +42,9 @@ public class GenesIndexingCache
     public IEnumerable<Image> Images { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Sample> Samples { get; private set; }
-    
-    
-    public GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
+
+
+    public ProteinsIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
     }
@@ -87,6 +88,7 @@ public class GenesIndexingCache
         Cnvs = null;
         Svs = null;
         GeneExpressions = null;
+        ProteinExpressions = null;
         SmEntries = null;
         CnvEntries = null;
         SvEntries = null;
@@ -101,9 +103,16 @@ public class GenesIndexingCache
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
+        var geneIds = dbContext.Set<Protein>()
+            .AsNoTracking()
+            .Where(protein => ids.Contains(protein.Id))
+            .Select(protein => protein.Transcript.GeneId.Value)
+            .Distinct()
+            .ToArray();
+
         GeneExpressions = await dbContext.Set<GeneExpression>()
             .AsNoTracking()
-            .Where(expression => ids.Contains(expression.EntityId))
+            .Where(expression => geneIds.Contains(expression.EntityId))
             .ToArrayAsync();
 
         var sampleIds = GeneExpressions.Select(expression => expression.SampleId).Distinct().ToArray();
@@ -118,16 +127,9 @@ public class GenesIndexingCache
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        var proteinIds = await dbContext.Set<Protein>()
-            .AsNoTracking()
-            .Where(protein => ids.Contains(protein.Transcript.GeneId.Value))
-            .Select(protein => protein.Id)
-            .Distinct()
-            .ToArrayAsync();
-
         ProteinExpressions = await dbContext.Set<ProteinExpression>()
             .AsNoTracking()
-            .Where(expression => proteinIds.Contains(expression.EntityId))
+            .Where(expression => ids.Contains(expression.EntityId))
             .ToArrayAsync();
 
         var sampleIds = ProteinExpressions.Select(expression => expression.SampleId).Distinct().ToArray();
@@ -145,8 +147,8 @@ public class GenesIndexingCache
         SmTranscripts = await dbContext.Set<SM.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
-            .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
+            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.Protein.Id))
             .ToArrayAsync();
     }
 
@@ -157,8 +159,8 @@ public class GenesIndexingCache
         CnvTranscripts = await dbContext.Set<CNV.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
-            .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
+            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.Protein.Id))
             .ToArrayAsync();
     }
 
@@ -169,8 +171,8 @@ public class GenesIndexingCache
         SvTranscripts = await dbContext.Set<SV.AffectedTranscript>()
             .AsNoTracking()
             .Include(affectedTranscript => affectedTranscript.Feature.Protein)
-            .Where(affectedTranscript => affectedTranscript.Feature.GeneId != null)
-            .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.GeneId.Value))
+            .Where(affectedTranscript => affectedTranscript.Feature.Protein != null)
+            .Where(affectedTranscript => ids.Contains(affectedTranscript.Feature.Protein.Id))
             .ToArrayAsync();
     }
 
@@ -178,9 +180,16 @@ public class GenesIndexingCache
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
+        var geneIds = dbContext.Set<Protein>()
+            .AsNoTracking()
+            .Where(protein => ids.Contains(protein.Id))
+            .Select(protein => protein.Transcript.GeneId)
+            .Distinct()
+            .ToArray();
+
         Genes = await dbContext.Set<Gene>()
             .AsNoTracking()
-            .Where(gene => ids.Contains(gene.Id))
+            .Where(gene => geneIds.Contains(gene.Id))
             .ToArrayAsync();
     }
 
@@ -191,7 +200,7 @@ public class GenesIndexingCache
         Proteins = await dbContext.Set<Protein>()
             .AsNoTracking()
             .Include(protein => protein.Transcript)
-            .Where(protein => ids.Contains(protein.Transcript.GeneId.Value))
+            .Where(protein => ids.Contains(protein.Id))
             .ToArrayAsync();
     }
 

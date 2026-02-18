@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Services.Tasks;
@@ -8,15 +8,15 @@ using Unite.Essentials.Extensions;
 
 namespace Unite.Omics.Feed.Web.Services.Indexing;
 
-public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
+public class ProteinIndexingTaskService : IndexingTaskService<Protein, int>
 {
     protected override int BucketSize => 1000;
-    private readonly GenesRepository _genesRepository;
+    protected readonly ProteinsRepository _proteinsRepository;
 
 
-    public GeneIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public ProteinIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        _genesRepository = new GenesRepository(dbContextFactory);
+        _proteinsRepository = new ProteinsRepository(dbContextFactory);
     }
 
 
@@ -25,9 +25,9 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
 
-        IterateEntities<Gene, int>(gene => true, gene => gene.Id, genes =>
+        IterateEntities<Protein, int>(protein => true, protein => protein.Id, proteins =>
         {
-            CreateTasks(IndexingTaskType.Gene, genes);
+            CreateTasks(IndexingTaskType.Protein, proteins);
         });
 
         transaction.Commit();
@@ -40,12 +40,12 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var genes = dbContext.Set<Gene>()
-                .Where(gene => chunk.Contains(gene.Id))
-                .Select(gene => gene.Id)
+            var genes = dbContext.Set<Protein>()
+                .Where(protein => chunk.Contains(protein.Id))
+                .Select(protein => protein.Id)
                 .ToArray();
 
-            CreateTasks(IndexingTaskType.Gene, genes);
+            CreateTasks(IndexingTaskType.Protein, genes);
         });
 
         transaction.Commit();
@@ -58,18 +58,18 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var genes = dbContext.Set<Gene>()
-                .Where(gene => chunk.Contains(gene.Id))
-                .Select(gene => gene.Id)
+            var proteins = dbContext.Set<Protein>()
+                .Where(protein => chunk.Contains(protein.Id))
+                .Select(protein => protein.Id)
                 .ToArray();
 
-            // TODO: Revise related entities to be indexed when genes are updated.
-            CreateProjectIndexingTasks(genes);
-            CreateDonorIndexingTasks(genes);
-            CreateImageIndexingTasks(genes);
-            CreateSpecimenIndexingTasks(genes);
-            CreateGeneIndexingTasks(genes);
-            CreateProteinIndexingTasks(genes);
+            // TODO: Revise related entities to be indexed when proteins are updated.
+            CreateProjectIndexingTasks(proteins);
+            CreateDonorIndexingTasks(proteins);
+            CreateImageIndexingTasks(proteins);
+            CreateSpecimenIndexingTasks(proteins);
+            CreateGeneIndexingTasks(proteins);
+            CreateProteinIndexingTasks(proteins);
         });
 
         transaction.Commit();
@@ -79,34 +79,34 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
     {
         var defaultProjects = LoadDefaultProjects();
-        var relatedProjects = _genesRepository.GetRelatedProjects(keys).Result;
+        var relatedProjects = _proteinsRepository.GetRelatedProjects(keys).Result;
         
         return Enumerable.Concat(defaultProjects, relatedProjects);
     }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedDonors(keys).Result;
+        return _proteinsRepository.GetRelatedDonors(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedImages(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedImages(keys).Result;
+        return _proteinsRepository.GetRelatedImages(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedSpecimens(keys).Result;
-    }
-
-    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
-    {
-        return keys;
+        return _proteinsRepository.GetRelatedSpecimens(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedProteins(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedProteins(keys).Result;
+        return keys;
+    }
+
+    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
+    {
+        return _proteinsRepository.GetRelatedGenes(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)

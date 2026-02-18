@@ -117,6 +117,11 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         return _variantsRepository.GetRelatedGenes<TV>(keys).Result;
     }
 
+    protected override IEnumerable<int> LoadRelatedProteins(IEnumerable<int> keys)
+    {
+        return _variantsRepository.GetRelatedProteins<TV>(keys).Result;
+    }
+
     protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)
     {
         if (typeof(TV) == typeof(SM.Variant))

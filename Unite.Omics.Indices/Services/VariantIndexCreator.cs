@@ -110,7 +110,8 @@ public abstract class VariantIndexCreator<TVariant, TVariantEntry>
             Svs = variant is Data.Entities.Omics.Analysis.Dna.Sv.Variant,
             Meth = CheckMethylation(sampleIds),
             Exp = CheckGeneExp(sampleIds),
-            ExpSc = CheckGeneExpScores(sampleIds)
+            ExpSc = CheckGeneExpSc(sampleIds),
+            Prot = CheckProtExp(sampleIds)
         };
     }
 
@@ -185,16 +186,24 @@ public abstract class VariantIndexCreator<TVariant, TVariantEntry>
 
     private bool CheckGeneExp(int[] sampleIds)
     {
-        return _cache.Expressions.Any(expression => 
+        return _cache.GeneExpressions.Any(expression => 
             sampleIds.Contains(expression.SampleId)
         );
     }
 
-    private bool CheckGeneExpScores(int[] sampleIds)
+    private bool CheckGeneExpSc(int[] sampleIds)
     {
         return _cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Expression) == true
+        );
+    }
+
+    private bool CheckProtExp(int[] sampleIds)
+    {
+        return _cache.Samples.Any(sample => 
+            sampleIds.Contains(sample.Id) && 
+            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Proteomics.Expression) == true
         );
     }
 }

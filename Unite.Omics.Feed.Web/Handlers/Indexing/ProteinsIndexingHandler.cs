@@ -1,0 +1,107 @@
+using System.Diagnostics;
+using Unite.Data.Context.Services.Tasks;
+using Unite.Data.Entities.Tasks.Enums;
+using Unite.Essentials.Extensions;
+using Unite.Indices.Context;
+using Unite.Indices.Entities.Proteins;
+using Unite.Omics.Indices.Services;
+
+namespace Unite.Omics.Feed.Web.Handlers.Indexing;
+
+public class ProteinsIndexingHandler
+{
+    private readonly TasksProcessingService _taskProcessingService;
+    private readonly ProteinsIndexingCache _indexingCache;
+    private readonly IIndexService<ProteinIndex> _indexingService;
+    private readonly ILogger _logger;
+
+
+    public ProteinsIndexingHandler(
+        TasksProcessingService taskProcessingService,
+        ProteinsIndexingCache indexingCache,
+        IIndexService<ProteinIndex> indexingService,
+        ILogger<GenesIndexingHandler> logger)
+    {
+        _taskProcessingService = taskProcessingService;
+        _indexingCache = indexingCache;
+        _indexingService = indexingService;
+        _logger = logger;
+    }
+
+
+    public async Task Prepare()
+    {
+        await _indexingService.UpdateIndex();
+    }
+
+    public async Task Handle(int bucketSize)
+    {
+        await ProcessIndexingTasks(bucketSize);
+    }
+
+
+    private async Task ProcessIndexingTasks(int bucketSize)
+    {
+        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+            return;
+
+        var stopwatch = new Stopwatch();
+        
+        await _taskProcessingService.Process(IndexingTaskType.Protein, bucketSize, async (tasks) =>
+        {
+            stopwatch.Restart();
+
+            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+
+            var indicesToDelete = new List<string>();
+            var indicesToCreate = new List<ProteinIndex>();
+            var indexCreator = new ProteinIndexCreator(_indexingCache);
+
+            tasks.ForEach(task =>
+            {
+                var id = int.Parse(task.Target);
+
+                var index = indexCreator.CreateIndex(id);
+
+                if (index == null)
+                    indicesToDelete.Add($"{id}");
+                else
+                    indicesToCreate.Add(index);
+
+            });
+
+            if (indicesToDelete.Any())
+                await _indexingService.DeleteRange(indicesToDelete);
+
+            if (indicesToCreate.Any())
+            {
+                try
+                {
+                    await _indexingService.AddRange(indicesToCreate);
+                }
+                catch
+                {
+                    foreach (var index in indicesToCreate)
+                    {
+                        try
+                        {
+                            await _indexingService.Add(index);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Failed to index protein {id}", index.Id);
+                        }
+                    }
+                }
+            }
+
+            _indexingCache.Clear();
+
+            stopwatch.Stop();
+
+            _logger.LogInformation("Indexed {number} proteins in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+
+            return true;
+        });
+    }
+}

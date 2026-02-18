@@ -102,6 +102,7 @@ public class ProteinDataLoader
             Symbol = resource.Symbol,
             Description = resource.Description,
             Database = resource.Database,
+            Chromosome = resource.Chromosome,
             Start = resource.Start,
             End = resource.End,
             Length = resource.Length,

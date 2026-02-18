@@ -6,7 +6,6 @@ using Unite.Indices.Context.Configuration.Options;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Annotations.Services.Vep;
 using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers;
@@ -62,7 +61,7 @@ public static class ConfigurationExtensions
         services.AddTransient<SmsAnnotationService>();
         services.AddTransient<CnvsAnnotationService>();
         services.AddTransient<SvsAnnotationService>();
-        services.AddTransient<ExpressionsAnnotationService>();
+        services.AddTransient<Annotations.Services.Rna.ExpressionsAnnotationService>();
         services.AddTransient<Annotations.Services.Prot.ExpressionsAnnotationService>();
 
         // Task processing services
@@ -72,6 +71,7 @@ public static class ConfigurationExtensions
         services.AddTransient<SubmissionTaskService>();
         services.AddTransient<SampleIndexingTaskService>();
         services.AddTransient<GeneIndexingTaskService>();
+        services.AddTransient<ProteinIndexingTaskService>();
         services.AddTransient<SmAnnotationTaskService>();
         services.AddTransient<SmIndexingTaskService>();
         services.AddTransient<CnvAnnotationTaskService>();
@@ -112,6 +112,11 @@ public static class ConfigurationExtensions
         services.AddTransient<GenesIndexingOptions>();
         services.AddTransient<GenesIndexingHandler>();
 
+        // Proteins indexing hosted service
+        services.AddHostedService<ProteinsIndexingWorker>();
+        services.AddTransient<ProteinsIndexingOptions>();
+        services.AddTransient<ProteinsIndexingHandler>();
+
         // Variant indexing services
         services.AddTransient<VariantIndexingCache<DnaEntities.Sm.Variant, DnaEntities.Sm.VariantEntry>>();
         services.AddTransient<VariantIndexingCache<DnaEntities.Cnv.Variant, DnaEntities.Cnv.VariantEntry>>();
@@ -119,6 +124,9 @@ public static class ConfigurationExtensions
 
         // Gene indexing services
         services.AddTransient<GenesIndexingCache>();
+
+        // Protein indexing services
+        services.AddTransient<ProteinsIndexingCache>();
         
         //Submission repositories
         services.AddTransient<SampleSubmissionRepository>();

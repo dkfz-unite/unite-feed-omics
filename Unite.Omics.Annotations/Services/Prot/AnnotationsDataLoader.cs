@@ -32,7 +32,6 @@ public class AnnotationsDataLoader
     public async Task<ProteinModel[]> LoadByAccession(string[] keys)
     {
         var proteins = await _proteinDataLoader.LoadByAccession(keys);
-        Console.WriteLine("Loaded {0}/{1} proteins ({2} missing).", proteins.Length, keys.Length, keys.Length - proteins.Length);
 
         await LoadMissingData(proteins);
 

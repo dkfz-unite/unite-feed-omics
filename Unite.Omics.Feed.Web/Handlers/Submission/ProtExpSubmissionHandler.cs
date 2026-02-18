@@ -3,6 +3,7 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Prot;
 using Unite.Omics.Feed.Data.Writers.Prot;
+using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Prot;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
@@ -12,6 +13,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionsAnnotationService _annotationService;
     private readonly ExpressionSubmissionRepository _submissionRepository;
+    private readonly ProteinIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
@@ -22,12 +24,14 @@ public class ProtExpSubmissionHandler : SubmissionHandler
         HandlerPriority priority,
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
+        ProteinIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ExpressionSubmissionRepository submissionRepository,
         ILogger<ProtExpSubmissionHandler> logger) : base(priority)
     {
         _dataWriter = dataWriter;
         _annotationService = annotationService;
+        _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
         _submissionRepository = submissionRepository;
@@ -70,6 +74,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
         convertedData.ProteinExpressions = convertedExpressions;
 
         _dataWriter.SaveData(convertedData, out var audit);
+        _indexingTaskService.PopulateTasks(audit.Proteins);
         _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
