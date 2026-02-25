@@ -42,9 +42,9 @@ public class RnaExpSubmissionHandler: SubmissionHandler
 	}
 
 
-	public override void Handle()
+	public override Task Handle()
 	{
-		ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
 	}
 
 

@@ -1,0 +1,35 @@
+using Unite.Omics.Feed.Web.Handlers.Indexing;
+
+namespace Unite.Omics.Feed.Web.Workers;
+
+public class IndexingWorker(
+    IEnumerable<IIndexingHandler> handlers,
+    IHostApplicationLifetime lifetime,
+    ILogger<SubmissionsWorker> logger)
+    : Worker<IIndexingHandler>(handlers, lifetime, logger)
+{
+    protected override string WorkerType => "Indices";
+    
+    protected override async Task PrepareHandlers(CancellationToken stoppingToken)
+    {
+        foreach (var handler in Handlers)
+        {
+            await handler.Prepare();
+        }
+    }
+    
+    protected override async Task ScheduleHandlers(CancellationToken stoppingToken)
+    {
+        IList<Task> handlerTasks = new List<Task>();
+        
+        foreach (var handler in Handlers)
+        {
+            handlerTasks.Add(Task.Run(async () =>
+            {
+                await RunHandler(handler, stoppingToken);
+            }, stoppingToken));
+        }
+        
+        await Task.WhenAll(handlerTasks);
+    }
+}

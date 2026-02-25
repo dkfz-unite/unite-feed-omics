@@ -14,10 +14,10 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
     ILogger<CnvProfileSubmissionHandler> logger) : SubmissionHandler(priority)
 {
     private readonly CnvProfileModelConverter _converter = new();
-    
-    public override void Handle()
+
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
     
     private void ProcessSubmissionTasks()

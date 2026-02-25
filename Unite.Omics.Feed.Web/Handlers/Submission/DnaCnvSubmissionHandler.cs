@@ -39,9 +39,9 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
         _converter = new Models.Dna.Cnv.Converters.AnalysisModelConverter();
     }
 
-    public override void Handle()
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
 
 

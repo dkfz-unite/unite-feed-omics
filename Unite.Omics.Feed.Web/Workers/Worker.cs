@@ -1,3 +1,4 @@
+using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Handlers;
 
 namespace Unite.Omics.Feed.Web.Workers;
@@ -12,6 +13,9 @@ public abstract class Worker<THandlerInterface>: BackgroundService
     protected virtual int CyclePauseTimeMs { get; } = 10000;
     protected abstract string WorkerType { get; }
 
+    protected IEnumerable<THandlerInterface> Handlers => _handlers;
+    protected ILogger Logger => _logger;
+
     public Worker(IEnumerable<THandlerInterface> handlers,
         IHostApplicationLifetime lifetime,
         ILogger<SubmissionsWorker> logger)
@@ -22,6 +26,8 @@ public abstract class Worker<THandlerInterface>: BackgroundService
             .OrderBy(h => h.Priority)
             .ToArray();
     }
+    protected abstract Task ScheduleHandlers(CancellationToken stoppingToken);
+    protected abstract Task PrepareHandlers(CancellationToken stoppingToken);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -31,6 +37,15 @@ public abstract class Worker<THandlerInterface>: BackgroundService
         await started.Task.WaitAsync(stoppingToken);
         
         _logger.LogInformation("{WorkerType} worker started", WorkerType);
+        
+        try
+        {
+            await PrepareHandlers(stoppingToken);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError("{error}", exception.GetShortMessage());
+        }
 
         stoppingToken.Register(() => _logger.LogInformation("{WorkerType} worker stopped", WorkerType));
         
@@ -38,10 +53,7 @@ public abstract class Worker<THandlerInterface>: BackgroundService
         {
             try
             {
-                foreach (var handler in _handlers)
-                {
-                    handler.Handle();
-                }
+                await ScheduleHandlers(stoppingToken);
             }
             catch (Exception exception)
             {
@@ -51,6 +63,18 @@ public abstract class Worker<THandlerInterface>: BackgroundService
             {
                 await Task.Delay(CyclePauseTimeMs, stoppingToken);
             }
+        }
+    }
+
+    protected virtual async Task RunHandler(THandlerInterface handler, CancellationToken stoppingToken)
+    {
+        try
+        {
+            await handler.Handle();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "{WorkerType} worker: handler failed {FullName}", WorkerType, handler.GetType().FullName);
         }
     }
 }
