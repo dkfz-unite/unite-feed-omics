@@ -68,9 +68,6 @@ public class AnnotationsDataLoader
 
         foreach (var protein in proteins)
         {
-            if (protein.Id != null)
-                continue;
-
             // If this fails, then the data is inconsistent
             protein.Transcript = transcriptsMap[protein.Transcript.StableId];
             protein.Transcript.Gene = genesMap[protein.Transcript.Gene.StableId];

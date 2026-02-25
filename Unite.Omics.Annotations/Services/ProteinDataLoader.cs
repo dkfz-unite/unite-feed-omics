@@ -26,39 +26,57 @@ public class ProteinDataLoader
     {
         var existingEntities = LoadEntities(entity => keys.Contains(entity.StableId));
 
-        var existingKeys = existingEntities.Select(entity => entity.StableId).ToArray();
-
-        var newKeys = keys.Except(existingKeys).ToArray();
+        var newKeys = keys.Where(key => !existingEntities.Any(entity => entity.StableId == key)).ToArray();
 
         var newResources = await _ensemblApiClient.FindById<ProteinResource>(newKeys, length: true, expand: false);
 
-        return Enumerable.Concat(existingEntities.Select(Convert), newResources.Select(Convert)).ToArray();
+        var models = existingEntities.Select(Convert).ToList();
+
+        foreach (var resource in newResources)
+        {
+            if (!existingEntities.Any(entity => entity.StableId == resource.Id))
+                models.Add(Convert(resource));
+        }
+
+        return models.ToArray();
     }
 
     public async Task<ProteinModel[]> LoadByAccession(string[] keys)
     {
-        var existingEntities = LoadEntities(entity => keys.Contains(entity.AccessionId));
+        var entities = LoadEntities(entity => keys.Contains(entity.AccessionId));
 
-        var existingKeys = existingEntities.Select(entity => entity.AccessionId).ToArray();
+        var newKeys = keys.Where(key => !entities.Any(entity => entity.AccessionId == key)).ToArray();
 
-        var newKeys = keys.Except(existingKeys).ToArray();
+        var resources = await _ensemblApiClient.FindByAccession(newKeys, length: true, expand: false);
 
-        var newResources = await _ensemblApiClient.FindByAccession(newKeys, length: true, expand: false);
+        var models = entities.Select(Convert).ToList();
 
-        return Enumerable.Concat(existingEntities.Select(Convert), newResources.Select(Convert)).ToArray();
+        foreach (var resource in resources)
+        {
+            if (!entities.Any(entity => entity.StableId == resource.Id))
+                models.Add(Convert(resource));
+        }
+
+        return models.ToArray();
     }
 
     public async Task<ProteinModel[]> LoadBySymbol(string[] keys)
     {
         var existingEntities = LoadEntities(entity => keys.Contains(entity.Symbol));
 
-        var existingKeys = existingEntities.Select(entity => entity.Symbol).ToArray();
-
-        var newKeys = keys.Except(existingKeys).ToArray();
+        var newKeys = keys.Where(key => !existingEntities.Any(entity => entity.Symbol == key)).ToArray();
 
         var newResources = await _ensemblApiClient.FindByName<ProteinResource>(newKeys, length: true, expand: false);
 
-        return Enumerable.Concat(existingEntities.Select(Convert), newResources.Select(Convert)).ToArray();
+        var models = existingEntities.Select(Convert).ToList();
+
+        foreach (var resource in newResources)
+        {
+            if (!existingEntities.Any(entity => entity.StableId == resource.Id))
+                models.Add(Convert(resource));
+        }
+
+        return models.ToArray();
     }
 
 
@@ -79,14 +97,8 @@ public class ProteinDataLoader
         {
             Id = entity.Id,
             StableId = entity.StableId,
-            // Accession = entity.AccessionId,
-            // Symbol = entity.Symbol,
-            // Description = entity.Description,
-            // Database = entity.Database,
-            // Start = entity.Start.Value,
-            // End = entity.End.Value,
-            // Length = entity.Length.Value,
-            // IsCanonical = entity.IsCanonical.Value,
+            Accession = entity.AccessionId,
+            Symbol = entity.Symbol,
             
             Transcript = new () { Id = entity.Transcript.Id, StableId = entity.Transcript.StableId }
         };

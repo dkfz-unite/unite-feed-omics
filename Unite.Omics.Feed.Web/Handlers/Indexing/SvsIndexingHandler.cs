@@ -32,6 +32,7 @@ public class SvsIndexingHandler
 
     public async Task Prepare()
     {
+        await _indexingService.CreateIndex();
         await _indexingService.UpdateIndex();
     }
 

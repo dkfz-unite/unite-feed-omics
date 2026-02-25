@@ -101,27 +101,31 @@ public class ProtExpSubmissionHandler : SubmissionHandler
     {
         foreach (var model in source)
         {
-            if (model.Protein.Transcript == null || model.Protein.Transcript.Gene == null)
+            var expressionModel = new Data.Models.Prot.ProteinExpressionModel
             {
-                Console.WriteLine($"Missing data for {model.Protein.StableId}, skipping...");
-                continue;
-            }
-
-            yield return new Data.Models.Prot.ProteinExpressionModel
+                Intensity = model.Intensity,
+                MedianCenteredLog2 = model.MedianCenteredLog2
+            };
+            
+            if (model.Protein != null)
             {
-                Protein = new Data.Models.ProteinModel
+                expressionModel.Protein = new Data.Models.ProteinModel
                 {
                     Id = model.Protein.StableId,
                     Accession = model.Protein.Accession,
                     Symbol = model.Protein.Symbol,
                     Description = model.Protein.Description,
                     Database = model.Protein.Database,
+                    Chromosome = model.Protein.Chromosome,
                     Start = model.Protein.Start,
                     End = model.Protein.End,
                     Length = model.Protein.Length,
-                    IsCanonical = model.Protein.IsCanonical,
+                    IsCanonical = model.Protein.IsCanonical
+                };
 
-                    Transcript = new Data.Models.TranscriptModel
+                if (model.Protein.Transcript != null)
+                {
+                    expressionModel.Protein.Transcript = new Data.Models.TranscriptModel
                     {
                         Id = model.Protein.Transcript.StableId,
                         Symbol = model.Protein.Transcript.Symbol,
@@ -132,9 +136,12 @@ public class ProtExpSubmissionHandler : SubmissionHandler
                         Start = model.Protein.Transcript.Start,
                         End = model.Protein.Transcript.End,
                         Strand = model.Protein.Transcript.Strand,
-                        ExonicLength = model.Protein.Transcript.ExonicLength,
+                        ExonicLength = model.Protein.Transcript.ExonicLength
+                    };
 
-                        Gene = new Data.Models.GeneModel
+                    if (model.Protein.Transcript.Gene != null)
+                    {
+                        expressionModel.Protein.Transcript.Gene = new Data.Models.GeneModel
                         {
                             Id = model.Protein.Transcript.Gene.StableId,
                             Symbol = model.Protein.Transcript.Gene.Symbol,
@@ -145,13 +152,12 @@ public class ProtExpSubmissionHandler : SubmissionHandler
                             End = model.Protein.Transcript.Gene.End,
                             Strand = model.Protein.Transcript.Gene.Strand,
                             ExonicLength = model.Protein.Transcript.Gene.ExonicLength
-                        },
+                        };
                     }
-                },
+                }
+            }
 
-                Intensity = model.Intensity,
-                MedianCenteredLog2 = model.MedianCenteredLog2
-            };
+            yield return expressionModel;
         }
     }
 }

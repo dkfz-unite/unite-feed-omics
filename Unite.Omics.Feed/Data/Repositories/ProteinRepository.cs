@@ -93,6 +93,10 @@ public class ProteinRepository
         var entity = new Protein
         {
             StableId = model.Id,
+            AccessionId = model.Accession,
+            Symbol = model.Symbol,
+            Description = model.Description,
+            Database = model.Database,
             ChromosomeId = model.Chromosome,
             Start = model.Start,
             End = model.End,

@@ -66,15 +66,7 @@ public class TranscriptDataLoader
         {
             Id = entity.Id,
             StableId = entity.StableId,
-            // Symbol = entity.Symbol,
-            // Description = entity.Description,
-            // Biotype = entity.Biotype,
-            // IsCanonical = entity.IsCanonical.Value,
-            // Chromosome = entity.ChromosomeId.Value,
-            // Start = entity.Start.Value,
-            // End = entity.End.Value,
-            // Strand = entity.Strand.Value,
-            // ExonicLength = entity.ExonicLength,
+            Symbol = entity.Symbol,
 
             Gene = new () { Id = entity.Gene.Id, StableId = entity.Gene.StableId }
         };
