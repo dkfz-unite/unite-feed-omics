@@ -89,6 +89,14 @@ public static class ConfigurationExtensions
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethLvlSubmissionHandler>(sp, HandlerPriority.Normal));
         services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<CnvProfileSubmissionHandler>(sp, HandlerPriority.Normal));
+        
+        //Indexing Handlers
+        services.AddHostedService<IndexingWorker>();
+        services.AddTransient<IIndexingHandler, GenesIndexingHandler>();
+        services.AddTransient<IIndexingHandler, CnvsIndexingHandler>();
+        services.AddTransient<IIndexingHandler, SmsIndexingHandler>();
+        services.AddTransient<IIndexingHandler, SvsIndexingHandler>();
+        services.AddTransient<IIndexingHandler, CnvProfilesIndexingHandler>();
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();
@@ -98,14 +106,12 @@ public static class ConfigurationExtensions
         services.AddTransient<SvsAnnotationHandler>();
 
         // Variants indexing hosted service
-        services.AddHostedService<VariantsIndexingWorker>();
         services.AddTransient<VariantsIndexingOptions>();
         services.AddTransient<SmsIndexingHandler>();
         services.AddTransient<CnvsIndexingHandler>();
         services.AddTransient<SvsIndexingHandler>();
 
         // Genes indexing hosted service
-        services.AddHostedService<GenesIndexingWorker>();
         services.AddTransient<GenesIndexingOptions>();
         services.AddTransient<GenesIndexingHandler>();
 

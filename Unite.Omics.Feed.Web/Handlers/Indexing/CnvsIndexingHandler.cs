@@ -6,57 +6,44 @@ using Unite.Essentials.Extensions;
 using Unite.Omics.Indices.Services;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.Variants;
+using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class CnvsIndexingHandler
+public class CnvsIndexingHandler(
+    VariantsIndexingOptions options,
+    TasksProcessingService taskProcessingService,
+    VariantIndexingCache<Variant, VariantEntry> indexingCache,
+    IIndexService<CnvIndex> indexingService,
+    ILogger<CnvsIndexingHandler> logger)
+    : IndexingHandler
 {
-    private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
-    private readonly IIndexService<CnvIndex> _indexingService;
-    private readonly ILogger _logger;
-
-
-    public CnvsIndexingHandler(
-        TasksProcessingService taskProcessingService,
-        VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexService<CnvIndex> indexingService,
-        ILogger<CnvsIndexingHandler> logger)
+    public override async Task Prepare()
     {
-        _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
-        _indexingService = indexingService;
-        _logger = logger;
+        await indexingService.UpdateIndex();
     }
 
-
-    public async Task Prepare()
+    public override async Task Handle()
     {
-        await _indexingService.UpdateIndex();
+        await ProcessIndexingTasks(options.CnvBucketSize);
     }
-
-    public async Task Handle(int bucketSize)
-    {
-        await ProcessIndexingTasks(bucketSize);
-    }
-
 
     private async Task ProcessIndexingTasks(int bucketSize)
     {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (taskProcessingService.HasTasks(WorkerType.Submission) || taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
                 
         var stopwatch = new Stopwatch();
 
-        await _taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, async (tasks) =>
+        await taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<CnvIndex>();
-            var indexCreator = new CnvIndexCreator(_indexingCache);
+            var indexCreator = new CnvIndexCreator(indexingCache);
 
             tasks.ForEach(task =>
             {
@@ -71,16 +58,16 @@ public class CnvsIndexingHandler
             });
 
             if (indicesToDelete.Any())
-                await _indexingService.DeleteRange(indicesToDelete);
+                await indexingService.DeleteRange(indicesToDelete);
             
             if (indicesToCreate.Any())
-                await _indexingService.AddRange(indicesToCreate);
+                await indexingService.AddRange(indicesToCreate);
 
-            _indexingCache.Clear();
+            indexingCache.Clear();
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexed {number} CNVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            logger.LogInformation("Indexed {number} CNVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

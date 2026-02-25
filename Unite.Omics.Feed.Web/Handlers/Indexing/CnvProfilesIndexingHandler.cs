@@ -13,19 +13,18 @@ public class CnvProfilesIndexingHandler(
     TasksProcessingService taskProcessingService,
     CnvProfileIndexingCache indexingCache,
     IIndexService<CnvProfileIndex> indexingService,
-    ILogger<GenesIndexingHandler> logger)
+    ILogger<GenesIndexingHandler> logger) : IndexingHandler
 {
-
-    public async Task Prepare()
+    public override async Task Prepare()
     {
         await indexingService.UpdateIndex();
     }
 
-    public async Task Handle(int bucketSize)
+    public override async Task Handle()
     {
-        await ProcessIndexingTasks(bucketSize);
+        //TODO: move bucket size to Options
+        await ProcessIndexingTasks(100);
     }
-
 
     private async Task ProcessIndexingTasks(int bucketSize)
     {

@@ -6,57 +6,45 @@ using Unite.Essentials.Extensions;
 using Unite.Omics.Indices.Services;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.Variants;
+using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class SvsIndexingHandler
+public class SvsIndexingHandler(
+    VariantsIndexingOptions options,
+    TasksProcessingService taskProcessingService,
+    VariantIndexingCache<Variant, VariantEntry> indexingCache,
+    IIndexService<SvIndex> indexingService,
+    ILogger<SvsIndexingHandler> logger): IndexingHandler
 {
-    private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
-    private readonly IIndexService<SvIndex> _indexingService;
-    private readonly ILogger _logger;
+    private readonly ILogger _logger = logger;
 
-
-    public SvsIndexingHandler(
-        TasksProcessingService taskProcessingService,
-        VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexService<SvIndex> indexingService,
-        ILogger<SvsIndexingHandler> logger)
+    public override async Task Prepare()
     {
-        _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
-        _indexingService = indexingService;
-        _logger = logger;
+        await indexingService.UpdateIndex();
     }
 
-
-    public async Task Prepare()
+    public override async Task Handle()
     {
-        await _indexingService.UpdateIndex();
+        await ProcessIndexingTasks(options.SvBucketSize);
     }
-
-    public async Task Handle(int bucketSize)
-    {
-        await ProcessIndexingTasks(bucketSize);
-    }
-
 
     private async Task ProcessIndexingTasks(int bucketSize)
     {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (taskProcessingService.HasTasks(WorkerType.Submission) || taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
 
-        await _taskProcessingService.Process(IndexingTaskType.SV, bucketSize, async (tasks) =>
+        await taskProcessingService.Process(IndexingTaskType.SV, bucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<SvIndex>();
-            var indexCreator = new SvIndexCreator(_indexingCache);
+            var indexCreator = new SvIndexCreator(indexingCache);
 
             tasks.ForEach(task =>
             {
@@ -71,12 +59,12 @@ public class SvsIndexingHandler
             });
 
             if (indicesToDelete.Any())
-                await _indexingService.DeleteRange(indicesToDelete);
+                await indexingService.DeleteRange(indicesToDelete);
             
             if (indicesToCreate.Any())
-                await _indexingService.AddRange(indicesToCreate);
+                await indexingService.AddRange(indicesToCreate);
 
-            _indexingCache.Clear();
+            indexingCache.Clear();
 
             stopwatch.Stop();
 
