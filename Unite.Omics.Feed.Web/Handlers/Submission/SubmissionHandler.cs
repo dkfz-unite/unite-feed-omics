@@ -4,9 +4,4 @@ namespace Unite.Omics.Feed.Web.Handlers.Submission;
 public abstract class SubmissionHandler(HandlerPriority priority) : Handler, ISubmissionHandler
 {
     public HandlerPriority Priority => priority;
-    
-    public override Task Prepare()
-    {
-        return Task.CompletedTask;
-    }
 }
