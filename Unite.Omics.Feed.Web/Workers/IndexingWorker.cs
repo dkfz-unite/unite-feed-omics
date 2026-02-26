@@ -10,12 +10,14 @@ public class IndexingWorker(
 {
     protected override string WorkerType => "Indices";
     
-    protected override async Task PrepareHandlers(CancellationToken stoppingToken)
+    protected override async Task<IIndexingHandler[]> PrepareHandlers(CancellationToken stoppingToken)
     {
         foreach (var handler in Handlers)
         {
             await handler.Prepare();
         }
+
+        return Handlers;
     }
     
     protected override async Task ScheduleHandlers(CancellationToken stoppingToken)
