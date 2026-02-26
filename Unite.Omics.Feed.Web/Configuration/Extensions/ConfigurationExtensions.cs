@@ -5,6 +5,9 @@ using Unite.Indices.Context.Configuration.Extensions;
 using Unite.Indices.Context.Configuration.Options;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
+using Unite.Indices.Entities.CnvProfiles;
+using Unite.Indices.Entities.Genes;
+using Unite.Indices.Entities.Variants;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Annotations.Services.Vep;
@@ -97,6 +100,13 @@ public static class ConfigurationExtensions
         services.AddTransient<IIndexingHandler, SmsIndexingHandler>();
         services.AddTransient<IIndexingHandler, SvsIndexingHandler>();
         services.AddTransient<IIndexingHandler, CnvProfilesIndexingHandler>();
+        
+        //Index Creators
+        services.AddTransient<IIndexCreator<CnvIndex>, CnvIndexCreator>();
+        services.AddTransient<IIndexCreator<SmIndex>, SmIndexCreator>();
+        services.AddTransient<IIndexCreator<SvIndex>, SvIndexCreator>();
+        services.AddTransient<IIndexCreator<GeneIndex>, GeneIndexCreator>();
+        services.AddTransient<IIndexCreator<CnvProfileIndex>, CnvProfileIndexCreator>();
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();

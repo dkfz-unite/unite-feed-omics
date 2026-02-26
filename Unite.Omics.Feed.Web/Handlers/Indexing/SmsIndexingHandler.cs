@@ -21,7 +21,8 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<SmIndex> indexingService,
-        ILogger<SmsIndexingHandler> logger) : base(indexingService)
+        IIndexCreator<SmIndex> indexCreator,
+        ILogger<SmsIndexingHandler> logger) : base(indexingService, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
@@ -46,8 +47,7 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
             stopwatch.Restart();
 
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
-
-            var indexCreator = new SmIndexCreator(_indexingCache);
+            
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<SmIndex>();
 
@@ -55,7 +55,7 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var index = IndexCreator.Create(id);
 
                 if (index == null)
                     indicesToDelete.Add($"{id}");

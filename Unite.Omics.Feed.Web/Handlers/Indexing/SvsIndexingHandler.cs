@@ -21,7 +21,8 @@ public class SvsIndexingHandler : IndexingHandler<SvIndex>
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<SvIndex> indexingService,
-        ILogger<SvsIndexingHandler> logger) : base(indexingService)
+        IIndexCreator<SvIndex> indexCreator,
+        ILogger<SvsIndexingHandler> logger) : base(indexingService, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
@@ -55,7 +56,7 @@ public class SvsIndexingHandler : IndexingHandler<SvIndex>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var index = IndexCreator.Create(id);
 
                 if (index == null)
                     indicesToDelete.Add($"{id}");

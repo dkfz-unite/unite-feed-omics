@@ -12,24 +12,12 @@ using Unite.Data.Constants;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GeneIndexCreator
+public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneIndex>
 {
-    private readonly GenesIndexingCache _cache;
-
-
-    public GeneIndexCreator(GenesIndexingCache cache)
+    public GeneIndex Create(int key)
     {
-        _cache = cache;
+        return CreateGeneIndex(key);
     }
-
-
-    public GeneIndex CreateIndex(object key)
-    {
-        var geneId = (int)key;
-
-        return CreateGeneIndex(geneId);
-    }
-
 
     private GeneIndex CreateGeneIndex(int geneId)
     {
@@ -48,7 +36,7 @@ public class GeneIndexCreator
         index.Specimens = CreateSpecimenIndices(gene.Id);
 
         var hasSpecimens = index.Specimens?.Any();
-        var hasExpressions = _cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
+        var hasExpressions = cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
 
         // If gene is not affected by any variant and has no expression data, it should be removed.
         if (hasSpecimens != true && hasExpressions != true)
@@ -62,7 +50,7 @@ public class GeneIndexCreator
 
     private Gene LoadGene(int geneId)
     {
-        return _cache.Genes.FirstOrDefault(gene => gene.Id == geneId);
+        return cache.Genes.FirstOrDefault(gene => gene.Id == geneId);
     }
 
 
@@ -83,40 +71,40 @@ public class GeneIndexCreator
     private Specimen[] LoadSpecimens(int geneId)
     {
         var sampleIds = LoadSamples(geneId).Select(sample => sample.Id).ToArray();
-        var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
+        var specimenIds = cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
 
-        return _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).ToArray();
+        return cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).ToArray();
     }
 
     private Sample[] LoadSamples(int geneId)
     {
-        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var sms = cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var cnvs = cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var svs = cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
-        var smSamples = _cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
-        var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
-        var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var smSamples = cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var cnvSamples = cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var svSamples = cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
         
         var sampleIds = smSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
 
-        return _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).ToArray();
+        return cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).ToArray();
     }
 
 
     private StatsIndex CreateStatsIndex(int geneId)
     {
-        var sms = _cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var cnvs = _cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
-        var svs = _cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var sms = cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var cnvs = cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
+        var svs = cache.SvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
 
-        var smSamples = _cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
-        var cnvSamples = _cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
-        var svSamples = _cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var smSamples = cache.SmEntries.Where(entry => sms.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var cnvSamples = cache.CnvEntries.Where(entry => cnvs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
+        var svSamples = cache.SvEntries.Where(entry => svs.Contains(entry.EntityId)).Select(entry => entry.SampleId).ToArray();
 
         var sampleIds = smSamples.Concat(cnvSamples).Concat(svSamples).Distinct().ToArray();
-        var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
-        var donorIds = _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
+        var specimenIds = cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
+        var donorIds = cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
         
         return new StatsIndex
         {
@@ -131,9 +119,9 @@ public class GeneIndexCreator
     private DataIndex CreateDataIndex(int geneId)
     {
         var sampleIds = LoadSamples(geneId).Select(sample => sample.Id).ToArray();
-        var specimenIds = _cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
-        var donorIds = _cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
-        var imageIds = _cache.Images.Where(image => donorIds.Contains(image.DonorId)).Select(image => image.Id).Distinct().ToArray();
+        var specimenIds = cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
+        var donorIds = cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
+        var imageIds = cache.Images.Where(image => donorIds.Contains(image.DonorId)).Select(image => image.Id).Distinct().ToArray();
         
         return new DataIndex
         {
@@ -167,7 +155,7 @@ public class GeneIndexCreator
 
     private bool CheckClinicalData(int[] donorIds)
     {
-        return _cache.Donors.Any(donor => 
+        return cache.Donors.Any(donor => 
             donorIds.Contains(donor.Id) && 
             donor.ClinicalData != null
         );
@@ -175,7 +163,7 @@ public class GeneIndexCreator
 
     private bool CheckTreatments(int[] donorIds)
     {
-        return _cache.Donors.Any(donor => 
+        return cache.Donors.Any(donor => 
             donorIds.Contains(donor.Id) && 
             donor.Treatments?.Any() == true
         );
@@ -183,7 +171,7 @@ public class GeneIndexCreator
 
     private bool CheckImages(int[] imageIds, ImageType type)
     {
-        return _cache.Images.Any(image => 
+        return cache.Images.Any(image => 
             imageIds.Contains(image.Id) &&
             image.TypeId == type
         );
@@ -191,7 +179,7 @@ public class GeneIndexCreator
 
     private bool CheckSpecimens(int[] specimenIds, SpecimenType type)
     {
-        return _cache.Specimens.Any(specimen => 
+        return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
             specimen.TypeId == type
         );
@@ -199,7 +187,7 @@ public class GeneIndexCreator
     
     private bool CheckMolecularData(int[] specimenIds, SpecimenType type)
     {
-        return _cache.Specimens.Any(specimen => 
+        return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
             specimen.TypeId == type && 
             specimen.MolecularData != null
@@ -208,7 +196,7 @@ public class GeneIndexCreator
 
     private bool CheckInterventions(int[] specimenIds, SpecimenType type)
     {
-        return _cache.Specimens.Any(specimen => 
+        return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
             specimen.TypeId == type && 
             specimen.Interventions?.Any() == true
@@ -217,7 +205,7 @@ public class GeneIndexCreator
 
     private bool CheckDrugScreenings(int[] specimenIds, SpecimenType type)
     {
-        return _cache.Specimens.Any(specimen => 
+        return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
             specimen.TypeId == type && 
             specimen.SpecimenSamples?.Any(sample => sample.DrugScreenings?.Any() == true) == true
@@ -226,22 +214,22 @@ public class GeneIndexCreator
 
     private bool CheckSms(int geneId)
     {
-        return _cache.SmTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return cache.SmTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
     private bool CheckCnvs(int geneId)
     {
-        return _cache.CnvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return cache.CnvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
     private bool CheckSvs(int geneId)
     {
-        return _cache.SvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
+        return cache.SvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
     private bool CheckMethylation(int[] sampleIds)
     {
-        return _cache.Samples.Any(sample => 
+        return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource => 
                 (resource.Type == DataTypes.Omics.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
@@ -251,12 +239,12 @@ public class GeneIndexCreator
 
     private bool CheckGeneExp(int geneId)
     {
-        return _cache.ExpEntries?.Any(entry => entry.EntityId == geneId) == true;
+        return cache.ExpEntries?.Any(entry => entry.EntityId == geneId) == true;
     }
 
     private bool CheckGeneExpSc(int[] sampleIds)
     {
-        return _cache.Samples.Any(sample => 
+        return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Exp) == true
         );

@@ -14,19 +14,16 @@ public class CnvProfilesIndexingHandler : IndexingHandler<CnvProfileIndex>
     public CnvProfilesIndexingHandler(TasksProcessingService taskProcessingService,
         CnvProfileIndexingCache indexingCache,
         IIndexService<CnvProfileIndex> indexingService,
-        ILogger<GenesIndexingHandler> logger) : base(indexingService)
+        IIndexCreator<CnvProfileIndex> indexCreator,
+        ILogger<GenesIndexingHandler> logger) : base(indexingService, indexCreator)
     {
         _taskProcessingService = taskProcessingService;
     }
 
-    public override async Task Handle()
+    protected override async Task ProcessIndexingTasks()
     {
-        //TODO: move bucket size to Options
-        await ProcessIndexingTasks(100);
-    }
-
-    private async Task ProcessIndexingTasks(int bucketSize)
-    {
+        const int bucketSize = 100;
+        
         if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
@@ -40,13 +37,12 @@ public class CnvProfilesIndexingHandler : IndexingHandler<CnvProfileIndex>
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<GeneIndex>();
-            var indexCreator = new GeneIndexCreator(indexingCache);
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var index = IndexCreator.Create(id);
 
                 if (index == null)
                     indicesToDelete.Add($"{id}");

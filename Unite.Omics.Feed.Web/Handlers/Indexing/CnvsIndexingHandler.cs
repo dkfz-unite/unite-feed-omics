@@ -21,7 +21,8 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<CnvIndex> indexingService,
-        ILogger<CnvsIndexingHandler> logger) : base(indexingService)
+        IIndexCreator<CnvIndex> indexCreator,
+        ILogger<CnvsIndexingHandler> logger) : base(indexingService, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
@@ -29,19 +30,14 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
         _logger = logger;
     }
 
-    public override async Task Handle()
-    {
-        await ProcessIndexingTasks(_options.CnvBucketSize);
-    }
-
-    private async Task ProcessIndexingTasks(int bucketSize)
+    protected override async Task ProcessIndexingTasks()
     {
         if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
                 
         var stopwatch = new Stopwatch();
 
-        await _taskProcessingService.Process(IndexingTaskType.CNV, bucketSize, async (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.CNV, _options.CnvBucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
@@ -49,13 +45,12 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<CnvIndex>();
-            var indexCreator = new CnvIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var index = IndexCreator.Create(id);
 
                 if (index == null)
                     indicesToDelete.Add($"{id}");

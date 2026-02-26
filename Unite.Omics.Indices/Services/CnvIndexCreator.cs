@@ -6,20 +6,13 @@ using Unite.Indices.Entities.Variants;
 
 namespace Unite.Omics.Indices.Services;
 
-public class CnvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
+public class CnvIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache)
+    : VariantIndexCreator<Variant, VariantEntry>(cache), IIndexCreator<CnvIndex>
 {
-    public CnvIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache) : base(cache)
+    public CnvIndex Create(int key)
     {
+        return CreateVariantIndex(key);
     }
-
-
-    public CnvIndex CreateIndex(object key)
-    {
-        var variantId = (int)key;
-
-        return CreateVariantIndex(variantId);
-    }
-
 
     private CnvIndex CreateVariantIndex(int variantId)
     {

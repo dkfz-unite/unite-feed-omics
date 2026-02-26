@@ -20,27 +20,23 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
         TasksProcessingService taskProcessingService,
         GenesIndexingCache indexingCache,
         IIndexService<GeneIndex> indexingService,
-        ILogger<GenesIndexingHandler> logger): base(indexingService)
+        IIndexCreator<GeneIndex> indexCreator,
+        ILogger<GenesIndexingHandler> logger): base(indexingService, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
         _indexingCache = indexingCache;
         _logger = logger;
     }
-
-    public override async Task Handle()
-    {
-        await ProcessIndexingTasks(_options.BucketSize);
-    }
     
-    private async Task ProcessIndexingTasks(int bucketSize)
+    protected override async Task ProcessIndexingTasks()
     {
         if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
         
-        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.Gene, _options.BucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
@@ -48,13 +44,12 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<GeneIndex>();
-            var indexCreator = new GeneIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var index = IndexCreator.Create(id);
 
                 if (index == null)
                     indicesToDelete.Add($"{id}");

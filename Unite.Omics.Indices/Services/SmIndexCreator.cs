@@ -5,21 +5,17 @@ using Unite.Indices.Entities.Variants;
 
 namespace Unite.Omics.Indices.Services;
 
-public class SmIndexCreator : VariantIndexCreator<Variant, VariantEntry>
+public class SmIndexCreator : VariantIndexCreator<Variant, VariantEntry>, IIndexCreator<SmIndex>
 {
     public SmIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache) : base(cache)
     {
     }
 
-
-    public SmIndex CreateIndex(object key)
+    public SmIndex Create(int key)
     {
-        var variantId = (int)key;
-
-        return CreateVariantIndex(variantId);
+        return CreateVariantIndex(key);
     }
-
-
+    
     private SmIndex CreateVariantIndex(int variantId)
     {
         var variant = LoadVariant(variantId);

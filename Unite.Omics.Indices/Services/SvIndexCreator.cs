@@ -6,20 +6,13 @@ using Unite.Indices.Entities.Variants;
 
 namespace Unite.Omics.Indices.Services;
 
-public class SvIndexCreator : VariantIndexCreator<Variant, VariantEntry>
+public class SvIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache)
+    : VariantIndexCreator<Variant, VariantEntry>(cache), IIndexCreator<SvIndex>
 {
-    public SvIndexCreator(VariantIndexingCache<Variant, VariantEntry> cache) : base(cache)
+    public SvIndex Create(int key)
     {
+        return CreateVariantIndex(key);
     }
-
-
-    public SvIndex CreateIndex(object key)
-    {
-        var variantId = (int)key;
-
-        return CreateVariantIndex(variantId);
-    }
-
 
     private SvIndex CreateVariantIndex(int variantId)
     {
