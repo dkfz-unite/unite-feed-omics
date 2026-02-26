@@ -15,18 +15,16 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
     private readonly ILogger _logger;
     private readonly VariantsIndexingOptions _options;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
 
     public SmsIndexingHandler(VariantsIndexingOptions options,
         TasksProcessingService taskProcessingService,
-        VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<SmIndex> indexingService,
+        VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexCreator<SmIndex> indexCreator,
-        ILogger<SmsIndexingHandler> logger) : base(indexingService, indexCreator)
+        ILogger<SmsIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
         _logger = logger;
     }
     
@@ -46,7 +44,7 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
         {
             stopwatch.Restart();
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            IndexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
             
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<SmIndex>();
@@ -69,7 +67,7 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
             if (indicesToCreate.Any())
                 await IndexingService.AddRange(indicesToCreate);
 
-            _indexingCache.Clear();
+            IndexingCache.Clear();
 
             stopwatch.Stop();
 

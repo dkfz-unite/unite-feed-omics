@@ -21,7 +21,7 @@ namespace Unite.Omics.Indices.Services;
 /// </summary>
 /// <typeparam name="TVariant"></typeparam>
 /// <typeparam name="TVariantEntry"></typeparam>
-public class VariantIndexingCache<TVariant, TVariantEntry>
+public class VariantIndexingCache<TVariant, TVariantEntry>: IIndexingCache
     where TVariant : Data.Entities.Omics.Analysis.Dna.Variant
     where TVariantEntry: Data.Entities.Omics.Analysis.Dna.VariantEntry<TVariant>
 {

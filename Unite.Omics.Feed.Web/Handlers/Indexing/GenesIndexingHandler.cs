@@ -13,7 +13,6 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
 {
     private readonly GenesIndexingOptions _options;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly GenesIndexingCache _indexingCache;
     private readonly ILogger<GenesIndexingHandler> _logger;
 
     public GenesIndexingHandler(GenesIndexingOptions options,
@@ -21,11 +20,10 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
         GenesIndexingCache indexingCache,
         IIndexService<GeneIndex> indexingService,
         IIndexCreator<GeneIndex> indexCreator,
-        ILogger<GenesIndexingHandler> logger): base(indexingService, indexCreator)
+        ILogger<GenesIndexingHandler> logger): base(indexingService, indexingCache, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
         _logger = logger;
     }
     
@@ -40,7 +38,7 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
         {
             stopwatch.Restart();
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            IndexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<GeneIndex>();
@@ -83,7 +81,7 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
                 }
             }
 
-            _indexingCache.Clear();
+            IndexingCache.Clear();
 
             stopwatch.Stop();
 

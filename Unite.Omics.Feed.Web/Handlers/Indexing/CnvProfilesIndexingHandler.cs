@@ -12,10 +12,10 @@ public class CnvProfilesIndexingHandler : IndexingHandler<CnvProfileIndex>
     private readonly TasksProcessingService _taskProcessingService;
 
     public CnvProfilesIndexingHandler(TasksProcessingService taskProcessingService,
-        CnvProfileIndexingCache indexingCache,
         IIndexService<CnvProfileIndex> indexingService,
+        CnvProfileIndexingCache indexingCache,
         IIndexCreator<CnvProfileIndex> indexCreator,
-        ILogger<GenesIndexingHandler> logger) : base(indexingService, indexCreator)
+        ILogger<GenesIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
     {
         _taskProcessingService = taskProcessingService;
     }

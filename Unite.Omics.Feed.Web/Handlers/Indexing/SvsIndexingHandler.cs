@@ -15,18 +15,16 @@ public class SvsIndexingHandler : IndexingHandler<SvIndex>
     private readonly ILogger _logger;
     private readonly VariantsIndexingOptions _options;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
 
     public SvsIndexingHandler(VariantsIndexingOptions options,
         TasksProcessingService taskProcessingService,
         VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<SvIndex> indexingService,
         IIndexCreator<SvIndex> indexCreator,
-        ILogger<SvsIndexingHandler> logger) : base(indexingService, indexCreator)
+        ILogger<SvsIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
         _logger = logger;
     }
     
@@ -46,11 +44,10 @@ public class SvsIndexingHandler : IndexingHandler<SvIndex>
         {
             stopwatch.Restart();
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            IndexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<SvIndex>();
-            var indexCreator = new SvIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
@@ -70,7 +67,7 @@ public class SvsIndexingHandler : IndexingHandler<SvIndex>
             if (indicesToCreate.Any())
                 await IndexingService.AddRange(indicesToCreate);
 
-            _indexingCache.Clear();
+            IndexingCache.Clear();
 
             stopwatch.Stop();
 

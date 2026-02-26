@@ -14,19 +14,17 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
 {
     private readonly VariantsIndexingOptions _options;
     private readonly TasksProcessingService _taskProcessingService;
-    private readonly VariantIndexingCache<Variant, VariantEntry> _indexingCache;
     private readonly ILogger<CnvsIndexingHandler> _logger;
 
     public CnvsIndexingHandler(VariantsIndexingOptions options,
         TasksProcessingService taskProcessingService,
-        VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexService<CnvIndex> indexingService,
+        VariantIndexingCache<Variant, VariantEntry> indexingCache,
         IIndexCreator<CnvIndex> indexCreator,
-        ILogger<CnvsIndexingHandler> logger) : base(indexingService, indexCreator)
+        ILogger<CnvsIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
     {
         _options = options;
         _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
         _logger = logger;
     }
 
@@ -41,7 +39,7 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
         {
             stopwatch.Restart();
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            IndexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<CnvIndex>();
@@ -64,7 +62,7 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
             if (indicesToCreate.Any())
                 await IndexingService.AddRange(indicesToCreate);
 
-            _indexingCache.Clear();
+            IndexingCache.Clear();
 
             stopwatch.Stop();
 

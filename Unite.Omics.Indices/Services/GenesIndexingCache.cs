@@ -9,14 +9,14 @@ using Unite.Data.Entities.Omics.Analysis;
 using Unite.Data.Entities.Omics.Analysis.Rna;
 using Unite.Data.Entities.Specimens;
 using Unite.Essentials.Extensions;
-
+using Unite.Indices.Entities.Genes;
 using SM = Unite.Data.Entities.Omics.Analysis.Dna.Sm;
 using CNV = Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
 using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GenesIndexingCache
+public class GenesIndexingCache: IIndexingCache
 {
     private static readonly object _lock = new();
 
@@ -44,8 +44,7 @@ public class GenesIndexingCache
     {
         _dbContextFactory = dbContextFactory;
     }
-
-
+    
     public void Load(int[] ids)
     {
         Task.WaitAll
@@ -90,8 +89,7 @@ public class GenesIndexingCache
         Specimens = null;
         Samples = null;
     }
-
-
+    
     private async Task LoadExpressions(int[] ids)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
