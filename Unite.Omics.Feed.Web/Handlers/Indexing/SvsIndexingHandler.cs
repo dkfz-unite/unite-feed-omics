@@ -19,52 +19,11 @@ public class SvsIndexingHandler(
     ILogger<SvsIndexingHandler> logger)
     : IndexingHandler<SvIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
 {
-    public override async Task Handle()
+    protected override int BucketSize => options.SvBucketSize;
+    protected override IndexingTaskType IndexingTaskType => IndexingTaskType.SV;
+    protected override string IndexEntityKind => "SV";
+    protected override string GetIndexEntityKey(SvIndex entity)
     {
-        await ProcessIndexingTasks(options.SvBucketSize);
-    }
-
-    private async Task ProcessIndexingTasks(int bucketSize)
-    {
-        if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
-            return;
-
-        var stopwatch = new Stopwatch();
-
-        await TaskProcessingService.Process(IndexingTaskType.SV, bucketSize, async (tasks) =>
-        {
-            stopwatch.Restart();
-
-            IndexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
-
-            var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<SvIndex>();
-
-            tasks.ForEach(task =>
-            {
-                var id = int.Parse(task.Target);
-
-                var index = IndexCreator.Create(id);
-
-                if (index == null)
-                    indicesToDelete.Add($"{id}");
-                else
-                    indicesToCreate.Add(index);
-            });
-
-            if (indicesToDelete.Any())
-                await IndexingService.DeleteRange(indicesToDelete);
-            
-            if (indicesToCreate.Any())
-                await IndexingService.AddRange(indicesToCreate);
-
-            IndexingCache.Clear();
-
-            stopwatch.Stop();
-
-            Logger.LogInformation("Indexed {number} SVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
-
-            return true;
-        });
+        return entity.Id.ToString();
     }
 }
