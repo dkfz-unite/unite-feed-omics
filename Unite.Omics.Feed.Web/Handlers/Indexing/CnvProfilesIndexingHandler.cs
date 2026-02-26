@@ -1,23 +1,22 @@
 using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.CnvProfiles;
-using Unite.Indices.Entities.Genes;
 using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class CnvProfilesIndexingHandler(
-    TasksProcessingService taskProcessingService,
-    CnvProfileIndexingCache indexingCache,
-    IIndexService<CnvProfileIndex> indexingService,
-    ILogger<GenesIndexingHandler> logger) : IndexingHandler
+public class CnvProfilesIndexingHandler : IndexingHandler<CnvProfileIndex>
 {
-    public override async Task Prepare()
+    private readonly TasksProcessingService _taskProcessingService;
+
+    public CnvProfilesIndexingHandler(TasksProcessingService taskProcessingService,
+        CnvProfileIndexingCache indexingCache,
+        IIndexService<CnvProfileIndex> indexingService,
+        ILogger<GenesIndexingHandler> logger) : base(indexingService)
     {
-        await indexingService.UpdateIndex();
+        _taskProcessingService = taskProcessingService;
     }
 
     public override async Task Handle()
@@ -28,12 +27,12 @@ public class CnvProfilesIndexingHandler(
 
     private async Task ProcessIndexingTasks(int bucketSize)
     {
-        if (taskProcessingService.HasTasks(WorkerType.Submission) || taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
         
-        await taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
         {
             /*stopwatch.Restart();
 

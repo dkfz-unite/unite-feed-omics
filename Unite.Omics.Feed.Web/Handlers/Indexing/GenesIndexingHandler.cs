@@ -9,40 +9,46 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class GenesIndexingHandler(
-    GenesIndexingOptions options,
-    TasksProcessingService taskProcessingService,
-    GenesIndexingCache indexingCache,
-    IIndexService<GeneIndex> indexingService,
-    ILogger<GenesIndexingHandler> logger)
-    : IndexingHandler
+public class GenesIndexingHandler : IndexingHandler<GeneIndex>
 {
-    public override async Task Prepare()
+    private readonly GenesIndexingOptions _options;
+    private readonly TasksProcessingService _taskProcessingService;
+    private readonly GenesIndexingCache _indexingCache;
+    private readonly ILogger<GenesIndexingHandler> _logger;
+
+    public GenesIndexingHandler(GenesIndexingOptions options,
+        TasksProcessingService taskProcessingService,
+        GenesIndexingCache indexingCache,
+        IIndexService<GeneIndex> indexingService,
+        ILogger<GenesIndexingHandler> logger): base(indexingService)
     {
-        await indexingService.UpdateIndex();
+        _options = options;
+        _taskProcessingService = taskProcessingService;
+        _indexingCache = indexingCache;
+        _logger = logger;
     }
 
     public override async Task Handle()
     {
-        await ProcessIndexingTasks(options.BucketSize);
+        await ProcessIndexingTasks(_options.BucketSize);
     }
     
     private async Task ProcessIndexingTasks(int bucketSize)
     {
-        if (taskProcessingService.HasTasks(WorkerType.Submission) || taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
         
-        await taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
+        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
-            indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indicesToDelete = new List<string>();
             var indicesToCreate = new List<GeneIndex>();
-            var indexCreator = new GeneIndexCreator(indexingCache);
+            var indexCreator = new GeneIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
@@ -58,13 +64,13 @@ public class GenesIndexingHandler(
             });
 
             if (indicesToDelete.Any())
-                await indexingService.DeleteRange(indicesToDelete);
+                await IndexingService.DeleteRange(indicesToDelete);
 
             if (indicesToCreate.Any())
             {
                 try
                 {
-                    await indexingService.AddRange(indicesToCreate);
+                    await IndexingService.AddRange(indicesToCreate);
                 }
                 catch
                 {
@@ -72,21 +78,21 @@ public class GenesIndexingHandler(
                     {
                         try
                         {
-                            await indexingService.Add(index);
+                            await IndexingService.Add(index);
                         }
                         catch (Exception e)
                         {
-                            logger.LogError(e, "Failed to index gene {id}", index.Id);
+                            _logger.LogError(e, "Failed to index gene {id}", index.Id);
                         }
                     }
                 }
             }
 
-            indexingCache.Clear();
+            _indexingCache.Clear();
 
             stopwatch.Stop();
 
-            logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
