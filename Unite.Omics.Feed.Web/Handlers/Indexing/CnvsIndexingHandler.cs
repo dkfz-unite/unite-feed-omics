@@ -10,32 +10,23 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
+public class CnvsIndexingHandler(
+    VariantsIndexingOptions options,
+    TasksProcessingService taskProcessingService,
+    IIndexService<CnvIndex> indexingService,
+    VariantIndexingCache<Variant, VariantEntry> indexingCache,
+    IIndexCreator<CnvIndex> indexCreator,
+    ILogger<CnvsIndexingHandler> logger)
+    : IndexingHandler<CnvIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
 {
-    private readonly VariantsIndexingOptions _options;
-    private readonly TasksProcessingService _taskProcessingService;
-    private readonly ILogger<CnvsIndexingHandler> _logger;
-
-    public CnvsIndexingHandler(VariantsIndexingOptions options,
-        TasksProcessingService taskProcessingService,
-        IIndexService<CnvIndex> indexingService,
-        VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexCreator<CnvIndex> indexCreator,
-        ILogger<CnvsIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
-    {
-        _options = options;
-        _taskProcessingService = taskProcessingService;
-        _logger = logger;
-    }
-
     protected override async Task ProcessIndexingTasks()
     {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
             return;
                 
         var stopwatch = new Stopwatch();
 
-        await _taskProcessingService.Process(IndexingTaskType.CNV, _options.CnvBucketSize, async (tasks) =>
+        await TaskProcessingService.Process(IndexingTaskType.CNV, options.CnvBucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
@@ -66,7 +57,7 @@ public class CnvsIndexingHandler : IndexingHandler<CnvIndex>
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexed {number} CNVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            Logger.LogInformation("Indexed {number} CNVs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

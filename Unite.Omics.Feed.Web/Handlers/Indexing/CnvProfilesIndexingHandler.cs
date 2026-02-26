@@ -7,29 +7,24 @@ using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class CnvProfilesIndexingHandler : IndexingHandler<CnvProfileIndex>
+public class CnvProfilesIndexingHandler(
+    TasksProcessingService taskProcessingService,
+    IIndexService<CnvProfileIndex> indexingService,
+    CnvProfileIndexingCache indexingCache,
+    IIndexCreator<CnvProfileIndex> indexCreator,
+    ILogger<GenesIndexingHandler> logger)
+    : IndexingHandler<CnvProfileIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
 {
-    private readonly TasksProcessingService _taskProcessingService;
-
-    public CnvProfilesIndexingHandler(TasksProcessingService taskProcessingService,
-        IIndexService<CnvProfileIndex> indexingService,
-        CnvProfileIndexingCache indexingCache,
-        IIndexCreator<CnvProfileIndex> indexCreator,
-        ILogger<GenesIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
-    {
-        _taskProcessingService = taskProcessingService;
-    }
-
     protected override async Task ProcessIndexingTasks()
     {
         const int bucketSize = 100;
         
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
         
-        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
+        await TaskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
         {
             /*stopwatch.Restart();
 

@@ -10,37 +10,28 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class SmsIndexingHandler : IndexingHandler<SmIndex>
+public class SmsIndexingHandler(
+    VariantsIndexingOptions options,
+    TasksProcessingService taskProcessingService,
+    IIndexService<SmIndex> indexingService,
+    VariantIndexingCache<Variant, VariantEntry> indexingCache,
+    IIndexCreator<SmIndex> indexCreator,
+    ILogger<SmsIndexingHandler> logger)
+    : IndexingHandler<SmIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
 {
-    private readonly ILogger _logger;
-    private readonly VariantsIndexingOptions _options;
-    private readonly TasksProcessingService _taskProcessingService;
-
-    public SmsIndexingHandler(VariantsIndexingOptions options,
-        TasksProcessingService taskProcessingService,
-        IIndexService<SmIndex> indexingService,
-        VariantIndexingCache<Variant, VariantEntry> indexingCache,
-        IIndexCreator<SmIndex> indexCreator,
-        ILogger<SmsIndexingHandler> logger) : base(indexingService, indexingCache, indexCreator)
-    {
-        _options = options;
-        _taskProcessingService = taskProcessingService;
-        _logger = logger;
-    }
-    
     public override async Task Handle()
     {
-        await ProcessIndexingTasks(_options.SmBucketSize);
+        await ProcessIndexingTasks(options.SmBucketSize);
     }
 
     private async Task ProcessIndexingTasks(int bucketSize)
     {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
 
-        await _taskProcessingService.Process(IndexingTaskType.SM, bucketSize, async (tasks) =>
+        await TaskProcessingService.Process(IndexingTaskType.SM, bucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
@@ -71,7 +62,7 @@ public class SmsIndexingHandler : IndexingHandler<SmIndex>
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexed {number} SMs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            Logger.LogInformation("Indexed {number} SMs in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

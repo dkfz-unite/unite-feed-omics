@@ -9,32 +9,23 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class GenesIndexingHandler : IndexingHandler<GeneIndex>
+public class GenesIndexingHandler(
+    GenesIndexingOptions options,
+    TasksProcessingService taskProcessingService,
+    GenesIndexingCache indexingCache,
+    IIndexService<GeneIndex> indexingService,
+    IIndexCreator<GeneIndex> indexCreator,
+    ILogger<GenesIndexingHandler> logger)
+    : IndexingHandler<GeneIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
 {
-    private readonly GenesIndexingOptions _options;
-    private readonly TasksProcessingService _taskProcessingService;
-    private readonly ILogger<GenesIndexingHandler> _logger;
-
-    public GenesIndexingHandler(GenesIndexingOptions options,
-        TasksProcessingService taskProcessingService,
-        GenesIndexingCache indexingCache,
-        IIndexService<GeneIndex> indexingService,
-        IIndexCreator<GeneIndex> indexCreator,
-        ILogger<GenesIndexingHandler> logger): base(indexingService, indexingCache, indexCreator)
-    {
-        _options = options;
-        _taskProcessingService = taskProcessingService;
-        _logger = logger;
-    }
-    
     protected override async Task ProcessIndexingTasks()
     {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+        if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
             return;
 
         var stopwatch = new Stopwatch();
         
-        await _taskProcessingService.Process(IndexingTaskType.Gene, _options.BucketSize, async (tasks) =>
+        await TaskProcessingService.Process(IndexingTaskType.Gene, options.BucketSize, async (tasks) =>
         {
             stopwatch.Restart();
 
@@ -75,7 +66,7 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(e, "Failed to index gene {id}", index.Id);
+                            Logger.LogError(e, "Failed to index gene {id}", index.Id);
                         }
                     }
                 }
@@ -85,7 +76,7 @@ public class GenesIndexingHandler : IndexingHandler<GeneIndex>
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            Logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
