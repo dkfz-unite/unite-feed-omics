@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
@@ -7,19 +9,19 @@ using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public abstract class IndexingHandler<TIndexEntity>(
+public abstract class IndexingHandler<TIndexEntity, TIndexingCache>(
     TasksProcessingService taskProcessingService,
     IIndexService<TIndexEntity> indexingService,
-    IIndexingCache indexingCache,
-    IIndexCreator<TIndexEntity> indexCreator,
+    IndexEntityBuilder<TIndexEntity, TIndexingCache> indexEntityBuilder,
+    IDbContextFactory<DomainDbContext> dbContextFactory,
     ILogger logger
     ) : Handler, IIndexingHandler 
     where TIndexEntity : class
+    where TIndexingCache : IndexingCache
 {
     protected TasksProcessingService TaskProcessingService => taskProcessingService;
     protected IIndexService<TIndexEntity> IndexingService => indexingService;
-    protected IIndexCreator<TIndexEntity> IndexCreator => indexCreator;
-    protected IIndexingCache IndexingCache => indexingCache;
+    protected IndexEntityBuilder<TIndexEntity, TIndexingCache> IndexEntityBuilder => indexEntityBuilder;
     protected ILogger Logger => logger;
     
     protected abstract int BucketSize { get; }
@@ -48,36 +50,37 @@ public abstract class IndexingHandler<TIndexEntity>(
         {
             stopwatch.Restart();
 
-            IndexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
-
-            var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<TIndexEntity>();
+            //TODO: there is a big inefficiency: cache is getting loaded multiple times(assumable that many entities in the cache are loaded over and over again)
+            using var indexingCache = IndexingCache.Create<TIndexingCache>(dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
+            
+            var entitiesToDelete = new List<string>();
+            var entitiesToCreate = new List<TIndexEntity>();
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = IndexCreator.Create(id);
+                var indexEntity = IndexEntityBuilder.Create(id, indexingCache);
 
-                if (index == null)
-                    indicesToDelete.Add($"{id}");
+                if (indexEntity == null)
+                    entitiesToDelete.Add($"{id}");
                 else
-                    indicesToCreate.Add(index);
+                    entitiesToCreate.Add(indexEntity);
 
             });
 
-            if (indicesToDelete.Any())
-                await IndexingService.DeleteRange(indicesToDelete);
+            if (entitiesToDelete.Any())
+                await IndexingService.DeleteRange(entitiesToDelete);
 
-            if (indicesToCreate.Any())
+            if (entitiesToCreate.Any())
             {
                 try
                 {
-                    await IndexingService.AddRange(indicesToCreate);
+                    await IndexingService.AddRange(entitiesToCreate);
                 }
                 catch
                 {
-                    foreach (var index in indicesToCreate)
+                    foreach (var index in entitiesToCreate)
                     {
                         try
                         {
@@ -90,8 +93,6 @@ public abstract class IndexingHandler<TIndexEntity>(
                     }
                 }
             }
-
-            IndexingCache.Clear();
 
             stopwatch.Stop();
 

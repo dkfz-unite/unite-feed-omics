@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 using Unite.Data.Entities.Tasks.Enums;
@@ -13,11 +15,11 @@ namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 public class SvsIndexingHandler(
     VariantsIndexingOptions options,
     TasksProcessingService taskProcessingService,
-    VariantIndexingCache<Variant, VariantEntry> indexingCache,
     IIndexService<SvIndex> indexingService,
-    IIndexCreator<SvIndex> indexCreator,
+    SvIndexEntityBuilder indexEntityBuilder,
+    IDbContextFactory<DomainDbContext> dbContextFactory,
     ILogger<SvsIndexingHandler> logger)
-    : IndexingHandler<SvIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
+    : IndexingHandler<SvIndex, VariantIndexingCache<Variant, VariantEntry>>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
 {
     protected override int BucketSize => options.SvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.SV;

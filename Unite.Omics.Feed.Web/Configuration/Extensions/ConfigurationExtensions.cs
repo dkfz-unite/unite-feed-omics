@@ -102,11 +102,11 @@ public static class ConfigurationExtensions
         services.AddTransient<IIndexingHandler, CnvProfilesIndexingHandler>();
         
         //Index Creators
-        services.AddTransient<IIndexCreator<CnvIndex>, CnvIndexCreator>();
-        services.AddTransient<IIndexCreator<SmIndex>, SmIndexCreator>();
-        services.AddTransient<IIndexCreator<SvIndex>, SvIndexCreator>();
-        services.AddTransient<IIndexCreator<GeneIndex>, GeneIndexCreator>();
-        services.AddTransient<IIndexCreator<CnvProfileIndex>, CnvProfileIndexCreator>();
+        services.AddTransient<CnvIndexEntityBuilder>();
+        services.AddTransient<SmIndexEntityBuilder>();
+        services.AddTransient<SvIndexEntityBuilder>();
+        services.AddTransient<GeneIndexEntityBuilder>();
+        services.AddTransient<CnvProfileIndexEntityBuilder>();
 
         // Variants annotation hosted service
         services.AddHostedService<VariantsAnnotationWorker>();
@@ -124,14 +124,6 @@ public static class ConfigurationExtensions
         // Genes indexing hosted service
         services.AddTransient<GenesIndexingOptions>();
         services.AddTransient<GenesIndexingHandler>();
-
-        // Variant indexing services
-        services.AddTransient<VariantIndexingCache<DnaEntities.Sm.Variant, DnaEntities.Sm.VariantEntry>>();
-        services.AddTransient<VariantIndexingCache<DnaEntities.Cnv.Variant, DnaEntities.Cnv.VariantEntry>>();
-        services.AddTransient<VariantIndexingCache<DnaEntities.Sv.Variant, DnaEntities.Sv.VariantEntry>>();
-
-        // Gene indexing services
-        services.AddTransient<GenesIndexingCache>();
         
         //Submission repositories
         services.AddTransient<CnvProfileSubmissionRepository>();

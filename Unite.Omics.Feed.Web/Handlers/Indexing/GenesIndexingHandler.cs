@@ -1,4 +1,6 @@
-﻿using Unite.Data.Context.Services.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Indices.Services;
 using Unite.Indices.Context;
@@ -10,11 +12,11 @@ namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 public class GenesIndexingHandler(
     GenesIndexingOptions options,
     TasksProcessingService taskProcessingService,
-    GenesIndexingCache indexingCache,
     IIndexService<GeneIndex> indexingService,
-    IIndexCreator<GeneIndex> indexCreator,
+    GeneIndexEntityBuilder indexEntityBuilder,
+    IDbContextFactory<DomainDbContext> dbContextFactory,
     ILogger<GenesIndexingHandler> logger)
-    : IndexingHandler<GeneIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
+    : IndexingHandler<GeneIndex, GenesIndexingCache>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
 {
     protected override int BucketSize => options.BucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;

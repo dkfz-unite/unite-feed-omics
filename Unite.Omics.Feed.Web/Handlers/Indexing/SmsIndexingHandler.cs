@@ -1,4 +1,6 @@
-﻿using Unite.Data.Context.Services.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Dna.Sm;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Indices.Services;
@@ -12,10 +14,10 @@ public class SmsIndexingHandler(
     VariantsIndexingOptions options,
     TasksProcessingService taskProcessingService,
     IIndexService<SmIndex> indexingService,
-    VariantIndexingCache<Variant, VariantEntry> indexingCache,
-    IIndexCreator<SmIndex> indexCreator,
+    SmIndexEntityBuilder indexEntityBuilder,
+    IDbContextFactory<DomainDbContext> dbContextFactory,
     ILogger<SmsIndexingHandler> logger)
-    : IndexingHandler<SmIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
+    : IndexingHandler<SmIndex, VariantIndexingCache<Variant, VariantEntry>>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
 {
     protected override int BucketSize => options.SmBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.SM;

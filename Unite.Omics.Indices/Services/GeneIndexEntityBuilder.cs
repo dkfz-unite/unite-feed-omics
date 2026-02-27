@@ -12,28 +12,28 @@ using Unite.Data.Constants;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneIndex>
+public class GeneIndexEntityBuilder : IndexEntityBuilder<GeneIndex, GenesIndexingCache>
 {
-    public GeneIndex Create(int key)
+    public override GeneIndex Create(int key, GenesIndexingCache cache)
     {
-        return CreateGeneIndex(key);
+        return CreateGeneIndex(key, cache);
     }
 
-    private GeneIndex CreateGeneIndex(int geneId)
+    private GeneIndex CreateGeneIndex(int geneId, GenesIndexingCache cache)
     {
-        var gene = LoadGene(geneId);
+        var gene = LoadGene(geneId, cache);
 
         if (gene == null)
             return null;
 
-        return CreateGeneIndex(gene);
+        return CreateGeneIndex(gene, cache);
     }
 
-    private GeneIndex CreateGeneIndex(Gene gene)
+    private GeneIndex CreateGeneIndex(Gene gene, GenesIndexingCache cache)
     {
         var index = GeneIndexMapper.CreateFrom<GeneIndex>(gene);
 
-        index.Specimens = CreateSpecimenIndices(gene.Id);
+        index.Specimens = CreateSpecimenIndices(gene.Id, cache);
 
         var hasSpecimens = index.Specimens?.Any();
         var hasExpressions = cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
@@ -42,21 +42,21 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         if (hasSpecimens != true && hasExpressions != true)
             return null;
 
-        index.Stats = CreateStatsIndex(gene.Id);
-        index.Data = CreateDataIndex(gene.Id);
+        index.Stats = CreateStatsIndex(gene.Id, cache);
+        index.Data = CreateDataIndex(gene.Id, cache);
 
         return index;
     }
 
-    private Gene LoadGene(int geneId)
+    private Gene LoadGene(int geneId, GenesIndexingCache cache)
     {
         return cache.Genes.FirstOrDefault(gene => gene.Id == geneId);
     }
 
 
-    private SpecimenIndex[] CreateSpecimenIndices(int geneId)
+    private SpecimenIndex[] CreateSpecimenIndices(int geneId, GenesIndexingCache cache)
     {
-        var specimens = LoadSpecimens(geneId);
+        var specimens = LoadSpecimens(geneId, cache);
 
         return specimens.Select(specimen => CreateSpecimenIndex(geneId, specimen)).ToArrayOrNull();
     }
@@ -68,15 +68,15 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         return index;
     }
 
-    private Specimen[] LoadSpecimens(int geneId)
+    private Specimen[] LoadSpecimens(int geneId, GenesIndexingCache cache)
     {
-        var sampleIds = LoadSamples(geneId).Select(sample => sample.Id).ToArray();
+        var sampleIds = LoadSamples(geneId, cache).Select(sample => sample.Id).ToArray();
         var specimenIds = cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
 
         return cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).ToArray();
     }
 
-    private Sample[] LoadSamples(int geneId)
+    private Sample[] LoadSamples(int geneId, GenesIndexingCache cache)
     {
         var sms = cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
         var cnvs = cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
@@ -92,7 +92,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
     }
 
 
-    private StatsIndex CreateStatsIndex(int geneId)
+    private StatsIndex CreateStatsIndex(int geneId, GenesIndexingCache cache)
     {
         var sms = cache.SmTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
         var cnvs = cache.CnvTranscripts.Where(transcript => transcript.Feature.GeneId == geneId).Select(transcript => transcript.VariantId).Distinct().ToArray();
@@ -116,9 +116,9 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
     }
 
 
-    private DataIndex CreateDataIndex(int geneId)
+    private DataIndex CreateDataIndex(int geneId, GenesIndexingCache cache)
     {
-        var sampleIds = LoadSamples(geneId).Select(sample => sample.Id).ToArray();
+        var sampleIds = LoadSamples(geneId, cache).Select(sample => sample.Id).ToArray();
         var specimenIds = cache.Samples.Where(sample => sampleIds.Contains(sample.Id)).Select(sample => sample.SpecimenId).Distinct().ToArray();
         var donorIds = cache.Specimens.Where(specimen => specimenIds.Contains(specimen.Id)).Select(specimen => specimen.DonorId).Distinct().ToArray();
         var imageIds = cache.Images.Where(image => donorIds.Contains(image.DonorId)).Select(image => image.Id).Distinct().ToArray();
@@ -126,34 +126,34 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         return new DataIndex
         {
             Donors = true,
-            Clinical = CheckClinicalData(donorIds),
-            Treatments = CheckTreatments(donorIds),
-            Mrs = CheckImages(imageIds, ImageType.MR),
-            Cts = CheckImages(imageIds, ImageType.CT),
-            Materials = CheckSpecimens(specimenIds, SpecimenType.Material),
-            MaterialsMolecular = CheckMolecularData(specimenIds, SpecimenType.Material),
-            Lines = CheckSpecimens(specimenIds, SpecimenType.Line),
-            LinesMolecular = CheckMolecularData(specimenIds, SpecimenType.Line),
-            LinesInterventions = CheckInterventions(specimenIds, SpecimenType.Line),
-            LinesDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Line),
-            Organoids = CheckSpecimens(specimenIds, SpecimenType.Organoid),
-            OrganoidsMolecular = CheckMolecularData(specimenIds, SpecimenType.Organoid),
-            OrganoidsInterventions = CheckInterventions(specimenIds, SpecimenType.Organoid),
-            OrganoidsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Organoid),
-            Xenografts = CheckSpecimens(specimenIds, SpecimenType.Xenograft),
-            XenograftsMolecular = CheckMolecularData(specimenIds, SpecimenType.Xenograft),
-            XenograftsInterventions = CheckInterventions(specimenIds, SpecimenType.Xenograft),
-            XenograftsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Xenograft),
-            Sms = CheckSms(geneId),
-            Cnvs = CheckCnvs(geneId),
-            Svs = CheckSvs(geneId),
-            Meth = CheckMethylation(sampleIds),
-            Exp = CheckGeneExp(geneId),
-            ExpSc = CheckGeneExpSc(sampleIds)
+            Clinical = CheckClinicalData(donorIds, cache),
+            Treatments = CheckTreatments(donorIds, cache),
+            Mrs = CheckImages(imageIds, ImageType.MR, cache),
+            Cts = CheckImages(imageIds, ImageType.CT, cache),
+            Materials = CheckSpecimens(specimenIds, SpecimenType.Material, cache),
+            MaterialsMolecular = CheckMolecularData(specimenIds, SpecimenType.Material, cache),
+            Lines = CheckSpecimens(specimenIds, SpecimenType.Line, cache),
+            LinesMolecular = CheckMolecularData(specimenIds, SpecimenType.Line, cache),
+            LinesInterventions = CheckInterventions(specimenIds, SpecimenType.Line, cache),
+            LinesDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Line, cache),
+            Organoids = CheckSpecimens(specimenIds, SpecimenType.Organoid, cache),
+            OrganoidsMolecular = CheckMolecularData(specimenIds, SpecimenType.Organoid, cache),
+            OrganoidsInterventions = CheckInterventions(specimenIds, SpecimenType.Organoid, cache),
+            OrganoidsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Organoid, cache),
+            Xenografts = CheckSpecimens(specimenIds, SpecimenType.Xenograft, cache),
+            XenograftsMolecular = CheckMolecularData(specimenIds, SpecimenType.Xenograft, cache),
+            XenograftsInterventions = CheckInterventions(specimenIds, SpecimenType.Xenograft, cache),
+            XenograftsDrugs = CheckDrugScreenings(specimenIds, SpecimenType.Xenograft, cache),
+            Sms = CheckSms(geneId, cache),
+            Cnvs = CheckCnvs(geneId, cache),
+            Svs = CheckSvs(geneId, cache),
+            Meth = CheckMethylation(sampleIds, cache),
+            Exp = CheckGeneExp(geneId, cache),
+            ExpSc = CheckGeneExpSc(sampleIds, cache)
         };
     }
 
-    private bool CheckClinicalData(int[] donorIds)
+    private bool CheckClinicalData(int[] donorIds, GenesIndexingCache cache)
     {
         return cache.Donors.Any(donor => 
             donorIds.Contains(donor.Id) && 
@@ -161,7 +161,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckTreatments(int[] donorIds)
+    private bool CheckTreatments(int[] donorIds, GenesIndexingCache cache)
     {
         return cache.Donors.Any(donor => 
             donorIds.Contains(donor.Id) && 
@@ -169,7 +169,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckImages(int[] imageIds, ImageType type)
+    private bool CheckImages(int[] imageIds, ImageType type, GenesIndexingCache cache)
     {
         return cache.Images.Any(image => 
             imageIds.Contains(image.Id) &&
@@ -177,7 +177,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckSpecimens(int[] specimenIds, SpecimenType type)
+    private bool CheckSpecimens(int[] specimenIds, SpecimenType type, GenesIndexingCache cache)
     {
         return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
@@ -185,7 +185,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
     
-    private bool CheckMolecularData(int[] specimenIds, SpecimenType type)
+    private bool CheckMolecularData(int[] specimenIds, SpecimenType type, GenesIndexingCache cache)
     {
         return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
@@ -194,7 +194,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckInterventions(int[] specimenIds, SpecimenType type)
+    private bool CheckInterventions(int[] specimenIds, SpecimenType type, GenesIndexingCache cache)
     {
         return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
@@ -203,7 +203,7 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckDrugScreenings(int[] specimenIds, SpecimenType type)
+    private bool CheckDrugScreenings(int[] specimenIds, SpecimenType type, GenesIndexingCache cache)
     {
         return cache.Specimens.Any(specimen => 
             specimenIds.Contains(specimen.Id) && 
@@ -212,22 +212,22 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckSms(int geneId)
+    private bool CheckSms(int geneId, GenesIndexingCache cache)
     {
         return cache.SmTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
-    private bool CheckCnvs(int geneId)
+    private bool CheckCnvs(int geneId, GenesIndexingCache cache)
     {
         return cache.CnvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
-    private bool CheckSvs(int geneId)
+    private bool CheckSvs(int geneId, GenesIndexingCache cache)
     {
         return cache.SvTranscripts.Any(transcript => transcript.Feature.GeneId == geneId);
     }
 
-    private bool CheckMethylation(int[] sampleIds)
+    private bool CheckMethylation(int[] sampleIds, GenesIndexingCache cache)
     {
         return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
@@ -237,12 +237,12 @@ public class GeneIndexCreator(GenesIndexingCache cache) : IIndexCreator<GeneInde
         );
     }
 
-    private bool CheckGeneExp(int geneId)
+    private bool CheckGeneExp(int geneId, GenesIndexingCache cache)
     {
         return cache.ExpEntries?.Any(entry => entry.EntityId == geneId) == true;
     }
 
-    private bool CheckGeneExpSc(int[] sampleIds)
+    private bool CheckGeneExpSc(int[] sampleIds, GenesIndexingCache cache)
     {
         return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 

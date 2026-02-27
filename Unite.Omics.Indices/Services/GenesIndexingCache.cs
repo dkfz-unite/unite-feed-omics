@@ -16,12 +16,11 @@ using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GenesIndexingCache: IIndexingCache
+public class GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : IndexingCache(dbContextFactory)
 {
     private static readonly object _lock = new();
 
     private readonly HashSet<int> _sampleIds = [];
-    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
     
     public IEnumerable<SM.AffectedTranscript> SmTranscripts { get; private set; }
     public IEnumerable<CNV.AffectedTranscript> CnvTranscripts { get; private set; }
@@ -38,14 +37,9 @@ public class GenesIndexingCache: IIndexingCache
     public IEnumerable<Image> Images { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Sample> Samples { get; private set; }
-    
-    
-    public GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
-    {
-        _dbContextFactory = dbContextFactory;
-    }
-    
-    public void Load(int[] ids)
+
+
+    protected override void Load(int[] ids)
     {
         Task.WaitAll
         ([
@@ -92,7 +86,7 @@ public class GenesIndexingCache: IIndexingCache
     
     private async Task LoadExpressions(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         ExpEntries = await dbContext.Set<GeneExpression>()
             .AsNoTracking()
@@ -109,7 +103,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadSmTranscripts(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         SmTranscripts = await dbContext.Set<SM.AffectedTranscript>()
             .AsNoTracking()
@@ -121,7 +115,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadCnvTranscripts(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         CnvTranscripts = await dbContext.Set<CNV.AffectedTranscript>()
             .AsNoTracking()
@@ -133,7 +127,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadSvTranscripts(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         SvTranscripts = await dbContext.Set<SV.AffectedTranscript>()
             .AsNoTracking()
@@ -145,7 +139,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadGenes(int[] ids)
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         Genes = await dbContext.Set<Gene>()
             .AsNoTracking()
@@ -155,7 +149,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadSms()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var variantIds = SmTranscripts.Select(affectedTranscript => affectedTranscript.VariantId).Distinct().ToArray();
 
@@ -180,7 +174,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadCnvs()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var predicate = Predicates.IsInfluentCnv.Compile();
 
@@ -208,7 +202,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadSvs()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var variantIds = SvTranscripts.Select(affectedTranscript => affectedTranscript.VariantId).Distinct().ToArray();
 
@@ -233,7 +227,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadDonors()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var ids = Specimens
             .Select(specimen => specimen.DonorId)
@@ -251,7 +245,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadImages()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var predicate = Predicates.IsImageRelatedSpecimen.Compile();
 
@@ -271,7 +265,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadSpecimens()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var ids = Samples
             .Select(sample => sample.SpecimenId)
@@ -293,7 +287,7 @@ public class GenesIndexingCache: IIndexingCache
 
     private async Task LoadSamples()
     {
-        using var dbContext = _dbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         Samples = await dbContext.Set<Sample>()
             .AsNoTracking()

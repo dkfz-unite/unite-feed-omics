@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Unite.Data.Context;
+using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Repositories.Constants;
 using Unite.Data.Context.Repositories.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
@@ -21,14 +22,16 @@ namespace Unite.Omics.Indices.Services;
 /// </summary>
 /// <typeparam name="TVariant"></typeparam>
 /// <typeparam name="TVariantEntry"></typeparam>
-public class VariantIndexingCache<TVariant, TVariantEntry>: IIndexingCache
+public class VariantIndexingCache<TVariant, TVariantEntry>(IDbContextFactory<DomainDbContext> dbContextFactory)
+    : IndexingCache(dbContextFactory)
     where TVariant : Data.Entities.Omics.Analysis.Dna.Variant
-    where TVariantEntry: Data.Entities.Omics.Analysis.Dna.VariantEntry<TVariant>
+    where TVariantEntry : Data.Entities.Omics.Analysis.Dna.VariantEntry<TVariant>
 {
     private static readonly object _lock = new();
+    
+    protected readonly VariantsRepository _variantsRepository = new(dbContextFactory);
 
     private readonly HashSet<int> _sampleIds = [];
-    public readonly IDbContextFactory<DomainDbContext> DbContextFactory;
 
     public IEnumerable<TVariant> Variants { get; private set; }
     public IEnumerable<TVariantEntry> Entries { get; private set; }
@@ -37,17 +40,12 @@ public class VariantIndexingCache<TVariant, TVariantEntry>: IIndexingCache
     public IEnumerable<Image> Images { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Data.Entities.Omics.Analysis.Sample> Samples { get; private set; }
+    public Dictionary<int, TVariant[]> SimilarVariants { get; set; }
 
-
-    public VariantIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
-    {
-        DbContextFactory = dbContextFactory;
-    }
-
-
-    public void Load(int[] ids)
+    protected override void Load(int[] ids)
     {
         LoadVariants(ids).Wait();
+        LoadSimilarVariants(ids).Wait();
         LoadExpressions().Wait();
         LoadSamples().Wait();
         LoadSpecimens().Wait();
@@ -68,6 +66,22 @@ public class VariantIndexingCache<TVariant, TVariantEntry>: IIndexingCache
         Samples = null;
     }
 
+    private async Task LoadSimilarVariants(int[] ids)
+    {
+        await using var dbContext = DbContextFactory.CreateDbContext();
+
+        foreach (var id in ids)
+        {
+            var variantIds = _variantsRepository.GetSimilarVariants<TVariant>([id]).Result;
+            
+            var similarVariantIds = dbContext.Set<TVariant>()
+                .AsNoTracking()
+                .Where(entity => variantIds.Contains(entity.Id))
+                .ToArray();
+
+            SimilarVariants[id] = similarVariantIds;
+        }
+    }
 
     private async Task LoadVariants(int[] ids)
     {

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Indices.Context;
@@ -9,10 +11,10 @@ namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 public class CnvProfilesIndexingHandler(
     TasksProcessingService taskProcessingService,
     IIndexService<CnvProfileIndex> indexingService,
-    CnvProfileIndexingCache indexingCache,
-    IIndexCreator<CnvProfileIndex> indexCreator,
+    CnvProfileIndexEntityBuilder indexEntityBuilder,
+    IDbContextFactory<DomainDbContext> dbContextFactory,
     ILogger<GenesIndexingHandler> logger)
-    : IndexingHandler<CnvProfileIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
+    : IndexingHandler<CnvProfileIndex, CnvProfileIndexingCache>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
 {
     protected override int BucketSize => 100;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNVProfile;

@@ -1,4 +1,6 @@
-﻿using Unite.Data.Context.Services.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
+using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Indices.Services;
@@ -12,10 +14,10 @@ public class CnvsIndexingHandler(
     VariantsIndexingOptions options,
     TasksProcessingService taskProcessingService,
     IIndexService<CnvIndex> indexingService,
-    VariantIndexingCache<Variant, VariantEntry> indexingCache,
-    IIndexCreator<CnvIndex> indexCreator,
+    CnvIndexEntityBuilder indexEntityBuilder,
+    IDbContextFactory<DomainDbContext> dbContextFactory,
     ILogger<CnvsIndexingHandler> logger)
-    : IndexingHandler<CnvIndex>(taskProcessingService, indexingService, indexingCache, indexCreator, logger)
+    : IndexingHandler<CnvIndex, VariantIndexingCache<Variant, VariantEntry>>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
 {
     protected override int BucketSize => options.CnvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNV;
