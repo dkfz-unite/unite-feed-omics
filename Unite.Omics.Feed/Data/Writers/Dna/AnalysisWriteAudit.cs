@@ -16,6 +16,7 @@ public class AnalysisWriteAudit : DataWriteAudit
     public HashSet<int> CnvsEntries = [];
     public HashSet<int> Svs = [];
     public HashSet<int> SvsEntries = [];
+    public HashSet<int> CnvProfiles = [];
 
     public override string ToString()
     {

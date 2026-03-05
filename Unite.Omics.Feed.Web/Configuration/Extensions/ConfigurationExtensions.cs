@@ -78,6 +78,7 @@ public static class ConfigurationExtensions
         services.AddTransient<CnvIndexingTaskService>();
         services.AddTransient<SvAnnotationTaskService>();
         services.AddTransient<SvIndexingTaskService>();
+        services.AddTransient<CnvProfileIndexingTaskService>();
 
         // Submissions hosted services
         services.AddHostedService<SubmissionsWorker>();

@@ -74,6 +74,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     private void WriteCnvs(int sampleId, IEnumerable<Models.Dna.Cnv.VariantModel> models, ref AnalysisWriteAudit audit)
     {
         var variants = _cnvRepository.CreateMissing(models);
+        //TODO: compile only once
         var predicate = Predicates.IsInfluentCnv.Compile();
         audit.Cnvs.AddRange(variants.Where(predicate).Select(variant => variant.Id));
         audit.CnvsCreated += variants.Count();
@@ -97,6 +98,14 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     protected void WriteCnvProfiles(int sampleId, IEnumerable<Models.Dna.Cnv.ProfileModel> models, ref AnalysisWriteAudit audit)
     {
         var cnvProfiles = _cnvProfileRepository.CreateOrUpdate(sampleId, models);
-        audit.CnvProfilesCreated += cnvProfiles.Count();
+
+        var count = 0;
+        foreach (var cnvProfile in cnvProfiles)
+        {
+            audit.CnvProfiles.Add(cnvProfile.Id);
+            ++count;
+        }
+        
+        audit.CnvProfilesCreated += count;
     }
 }

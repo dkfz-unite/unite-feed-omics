@@ -49,8 +49,7 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache>(
         await TaskProcessingService.Process(IndexingTaskType, BucketSize, async (tasks) =>
         {
             stopwatch.Restart();
-
-            //TODO: there is a big inefficiency: cache is getting loaded multiple times(assumable that many entities in the cache are loaded over and over again)
+            
             using var indexingCache = IndexingCache.Create<TIndexingCache>(dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
             
             var entitiesToDelete = new List<string>();

@@ -1,34 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Services.Tasks;
-using Unite.Data.Entities.Omics;
+using Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 
 namespace Unite.Omics.Feed.Web.Services.Indexing;
 
-public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
+public class CnvProfileIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory)
+    : IndexingTaskService<Profile, int>(dbContextFactory)
 {
-    protected override int BucketSize => 1000;
-    private readonly GenesRepository _genesRepository;
-
-
-    public GeneIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
-    {
-        //TODO: Dependency Injection should be used instead
-        _genesRepository = new GenesRepository(dbContextFactory);
-    }
-
-
+    private readonly CnvProfilesRepository _profilesRepository = new CnvProfilesRepository(dbContextFactory);
+    
+    //TODO: are those CreateTasks methods needed?
+    //TODO: the implementation is very similar along the task services
     public override void CreateTasks()
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
         var transaction = dbContext.Database.BeginTransaction();
 
-        IterateEntities<Gene, int>(gene => true, gene => gene.Id, genes =>
+        IterateEntities<Profile, int>(profile => true, profile => profile.Id, profile =>
         {
-            CreateTasks(IndexingTaskType.Gene, genes);
+            CreateTasks(IndexingTaskType.CNVProfile, profile);
         });
 
         transaction.Commit();
@@ -41,12 +35,12 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var genes = dbContext.Set<Gene>()
-                .Where(gene => chunk.Contains(gene.Id))
-                .Select(gene => gene.Id)
+            var profiles = dbContext.CnvProfiles
+                .Where(profile => chunk.Contains(profile.Id))
+                .Select(profile => profile.Id)
                 .ToArray();
 
-            CreateTasks(IndexingTaskType.Gene, genes);
+            CreateTasks(IndexingTaskType.CNVProfile, profiles);
         });
 
         transaction.Commit();
@@ -59,52 +53,48 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var genes = dbContext.Set<Gene>()
-                .Where(gene => chunk.Contains(gene.Id))
-                .Select(gene => gene.Id)
+            //TODO: do not make any direct DB queries from this layer
+            var profiles = dbContext.CnvProfiles
+                .Where(profile => chunk.Contains(profile.Id))
+                .Select(profile => profile.Id)
                 .ToArray();
 
-            CreateProjectIndexingTasks(genes);
-            CreateDonorIndexingTasks(genes);
-            CreateImageIndexingTasks(genes);
-            CreateSpecimenIndexingTasks(genes);
-            CreateGeneIndexingTasks(genes);
+            CreateProjectIndexingTasks(profiles);
+            CreateDonorIndexingTasks(profiles);
+            CreateImageIndexingTasks(profiles);
+            CreateSpecimenIndexingTasks(profiles);
+            CreateCnvProfileIndexingTasks(profiles);
         });
 
         transaction.Commit();
     }
 
-
     protected override IEnumerable<int> LoadRelatedProjects(IEnumerable<int> keys)
     {
-        var defaultProjects = LoadDefaultProjects();
-        var relatedProjects = _genesRepository.GetRelatedProjects(keys).Result;
-        
-        return Enumerable.Concat(defaultProjects, relatedProjects);
+        return _profilesRepository.GetRelatedProjects(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedDonors(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedDonors(keys).Result;
+        return _profilesRepository.GetRelatedDonors(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedImages(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedImages(keys).Result;
+        return _profilesRepository.GetRelatedImages(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<int> keys)
     {
-        return _genesRepository.GetRelatedSpecimens(keys).Result;
+        return _profilesRepository.GetRelatedSpecimens(keys).Result;
     }
 
-    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
     {
         return keys;
     }
-
-    //TODO: redesign so that such unrelated methods should not be implemented in all indexing task services
-    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    
+    protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
     {
         return [];
     }
@@ -123,4 +113,6 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
     {
         return [];
     }
+
+    protected override int BucketSize => 1000;
 }
