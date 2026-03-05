@@ -57,8 +57,8 @@ public class ExpressionsAnnotationService
         return new ProteinExpressionModel
         {
             Protein = model,
-            Intensity = intensity,
-            MedianCenteredLog2 = medianCenteredLog2
+            Raw = intensity,
+            Normalized = medianCenteredLog2
         };
     }
 

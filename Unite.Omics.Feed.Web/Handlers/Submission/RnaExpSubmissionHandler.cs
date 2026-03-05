@@ -117,9 +117,10 @@ public class RnaExpSubmissionHandler: SubmissionHandler
                     ExonicLength = model.Gene.ExonicLength
                 },
 
-                Reads = model.Reads,
+                Raw = model.Reads,
                 TPM = model.TPM,
-                FPKM = model.FPKM
+                FPKM = model.FPKM,
+                Normalized = model.Normalized
             };
         }
     }

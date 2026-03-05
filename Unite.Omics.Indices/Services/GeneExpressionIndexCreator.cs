@@ -35,7 +35,7 @@ public class GeneExpressionIndexCreator
                     Id = $"{specimen.Id}_{geneId}",
                     Gene = new Unite.Indices.Entities.Basic.Omics.GeneNavIndex { Id = geneId },
                     Specimen = new Unite.Indices.Entities.Basic.Specimens.SpecimenNavIndex { Id = specimen.Id, ReferenceId = specimen.ReferenceId, Type = specimen.TypeId.ToDefinitionString() },
-                    Expression = geneExpression.FPKM
+                    Expression = geneExpression.Normalized
                 };
 
                 indices.Add(index);

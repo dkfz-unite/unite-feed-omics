@@ -112,7 +112,7 @@ public class ExpressionRepository
 
     private static void Map(ProteinExpressionModel model, ref ProteinExpression entity)
     {
-        entity.Intensity = model.Intensity;
-        entity.MedianCenteredLog2 = model.MedianCenteredLog2;
+        entity.Raw = model.Raw;
+        entity.Normalized = model.Normalized;
     }
 }

@@ -6,5 +6,6 @@ public class GeneExpressionModel
     public int Reads;
     public double FPKM;
     public double TPM;
+    public double Normalized;
 }
 

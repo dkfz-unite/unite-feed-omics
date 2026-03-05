@@ -103,8 +103,8 @@ public class ProtExpSubmissionHandler : SubmissionHandler
         {
             var expressionModel = new Data.Models.Prot.ProteinExpressionModel
             {
-                Intensity = model.Intensity,
-                MedianCenteredLog2 = model.MedianCenteredLog2
+                Raw = model.Raw,
+                Normalized = model.Normalized
             };
             
             if (model.Protein != null)

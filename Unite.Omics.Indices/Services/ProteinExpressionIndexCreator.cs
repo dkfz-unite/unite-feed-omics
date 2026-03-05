@@ -35,7 +35,7 @@ public class ProteinExpressionIndexCreator
                     Id = $"{specimen.Id}_{proteinId}",
                     Protein = new Unite.Indices.Entities.Basic.Omics.ProteinNavIndex { Id = proteinId },
                     Specimen = new Unite.Indices.Entities.Basic.Specimens.SpecimenNavIndex { Id = specimen.Id, ReferenceId = specimen.ReferenceId, Type = specimen.TypeId.ToDefinitionString() },
-                    Expression = proteinExpression.MedianCenteredLog2
+                    Expression = proteinExpression.Normalized
                 };
 
                 indices.Add(index);
