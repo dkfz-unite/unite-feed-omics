@@ -12,26 +12,30 @@ public class GenesIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
     private readonly GenesIndexingCache _indexingCache;
-    private readonly IIndexService<GeneIndex> _indexingService;
+    private readonly IIndexService<GeneIndex> _genesIndexingService;
+    private readonly IIndexService<GeneExpressionIndex> _expressionsIndexingService;
     private readonly ILogger _logger;
 
 
     public GenesIndexingHandler(
         TasksProcessingService taskProcessingService,
         GenesIndexingCache indexingCache,
-        IIndexService<GeneIndex> indexingService,
+        IIndexService<GeneIndex> genesIndexingService,
+        IIndexService<GeneExpressionIndex> expressionsIndexingService,
         ILogger<GenesIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
         _indexingCache = indexingCache;
-        _indexingService = indexingService;
+        _genesIndexingService = genesIndexingService;
+        _expressionsIndexingService = expressionsIndexingService;
         _logger = logger;
     }
 
 
     public async Task Prepare()
     {
-        await _indexingService.CreateIndex();
+        await _genesIndexingService.CreateIndex();
+        await _expressionsIndexingService.CreateIndex();
         // await _indexingService.UpdateIndex();
     }
 
@@ -54,53 +58,48 @@ public class GenesIndexingHandler
 
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
-            var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<GeneIndex>();
-            var indexCreator = new GeneIndexCreator(_indexingCache);
+            var geneIndicesToDelete = new List<string>();
+            var geneIndicesToCreate = new List<GeneIndex>();
+            var geneIndexCreator = new GeneIndexCreator(_indexingCache);
+
+            var expressionIndicesToCreate = new List<GeneExpressionIndex>();
+            var expressionIndexCreator = new GeneExpressionIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var geneIndex = geneIndexCreator.CreateIndex(id);
+                var expressionIndices = expressionIndexCreator.CreateIndices(id);
 
-                if (index == null)
-                    indicesToDelete.Add($"{id}");
+
+                if (geneIndex != null)
+                    geneIndicesToCreate.Add(geneIndex);
                 else
-                    indicesToCreate.Add(index);
+                    geneIndicesToDelete.Add($"{id}");
+
+                if (expressionIndices != null)
+                    expressionIndicesToCreate.AddRange(expressionIndices);
 
             });
 
-            if (indicesToDelete.Any())
-                await _indexingService.DeleteRange(indicesToDelete);
-
-            if (indicesToCreate.Any())
+            if (geneIndicesToDelete.Any())
             {
-                try
-                {
-                    await _indexingService.AddRange(indicesToCreate);
-                }
-                catch
-                {
-                    foreach (var index in indicesToCreate)
-                    {
-                        try
-                        {
-                            await _indexingService.Add(index);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogError(e, "Failed to index gene {id}", index.Id);
-                        }
-                    }
-                }
+                await _genesIndexingService.DeleteRange(geneIndicesToDelete);
+                await _expressionsIndexingService.DeleteWhereEquals(index => index.Gene.Id, geneIndicesToDelete.Select(id => int.Parse(id)).ToArray());
             }
+
+            if (geneIndicesToCreate.Any())
+                await _genesIndexingService.AddRange(geneIndicesToCreate);
+
+            if (expressionIndicesToCreate.Any())
+                await _expressionsIndexingService.AddRange(expressionIndicesToCreate);
 
             _indexingCache.Clear();
 
             stopwatch.Stop();
 
-            _logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} genes and in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });

@@ -79,11 +79,6 @@ public class GeneIndexCreator
     private SpecimenIndex CreateSpecimenIndex(int geneId, Specimen specimen)
     {
         var index = SpecimenIndexMapper.CreateFrom<SpecimenIndex>(specimen, null);
-
-        var sampleId = _cache.Samples.FirstOrDefault(sample => sample.SpecimenId == specimen.Id)?.Id;
-
-        index.TPM = _cache.GeneExpressions.FirstOrDefault(entry => entry.EntityId == geneId && entry.SampleId == sampleId)?.TPM;
-        index.FPKM = _cache.GeneExpressions.FirstOrDefault(entry => entry.EntityId == geneId && entry.SampleId == sampleId)?.FPKM;
         
         return index;
     }

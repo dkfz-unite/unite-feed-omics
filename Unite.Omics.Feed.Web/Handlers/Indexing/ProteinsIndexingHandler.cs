@@ -12,26 +12,30 @@ public class ProteinsIndexingHandler
 {
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ProteinsIndexingCache _indexingCache;
-    private readonly IIndexService<ProteinIndex> _indexingService;
+    private readonly IIndexService<ProteinIndex> _proteinsIndexingService;
+    private readonly IIndexService<ProteinExpressionIndex> _expressionsIndexingService;
     private readonly ILogger _logger;
 
 
     public ProteinsIndexingHandler(
         TasksProcessingService taskProcessingService,
         ProteinsIndexingCache indexingCache,
-        IIndexService<ProteinIndex> indexingService,
+        IIndexService<ProteinIndex> proteinsIndexingService,
+        IIndexService<ProteinExpressionIndex> expressionsIndexingService,
         ILogger<GenesIndexingHandler> logger)
     {
         _taskProcessingService = taskProcessingService;
         _indexingCache = indexingCache;
-        _indexingService = indexingService;
+        _proteinsIndexingService = proteinsIndexingService;
+        _expressionsIndexingService = expressionsIndexingService;
         _logger = logger;
     }
 
 
     public async Task Prepare()
     {
-        await _indexingService.CreateIndex();
+        await _proteinsIndexingService.CreateIndex();
+        await _expressionsIndexingService.CreateIndex();
         // await _indexingService.UpdateIndex();
     }
 
@@ -54,47 +58,41 @@ public class ProteinsIndexingHandler
 
             _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
 
-            var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<ProteinIndex>();
-            var indexCreator = new ProteinIndexCreator(_indexingCache);
+            var proteinIndicesToDelete = new List<string>();
+            var proteinIndicesToCreate = new List<ProteinIndex>();
+            var proteinIndexCreator = new ProteinIndexCreator(_indexingCache);
+
+            var expressionIndicesToCreate = new List<ProteinExpressionIndex>();
+            var expressionIndexCreator = new ProteinExpressionIndexCreator(_indexingCache);
 
             tasks.ForEach(task =>
             {
                 var id = int.Parse(task.Target);
 
-                var index = indexCreator.CreateIndex(id);
+                var proteinIndex = proteinIndexCreator.CreateIndex(id);
+                var expressionIndices = expressionIndexCreator.CreateIndices(id);
 
-                if (index == null)
-                    indicesToDelete.Add($"{id}");
+                if (proteinIndex != null)
+                    proteinIndicesToCreate.Add(proteinIndex);
                 else
-                    indicesToCreate.Add(index);
+                    proteinIndicesToDelete.Add(task.Target);
+                
+                if (expressionIndices != null)
+                    expressionIndicesToCreate.AddRange(expressionIndices);
 
             });
 
-            if (indicesToDelete.Any())
-                await _indexingService.DeleteRange(indicesToDelete);
-
-            if (indicesToCreate.Any())
+            if (proteinIndicesToDelete.Any())
             {
-                try
-                {
-                    await _indexingService.AddRange(indicesToCreate);
-                }
-                catch
-                {
-                    foreach (var index in indicesToCreate)
-                    {
-                        try
-                        {
-                            await _indexingService.Add(index);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogError(e, "Failed to index protein {id}", index.Id);
-                        }
-                    }
-                }
+                await _proteinsIndexingService.DeleteRange(proteinIndicesToDelete);
+                await _expressionsIndexingService.DeleteWhereEquals(index => index.Protein.Id, proteinIndicesToDelete.Select(id => int.Parse(id)).ToArray());
             }
+
+            if (proteinIndicesToCreate.Any())
+                await _proteinsIndexingService.AddRange(proteinIndicesToCreate);
+
+            if (expressionIndicesToCreate.Any())
+                await _expressionsIndexingService.AddRange(expressionIndicesToCreate);
 
             _indexingCache.Clear();
 

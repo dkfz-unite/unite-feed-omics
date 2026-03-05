@@ -78,9 +78,6 @@ public class ProteinIndexCreator
     private SpecimenIndex CreateSpecimenIndex(int proteinId, Specimen specimen)
     {
         var index = SpecimenIndexMapper.CreateFrom<SpecimenIndex>(specimen, null);
-
-        var sampleId = _cache.Samples.FirstOrDefault(sample => sample.SpecimenId == specimen.Id)?.Id;
-        index.Intensity = _cache.ProteinExpressions.FirstOrDefault(entry => entry.EntityId == proteinId && entry.SampleId == sampleId)?.Intensity;
         
         return index;
     }
