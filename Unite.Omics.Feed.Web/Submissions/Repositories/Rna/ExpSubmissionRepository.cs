@@ -4,4 +4,9 @@ using Unite.Omics.Feed.Web.Models.Rna;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
-public class ExpSubmissionRepository(IMongoOptions options) : SubmissionRepository<AnalysisModel<ExpressionModel>>(options, "rna_expressions");
+public class ExpSubmissionRepository : SubmissionRepository<AnalysisModel<ExpressionModel>>
+{
+    public ExpSubmissionRepository(IMongoOptions options) : base(options, "rna_expressions")
+    {
+    }
+}

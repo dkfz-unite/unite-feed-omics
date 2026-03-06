@@ -3,9 +3,14 @@ using Unite.Data.Context;
 
 namespace Unite.Omics.Indices.Services;
 
-public abstract class IndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : IDisposable
+public abstract class IndexingCache : IDisposable
 {
-    public IDbContextFactory<DomainDbContext> DbContextFactory { get; } = dbContextFactory;
+    protected IndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
+    {
+        DbContextFactory = dbContextFactory;
+    }
+
+    public IDbContextFactory<DomainDbContext> DbContextFactory { get; }
 
     public static T Create<T>(
         IDbContextFactory<DomainDbContext> dbContextFactory,

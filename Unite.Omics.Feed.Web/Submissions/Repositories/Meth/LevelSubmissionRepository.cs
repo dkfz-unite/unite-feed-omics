@@ -3,4 +3,9 @@ using Unite.Omics.Feed.Web.Models.Base;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
-public class LevelSubmissionRepository(IMongoOptions options) : SubmissionRepository<AnalysisModel<EmptyModel>>(options, "meth_lvl");
+public class LevelSubmissionRepository : SubmissionRepository<AnalysisModel<EmptyModel>>
+{
+    public LevelSubmissionRepository(IMongoOptions options) : base(options, "meth_lvl")
+    {
+    }
+}

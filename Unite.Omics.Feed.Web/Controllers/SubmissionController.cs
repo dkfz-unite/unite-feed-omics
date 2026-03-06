@@ -13,14 +13,22 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTaskService submissionTaskService, 
-    SubmissionRepository<TModel> submissionRepository,
-    ILogger logger) : Controller
+public abstract class SubmissionController<TModel, TSubmissionForm> : Controller
     where TModel : SubmissionModel, new()
     where TSubmissionForm : SubmissionForm
 {
     protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
-    
+    private readonly SubmissionTaskService _submissionTaskService;
+    private readonly SubmissionRepository<TModel> _submissionRepository;
+
+    protected SubmissionController(SubmissionTaskService submissionTaskService, 
+        SubmissionRepository<TModel> submissionRepository,
+        ILogger logger)
+    {
+        _submissionTaskService = submissionTaskService;
+        _submissionRepository = submissionRepository;
+    }
+
     protected abstract SubmissionTaskType  SubmissionTaskType { get; }
     protected abstract string DataType { get; }
 
@@ -28,7 +36,7 @@ public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTa
     [Authorize]
     public virtual IActionResult Get(long id)
     {
-        var task = submissionTaskService.GetTask(id);
+        var task = _submissionTaskService.GetTask(id);
         if (task == null)
             return NotFound();
 
@@ -41,7 +49,7 @@ public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTa
     [Authorize]
     public virtual IActionResult GetStatus(long id)
     {
-        var task = submissionTaskService.GetTask(id);
+        var task = _submissionTaskService.GetTask(id);
         if (task == null)
             return NotFound();
         
@@ -86,16 +94,16 @@ public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTa
     
     protected virtual TModel FindSubmission(string id)
     {
-        return submissionRepository.Find(id)?.Document;
+        return _submissionRepository.Find(id)?.Document;
     }
     
     protected virtual long AddSubmission(TModel model, bool review)
     {
-        string submissionId = submissionRepository.Add(model);
+        string submissionId = _submissionRepository.Add(model);
         
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        return submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
+        return _submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
     }
 
     protected virtual void ReadSubmissionForm(TSubmissionForm form, TModel model, string format = null)

@@ -2,12 +2,14 @@
 
 namespace Unite.Omics.Feed.Web.Workers;
 
-public class SubmissionsWorker(
-    IEnumerable<ISubmissionHandler> handlers,
-    IHostApplicationLifetime lifetime,
-    ILogger<SubmissionsWorker> logger)
-    : Worker<ISubmissionHandler>(handlers, lifetime, logger)
+public class SubmissionsWorker : Worker<ISubmissionHandler>
 {
+    public SubmissionsWorker(IEnumerable<ISubmissionHandler> handlers,
+        IHostApplicationLifetime lifetime,
+        ILogger<SubmissionsWorker> logger) : base(handlers, lifetime, logger)
+    {
+    }
+
     protected override string WorkerType => "Submissions";
     
     protected override Task<ISubmissionHandler[]> PrepareHandlers(CancellationToken stoppingToken)

@@ -9,16 +9,21 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class GenesIndexingHandler(
-    GenesIndexingOptions options,
-    TasksProcessingService taskProcessingService,
-    IIndexService<GeneIndex> indexingService,
-    GeneIndexEntityBuilder indexEntityBuilder,
-    IDbContextFactory<DomainDbContext> dbContextFactory,
-    ILogger<GenesIndexingHandler> logger)
-    : IndexingHandler<GeneIndex, GenesIndexingCache>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
+public class GenesIndexingHandler : IndexingHandler<GeneIndex, GenesIndexingCache>
 {
-    protected override int BucketSize => options.BucketSize;
+    private readonly GenesIndexingOptions _options;
+
+    public GenesIndexingHandler(GenesIndexingOptions options,
+        TasksProcessingService taskProcessingService,
+        IIndexService<GeneIndex> indexingService,
+        GeneIndexEntityBuilder indexEntityBuilder,
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        ILogger<GenesIndexingHandler> logger) : base(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
+    {
+        _options = options;
+    }
+
+    protected override int BucketSize => _options.BucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;
     protected override string IndexEntityKind => "Gene";
     protected override string GetIndexEntityKey(GeneIndex entity)

@@ -8,14 +8,28 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class CnvProfileSubmissionHandler(HandlerPriority priority,
-    AnalysisWriter dataWriter,
-    TasksProcessingService tasksProcessingService,
-    CnvProfileSubmissionRepository submissionRepository,
-    CnvProfileIndexingTaskService indexingTaskService,
-    ILogger<CnvProfileSubmissionHandler> logger) : SubmissionHandler(priority)
+public class CnvProfileSubmissionHandler : SubmissionHandler
 {
     private readonly CnvProfileModelConverter _converter = new();
+    private readonly AnalysisWriter _dataWriter;
+    private readonly TasksProcessingService _tasksProcessingService;
+    private readonly CnvProfileSubmissionRepository _submissionRepository;
+    private readonly CnvProfileIndexingTaskService _indexingTaskService;
+    private readonly ILogger<CnvProfileSubmissionHandler> _logger;
+
+    public CnvProfileSubmissionHandler(HandlerPriority priority,
+        AnalysisWriter dataWriter,
+        TasksProcessingService tasksProcessingService,
+        CnvProfileSubmissionRepository submissionRepository,
+        CnvProfileIndexingTaskService indexingTaskService,
+        ILogger<CnvProfileSubmissionHandler> logger) : base(priority)
+    {
+        _dataWriter = dataWriter;
+        _tasksProcessingService = tasksProcessingService;
+        _submissionRepository = submissionRepository;
+        _indexingTaskService = indexingTaskService;
+        _logger = logger;
+    }
 
     public override Task Handle()
     {
@@ -26,7 +40,7 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
     {
         var stopwatch = new Stopwatch();
 
-        tasksProcessingService.Process(SubmissionTaskType.DNA_CNV_PROFILE, TaskStatusType.Prepared, 1, (tasks) =>
+        _tasksProcessingService.Process(SubmissionTaskType.DNA_CNV_PROFILE, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 
@@ -34,7 +48,7 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
 
             stopwatch.Stop();
 
-            logger.LogInformation("Processed CNVs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Processed CNVs data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
 
             return true;
         });
@@ -42,17 +56,17 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = submissionRepository.Find(submissionId)?.Document;
+        var submittedData = _submissionRepository.Find(submissionId)?.Document;
         var convertedData = _converter.Convert(submittedData);
 
-        dataWriter.SaveData(convertedData, out var audit);
+        _dataWriter.SaveData(convertedData, out var audit);
         
         var allIds = new HashSet<int>(audit.CnvProfilesCreated);
         allIds.UnionWith(audit.CnvProfilesUpdated);
-        indexingTaskService.PopulateTasks(allIds);
+        _indexingTaskService.PopulateTasks(allIds);
         
-        submissionRepository.Delete(submissionId);
+        _submissionRepository.Delete(submissionId);
 
-        logger.LogInformation("{audit}", audit.ToString());
+        _logger.LogInformation("{audit}", audit.ToString());
     }
 }

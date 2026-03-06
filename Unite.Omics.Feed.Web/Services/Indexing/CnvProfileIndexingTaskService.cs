@@ -8,11 +8,15 @@ using Unite.Essentials.Extensions;
 
 namespace Unite.Omics.Feed.Web.Services.Indexing;
 
-public class CnvProfileIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory)
-    : IndexingTaskService<Profile, int>(dbContextFactory)
+public class CnvProfileIndexingTaskService : IndexingTaskService<Profile, int>
 {
-    private readonly CnvProfilesRepository _profilesRepository = new CnvProfilesRepository(dbContextFactory);
-    
+    private readonly CnvProfilesRepository _profilesRepository;
+
+    public CnvProfileIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    {
+        _profilesRepository = new CnvProfilesRepository(dbContextFactory);
+    }
+
     //TODO: are those CreateTasks methods needed?
     //TODO: the implementation is very similar along the task services
     public override void CreateTasks()

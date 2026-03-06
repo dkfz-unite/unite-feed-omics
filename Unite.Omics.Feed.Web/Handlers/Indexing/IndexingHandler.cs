@@ -9,20 +9,33 @@ using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public abstract class IndexingHandler<TIndexEntity, TIndexingCache>(
-    TasksProcessingService taskProcessingService,
-    IIndexService<TIndexEntity> indexingService,
-    IndexEntityBuilder<TIndexEntity, TIndexingCache> indexEntityBuilder,
-    IDbContextFactory<DomainDbContext> dbContextFactory,
-    ILogger logger
-    ) : Handler, IIndexingHandler 
+public abstract class IndexingHandler<TIndexEntity, TIndexingCache> : Handler, IIndexingHandler 
     where TIndexEntity : class
     where TIndexingCache : IndexingCache
 {
-    protected TasksProcessingService TaskProcessingService => taskProcessingService;
-    protected IIndexService<TIndexEntity> IndexingService => indexingService;
-    protected IndexEntityBuilder<TIndexEntity, TIndexingCache> IndexEntityBuilder => indexEntityBuilder;
-    protected ILogger Logger => logger;
+    private readonly TasksProcessingService _taskProcessingService;
+    private readonly IIndexService<TIndexEntity> _indexingService;
+    private readonly IndexEntityBuilder<TIndexEntity, TIndexingCache> _indexEntityBuilder;
+    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
+    private readonly ILogger _logger;
+
+    protected IndexingHandler(TasksProcessingService taskProcessingService,
+        IIndexService<TIndexEntity> indexingService,
+        IndexEntityBuilder<TIndexEntity, TIndexingCache> indexEntityBuilder,
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        ILogger logger)
+    {
+        _taskProcessingService = taskProcessingService;
+        _indexingService = indexingService;
+        _indexEntityBuilder = indexEntityBuilder;
+        _dbContextFactory = dbContextFactory;
+        _logger = logger;
+    }
+
+    protected TasksProcessingService TaskProcessingService => _taskProcessingService;
+    protected IIndexService<TIndexEntity> IndexingService => _indexingService;
+    protected IndexEntityBuilder<TIndexEntity, TIndexingCache> IndexEntityBuilder => _indexEntityBuilder;
+    protected ILogger Logger => _logger;
     
     protected abstract int BucketSize { get; }
     protected abstract IndexingTaskType IndexingTaskType { get; }
@@ -50,7 +63,7 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache>(
         {
             stopwatch.Restart();
             
-            using var indexingCache = IndexingCache.Create<TIndexingCache>(dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
+            using var indexingCache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
             
             var entitiesToDelete = new List<string>();
             var entitiesToCreate = new List<TIndexEntity>();

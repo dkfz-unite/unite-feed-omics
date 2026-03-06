@@ -15,12 +15,14 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
 [Route("api/dna/analysis/cnv")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class CnvsController(
-    SubmissionTaskService submissionTaskService,
-    ILogger<CnvsController> logger,
-    CnvSubmissionRepository submissionRepository)
-    : AnalysisDataController<VariantModel>(submissionTaskService, submissionRepository, logger)
+public class CnvsController : AnalysisDataController<VariantModel>
 {
+    public CnvsController(SubmissionTaskService submissionTaskService,
+        ILogger<CnvsController> logger,
+        CnvSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Cnv;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];

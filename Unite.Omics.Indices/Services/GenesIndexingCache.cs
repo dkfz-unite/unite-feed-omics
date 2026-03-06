@@ -16,12 +16,16 @@ using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : IndexingCache(dbContextFactory)
+public class GenesIndexingCache : IndexingCache
 {
     private static readonly object _lock = new();
 
     private readonly HashSet<int> _sampleIds = [];
-    
+
+    public GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    {
+    }
+
     public IEnumerable<SM.AffectedTranscript> SmTranscripts { get; private set; }
     public IEnumerable<CNV.AffectedTranscript> CnvTranscripts { get; private set; }
     public IEnumerable<SV.AffectedTranscript> SvTranscripts { get; private set; }

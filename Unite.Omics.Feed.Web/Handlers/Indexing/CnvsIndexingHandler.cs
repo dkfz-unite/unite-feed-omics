@@ -10,16 +10,21 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class CnvsIndexingHandler(
-    VariantsIndexingOptions options,
-    TasksProcessingService taskProcessingService,
-    IIndexService<CnvIndex> indexingService,
-    CnvIndexEntityBuilder indexEntityBuilder,
-    IDbContextFactory<DomainDbContext> dbContextFactory,
-    ILogger<CnvsIndexingHandler> logger)
-    : IndexingHandler<CnvIndex, VariantIndexingCache<Variant, VariantEntry>>(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
+public class CnvsIndexingHandler : IndexingHandler<CnvIndex, VariantIndexingCache<Variant, VariantEntry>>
 {
-    protected override int BucketSize => options.CnvBucketSize;
+    private readonly VariantsIndexingOptions _options;
+
+    public CnvsIndexingHandler(VariantsIndexingOptions options,
+        TasksProcessingService taskProcessingService,
+        IIndexService<CnvIndex> indexingService,
+        CnvIndexEntityBuilder indexEntityBuilder,
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        ILogger<CnvsIndexingHandler> logger) : base(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
+    {
+        _options = options;
+    }
+
+    protected override int BucketSize => _options.CnvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNV;
     protected override string IndexEntityKind => "CNV";
     protected override string GetIndexEntityKey(CnvIndex entity)

@@ -3,19 +3,27 @@ using Unite.Omics.Feed.Web.Handlers;
 
 namespace Unite.Omics.Feed.Web.Workers;
 
-public abstract class Worker<THandlerInterface>(
-    IEnumerable<THandlerInterface> handlers,
-    IHostApplicationLifetime lifetime,
-    ILogger<SubmissionsWorker> logger)
-    : BackgroundService
+public abstract class Worker<THandlerInterface> : BackgroundService
     where THandlerInterface : IHandler
 {
-    private THandlerInterface[] _handlers = handlers.ToArray();
+    private THandlerInterface[] _handlers;
+    private readonly IHostApplicationLifetime _lifetime;
+    private readonly ILogger<SubmissionsWorker> _logger;
+
+    protected Worker(IEnumerable<THandlerInterface> handlers,
+        IHostApplicationLifetime lifetime,
+        ILogger<SubmissionsWorker> logger)
+    {
+        _lifetime = lifetime;
+        _logger = logger;
+        _handlers = handlers.ToArray();
+    }
+
     protected virtual int CyclePauseTimeMs { get; } = 10000;
     protected abstract string WorkerType { get; }
 
     protected THandlerInterface[] Handlers => _handlers;
-    protected ILogger Logger => logger;
+    protected ILogger Logger => _logger;
 
     protected abstract Task ScheduleHandlers(CancellationToken stoppingToken);
     protected abstract Task<THandlerInterface[]> PrepareHandlers(CancellationToken stoppingToken);
@@ -23,11 +31,11 @@ public abstract class Worker<THandlerInterface>(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        await using var reg = lifetime.ApplicationStarted.Register(() => started.TrySetResult());
+        await using var reg = _lifetime.ApplicationStarted.Register(() => started.TrySetResult());
 
         await started.Task.WaitAsync(stoppingToken);
         
-        logger.LogInformation("{WorkerType} worker started", WorkerType);
+        _logger.LogInformation("{WorkerType} worker started", WorkerType);
         
         try
         {
@@ -35,10 +43,10 @@ public abstract class Worker<THandlerInterface>(
         }
         catch (Exception exception)
         {
-            logger.LogError("{error}", exception.GetShortMessage());
+            _logger.LogError("{error}", exception.GetShortMessage());
         }
 
-        stoppingToken.Register(() => logger.LogInformation("{WorkerType} worker stopped", WorkerType));
+        stoppingToken.Register(() => _logger.LogInformation("{WorkerType} worker stopped", WorkerType));
         
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -48,7 +56,7 @@ public abstract class Worker<THandlerInterface>(
             }
             catch (Exception exception)
             {
-                logger.LogError(exception, "{WorkerType} processing failed", WorkerType);
+                _logger.LogError(exception, "{WorkerType} processing failed", WorkerType);
             }
             finally
             {

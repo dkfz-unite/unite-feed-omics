@@ -6,8 +6,12 @@ using Unite.Data.Entities.Specimens;
 
 namespace Unite.Omics.Indices.Services;
 
-public class CnvProfileIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : IndexingCache(dbContextFactory)
+public class CnvProfileIndexingCache : IndexingCache
 {
+    public CnvProfileIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    {
+    }
+
     public IEnumerable<Profile> CnvProfiles { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Data.Entities.Omics.Analysis.Sample> Samples { get; private set; }

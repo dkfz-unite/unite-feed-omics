@@ -12,12 +12,14 @@ namespace Unite.Omics.Feed.Web.Controllers.Meth;
 
 [Route("api/meth/analysis/levels")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class LevelsController(
-    SubmissionTaskService submissionTaskService,
-    ILogger<LevelsController> logger,
-    LevelSubmissionRepository submissionRepository)
-    : AnalysisController<EmptyModel>(submissionTaskService, submissionRepository, logger)
+public class LevelsController : AnalysisController<EmptyModel>
 {
+    public LevelsController(SubmissionTaskService submissionTaskService,
+        ILogger<LevelsController> logger,
+        LevelSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH_LVL;
     protected override string DataType => DataTypes.Omics.Meth.Level;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];

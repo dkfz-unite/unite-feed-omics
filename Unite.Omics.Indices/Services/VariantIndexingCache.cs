@@ -17,21 +17,25 @@ using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 
 namespace Unite.Omics.Indices.Services;
 
-/// <summary>
-/// Cache for indexing variants. This is a stateful service, make sure to clean it up after usage.
-/// </summary>
-/// <typeparam name="TVariant"></typeparam>
-/// <typeparam name="TVariantEntry"></typeparam>
-public class VariantIndexingCache<TVariant, TVariantEntry>(IDbContextFactory<DomainDbContext> dbContextFactory)
-    : IndexingCache(dbContextFactory)
+public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
     where TVariant : Data.Entities.Omics.Analysis.Dna.Variant
     where TVariantEntry : Data.Entities.Omics.Analysis.Dna.VariantEntry<TVariant>
 {
     private static readonly object _lock = new();
     
-    protected readonly VariantsRepository _variantsRepository = new(dbContextFactory);
+    protected readonly VariantsRepository _variantsRepository;
 
     private readonly HashSet<int> _sampleIds = [];
+
+    /// <summary>
+    /// Cache for indexing variants. This is a stateful service, make sure to clean it up after usage.
+    /// </summary>
+    /// <typeparam name="TVariant"></typeparam>
+    /// <typeparam name="TVariantEntry"></typeparam>
+    public VariantIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    {
+        _variantsRepository = new VariantsRepository(dbContextFactory);
+    }
 
     public IEnumerable<TVariant> Variants { get; private set; }
     public IEnumerable<TVariantEntry> Entries { get; private set; }
