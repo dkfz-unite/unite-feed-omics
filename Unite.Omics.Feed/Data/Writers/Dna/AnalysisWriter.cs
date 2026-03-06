@@ -97,15 +97,9 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     
     protected void WriteCnvProfiles(int sampleId, IEnumerable<Models.Dna.Cnv.ProfileModel> models, ref AnalysisWriteAudit audit)
     {
-        var cnvProfiles = _cnvProfileRepository.CreateOrUpdate(sampleId, models);
-
-        var count = 0;
-        foreach (var cnvProfile in cnvProfiles)
-        {
-            audit.CnvProfiles.Add(cnvProfile.Id);
-            ++count;
-        }
+        _cnvProfileRepository.CreateOrUpdate(sampleId, models, ref audit.CnvProfilesCreated, ref audit.CnvProfilesUpdated);
         
-        audit.CnvProfilesCreated += count;
+        audit.CnvProfilesCreatedCount = audit.CnvProfilesCreated.Count;
+        audit.CnvProfilesUpdatedCount = audit.CnvProfilesUpdated.Count;
     }
 }

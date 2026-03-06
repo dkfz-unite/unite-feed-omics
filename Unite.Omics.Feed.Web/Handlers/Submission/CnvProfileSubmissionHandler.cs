@@ -46,7 +46,11 @@ public class CnvProfileSubmissionHandler(HandlerPriority priority,
         var convertedData = _converter.Convert(submittedData);
 
         dataWriter.SaveData(convertedData, out var audit);
-        indexingTaskService.PopulateTasks(audit.CnvProfiles);
+        
+        var allIds = new HashSet<int>(audit.CnvProfilesCreated);
+        allIds.UnionWith(audit.CnvProfilesUpdated);
+        indexingTaskService.PopulateTasks(allIds);
+        
         submissionRepository.Delete(submissionId);
 
         logger.LogInformation("{audit}", audit.ToString());

@@ -75,7 +75,7 @@ public static class ConfigurationExtensions
         services.AddTransient<SmAnnotationTaskService>();
         services.AddTransient<SmIndexingTaskService>();
         services.AddTransient<CnvAnnotationTaskService>();
-        services.AddTransient<CnvIndexingTaskService>();
+        //services.AddTransient<CnvIndexingTaskService>();
         services.AddTransient<SvAnnotationTaskService>();
         services.AddTransient<SvIndexingTaskService>();
         services.AddTransient<CnvProfileIndexingTaskService>();

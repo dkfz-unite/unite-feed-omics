@@ -6,22 +6,35 @@ namespace Unite.Omics.Feed.Data.Repositories.Dna.Cnv;
 
 public class ProfileRepository(DomainDbContext dbContext)
 {
-    public IEnumerable<Profile> CreateOrUpdate(int sampleId, IEnumerable<ProfileModel> models)
+    public void CreateOrUpdate(int sampleId, IEnumerable<ProfileModel> models,
+        ref ISet<int> createdEntities, ref ISet<int> updatedEntities)
     {
-        var entities = new List<Profile>();
-
+        var newEntities = new List<Profile>();
+        
         foreach (var model in models)
         {
-            var entity = CreateOrUpdate(sampleId, model);
-            entities.Add(entity);
+            bool isNewEntity = false;
+            var entity = CreateOrUpdate(sampleId, model, ref isNewEntity);
+            if (isNewEntity)
+            {
+                newEntities.Add(entity);
+            }
+            else
+            {
+                updatedEntities.Add(entity.Id);
+            }
         }
         
         dbContext.SaveChanges();
-        
-        return entities;
+
+        //Track new entities after they are saved and have unique id set
+        foreach (var entity in newEntities)
+        {
+            createdEntities.Add(entity.Id);
+        }
     }
 
-    public Profile CreateOrUpdate(int sampleId, ProfileModel model)
+    public Profile CreateOrUpdate(int sampleId, ProfileModel model, ref bool isNewEntity)
     {
         var entity = Find(sampleId, model);
         if (entity == null)
@@ -32,6 +45,8 @@ public class ProfileRepository(DomainDbContext dbContext)
                 Chromosome = model.Chromosome,
                 ChromosomeArm = model.ChromosomeArm,
             };
+            
+            isNewEntity = true;
             
             dbContext.Add(entity);
         }
