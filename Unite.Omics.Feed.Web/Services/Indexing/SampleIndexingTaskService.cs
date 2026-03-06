@@ -112,4 +112,9 @@ public class SampleIndexingTaskService : IndexingTaskService<Sample, int>
     {
         return [];
     }
+
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    {
+        return [];
+    }
 }

@@ -123,4 +123,9 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
     {
         return [];
     }
+
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    {
+        return [];
+    }
 }

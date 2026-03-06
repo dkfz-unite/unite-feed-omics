@@ -145,4 +145,9 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         
         return [];
     }
+
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    {
+        return [];
+    }
 }

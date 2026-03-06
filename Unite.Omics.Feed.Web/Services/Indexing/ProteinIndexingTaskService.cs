@@ -123,4 +123,9 @@ public class ProteinIndexingTaskService : IndexingTaskService<Protein, int>
     {
         return [];
     }
+
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    {
+        return [];
+    }
 }
