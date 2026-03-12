@@ -18,6 +18,7 @@ public record AnalysisForm: SubmissionForm
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
+    protected string _batch;
     protected string _format;
     protected IFormFile _entriesFile;
 
@@ -57,6 +58,9 @@ public record AnalysisForm: SubmissionForm
 
     [FromForm(Name = "cells")]
     public int? Cells { get => _cells; set => _cells = value; }
+
+    [FromForm(Name = "batch")]
+    public string Batch { get => _batch?.Trim(); set => _batch = value; }
     
     [FromForm(Name = "entries")]
     public IFormFile EntriesFile { get => _entriesFile; set => _entriesFile = value; }
