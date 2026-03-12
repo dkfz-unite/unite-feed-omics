@@ -36,7 +36,7 @@
         "UNITE_CNV_INDEXING_BUCKET_SIZE": "100",
         "UNITE_SV_ANNOTATION_BUCKET_SIZE": "10",
         "UNITE_SV_INDEXING_BUCKET_SIZE": "100",
-        "UNITE_GENOME_BUILD": "GRCh38"
+        "UNITE_GENOME_BUILD": "GRCh37"
       }
     },
     "Unite.Omics.Feed.Web": {
@@ -67,7 +67,7 @@
         "UNITE_CNV_INDEXING_BUCKET_SIZE": "100",
         "UNITE_SV_ANNOTATION_BUCKET_SIZE": "10",
         "UNITE_SV_INDEXING_BUCKET_SIZE": "100",
-        "UNITE_GENOME_BUILD": "GRCh38"
+        "UNITE_GENOME_BUILD": "GRCh37"
       }
     }
   }
