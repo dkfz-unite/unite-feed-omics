@@ -97,6 +97,11 @@ public static class EffectsDataConverter
     private static void Map(DataResources.ProteinModel resource, DataModels.ProteinModel model)
     {
         model.Id = resource.StableId;
+        model.Accession = resource.Accession;
+        model.Symbol = resource.Symbol;
+        model.Description = resource.Description;
+        model.Database = resource.Database;
+        model.Chromosome = resource.Chromosome;
         model.Start = resource.Start;
         model.End = resource.End;
         model.Length = resource.Length;
