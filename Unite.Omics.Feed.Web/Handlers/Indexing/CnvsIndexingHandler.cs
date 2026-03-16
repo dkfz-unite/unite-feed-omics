@@ -7,28 +7,30 @@ using Unite.Omics.Indices.Services;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.Variants;
 using Unite.Omics.Feed.Web.Configuration.Options;
+using Unite.Omics.Feed.Web.Handlers.Indexing.Indexers;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class CnvsIndexingHandler : IndexingHandler<CnvIndex, VariantIndexingCache<Variant, VariantEntry>>
+public class CnvsIndexingHandler : IndexingHandler<VariantIndexingCache<Variant, VariantEntry>>
 {
     private readonly VariantsIndexingOptions _options;
+    private readonly CnvIndexer _cnvIndexer;
 
     public CnvsIndexingHandler(VariantsIndexingOptions options,
         TasksProcessingService taskProcessingService,
-        IIndexService<CnvIndex> indexingService,
-        CnvIndexEntityBuilder indexEntityBuilder,
         IDbContextFactory<DomainDbContext> dbContextFactory,
-        ILogger<CnvsIndexingHandler> logger) : base(taskProcessingService, indexingService, indexEntityBuilder, dbContextFactory, logger)
+        CnvIndexer cnvIndexer,
+        ILogger<CnvsIndexingHandler> logger) : base(taskProcessingService, dbContextFactory, logger)
     {
         _options = options;
+        _cnvIndexer = cnvIndexer;
     }
 
+    protected override IIndexer<VariantIndexingCache<Variant, VariantEntry>>[] Indexers =>
+    [
+        _cnvIndexer
+    ];
+    
     protected override int BucketSize => _options.CnvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNV;
-    protected override string IndexEntityKind => "CNV";
-    protected override string GetIndexEntityKey(CnvIndex entity)
-    {
-        return entity.Id.ToString();
-    }
 }

@@ -7,9 +7,9 @@ namespace Unite.Omics.Indices.Services;
 
 public class SmIndexEntityBuilder : VariantIndexEntityBuilder<Variant, VariantEntry, SmIndex>
 {
-    public override SmIndex Create(int key, VariantIndexingCache<Variant, VariantEntry> cache)
+    public override SmIndex[] Create(int key, VariantIndexingCache<Variant, VariantEntry> cache)
     {
-        return CreateVariantIndex(key, cache);
+        return [CreateVariantIndex(key, cache)];
     }
     
     private SmIndex CreateVariantIndex(int variantId, VariantIndexingCache<Variant, VariantEntry> cache)

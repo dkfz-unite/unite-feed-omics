@@ -1,6 +1,9 @@
 # FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 ENV ASPNETCORE_HTTP_PORTS=80
+RUN apt-get update && apt-get install -y \
+    tabix \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 EXPOSE 80
 

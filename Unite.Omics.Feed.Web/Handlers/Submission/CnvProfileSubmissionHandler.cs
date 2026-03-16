@@ -40,7 +40,7 @@ public class CnvProfileSubmissionHandler : SubmissionHandler
     {
         var stopwatch = new Stopwatch();
 
-        _tasksProcessingService.Process(SubmissionTaskType.DNA_CNV_PROFILE, TaskStatusType.Prepared, 1, (tasks) =>
+        _tasksProcessingService.Process(SubmissionTaskType.DNA_CNVP, TaskStatusType.Prepared, 1, (tasks) =>
         {
             stopwatch.Restart();
 

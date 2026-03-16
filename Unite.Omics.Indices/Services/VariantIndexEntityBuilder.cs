@@ -99,7 +99,8 @@ public abstract class VariantIndexEntityBuilder<TVariant, TVariantEntry, TIndexE
             Svs = variant is Data.Entities.Omics.Analysis.Dna.Sv.Variant,
             Meth = CheckMethylation(sampleIds, cache),
             Exp = CheckGeneExp(sampleIds, cache),
-            ExpSc = CheckGeneExpScores(sampleIds, cache)
+            ExpSc = CheckGeneExpSc(sampleIds, cache),
+            Prot = CheckProtExp(sampleIds, cache)
         };
     }
     
@@ -175,23 +176,32 @@ public abstract class VariantIndexEntityBuilder<TVariant, TVariantEntry, TIndexE
         return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource =>
-                (resource.Type == DataTypes.Omics.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
-                (resource.Type == DataTypes.Omics.Meth.Level)) == true
+                (resource.Type == DataTypes.Omics.Methylation.Sample && resource.Format == FileTypes.Sequence.Idat) ||
+                (resource.Type == DataTypes.Omics.Methylation.Level)) == true
         );
     }
 
     private bool CheckGeneExp(int[] sampleIds, VariantIndexingCache<TVariant, TVariantEntry> cache)
     {
-        return cache.Expressions.Any(expression => 
+        return cache.GeneExpressions.Any(expression => 
             sampleIds.Contains(expression.SampleId)
         );
     }
 
-    private bool CheckGeneExpScores(int[] sampleIds, VariantIndexingCache<TVariant, TVariantEntry> cache)
+    private bool CheckGeneExpSc(int[] sampleIds, VariantIndexingCache<TVariant, TVariantEntry> cache)
     {
         return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
-            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Exp) == true
+            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Expression) == true
+        );
+    }
+
+    private bool CheckProtExp(int[] sampleIds, VariantIndexingCache<TVariant, TVariantEntry> cache)
+    {
+        return cache.Samples.Any(sample => 
+            sampleIds.Contains(sample.Id) && 
+            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Expression) == true
         );
     }
 }
+

@@ -17,12 +17,12 @@ public class ExpressionsController : AnalysisController<EmptyModel>
 {
     public ExpressionsController(SubmissionTaskService submissionTaskService,
         ILogger<ExpressionsController> logger,
-        ExpSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
+        ExpressionSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
     {
     }
 
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.RNASC_EXP;
-    protected override string DataType => DataTypes.Omics.Rnasc.Exp;
+    protected override string DataType => DataTypes.Omics.Rnasc.Expression;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
 
     protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)

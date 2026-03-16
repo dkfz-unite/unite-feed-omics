@@ -7,9 +7,9 @@ namespace Unite.Omics.Indices.Services;
 
 public class CnvIndexEntityBuilder : VariantIndexEntityBuilder<Variant, VariantEntry, CnvIndex>
 {
-    public override CnvIndex Create(int key, VariantIndexingCache<Variant, VariantEntry> cache)
+    public override CnvIndex[] Create(int key, VariantIndexingCache<Variant, VariantEntry> cache)
     {
-        return CreateVariantIndex(key, cache);
+        return [CreateVariantIndex(key, cache)];
     }
 
     private CnvIndex CreateVariantIndex(int variantId, VariantIndexingCache<Variant, VariantEntry> cache)

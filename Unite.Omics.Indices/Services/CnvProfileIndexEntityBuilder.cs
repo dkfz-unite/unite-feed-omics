@@ -6,7 +6,7 @@ namespace Unite.Omics.Indices.Services;
 
 public class CnvProfileIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, CnvProfileIndexingCache>
 {
-    public override CnvProfileIndex Create(int key, CnvProfileIndexingCache cache)
+    public override CnvProfileIndex[] Create(int key, CnvProfileIndexingCache cache)
     {
         var cnvProfile = cache.CnvProfiles.FirstOrDefault(x => x.Id == key);
         if (cnvProfile == null)
@@ -20,13 +20,14 @@ public class CnvProfileIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, C
         if(specimen == null)
             return null;
         
-        return new CnvProfileIndex
+        //TODO: convert Gain, Loss and Neutral to float
+        return [new CnvProfileIndex
         {
-            Chromosome = cnvProfile.Chromosome.ToString(),
-            ChromosomeArm = cnvProfile.ChromosomeArm.ToString(),
-            Gain =  cnvProfile.Gain,
-            Loss =  cnvProfile.Loss,
-            Neutral = cnvProfile.Neutral,
+            Chromosome = cnvProfile.ChromosomeId.ToString(),
+            ChromosomeArm = cnvProfile.ChromosomeArmId.ToString(),
+            Gain =  (float)cnvProfile.Gain,
+            Loss =  (float)cnvProfile.Loss,
+            Neutral = (float)cnvProfile.Neutral,
             Id =  cnvProfile.Id,
             Specimen = new SpecimenNavIndex
             {
@@ -34,6 +35,6 @@ public class CnvProfileIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, C
                 ReferenceId =  specimen.ReferenceId,
                 Type = specimen.TypeId.ToDefinitionString()
             }
-        };
+        }];
     }
 }

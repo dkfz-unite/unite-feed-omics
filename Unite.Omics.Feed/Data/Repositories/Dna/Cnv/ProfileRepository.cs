@@ -42,8 +42,8 @@ public class ProfileRepository(DomainDbContext dbContext)
             entity = new Profile
             {
                 SampleId = sampleId,
-                Chromosome = model.Chromosome,
-                ChromosomeArm = model.ChromosomeArm,
+                ChromosomeId = model.Chromosome,
+                ChromosomeArmId = model.ChromosomeArm,
             };
             
             isNewEntity = true;
@@ -63,7 +63,7 @@ public class ProfileRepository(DomainDbContext dbContext)
         return dbContext.Set<Profile>()
             .FirstOrDefault(e => 
                 e.SampleId == sampleId 
-                && e.Chromosome == model.Chromosome 
-                && e.ChromosomeArm == model.ChromosomeArm);
+                && e.ChromosomeId == model.Chromosome 
+                && e.ChromosomeArmId == model.ChromosomeArm);
     }
 }

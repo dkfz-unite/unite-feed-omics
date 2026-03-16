@@ -5,6 +5,7 @@ using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Repositories.Constants;
 using Unite.Data.Context.Repositories.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
+using Unite.Data.Entities.Omics.Analysis.Prot;
 using Unite.Data.Entities.Omics.Analysis.Rna;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
@@ -39,18 +40,21 @@ public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
 
     public IEnumerable<TVariant> Variants { get; private set; }
     public IEnumerable<TVariantEntry> Entries { get; private set; }
-    public IEnumerable<GeneExpression> Expressions { get; private set; }
+    public IEnumerable<GeneExpression> GeneExpressions { get; private set; }
+    public IEnumerable<ProteinExpression> ProteinExpressions { get; private set; }
     public IEnumerable<Donor> Donors { get; private set; }
     public IEnumerable<Image> Images { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Data.Entities.Omics.Analysis.Sample> Samples { get; private set; }
     public Dictionary<int, TVariant[]> SimilarVariants { get; set; }
 
+
     protected override void Load(int[] ids)
     {
         LoadVariants(ids).Wait();
         LoadSimilarVariants(ids).Wait();
-        LoadExpressions().Wait();
+        LoadGeneExpressions().Wait();
+        LoadProteinExpressions().Wait();
         LoadSamples().Wait();
         LoadSpecimens().Wait();
         LoadImages().Wait();
@@ -63,7 +67,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
 
         Variants = null;
         Entries = null;
-        Expressions = null;
+        GeneExpressions = null;
         Donors = null;
         Images = null;
         Specimens = null;
@@ -117,7 +121,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
         _sampleIds.AddRange(sampleIds);
     }
 
-    private async Task LoadExpressions()
+    private async Task LoadGeneExpressions()
     {
         using var dbContext = DbContextFactory.CreateDbContext();
 
@@ -130,7 +134,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
                 .Where(transcript => transcript.Feature.GeneId != null)
                 .Select(transcript => transcript.Feature.GeneId.Value)
                 .Distinct()
-                .ToArray();                
+                .ToArray();
         }
         else if (typeof(TVariant) == typeof(CNV.Variant))
         {
@@ -151,9 +155,49 @@ public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
                 .ToArray();
         }
 
-        Expressions = await dbContext.Set<GeneExpression>()
+        GeneExpressions = await dbContext.Set<GeneExpression>()
             .AsNoTracking()
             .Where(expression => geneIds.Contains(expression.EntityId))
+            .ToArrayAsync();
+    }
+
+    private async Task LoadProteinExpressions()
+    {
+        using var dbContext = DbContextFactory.CreateDbContext();
+
+        var proteinIds = Array.Empty<int>();
+
+        if (typeof(TVariant) == typeof(SM.Variant))
+        {
+            proteinIds = (Variants as IEnumerable<SM.Variant>)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .Where(transcript => transcript.Feature.Protein != null)
+                .Select(transcript => transcript.Feature.Protein.Id)
+                .Distinct()
+                .ToArray();
+        }
+        else if (typeof(TVariant) == typeof(CNV.Variant))
+        {
+            proteinIds = (Variants as IEnumerable<CNV.Variant>)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .Where(transcript => transcript.Feature.Protein != null)
+                .Select(transcript => transcript.Feature.Protein.Id)
+                .Distinct()
+                .ToArray();
+        }
+        else if (typeof(TVariant) == typeof(SV.Variant))
+        {
+            proteinIds = (Variants as IEnumerable<SV.Variant>)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .Where(transcript => transcript.Feature.Protein != null)
+                .Select(transcript => transcript.Feature.Protein.Id)
+                .Distinct()
+                .ToArray();
+        }
+
+        ProteinExpressions = await dbContext.Set<ProteinExpression>()
+            .AsNoTracking()
+            .Where(expression => proteinIds.Contains(expression.EntityId))
             .ToArrayAsync();
     }
 

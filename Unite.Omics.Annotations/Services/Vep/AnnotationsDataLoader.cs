@@ -71,7 +71,7 @@ internal class AnnotationsDataLoader
             .Select(id => new GeneResource { Id = id })
             .ToArray();
 
-        var newResources = await _ensemblApiClient.Find<GeneResource>(newIdentifiers, length: true, grch: grch);
+        var newResources = await _ensemblApiClient.FindById<GeneResource>(newIdentifiers, length: true, grch: grch);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
     }
@@ -102,7 +102,7 @@ internal class AnnotationsDataLoader
             .Select(id => new TranscriptResource { Id = id })
             .ToArray();
 
-        var newResources = await _ensemblApiClient.Find<TranscriptResource>(newIdentifiers, length: true, expand: true, grch: grch);
+        var newResources = await _ensemblApiClient.FindById<TranscriptResource>(newIdentifiers, length: true, expand: true, grch: grch);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
     }

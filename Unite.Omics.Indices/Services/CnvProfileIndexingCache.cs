@@ -20,6 +20,7 @@ public class CnvProfileIndexingCache : IndexingCache
     {
         LoadCnvProfiles(ids).Wait();
         LoadSamples().Wait();
+        LoadSpecimens().Wait();
     }
 
     async Task LoadCnvProfiles(int[] ids)

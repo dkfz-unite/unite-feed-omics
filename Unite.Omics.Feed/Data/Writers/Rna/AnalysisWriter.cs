@@ -31,8 +31,8 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     {
         var sampleId = WriteSample(model, ref audit);
 
-        if (model.Exps.IsNotEmpty())
-            WriteExpressions(sampleId, model.Exps, ref audit);
+        if (model.GeneExpressions.IsNotEmpty())
+            WriteExpressions(sampleId, model.GeneExpressions, ref audit);
 
         if (model.Resources.IsNotEmpty())
             WriteResources(sampleId, model.Resources, ref audit);
@@ -48,6 +48,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         while (queue.Any())
         {
             var chunk = queue.Dequeue(_batchSize).ToArray();
+
 
             var existingGenes = _geneRepository.Find(chunk.Select(model => model.Gene)).ToArray();
 

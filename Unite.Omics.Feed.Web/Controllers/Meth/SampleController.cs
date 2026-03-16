@@ -16,7 +16,7 @@ public class SampleController : Controllers.SampleController
     {
     }
 
-    protected override string DataType => DataTypes.Omics.Meth.Sample;
+    protected override string DataType => DataTypes.Omics.Methylation.Sample;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH;
 

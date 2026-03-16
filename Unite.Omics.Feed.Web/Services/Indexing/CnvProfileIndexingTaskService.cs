@@ -97,7 +97,12 @@ public class CnvProfileIndexingTaskService : IndexingTaskService<Profile, int>
     {
         return keys;
     }
-    
+
+    protected override IEnumerable<int> LoadRelatedProteins(IEnumerable<int> keys)
+    {
+        return [];
+    }
+
     protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
     {
         return [];

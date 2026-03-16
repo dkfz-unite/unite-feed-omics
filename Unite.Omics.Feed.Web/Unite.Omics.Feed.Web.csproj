@@ -15,4 +15,12 @@
     <ProjectReference Include="../Unite.Omics.Feed/Unite.Omics.Feed.csproj" />
     <ProjectReference Include="../Unite.Omics.Indices/Unite.Omics.Indices.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers/Prot/" />
+    <Folder Include="Models/Prot/Converters/" />
+    <Folder Include="Models/Prot/Readers/" />
+    <Folder Include="Models/Prot/Readers/DiaNN/" />
+    <Folder Include="Models/Prot/Validators/" />
+    <Folder Include="Submissions/Repositories/Prot/" />
+  </ItemGroup>
 </Project>

@@ -21,6 +21,6 @@ public class LevelsController : AnalysisController<EmptyModel>
     }
 
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH_LVL;
-    protected override string DataType => DataTypes.Omics.Meth.Level;
+    protected override string DataType => DataTypes.Omics.Methylation.Level;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
 }

@@ -3,114 +3,70 @@ using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
-using Unite.Indices.Context;
 using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public abstract class IndexingHandler<TIndexEntity, TIndexingCache> : Handler, IIndexingHandler 
-    where TIndexEntity : class
+public abstract class IndexingHandler<TIndexingCache> : Handler, IIndexingHandler 
     where TIndexingCache : IndexingCache
 {
-    private readonly TasksProcessingService _taskProcessingService;
-    private readonly IIndexService<TIndexEntity> _indexingService;
-    private readonly IndexEntityBuilder<TIndexEntity, TIndexingCache> _indexEntityBuilder;
     private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
-    private readonly ILogger _logger;
 
     protected IndexingHandler(TasksProcessingService taskProcessingService,
-        IIndexService<TIndexEntity> indexingService,
-        IndexEntityBuilder<TIndexEntity, TIndexingCache> indexEntityBuilder,
         IDbContextFactory<DomainDbContext> dbContextFactory,
         ILogger logger)
     {
-        _taskProcessingService = taskProcessingService;
-        _indexingService = indexingService;
-        _indexEntityBuilder = indexEntityBuilder;
+        TaskProcessingService = taskProcessingService;
+        Logger = logger;
         _dbContextFactory = dbContextFactory;
-        _logger = logger;
     }
 
-    protected TasksProcessingService TaskProcessingService => _taskProcessingService;
-    protected IIndexService<TIndexEntity> IndexingService => _indexingService;
-    protected IndexEntityBuilder<TIndexEntity, TIndexingCache> IndexEntityBuilder => _indexEntityBuilder;
-    protected ILogger Logger => _logger;
-    
+    protected TasksProcessingService TaskProcessingService { get; }
+    protected ILogger Logger { get; }
+
+    protected abstract IIndexer<TIndexingCache>[] Indexers { get; }
     protected abstract int BucketSize { get; }
     protected abstract IndexingTaskType IndexingTaskType { get; }
-    protected abstract string IndexEntityKind { get; }
-
-    protected abstract string GetIndexEntityKey(TIndexEntity entity);
     
-    public async Task Prepare()
+    public Task Prepare()
     {
-        await IndexingService.UpdateIndex();
+        List<Task> indexingJobs = [];
+        foreach (var indexer in Indexers)
+        {
+            indexingJobs.Add(indexer.PrepareIndex());
+        }
+        return Task.WhenAll(indexingJobs.ToArray());
     }
     
     public override async Task Handle()
     {
         await ProcessIndexingTasks();
     }
-    private async Task ProcessIndexingTasks()
+    private Task ProcessIndexingTasks()
     {
         if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
-            return;
+            return Task.CompletedTask;
 
         var stopwatch = new Stopwatch();
         
-        await TaskProcessingService.Process(IndexingTaskType, BucketSize, async (tasks) =>
+        TaskProcessingService.Process(IndexingTaskType, BucketSize, tasks =>
         {
             stopwatch.Restart();
             
             using var indexingCache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
-            
-            var entitiesToDelete = new List<string>();
-            var entitiesToCreate = new List<TIndexEntity>();
 
-            tasks.ForEach(task =>
+            List<Task> indexingJobs = [];
+            foreach (var indexer in Indexers)
             {
-                var id = int.Parse(task.Target);
-
-                var indexEntity = IndexEntityBuilder.Create(id, indexingCache);
-
-                if (indexEntity == null)
-                    entitiesToDelete.Add($"{id}");
-                else
-                    entitiesToCreate.Add(indexEntity);
-
-            });
-
-            if (entitiesToDelete.Any())
-                await IndexingService.DeleteRange(entitiesToDelete);
-
-            if (entitiesToCreate.Any())
-            {
-                try
-                {
-                    await IndexingService.AddRange(entitiesToCreate);
-                }
-                catch
-                {
-                    foreach (var index in entitiesToCreate)
-                    {
-                        try
-                        {
-                            await IndexingService.Add(index);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.LogError(e, "Failed to index {entityKind} {id}", IndexEntityKind, GetIndexEntityKey(index));
-                        }
-                    }
-                }
+                indexingJobs.Add(indexer.BuildIndex(tasks, indexingCache));
             }
-
-            stopwatch.Stop();
-
-            Logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+            Task.WaitAll(indexingJobs.ToArray());
 
             return true;
         });
+        
+        stopwatch.Stop();
+        Logger.LogInformation("Indexing Task of type {indexingTaskType} is completed in {time}s", IndexingTaskType, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+        return Task.CompletedTask;
     }
 }

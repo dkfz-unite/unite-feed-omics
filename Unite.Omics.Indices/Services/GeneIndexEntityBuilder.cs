@@ -14,9 +14,9 @@ namespace Unite.Omics.Indices.Services;
 
 public class GeneIndexEntityBuilder : IndexEntityBuilder<GeneIndex, GenesIndexingCache>
 {
-    public override GeneIndex Create(int key, GenesIndexingCache cache)
+    public override GeneIndex[] Create(int key, GenesIndexingCache cache)
     {
-        return CreateGeneIndex(key, cache);
+        return [CreateGeneIndex(key, cache)];
     }
 
     private GeneIndex CreateGeneIndex(int geneId, GenesIndexingCache cache)
@@ -28,7 +28,7 @@ public class GeneIndexEntityBuilder : IndexEntityBuilder<GeneIndex, GenesIndexin
 
         return CreateGeneIndex(gene, cache);
     }
-
+    
     private GeneIndex CreateGeneIndex(Gene gene, GenesIndexingCache cache)
     {
         var index = GeneIndexMapper.CreateFrom<GeneIndex>(gene);
@@ -36,10 +36,13 @@ public class GeneIndexEntityBuilder : IndexEntityBuilder<GeneIndex, GenesIndexin
         index.Specimens = CreateSpecimenIndices(gene.Id, cache);
 
         var hasSpecimens = index.Specimens?.Any();
-        var hasExpressions = cache.ExpEntries?.Any(entry => entry.EntityId == gene.Id);
+
+        var proteinIds = cache.Proteins.Where(protein => protein.Transcript.GeneId == gene.Id).Select(protein => protein.Id).ToArray();
+        var hasGeneExpressions = cache.GeneExpressions?.Any(entry => entry.EntityId == gene.Id);
+        var hasProteinExpressions = cache.ProteinExpressions?.Any(entry => proteinIds.Contains(entry.EntityId));
 
         // If gene is not affected by any variant and has no expression data, it should be removed.
-        if (hasSpecimens != true && hasExpressions != true)
+        if (hasSpecimens != true && hasGeneExpressions != true && hasProteinExpressions != true)
             return null;
 
         index.Stats = CreateStatsIndex(gene.Id, cache);
@@ -232,21 +235,21 @@ public class GeneIndexEntityBuilder : IndexEntityBuilder<GeneIndex, GenesIndexin
         return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
             sample.Resources?.Any(resource => 
-                (resource.Type == DataTypes.Omics.Meth.Sample && resource.Format == FileTypes.Sequence.Idat) ||
-                (resource.Type == DataTypes.Omics.Meth.Level)) == true
+                (resource.Type == DataTypes.Omics.Methylation.Sample && resource.Format == FileTypes.Sequence.Idat) ||
+                (resource.Type == DataTypes.Omics.Methylation.Level)) == true
         );
     }
 
     private bool CheckGeneExp(int geneId, GenesIndexingCache cache)
     {
-        return cache.ExpEntries?.Any(entry => entry.EntityId == geneId) == true;
+        return cache.GeneExpressions?.Any(entry => entry.EntityId == geneId) == true;
     }
 
     private bool CheckGeneExpSc(int[] sampleIds, GenesIndexingCache cache)
     {
         return cache.Samples.Any(sample => 
             sampleIds.Contains(sample.Id) && 
-            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Exp) == true
+            sample.Resources?.Any(resource => resource.Type == DataTypes.Omics.Rnasc.Expression) == true
         );
     }
 }

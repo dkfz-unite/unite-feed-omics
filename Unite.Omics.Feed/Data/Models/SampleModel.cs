@@ -16,7 +16,8 @@ public class SampleModel
     public IEnumerable<Dna.Sm.VariantModel> Sms;
     public IEnumerable<Dna.Cnv.VariantModel> Cnvs;
     public IEnumerable<Dna.Sv.VariantModel> Svs;
-    public IEnumerable<Rna.GeneExpressionModel> Exps;
+    public IEnumerable<Rna.GeneExpressionModel> GeneExpressions;
+    public IEnumerable<Prot.ProteinExpressionModel> ProteinExpressions;
     public IEnumerable<ResourceModel> Resources;
     public IEnumerable<ProfileModel> CnvProfiles;
 }
