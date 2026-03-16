@@ -11,6 +11,7 @@ public record SampleForm: SubmissionForm
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
     protected string _genome;
+    protected string _batch;
 
 
     /// <summary>
@@ -55,4 +56,10 @@ public record SampleForm: SubmissionForm
     /// </summary>
     [FromForm(Name = "genome")]
     public string Genome { get => _genome?.Trim(); set => _genome = value; }
+
+    /// <summary>
+    /// Batch information
+    /// </summary>
+    [FromForm(Name = "batch")]
+    public string Batch { get => _batch?.Trim(); set => _batch = value; }
 }

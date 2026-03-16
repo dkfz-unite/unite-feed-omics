@@ -20,6 +20,7 @@ public record SampleModel: SubmissionModel
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
+    protected string _batch;
 
 
     /// <summary>
@@ -81,6 +82,12 @@ public record SampleModel: SubmissionModel
     /// </summary>
     [JsonPropertyName("cells")]
     public virtual int? Cells { get => _cells; set => _cells = value; }
+
+    /// <summary>
+    /// Batch information
+    /// </summary>
+    [JsonPropertyName("batch")]
+    public virtual string Batch { get => _batch?.Trim(); set => _batch = value; }
 
     /// <summary>
     /// Sample resources

@@ -96,6 +96,11 @@ public class AnalysisFormValidator<T> : AbstractValidator<AnalysisForm>
             .WithMessage("Should be greater than or equal to 1");
 
 
+        RuleFor(model => model.Batch)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
+
+
         RuleFor(model => model.ResourcesFile)
             .NotEmpty()
             .When(model => model.EntriesFile.IsEmpty())

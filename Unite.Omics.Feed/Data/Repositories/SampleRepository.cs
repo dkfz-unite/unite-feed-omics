@@ -51,7 +51,8 @@ public class SampleRepository
             Genome = model.Genome,
             Purity = model.Purity,
             Ploidy = model.Ploidy,
-            Cells = model.Cells
+            Cells = model.Cells,
+            Batch = model.Batch
         };
 
         _dbContext.Add(entity);
@@ -75,6 +76,9 @@ public class SampleRepository
 
         if (model.Cells != null)
             entity.Cells = model.Cells;
+
+        if (model.Batch != null)
+            entity.Batch = model.Batch;
 
         _dbContext.Update(entity);
         _dbContext.SaveChanges();

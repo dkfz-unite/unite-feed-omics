@@ -29,7 +29,8 @@ public static class AnalysisFormConverter<TEntry> where TEntry : class, new()
             Genome = form.Genome,
             Purity = form.Purity,
             Ploidy = form.Ploidy,
-            Cells = form.Cells
+            Cells = form.Cells,
+            Batch = form.Batch
         };
     }
 

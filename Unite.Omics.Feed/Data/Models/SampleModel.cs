@@ -8,6 +8,7 @@ public class SampleModel
     public double? Purity;
     public double? Ploidy;
     public int? Cells;
+    public string Batch;
 
     public SpecimenModel Specimen;
     public AnalysisModel Analysis;
