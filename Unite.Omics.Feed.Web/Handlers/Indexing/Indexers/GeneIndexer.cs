@@ -18,9 +18,4 @@ public class GeneIndexer: Indexer<GeneIndex, GenesIndexingCache>
     {
         return entity.Id.ToString();
     }
-
-    public override async Task PrepareIndex()
-    {
-        await IndexingService.CreateIndex();
-    }
 }

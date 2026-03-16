@@ -18,11 +18,6 @@ public class GeneExpressionIndexer: Indexer<GeneExpressionIndex, GenesIndexingCa
     {
         return entity.Id;
     }
-    
-    public override async Task PrepareIndex()
-    {
-        await IndexingService.CreateIndex();
-    }
 
     protected override Task DeleteIndexEntities(IList<string> entities)
     {

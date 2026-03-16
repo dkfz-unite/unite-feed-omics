@@ -24,7 +24,7 @@ public class IndexingWorker : Worker<IIndexingHandler>
     
     protected override async Task ScheduleHandlers(CancellationToken stoppingToken)
     {
-        IList<Task> handlerTasks = new List<Task>();
+        var handlerTasks = new List<Task>();
         
         foreach (var handler in Handlers)
         {

@@ -17,9 +17,4 @@ public class ProteinIndexer: Indexer<ProteinIndex, ProteinsIndexingCache>
     {
         return entity.Id.ToString();
     }
-    
-    public override async Task PrepareIndex()
-    {
-        await IndexingService.CreateIndex();
-    }
 }

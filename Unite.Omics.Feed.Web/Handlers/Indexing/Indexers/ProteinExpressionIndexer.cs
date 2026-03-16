@@ -17,9 +17,4 @@ public class ProteinExpressionIndexer: Indexer<ProteinExpressionIndex, ProteinsI
     {
         return entity.Id;
     }
-    
-    public override async Task PrepareIndex()
-    {
-        await IndexingService.CreateIndex();
-    }
 }

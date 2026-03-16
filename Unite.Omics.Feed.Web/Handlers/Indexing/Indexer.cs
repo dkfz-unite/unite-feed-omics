@@ -32,12 +32,12 @@ public abstract class Indexer<TIndexEntity, TIndexingCache>: IIndexer<TIndexingC
 
     public virtual async Task PrepareIndex()
     {
-        await IndexingService.UpdateIndex();
+        await IndexingService.CreateIndex();
     }
 
-    public async Task BuildIndex(Unite.Data.Entities.Tasks.Task[] tasks, TIndexingCache indexingCache)
+    public virtual async Task BuildIndex(Unite.Data.Entities.Tasks.Task[] tasks, TIndexingCache indexingCache)
     {
-        var stopwatch = new Stopwatch();
+        var stopwatch = Stopwatch.StartNew();
         
         var entitiesToDelete = new List<string>();
         var entitiesToCreate = new List<TIndexEntity>();
@@ -71,25 +71,6 @@ public abstract class Indexer<TIndexEntity, TIndexingCache>: IIndexer<TIndexingC
     protected virtual async Task CreateIndexEntities(List<TIndexEntity> entities)
     {
         if (entities.Any())
-        {
-            try
-            {
-                await IndexingService.AddRange(entities);
-            }
-            catch
-            {
-                foreach (var index in entities)
-                {
-                    try
-                    {
-                        await IndexingService.Add(index);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogError(e, "Failed to index {entityKind} {id}", IndexEntityKind, GetIndexEntityKey(index));
-                    }
-                }
-            }
-        }
+            await IndexingService.AddRange(entities);
     }
 }

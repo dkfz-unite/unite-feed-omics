@@ -47,12 +47,10 @@ public abstract class IndexingHandler<TIndexingCache> : Handler, IIndexingHandle
         if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
             return Task.CompletedTask;
 
-        var stopwatch = new Stopwatch();
+        var stopwatch = Stopwatch.StartNew();
         
         TaskProcessingService.Process(IndexingTaskType, BucketSize, tasks =>
         {
-            stopwatch.Restart();
-            
             using var indexingCache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             List<Task> indexingJobs = [];
