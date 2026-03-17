@@ -23,8 +23,8 @@ public class SvsIndexingHandler: IndexingHandler<SvIndex, VariantIndexingCache<V
         TasksProcessingService taskProcessingService,
         SvIndexEntityBuilder indexEntityBuilder,
         IIndexService<SvIndex> indexingService,
-        ILogger logger,
-        VariantsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+        VariantsIndexingOptions options,
+        ILogger<SvsIndexingHandler> logger) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
     {
         _options = options;
     }

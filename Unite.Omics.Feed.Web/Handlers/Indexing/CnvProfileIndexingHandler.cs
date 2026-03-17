@@ -19,7 +19,7 @@ public class CnvProfileIndexingHandler: IndexingHandler<CnvProfileIndex, CnvProf
         TasksProcessingService taskProcessingService,
         CnvProfileIndexEntityBuilder indexEntityBuilder,
         IIndexService<CnvProfileIndex> indexingService,
-        ILogger logger) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+        ILogger<CnvProfileIndexingHandler> logger) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
     {
     }
 }

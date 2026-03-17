@@ -23,8 +23,8 @@ public class CnvsIndexingHandler: IndexingHandler<CnvIndex, VariantIndexingCache
         TasksProcessingService taskProcessingService,
         CnvIndexEntityBuilder indexEntityBuilder,
         IIndexService<CnvIndex> indexingService,
-        ILogger logger,
-        VariantsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+        VariantsIndexingOptions options,
+        ILogger<CnvsIndexingHandler> logger) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
     {
         _options = options;
     }

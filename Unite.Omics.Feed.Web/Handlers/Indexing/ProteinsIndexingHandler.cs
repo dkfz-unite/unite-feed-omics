@@ -20,22 +20,23 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Protein;
     protected override string IndexEntityKind => "Protein";
 
-    private readonly ProteinsIndexingOptions _options;
-    private readonly IIndexService<ProteinExpressionIndex> _expressionsIndexingService;
     private readonly ProteinExpressionIndexEntityBuilder _proteinExpressionIndexEntityBuilder;
+    private readonly IIndexService<ProteinExpressionIndex> _proteinExpressionIndexingService;
+    private readonly ProteinsIndexingOptions _options;
+    
     
     public ProteinsIndexingHandler( 
         IDbContextFactory<DomainDbContext> dbContextFactory,
         TasksProcessingService taskProcessingService,
-        ProteinIndexEntityBuilder indexEntityBuilder,
-        IIndexService<ProteinIndex> indexingService,
-        ILogger logger,
-        IIndexService<ProteinExpressionIndex> expressionsIndexingService,
+        ProteinIndexEntityBuilder proteinIndexEntityBuilder,
+        IIndexService<ProteinIndex> proteinIndexingService,
         ProteinExpressionIndexEntityBuilder proteinExpressionIndexEntityBuilder,
-        ProteinsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+        IIndexService<ProteinExpressionIndex> proteinExpressionIndexingService,
+        ProteinsIndexingOptions options,
+        ILogger<ProteinsIndexingHandler> logger) : base(dbContextFactory, taskProcessingService, proteinIndexEntityBuilder, proteinIndexingService, logger)
     {
-        _expressionsIndexingService = expressionsIndexingService;
         _proteinExpressionIndexEntityBuilder = proteinExpressionIndexEntityBuilder;
+        _proteinExpressionIndexingService = proteinExpressionIndexingService;
         _options = options;
     }
 
@@ -50,12 +51,12 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
     protected override async Task DeleteIndexEntities(ProteinIndexingContext indexingContext)
     {
         await base.DeleteIndexEntities(indexingContext);
-        await _expressionsIndexingService.DeleteWhereEquals(index => index.Protein.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+        await _proteinExpressionIndexingService.DeleteWhereEquals(index => index.Protein.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
     }
 
     protected override async Task CreateIndexEntities(ProteinIndexingContext indexingContext)
     {
         await base.CreateIndexEntities(indexingContext);
-        await _expressionsIndexingService.AddRange(indexingContext.ProteinExpressionsToAdd);
+        await _proteinExpressionIndexingService.AddRange(indexingContext.ProteinExpressionsToAdd);
     }
 }

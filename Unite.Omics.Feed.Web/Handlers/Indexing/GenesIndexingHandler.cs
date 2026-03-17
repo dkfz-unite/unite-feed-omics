@@ -20,22 +20,24 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;
     protected override string IndexEntityKind => "Gene";
 
-    private readonly GenesIndexingOptions _options;
-    private readonly IIndexService<GeneExpressionIndex> _expressionsIndexingService;
     private readonly GeneExpressionIndexEntityBuilder _geneExpressionIndexEntityBuilder;
+    private readonly IIndexService<GeneExpressionIndex> _geneExpressionIndexingService;
+    private readonly GenesIndexingOptions _options;
+    
     
     public GenesIndexingHandler( 
         IDbContextFactory<DomainDbContext> dbContextFactory,
         TasksProcessingService taskProcessingService,
-        GeneIndexEntityBuilder indexEntityBuilder,
-        IIndexService<GeneIndex> indexingService,
-        ILogger logger,
-        IIndexService<GeneExpressionIndex> expressionsIndexingService,
+        GeneIndexEntityBuilder geneIndexEntityBuilder,
+        IIndexService<GeneIndex> geneIndexingService,
         GeneExpressionIndexEntityBuilder geneExpressionIndexEntityBuilder,
-        GenesIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+        IIndexService<GeneExpressionIndex> geneExpressionIndexingService,
+        GenesIndexingOptions options,
+        ILogger<GenesIndexingHandler> logger
+        ) : base(dbContextFactory, taskProcessingService, geneIndexEntityBuilder, geneIndexingService, logger)
     {
-        _expressionsIndexingService = expressionsIndexingService;
         _geneExpressionIndexEntityBuilder = geneExpressionIndexEntityBuilder;
+        _geneExpressionIndexingService = geneExpressionIndexingService;
         _options = options;
     }
 
@@ -50,12 +52,12 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
     protected override async Task DeleteIndexEntities(GeneIndexingContext indexingContext)
     {
         await base.DeleteIndexEntities(indexingContext);
-        await _expressionsIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+        await _geneExpressionIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
     }
 
     protected override async Task CreateIndexEntities(GeneIndexingContext indexingContext)
     {
         await base.CreateIndexEntities(indexingContext);
-        await _expressionsIndexingService.AddRange(indexingContext.GeneExpressionsToAdd);
+        await _geneExpressionIndexingService.AddRange(indexingContext.GeneExpressionsToAdd);
     }
 }

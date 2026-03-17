@@ -23,8 +23,8 @@ public class SmsIndexingHandler: IndexingHandler<SmIndex, VariantIndexingCache<V
         TasksProcessingService taskProcessingService,
         SmIndexEntityBuilder indexEntityBuilder,
         IIndexService<SmIndex> indexingService,
-        ILogger logger,
-        VariantsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+        VariantsIndexingOptions options,
+        ILogger<SmsIndexingHandler> logger) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
     {
         _options = options;
     }
