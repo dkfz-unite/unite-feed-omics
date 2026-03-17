@@ -12,19 +12,20 @@ namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
 public class CnvsIndexingHandler: IndexingHandler<CnvIndex, VariantIndexingCache<Variant, VariantEntry>, CnvIndexEntityBuilder, IndexingContext<CnvIndex>>
 {
-    private readonly VariantsIndexingOptions _options;
-    
-    public CnvsIndexingHandler(TasksProcessingService taskProcessingService, 
-        IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
-        IIndexService<CnvIndex> indexingService, 
-        CnvIndexEntityBuilder indexEntityBuilder, 
-        VariantsIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
-    {
-        _options = options;
-    }
-
     protected override int BucketSize => _options.CnvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNV;
     protected override string IndexEntityKind => "CNV";
+
+    private readonly VariantsIndexingOptions _options;
+    
+    public CnvsIndexingHandler( 
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        TasksProcessingService taskProcessingService,
+        CnvIndexEntityBuilder indexEntityBuilder,
+        IIndexService<CnvIndex> indexingService,
+        ILogger logger,
+        VariantsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+    {
+        _options = options;
+    }
 }

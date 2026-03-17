@@ -10,15 +10,16 @@ namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
 public class CnvProfileIndexingHandler: IndexingHandler<CnvProfileIndex, CnvProfileIndexingCache, CnvProfileIndexEntityBuilder, IndexingContext<CnvProfileIndex>>
 {
-    public CnvProfileIndexingHandler(TasksProcessingService taskProcessingService, 
-        IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
-        IIndexService<CnvProfileIndex> indexingService, 
-        CnvProfileIndexEntityBuilder indexEntityBuilder) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
-    {
-    }
-
     protected override int BucketSize => 100;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNVProfile;
     protected override string IndexEntityKind => "CnvProfile";
+
+    public CnvProfileIndexingHandler( 
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        TasksProcessingService taskProcessingService,
+        CnvProfileIndexEntityBuilder indexEntityBuilder,
+        IIndexService<CnvProfileIndex> indexingService,
+        ILogger logger) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+    {
+    }
 }

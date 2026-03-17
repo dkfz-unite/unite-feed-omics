@@ -12,19 +12,20 @@ namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
 public class SvsIndexingHandler: IndexingHandler<SvIndex, VariantIndexingCache<Variant, VariantEntry>, SvIndexEntityBuilder, IndexingContext<SvIndex>>
 {
-    private readonly VariantsIndexingOptions _options;
-    
-    public SvsIndexingHandler(TasksProcessingService taskProcessingService, 
-        IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
-        IIndexService<SvIndex> indexingService, 
-        SvIndexEntityBuilder indexEntityBuilder, 
-        VariantsIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
-    {
-        _options = options;
-    }
-
     protected override int BucketSize => _options.SvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.SV;
     protected override string IndexEntityKind => "SV";
+
+    private readonly VariantsIndexingOptions _options;
+    
+    public SvsIndexingHandler( 
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        TasksProcessingService taskProcessingService,
+        SvIndexEntityBuilder indexEntityBuilder,
+        IIndexService<SvIndex> indexingService,
+        ILogger logger,
+        VariantsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
+    {
+        _options = options;
+    }
 }

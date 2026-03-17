@@ -16,27 +16,28 @@ public class GeneIndexingContext : IndexingContext<GeneIndex>
 
 public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache, GeneIndexEntityBuilder, GeneIndexingContext>
 {
+    protected override int BucketSize => _options.BucketSize;
+    protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;
+    protected override string IndexEntityKind => "Gene";
+
     private readonly GenesIndexingOptions _options;
     private readonly IIndexService<GeneExpressionIndex> _expressionsIndexingService;
     private readonly GeneExpressionIndexEntityBuilder _geneExpressionIndexEntityBuilder;
     
-    public GenesIndexingHandler(TasksProcessingService taskProcessingService, 
-        IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
-        IIndexService<GeneIndex> indexingService, 
-        GeneIndexEntityBuilder indexEntityBuilder, 
-        IIndexService<GeneExpressionIndex> expressionsIndexingService, 
-        GeneExpressionIndexEntityBuilder geneExpressionIndexEntityBuilder, 
-        GenesIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
+    public GenesIndexingHandler( 
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        TasksProcessingService taskProcessingService,
+        GeneIndexEntityBuilder indexEntityBuilder,
+        IIndexService<GeneIndex> indexingService,
+        ILogger logger,
+        IIndexService<GeneExpressionIndex> expressionsIndexingService,
+        GeneExpressionIndexEntityBuilder geneExpressionIndexEntityBuilder,
+        GenesIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
     {
         _expressionsIndexingService = expressionsIndexingService;
         _geneExpressionIndexEntityBuilder = geneExpressionIndexEntityBuilder;
         _options = options;
     }
-
-    protected override int BucketSize => _options.BucketSize;
-    protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;
-    protected override string IndexEntityKind => "Gene";
 
     protected override async Task BuildIndexEntity(int id, GenesIndexingCache indexingCache, GeneIndexingContext indexingContext)
     {

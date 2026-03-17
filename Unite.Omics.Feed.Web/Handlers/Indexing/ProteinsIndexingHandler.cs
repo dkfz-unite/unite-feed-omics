@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
@@ -17,27 +16,28 @@ public class ProteinIndexingContext : IndexingContext<ProteinIndex>
 
 public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsIndexingCache, ProteinIndexEntityBuilder, ProteinIndexingContext>
 {
+    protected override int BucketSize => _options.BucketSize;
+    protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Protein;
+    protected override string IndexEntityKind => "Protein";
+
     private readonly ProteinsIndexingOptions _options;
     private readonly IIndexService<ProteinExpressionIndex> _expressionsIndexingService;
     private readonly ProteinExpressionIndexEntityBuilder _proteinExpressionIndexEntityBuilder;
     
-    public ProteinsIndexingHandler(TasksProcessingService taskProcessingService, 
-        IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
-        IIndexService<ProteinIndex> indexingService, 
-        ProteinIndexEntityBuilder indexEntityBuilder, 
-        IIndexService<ProteinExpressionIndex> expressionsIndexingService, 
-        ProteinExpressionIndexEntityBuilder proteinExpressionIndexEntityBuilder, 
-        ProteinsIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
+    public ProteinsIndexingHandler( 
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        TasksProcessingService taskProcessingService,
+        ProteinIndexEntityBuilder indexEntityBuilder,
+        IIndexService<ProteinIndex> indexingService,
+        ILogger logger,
+        IIndexService<ProteinExpressionIndex> expressionsIndexingService,
+        ProteinExpressionIndexEntityBuilder proteinExpressionIndexEntityBuilder,
+        ProteinsIndexingOptions options) : base(dbContextFactory, taskProcessingService, indexEntityBuilder, indexingService, logger)
     {
         _expressionsIndexingService = expressionsIndexingService;
         _proteinExpressionIndexEntityBuilder = proteinExpressionIndexEntityBuilder;
         _options = options;
     }
-
-    protected override int BucketSize => _options.BucketSize;
-    protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Protein;
-    protected override string IndexEntityKind => "Protein";
 
     protected override async Task BuildIndexEntity(int id, ProteinsIndexingCache indexingCache, ProteinIndexingContext indexingContext)
     {

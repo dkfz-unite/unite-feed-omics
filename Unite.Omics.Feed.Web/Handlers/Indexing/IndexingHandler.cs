@@ -21,38 +21,35 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
     where TIndexingContext : IndexingContext<TIndexEntity>, new()
     where TIndexEntityBuilder : IndexEntityBuilder<TIndexEntity, TIndexingCache>
 {
-    private readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
-
-    protected IndexingHandler(TasksProcessingService taskProcessingService,
-        IDbContextFactory<DomainDbContext> dbContextFactory,
-        ILogger logger, 
-        IIndexService<TIndexEntity> indexingService, 
-        TIndexEntityBuilder indexEntityBuilder)
-    {
-        TaskProcessingService = taskProcessingService;
-        Logger = logger;
-        IndexingService = indexingService;
-        IndexEntityBuilder = indexEntityBuilder;
-        _dbContextFactory = dbContextFactory;
-    }
-
-    private TasksProcessingService TaskProcessingService { get; }
-    
-    protected ILogger Logger { get; }
-    
-    protected IIndexService<TIndexEntity> IndexingService { get; }
-
-    protected TIndexEntityBuilder IndexEntityBuilder { get; }
+    protected readonly IDbContextFactory<DomainDbContext> _dbContextFactory;
+    protected readonly TasksProcessingService _taskProcessingService;
+    protected readonly TIndexEntityBuilder _indexEntityBuilder;
+    protected readonly IIndexService<TIndexEntity> _indexingService;
+    protected readonly ILogger _logger;
 
     protected abstract int BucketSize { get; }
-    
     protected abstract IndexingTaskType IndexingTaskType { get; }
-    
     protected abstract string IndexEntityKind { get; }
+
+
+    protected IndexingHandler(
+        IDbContextFactory<DomainDbContext> dbContextFactory,
+        TasksProcessingService taskProcessingService,
+        TIndexEntityBuilder indexEntityBuilder,
+        IIndexService<TIndexEntity> indexingService,
+        ILogger logger)
+    {
+        _dbContextFactory = dbContextFactory;
+        _taskProcessingService = taskProcessingService;
+        _indexEntityBuilder = indexEntityBuilder;
+        _indexingService = indexingService;
+        _logger = logger;
+    }
+
 
     public virtual async Task Prepare()
     {
-        await IndexingService.CreateIndex();
+        await _indexingService.CreateIndex();
     }
 
     public override async Task Handle()
@@ -62,12 +59,12 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
 
     private Task ProcessIndexingTasks()
     {
-        if (TaskProcessingService.HasTasks(WorkerType.Submission) || TaskProcessingService.HasTasks(WorkerType.Annotation))
+        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return Task.CompletedTask;
 
         var stopwatch = Stopwatch.StartNew();
         
-        TaskProcessingService.Process(IndexingTaskType, BucketSize, async tasks =>
+        _taskProcessingService.Process(IndexingTaskType, BucketSize, async tasks =>
         {
             var stopwatchBatch = Stopwatch.StartNew();
             using var indexingCache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
@@ -84,19 +81,19 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
             await CreateIndexEntities(indexingContext);
 
             stopwatchBatch.Stop();
-            Logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatchBatch.Elapsed.TotalSeconds, 2));
+            _logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatchBatch.Elapsed.TotalSeconds, 2));
             
             return true;
         });
         
         stopwatch.Stop();
-        Logger.LogInformation("Indexing Task of type {indexingTaskType} is completed in {time}s", IndexingTaskType, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+        _logger.LogInformation("Indexing Task of type {indexingTaskType} is completed in {time}s", IndexingTaskType, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
         return Task.CompletedTask;
     }
 
     protected virtual Task BuildIndexEntity(int id, TIndexingCache indexingCache, TIndexingContext indexingContext)
     {
-        var indexEntities = IndexEntityBuilder.Create(id, indexingCache);
+        var indexEntities = _indexEntityBuilder.Create(id, indexingCache);
 
         if (indexEntities == null || indexEntities.Length == 0)
             indexingContext.EntitiesToDelete.Add($"{id}");
@@ -109,12 +106,12 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
     protected virtual async Task DeleteIndexEntities(TIndexingContext indexingContext)
     {
         if(indexingContext.EntitiesToDelete.Any())
-            await IndexingService.DeleteRange(indexingContext.EntitiesToDelete);
+            await _indexingService.DeleteRange(indexingContext.EntitiesToDelete);
     }
 
     protected virtual async Task CreateIndexEntities(TIndexingContext indexingContext)
     {
         if (indexingContext.EntitiesToAdd.Any())
-            await IndexingService.AddRange(indexingContext.EntitiesToAdd);
+            await _indexingService.AddRange(indexingContext.EntitiesToAdd);
     }
 }
