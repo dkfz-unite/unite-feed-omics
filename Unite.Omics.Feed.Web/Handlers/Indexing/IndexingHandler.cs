@@ -61,12 +61,10 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
     {
         if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return Task.CompletedTask;
-
-        var stopwatch = Stopwatch.StartNew();
         
         _taskProcessingService.Process(IndexingTaskType, BucketSize, async tasks =>
         {
-            var stopwatchBatch = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
             using var indexingCache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
 
             var indexingContext = new TIndexingContext();
@@ -80,14 +78,12 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
             await DeleteIndexEntities(indexingContext);
             await CreateIndexEntities(indexingContext);
 
-            stopwatchBatch.Stop();
-            _logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatchBatch.Elapsed.TotalSeconds, 2));
+            stopwatch.Stop();
+            _logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
             
             return true;
         });
         
-        stopwatch.Stop();
-        _logger.LogInformation("Indexing Task of type {indexingTaskType} is completed in {time}s", IndexingTaskType, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
         return Task.CompletedTask;
     }
 
