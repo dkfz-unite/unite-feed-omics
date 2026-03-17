@@ -11,7 +11,6 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers;
 using Unite.Omics.Feed.Web.Handlers.Annotation;
 using Unite.Omics.Feed.Web.Handlers.Indexing;
-using Unite.Omics.Feed.Web.Handlers.Indexing.Indexers;
 using Unite.Omics.Feed.Web.Handlers.Submission;
 using Unite.Omics.Feed.Web.Workers;
 using Unite.Omics.Feed.Web.Models.Base;
@@ -100,18 +99,8 @@ public static class ConfigurationExtensions
         services.AddTransient<IIndexingHandler, CnvsIndexingHandler>();
         services.AddTransient<IIndexingHandler, SmsIndexingHandler>();
         services.AddTransient<IIndexingHandler, SvsIndexingHandler>();
-        services.AddTransient<IIndexingHandler, CnvProfilesIndexingHandler>();
+        services.AddTransient<IIndexingHandler, CnvProfileIndexingHandler>();
         services.AddTransient<IIndexingHandler, ProteinsIndexingHandler>();
-        
-        //Indexers
-        services.AddTransient<CnvIndexer>();
-        services.AddTransient<CnvProfileIndexer>();
-        services.AddTransient<GeneExpressionIndexer>();
-        services.AddTransient<GeneIndexer>();
-        services.AddTransient<ProteinExpressionIndexer>();
-        services.AddTransient<ProteinIndexer>();
-        services.AddTransient<SmIndexer>();
-        services.AddTransient<SvIndexer>();
         
         //Index Creators
         services.AddTransient<CnvIndexEntityBuilder>();
