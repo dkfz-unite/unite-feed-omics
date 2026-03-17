@@ -23,7 +23,7 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
     
     public ProteinsIndexingHandler(TasksProcessingService taskProcessingService, 
         IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
+        ILogger<ProteinsIndexingHandler> logger, 
         IIndexService<ProteinIndex> indexingService, 
         ProteinIndexEntityBuilder indexEntityBuilder, 
         IIndexService<ProteinExpressionIndex> expressionsIndexingService, 

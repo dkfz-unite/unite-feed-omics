@@ -22,7 +22,7 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
     
     public GenesIndexingHandler(TasksProcessingService taskProcessingService, 
         IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
+        ILogger<GenesIndexingHandler> logger, 
         IIndexService<GeneIndex> indexingService, 
         GeneIndexEntityBuilder indexEntityBuilder, 
         IIndexService<GeneExpressionIndex> expressionsIndexingService, 

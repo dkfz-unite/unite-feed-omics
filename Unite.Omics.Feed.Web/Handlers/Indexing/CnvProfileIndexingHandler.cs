@@ -12,7 +12,7 @@ public class CnvProfileIndexingHandler: IndexingHandler<CnvProfileIndex, CnvProf
 {
     public CnvProfileIndexingHandler(TasksProcessingService taskProcessingService, 
         IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
+        ILogger<CnvProfileIndexingHandler> logger, 
         IIndexService<CnvProfileIndex> indexingService, 
         CnvProfileIndexEntityBuilder indexEntityBuilder) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
     {
@@ -21,4 +21,9 @@ public class CnvProfileIndexingHandler: IndexingHandler<CnvProfileIndex, CnvProf
     protected override int BucketSize => 100;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNVProfile;
     protected override string IndexEntityKind => "CnvProfile";
+
+    protected override Task BuildIndexEntity(int id, CnvProfileIndexingCache indexingCache, IndexingContext<CnvProfileIndex> indexingContext)
+    {
+        return base.BuildIndexEntity(id, indexingCache, indexingContext);
+    }
 }

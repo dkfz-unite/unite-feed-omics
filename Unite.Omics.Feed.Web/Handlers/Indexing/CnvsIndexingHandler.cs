@@ -16,7 +16,7 @@ public class CnvsIndexingHandler: IndexingHandler<CnvIndex, VariantIndexingCache
     
     public CnvsIndexingHandler(TasksProcessingService taskProcessingService, 
         IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
+        ILogger<CnvsIndexingHandler> logger, 
         IIndexService<CnvIndex> indexingService, 
         CnvIndexEntityBuilder indexEntityBuilder, 
         VariantsIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)

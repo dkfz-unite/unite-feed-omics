@@ -16,7 +16,7 @@ public class SmsIndexingHandler: IndexingHandler<SmIndex, VariantIndexingCache<V
     
     public SmsIndexingHandler(TasksProcessingService taskProcessingService, 
         IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
+        ILogger<SmsIndexingHandler> logger, 
         IIndexService<SmIndex> indexingService, 
         SmIndexEntityBuilder indexEntityBuilder, 
         VariantsIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)

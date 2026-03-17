@@ -16,7 +16,7 @@ public class SvsIndexingHandler: IndexingHandler<SvIndex, VariantIndexingCache<V
     
     public SvsIndexingHandler(TasksProcessingService taskProcessingService, 
         IDbContextFactory<DomainDbContext> dbContextFactory, 
-        ILogger logger, 
+        ILogger<SvsIndexingHandler> logger, 
         IIndexService<SvIndex> indexingService, 
         SvIndexEntityBuilder indexEntityBuilder, 
         VariantsIndexingOptions options) : base(taskProcessingService, dbContextFactory, logger, indexingService, indexEntityBuilder)
