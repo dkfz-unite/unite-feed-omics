@@ -14,14 +14,12 @@ namespace Unite.Omics.Feed.Web.Controllers.Rna;
 
 [Route("api/rna/analysis/exp")]
 [Authorize(Policy = Policies.Data.Writer)]
-internal class ExpressionsController : AnalysisDataController<ExpressionModel>
+public class ExpressionsController(
+    SubmissionTaskService submissionTaskService,
+    ILogger<ExpressionsController> logger,
+    Submissions.Repositories.Rna.ExpressionSubmissionRepository submissionRepository)
+    : AnalysisDataController<ExpressionModel>(submissionTaskService, submissionRepository, logger)
 {
-    public ExpressionsController(SubmissionTaskService submissionTaskService,
-        ILogger<ExpressionsController> logger,
-        Submissions.Repositories.Rna.ExpressionSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
-    {
-    }
-
     protected override IValidator<ExpressionModel> EntryModelValidator => new ExpressionModelValidator();
     protected override string DataType => DataTypes.Omics.Rna.Expression;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeq];
