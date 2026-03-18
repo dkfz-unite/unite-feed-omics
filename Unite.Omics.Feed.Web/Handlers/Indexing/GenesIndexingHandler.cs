@@ -52,12 +52,16 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
     protected override async Task DeleteIndexEntities(GeneIndexingContext indexingContext)
     {
         await base.DeleteIndexEntities(indexingContext);
-        await _geneExpressionIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+
+        if (indexingContext.EntitiesToDelete.Any())
+            await _geneExpressionIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
     }
 
     protected override async Task CreateIndexEntities(GeneIndexingContext indexingContext)
     {
         await base.CreateIndexEntities(indexingContext);
-        await _geneExpressionIndexingService.AddRange(indexingContext.GeneExpressionsToAdd);
+
+        if (indexingContext.GeneExpressionsToAdd.Any())
+            await _geneExpressionIndexingService.AddRange(indexingContext.GeneExpressionsToAdd);
     }
 }

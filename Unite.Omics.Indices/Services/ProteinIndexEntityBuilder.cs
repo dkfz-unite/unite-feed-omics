@@ -15,7 +15,9 @@ public class ProteinIndexEntityBuilder: IndexEntityBuilder<ProteinIndex, Protein
 { 
     public override ProteinIndex[] Create(int key, ProteinsIndexingCache cache)
     {
-        return [CreateProteinIndex(key, cache)];
+        var index = CreateProteinIndex(key, cache);
+
+        return index == null ? null : [index];
     }
 
     private ProteinIndex CreateProteinIndex(int proteinId, ProteinsIndexingCache cache)

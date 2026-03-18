@@ -47,51 +47,50 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
     }
 
 
-    public virtual async Task Prepare()
+    public virtual Task Prepare()
     {
-        await _indexingService.CreateIndex();
+        return _indexingService.CreateIndex();
     }
 
     public override async Task Handle()
     {
-        await ProcessIndexingTasks();
+        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
+            return;
+        
+        await _taskProcessingService.Process(IndexingTaskType, BucketSize, ProcessChunk);
+        
+        return;
     }
 
-    private Task ProcessIndexingTasks()
+    protected virtual async Task<bool> ProcessChunk(Unite.Data.Entities.Tasks.Task[] tasks)
     {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-            return Task.CompletedTask;
-        
-        _taskProcessingService.Process(IndexingTaskType, BucketSize, async tasks =>
+        var stopwatch = Stopwatch.StartNew();
+
+        var ids = tasks.Select(task => int.Parse(task.Target)).ToArray();
+        var cache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, ids);
+        var ontext = new TIndexingContext();
+
+        foreach (var task in tasks)
         {
-            var stopwatch = Stopwatch.StartNew();
-            using var indexingCache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, tasks.Select(task => int.Parse(task.Target)).ToArray());
+            var id = int.Parse(task.Target);
+            await BuildIndexEntity(id, cache, ontext);
+        }
 
-            var indexingContext = new TIndexingContext();
+        await DeleteIndexEntities(ontext);
+        await CreateIndexEntities(ontext);
 
-            tasks.ForEach(async void (task) =>
-            {
-                var id = int.Parse(task.Target);
-                await BuildIndexEntity(id, indexingCache, indexingContext);
-            });
-
-            await DeleteIndexEntities(indexingContext);
-            await CreateIndexEntities(indexingContext);
-
-            stopwatch.Stop();
-            _logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
-            
-            return true;
-        });
+        stopwatch.Stop();
         
-        return Task.CompletedTask;
+        _logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+        
+        return true;
     }
 
     protected virtual Task BuildIndexEntity(int id, TIndexingCache indexingCache, TIndexingContext indexingContext)
     {
         var indexEntities = _indexEntityBuilder.Create(id, indexingCache);
 
-        if (indexEntities == null || indexEntities.Length == 0)
+        if (indexEntities.IsEmpty())
             indexingContext.EntitiesToDelete.Add($"{id}");
         else
             indexingContext.EntitiesToAdd.AddRange(indexEntities);
@@ -99,15 +98,19 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
         return Task.CompletedTask;
     }
     
-    protected virtual async Task DeleteIndexEntities(TIndexingContext indexingContext)
+    protected virtual Task DeleteIndexEntities(TIndexingContext indexingContext)
     {
         if(indexingContext.EntitiesToDelete.Any())
-            await _indexingService.DeleteRange(indexingContext.EntitiesToDelete);
+            return _indexingService.DeleteRange(indexingContext.EntitiesToDelete);
+
+        return Task.CompletedTask;
     }
 
-    protected virtual async Task CreateIndexEntities(TIndexingContext indexingContext)
+    protected virtual Task CreateIndexEntities(TIndexingContext indexingContext)
     {
         if (indexingContext.EntitiesToAdd.Any())
-            await _indexingService.AddRange(indexingContext.EntitiesToAdd);
+            return _indexingService.AddRange(indexingContext.EntitiesToAdd);
+        
+        return Task.CompletedTask;
     }
 }

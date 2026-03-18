@@ -9,7 +9,9 @@ public class SvIndexEntityBuilder : VariantIndexEntityBuilder<Variant, VariantEn
 {
     public override SvIndex[] Create(int key, VariantIndexingCache<Variant, VariantEntry> cache)
     {
-        return [CreateVariantIndex(key, cache)];
+        var index = CreateVariantIndex(key, cache);
+
+        return index == null ? null : [index];
     }
 
     private SvIndex CreateVariantIndex(int variantId, VariantIndexingCache<Variant, VariantEntry> cache)

@@ -16,7 +16,9 @@ public class GeneIndexEntityBuilder : IndexEntityBuilder<GeneIndex, GenesIndexin
 {
     public override GeneIndex[] Create(int key, GenesIndexingCache cache)
     {
-        return [CreateGeneIndex(key, cache)];
+        var index = CreateGeneIndex(key, cache);
+
+        return index == null ? null : [index];
     }
 
     private GeneIndex CreateGeneIndex(int geneId, GenesIndexingCache cache)

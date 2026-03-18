@@ -5,17 +5,14 @@ namespace Unite.Omics.Indices.Services;
 
 public abstract class IndexingCache : IDisposable
 {
-    protected IndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
+    public IDbContextFactory<DomainDbContext> DbContextFactory { get; }
+
+    public IndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
     {
         DbContextFactory = dbContextFactory;
     }
 
-    public IDbContextFactory<DomainDbContext> DbContextFactory { get; }
-
-    public static T Create<T>(
-        IDbContextFactory<DomainDbContext> dbContextFactory,
-        int[] ids
-    ) where T : IndexingCache
+    public static T Create<T>(IDbContextFactory<DomainDbContext> dbContextFactory, int[] ids) where T : IndexingCache
     {
         var instance = (T)Activator.CreateInstance(typeof(T), dbContextFactory)!;
         instance.Initialize(ids);
