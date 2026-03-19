@@ -53,25 +53,7 @@ public abstract class VariantIndexMapper
             Strand = entity.Strand,
             ExonicLength = entity.ExonicLength,
 
-            Protein = CreateFrom(entity.Protein)
-        };
-    }
-
-    protected static ProteinIndex CreateFrom(in Protein entity)
-    {
-        if (entity == null)
-        {
-            return null;
-        }
-
-        return new ProteinIndex
-        {
-            Id = entity.Id,
-            StableId = entity.StableId,
-            IsCanonical = entity.IsCanonical,
-            Start = entity.Start,
-            End = entity.End,
-            Length = entity.Length
+            Protein = ProteinIndexMapper.CreateFrom<ProteinIndex>(entity.Protein)
         };
     }
 }

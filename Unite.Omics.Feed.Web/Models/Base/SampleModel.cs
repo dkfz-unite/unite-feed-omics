@@ -6,7 +6,7 @@ namespace Unite.Omics.Feed.Web.Models.Base;
 
 // Do not assigne default values to properties!
 // Otherwise, empty model for matched samples will be created and fail to be validated.
-public record SampleModel
+public record SampleModel: SubmissionModel
 {
     public const double DefaultPloidy = 2.0;
 
@@ -20,6 +20,7 @@ public record SampleModel
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
+    protected string _batch;
 
 
     /// <summary>
@@ -83,8 +84,14 @@ public record SampleModel
     public virtual int? Cells { get => _cells; set => _cells = value; }
 
     /// <summary>
+    /// Batch information
+    /// </summary>
+    [JsonPropertyName("batch")]
+    public virtual string Batch { get => _batch?.Trim(); set => _batch = value; }
+
+    /// <summary>
     /// Sample resources
     /// </summary>
     [JsonPropertyName("resources")]
-    public virtual ResourceModel[] Resources { get; set; }
+    public override ResourceModel[] Resources { get; set; }
 }

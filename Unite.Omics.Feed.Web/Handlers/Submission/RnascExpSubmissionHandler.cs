@@ -2,15 +2,16 @@ using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.RnaSc;
+using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class RnascExpSubmissionHandler
+public class RnascExpSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
-    private readonly RnascSubmissionService _submissionService;
+    private readonly ExpressionSubmissionRepository _submissionRepository;
     private readonly SampleIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -19,23 +20,24 @@ public class RnascExpSubmissionHandler
 
 
     public RnascExpSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
-        RnascSubmissionService submissionService,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ILogger<RnascExpSubmissionHandler> logger)
+        ExpressionSubmissionRepository submissionRepository,
+        ILogger<RnascExpSubmissionHandler> logger) : base(priority)
     {
         _dataWriter = dataWriter;
-        _submissionService = submissionService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
     }
 
 
-    public void Handle()
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
 
 
@@ -59,12 +61,12 @@ public class RnascExpSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindExpSubmission(submissionId);
+        var submittedData = _submissionRepository.FindDocument(submissionId);
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Samples);
-        _submissionService.DeleteExpSubmission(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

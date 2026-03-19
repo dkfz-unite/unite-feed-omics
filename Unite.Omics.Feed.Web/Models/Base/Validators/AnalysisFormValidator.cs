@@ -6,7 +6,7 @@ using Unite.Omics.Feed.Web.Models.Base.Extensions;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
-public class AnalysisFormValidator<T> : AbstractValidator<AnalysisForm<T>>
+public class AnalysisFormValidator<T> : AbstractValidator<AnalysisForm>
     where T : class, new()
 {
     private readonly StringComparison _comparison = StringComparison.InvariantCultureIgnoreCase;
@@ -94,6 +94,11 @@ public class AnalysisFormValidator<T> : AbstractValidator<AnalysisForm<T>>
         RuleFor(model => model.Cells)
             .GreaterThanOrEqualTo(1)
             .WithMessage("Should be greater than or equal to 1");
+
+
+        RuleFor(model => model.Batch)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
 
 
         RuleFor(model => model.ResourcesFile)

@@ -2,79 +2,31 @@
 
 namespace Unite.Omics.Feed.Web.Workers;
 
-public class SubmissionsWorker : BackgroundService
+public class SubmissionsWorker : Worker<ISubmissionHandler>
 {
-    private readonly RnaSubmissionHandler _rnaSubmissionHandler;
-    private readonly RnaExpSubmissionHandler _rnaExpSubmissionHandler;
-    private readonly RnascSubmissionHandler _rnascSubmissionHandler;
-    private readonly RnascExpSubmissionHandler _rnascExpSubmissionHandler;
-    private readonly DnaSubmissionHandler _dnaSubmissionHandler;
-    private readonly DnaSmSubmissionHandler _dnaSmSubmissionHandler;
-    private readonly DnaCnvSubmissionHandler _dnaCnvSubmissionHandler;
-    private readonly DnaSvSubmissionHandler _dnaSvSubmissionHandler;
-    private readonly MethSubmissionHandler _methSubmissionHandler;
-    private readonly MethLvlSubmissionHandler _methLvlSubmissionHandler;
-    private readonly ILogger _logger;
-
-
-    public SubmissionsWorker(
-        RnaSubmissionHandler rnaSubmissionHandler,
-        RnaExpSubmissionHandler rnaExpSubmissionHandler,
-        RnascSubmissionHandler rnascSubmissionHandler,
-        RnascExpSubmissionHandler rnascExpSubmissionHandler,
-        DnaSubmissionHandler dnaSubmissionHandler,
-        DnaSmSubmissionHandler dnaSmSubmissionHandler,
-        DnaCnvSubmissionHandler dnaCnvSubmissionHandler,
-        DnaSvSubmissionHandler dnaSvSubmissionHandler,
-        MethSubmissionHandler methSubmissionHandler,
-        MethLvlSubmissionHandler methLvlSubmissionHandler,
-        ILogger<SubmissionsWorker> logger)
+    public SubmissionsWorker(IEnumerable<ISubmissionHandler> handlers,
+        IHostApplicationLifetime lifetime,
+        ILogger<SubmissionsWorker> logger) : base(handlers, lifetime, logger)
     {
-        _rnaSubmissionHandler = rnaSubmissionHandler;
-        _rnaExpSubmissionHandler = rnaExpSubmissionHandler;
-        _rnascSubmissionHandler = rnascSubmissionHandler;
-        _rnascExpSubmissionHandler = rnascExpSubmissionHandler;
-        _dnaSubmissionHandler = dnaSubmissionHandler;
-        _dnaSmSubmissionHandler = dnaSmSubmissionHandler;
-        _dnaCnvSubmissionHandler = dnaCnvSubmissionHandler;
-        _dnaSvSubmissionHandler = dnaSvSubmissionHandler;
-        _methSubmissionHandler = methSubmissionHandler;
-        _methLvlSubmissionHandler = methLvlSubmissionHandler;
-        _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override string WorkerType => "Submissions";
+    
+    protected override Task<ISubmissionHandler[]> PrepareHandlers(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Submissions worker started");
-
-        stoppingToken.Register(() => _logger.LogInformation("Submissions worker stopped"));
-
-        // Delay 5 seconds to let the web api start working
-        await Task.Delay(5000, stoppingToken);
-
-        while (!stoppingToken.IsCancellationRequested)
+        return Task.Run(() =>
+            {
+                return Handlers
+                    .OrderBy(h => h.Priority)
+                    .ToArray();
+            }, stoppingToken);
+    }
+    
+    protected override async Task ScheduleHandlers(CancellationToken stoppingToken)
+    {
+        foreach (var handler in Handlers)
         {
-            try
-            {
-                _rnaSubmissionHandler.Handle();
-                _rnaExpSubmissionHandler.Handle();
-                _rnascSubmissionHandler.Handle();
-                _rnascExpSubmissionHandler.Handle();
-                _dnaSubmissionHandler.Handle();
-                _dnaSmSubmissionHandler.Handle();
-                _dnaCnvSubmissionHandler.Handle();
-                _dnaSvSubmissionHandler.Handle();
-                _methSubmissionHandler.Handle();
-                _methLvlSubmissionHandler.Handle();
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Submissions processing failed");
-            }
-            finally
-            {
-                await Task.Delay(10000, stoppingToken);
-            }
+            await RunHandler(handler, stoppingToken);
         }
     }
 }

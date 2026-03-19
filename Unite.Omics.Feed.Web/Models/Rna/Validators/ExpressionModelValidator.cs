@@ -6,9 +6,9 @@ public class ExpressionModelValidator : AbstractValidator<ExpressionModel>
 {
     public ExpressionModelValidator()
     {
-        RuleFor(model => model.GetDataType())
+        RuleFor(model => model.GetKeyType())
             .Must(value => value != 0)
-            .WithMessage("Either 'GeneId', 'GeneSymbol', 'TranscriptId' or 'TranscriptSymbol' has to be specified");
+            .WithMessage("Either 'gene_id', 'gene_symbol', 'transcript_id' or 'transcript_symbol' has to be specified");
 
         RuleFor(model => model.GeneId)
             .MaximumLength(100)

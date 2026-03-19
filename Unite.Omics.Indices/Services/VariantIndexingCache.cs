@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Unite.Data.Context;
+using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Repositories.Constants;
 using Unite.Data.Context.Repositories.Extensions.Queryable;
 using Unite.Data.Entities.Donors;
+using Unite.Data.Entities.Omics.Analysis.Prot;
 using Unite.Data.Entities.Omics.Analysis.Rna;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Specimens;
@@ -16,39 +18,44 @@ using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 
 namespace Unite.Omics.Indices.Services;
 
-/// <summary>
-/// Cache for indexing variants. This is a stateful service, make sure to clean it up after usage.
-/// </summary>
-/// <typeparam name="TVariant"></typeparam>
-/// <typeparam name="TVariantEntry"></typeparam>
-public class VariantIndexingCache<TVariant, TVariantEntry>
+public class VariantIndexingCache<TVariant, TVariantEntry> : IndexingCache
     where TVariant : Data.Entities.Omics.Analysis.Dna.Variant
-    where TVariantEntry: Data.Entities.Omics.Analysis.Dna.VariantEntry<TVariant>
+    where TVariantEntry : Data.Entities.Omics.Analysis.Dna.VariantEntry<TVariant>
 {
     private static readonly object _lock = new();
+    
+    protected readonly VariantsRepository _variantsRepository;
 
     private readonly HashSet<int> _sampleIds = [];
-    public readonly IDbContextFactory<DomainDbContext> DbContextFactory;
 
     public IEnumerable<TVariant> Variants { get; private set; }
     public IEnumerable<TVariantEntry> Entries { get; private set; }
-    public IEnumerable<GeneExpression> Expressions { get; private set; }
+    public IEnumerable<GeneExpression> GeneExpressions { get; private set; }
+    public IEnumerable<ProteinExpression> ProteinExpressions { get; private set; }
     public IEnumerable<Donor> Donors { get; private set; }
     public IEnumerable<Image> Images { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Data.Entities.Omics.Analysis.Sample> Samples { get; private set; }
+    public Dictionary<int, TVariant[]> SimilarVariants { get; private set; } = [];
 
 
-    public VariantIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
+    /// <summary>
+    /// Cache for indexing variants. This is a stateful service, make sure to clean it up after usage.
+    /// </summary>
+    /// <typeparam name="TVariant"></typeparam>
+    /// <typeparam name="TVariantEntry"></typeparam>
+    public VariantIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        DbContextFactory = dbContextFactory;
+        _variantsRepository = new VariantsRepository(dbContextFactory);
     }
 
 
-    public void Load(int[] ids)
+    protected override void Load(int[] ids)
     {
         LoadVariants(ids).Wait();
-        LoadExpressions().Wait();
+        LoadSimilarVariants(ids).Wait();
+        LoadGeneExpressions().Wait();
+        LoadProteinExpressions().Wait();
         LoadSamples().Wait();
         LoadSpecimens().Wait();
         LoadImages().Wait();
@@ -61,17 +68,33 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
         Variants = null;
         Entries = null;
-        Expressions = null;
+        GeneExpressions = null;
         Donors = null;
         Images = null;
         Specimens = null;
         Samples = null;
     }
 
+    private async Task LoadSimilarVariants(int[] ids)
+    {
+        using var dbContext = DbContextFactory.CreateDbContext();
+
+        foreach (var id in ids)
+        {
+            var variantIds = await _variantsRepository.GetSimilarVariants<TVariant>([id]);
+            
+            var similarVariantIds = dbContext.Set<TVariant>()
+                .AsNoTracking()
+                .Where(entity => variantIds.Contains(entity.Id))
+                .ToArray();
+
+            SimilarVariants[id] = similarVariantIds;
+        }
+    }
 
     private async Task LoadVariants(int[] ids)
     {
-        await using var dbContext = DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         if (typeof(TVariantEntry) == typeof(SM.VariantEntry))
             Entries = await GetSmEntries(ids) as IEnumerable<TVariantEntry>;
@@ -99,7 +122,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
         _sampleIds.AddRange(sampleIds);
     }
 
-    private async Task LoadExpressions()
+    private async Task LoadGeneExpressions()
     {
         using var dbContext = DbContextFactory.CreateDbContext();
 
@@ -112,7 +135,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
                 .Where(transcript => transcript.Feature.GeneId != null)
                 .Select(transcript => transcript.Feature.GeneId.Value)
                 .Distinct()
-                .ToArray();                
+                .ToArray();
         }
         else if (typeof(TVariant) == typeof(CNV.Variant))
         {
@@ -133,15 +156,55 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
                 .ToArray();
         }
 
-        Expressions = await dbContext.Set<GeneExpression>()
+        GeneExpressions = await dbContext.Set<GeneExpression>()
             .AsNoTracking()
             .Where(expression => geneIds.Contains(expression.EntityId))
             .ToArrayAsync();
     }
 
+    private async Task LoadProteinExpressions()
+    {
+        using var dbContext = DbContextFactory.CreateDbContext();
+
+        var proteinIds = Array.Empty<int>();
+
+        if (typeof(TVariant) == typeof(SM.Variant))
+        {
+            proteinIds = (Variants as IEnumerable<SM.Variant>)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .Where(transcript => transcript.Feature.Protein != null)
+                .Select(transcript => transcript.Feature.Protein.Id)
+                .Distinct()
+                .ToArray();
+        }
+        else if (typeof(TVariant) == typeof(CNV.Variant))
+        {
+            proteinIds = (Variants as IEnumerable<CNV.Variant>)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .Where(transcript => transcript.Feature.Protein != null)
+                .Select(transcript => transcript.Feature.Protein.Id)
+                .Distinct()
+                .ToArray();
+        }
+        else if (typeof(TVariant) == typeof(SV.Variant))
+        {
+            proteinIds = (Variants as IEnumerable<SV.Variant>)
+                .SelectMany(variant => variant.AffectedTranscripts)
+                .Where(transcript => transcript.Feature.Protein != null)
+                .Select(transcript => transcript.Feature.Protein.Id)
+                .Distinct()
+                .ToArray();
+        }
+
+        ProteinExpressions = await dbContext.Set<ProteinExpression>()
+            .AsNoTracking()
+            .Where(expression => proteinIds.Contains(expression.EntityId))
+            .ToArrayAsync();
+    }
+
     private async Task LoadDonors()
     {
-        await using var dbContext = DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var donorIds = Specimens
             .Select(specimen => specimen.DonorId)
@@ -160,7 +223,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadImages()
     {
-        await using var dbContext = DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var predicate = Predicates.IsImageRelatedSpecimen.Compile();
 
@@ -180,7 +243,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadSpecimens()
     {
-        await using var dbContext = DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         var specimenIds = Samples
             .Select(sample => sample.SpecimenId)
@@ -202,7 +265,7 @@ public class VariantIndexingCache<TVariant, TVariantEntry>
 
     private async Task LoadSamples()
     {
-        await using var dbContext = DbContextFactory.CreateDbContext();
+        using var dbContext = DbContextFactory.CreateDbContext();
 
         Samples = await dbContext.Set<Data.Entities.Omics.Analysis.Sample>()
             .AsNoTracking()

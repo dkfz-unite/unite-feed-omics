@@ -112,8 +112,9 @@ public class GeneExpressionRepository
 
     private static void Map(GeneExpressionModel model, ref GeneExpression entity)
     {
-        entity.Reads = model.Reads;
+        entity.Raw = model.Raw;
         entity.TPM = model.TPM;
         entity.FPKM = model.FPKM;
+        entity.Normalized = model.Normalized;
     }
 }

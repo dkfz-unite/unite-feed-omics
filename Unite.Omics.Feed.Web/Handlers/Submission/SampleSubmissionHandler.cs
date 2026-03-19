@@ -7,7 +7,7 @@ using Unite.Omics.Feed.Web.Services.Indexing;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public abstract class SampleSubmissionHandler
+public abstract class SampleSubmissionHandler: SubmissionHandler
 {
     protected readonly SampleWriter _dataWriter;
     protected readonly TasksProcessingService _taskProcessingService;
@@ -20,10 +20,11 @@ public abstract class SampleSubmissionHandler
 
 
     public SampleSubmissionHandler(
+        HandlerPriority priority,
         SampleWriter dataWriter,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
-        ILogger logger)
+        ILogger logger): base(priority)
     {
         _dataWriter = dataWriter;
         _taskProcessingService = taskProcessingService;
@@ -32,9 +33,9 @@ public abstract class SampleSubmissionHandler
     }
 
 
-    public virtual void Handle()
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
 
 

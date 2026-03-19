@@ -4,15 +4,15 @@ using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Rna;
 using Unite.Omics.Feed.Data.Writers.Rna;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Rna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class RnaExpSubmissionHandler
+public class RnaExpSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly ExpressionsAnnotationService _annotationService;
-    private readonly RnaSubmissionService _submissionService;
+    private readonly ExpressionSubmissionRepository _submissionRepository;
     private readonly GeneIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
@@ -21,27 +21,28 @@ public class RnaExpSubmissionHandler
 
 
 	public RnaExpSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
-        RnaSubmissionService submissionService,
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
-        ILogger<RnaExpSubmissionHandler> logger)
+        ExpressionSubmissionRepository submissionRepository,
+        ILogger<RnaExpSubmissionHandler> logger): base(priority)
 	{
         _dataWriter = dataWriter;
         _annotationService = annotationService;
-        _submissionService = submissionService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
 
         _converter = new Models.Rna.Converters.AnalysisModelConverter();
 	}
 
 
-	public void Handle()
+	public override Task Handle()
 	{
-		ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
 	}
 
 
@@ -54,7 +55,6 @@ public class RnaExpSubmissionHandler
             stopwatch.Restart();
 
             ProcessSubmission(tasks[0].Target);
-
             stopwatch.Stop();
 
             _logger.LogInformation("Processed bulk transcriptomics data submission in {time}s", Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
@@ -65,22 +65,22 @@ public class RnaExpSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindExpSubmission(submissionId);
+        var submittedData = _submissionRepository.FindDocument(submissionId);
         var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
         var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedData = _converter.Convert(submittedData);
-        convertedData.Exps = convertedExpressions;
+        convertedData.GeneExpressions = convertedExpressions;
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Genes);
-        _submissionService.DeleteExpSubmission(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }
 
 	private Annotations.Services.Models.Rna.GeneExpressionModel[] AnnotateExpressions(ExpressionsAnnotationService annotationService, Models.Rna.ExpressionModel[] expressions)
 	{
-        var dataType = expressions.First().GetDataType();
+        var dataType = expressions.First().GetKeyType();
 
         var data = expressions
             .Select(expression => expression.GetData())
@@ -105,7 +105,7 @@ public class RnaExpSubmissionHandler
             {
                 Gene = new Data.Models.GeneModel
                 {
-                    Id = model.Gene.Id,
+                    Id = model.Gene.StableId,
                     Symbol = model.Gene.Symbol,
                     Description = model.Gene.Description,
                     Biotype = model.Gene.Biotype,
@@ -116,9 +116,10 @@ public class RnaExpSubmissionHandler
                     ExonicLength = model.Gene.ExonicLength
                 },
 
-                Reads = model.Reads,
+                Raw = model.Reads,
                 TPM = model.TPM,
-                FPKM = model.FPKM
+                FPKM = model.FPKM,
+                Normalized = model.Normalized
             };
         }
     }

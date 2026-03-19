@@ -16,6 +16,7 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
 
     public GeneIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
+        //TODO: Dependency Injection should be used instead
         _genesRepository = new GenesRepository(dbContextFactory);
     }
 
@@ -63,11 +64,13 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
                 .Select(gene => gene.Id)
                 .ToArray();
 
+            // TODO: Revise related entities to be indexed when genes are updated.
             CreateProjectIndexingTasks(genes);
             CreateDonorIndexingTasks(genes);
             CreateImageIndexingTasks(genes);
             CreateSpecimenIndexingTasks(genes);
             CreateGeneIndexingTasks(genes);
+            CreateProteinIndexingTasks(genes);
         });
 
         transaction.Commit();
@@ -100,6 +103,17 @@ public class GeneIndexingTaskService : IndexingTaskService<Gene, int>
     protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
     {
         return keys;
+    }
+
+    //TODO: redesign so that such unrelated methods should not be implemented in all indexing task services
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    {
+        return [];
+    }
+
+    protected override IEnumerable<int> LoadRelatedProteins(IEnumerable<int> keys)
+    {
+        return _genesRepository.GetRelatedProteins(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)

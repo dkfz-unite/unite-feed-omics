@@ -4,16 +4,16 @@ using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.Dna;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class DnaCnvSubmissionHandler
+public class DnaCnvSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly CnvAnnotationTaskService _annotationTaskService;
     private readonly CnvIndexingTaskService _indexingTaskService;
-    private readonly DnaSubmissionService _submissionService;
+    private readonly CnvSubmissionRepository _submissionRepository;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
@@ -21,27 +21,27 @@ public class DnaCnvSubmissionHandler
 
 
     public DnaCnvSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         CnvAnnotationTaskService annotationTaskService,
         CnvIndexingTaskService indexingTaskService,
-        DnaSubmissionService submissionService,
         TasksProcessingService tasksProcessingService,
-        ILogger<DnaCnvSubmissionHandler> logger)
+        CnvSubmissionRepository submissionRepository,
+        ILogger<DnaCnvSubmissionHandler> logger): base(priority)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
         _indexingTaskService = indexingTaskService;
-        _submissionService = submissionService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
 
         _converter = new Models.Dna.Cnv.Converters.AnalysisModelConverter();
     }
 
-
-    public void Handle()
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
 
 
@@ -65,13 +65,14 @@ public class DnaCnvSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindCnvSubmission(submissionId);
+        var submittedData = _submissionRepository.Find(submissionId)?.Document;
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
+        //TODO: If server fails, audit.Cnvs will be lost forever and indexing with annotation won't happen
         _annotationTaskService.PopulateTasks(audit.Cnvs);
         _indexingTaskService.PopulateTasks(audit.CnvsEntries.Except(audit.Cnvs));
-        _submissionService.DeleteCnvSubmission(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

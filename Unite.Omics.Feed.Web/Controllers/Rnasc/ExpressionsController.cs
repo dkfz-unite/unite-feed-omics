@@ -7,42 +7,29 @@ using Unite.Data.Entities.Tasks.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
 namespace Unite.Omics.Feed.Web.Controllers.RnaSc;
 
 [Route("api/rnasc/analysis/exp")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class ExpressionsController : AnalysisController
+public class ExpressionsController : AnalysisController<EmptyModel>
 {
-    private readonly RnascSubmissionService _submissionService;
-    protected override string DataType => DataTypes.Omics.Rnasc.Exp;
+    public ExpressionsController(SubmissionTaskService submissionTaskService,
+        ILogger<ExpressionsController> logger,
+        ExpressionSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
+    protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.RNASC_EXP;
+    protected override string DataType => DataTypes.Omics.Rnasc.Expression;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeqSc, AnalysisType.RNASeqSn];
-
-
-    public ExpressionsController(
-        RnascSubmissionService submissionService,
-        SubmissionTaskService submissionTaskService,
-        ILogger<ExpressionsController> logger) : base(submissionTaskService, logger)
-    {
-        _submissionService = submissionService;
-    }
-
-
-    protected override AnalysisModel<EmptyModel> FindSubmission(string id)
-    {
-        return _submissionService.FindExpSubmission(id);
-    }
 
     protected override long AddSubmission(AnalysisModel<EmptyModel> model, bool review)
     {
         model.Resources?.ForEach(resource => resource.Type = DataType);
 
-        var submissionId = _submissionService.AddExpSubmission(model);
-
-        var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
-
-        return _submissionTaskService.CreateTask(SubmissionTaskType.RNASC_EXP, submissionId, taskStatus);
+        return base.AddSubmission(model, review);
     }
 
     // Temporarly commented as data source service submits resources one by one, not all together, so validation fails.

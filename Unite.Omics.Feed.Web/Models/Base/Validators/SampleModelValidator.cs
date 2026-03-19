@@ -78,6 +78,11 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage("Should be greater than or equal to 1");
 
 
+        RuleFor(model => model.Batch)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
+
+
         RuleForEach(model => model.Resources)
             .SetValidator(_resourceModelValidator);
     }

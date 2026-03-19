@@ -1,4 +1,6 @@
-﻿namespace Unite.Omics.Feed.Data.Models;
+﻿using Unite.Omics.Feed.Data.Models.Dna.Cnv;
+
+namespace Unite.Omics.Feed.Data.Models;
 
 public class SampleModel
 {
@@ -6,6 +8,7 @@ public class SampleModel
     public double? Purity;
     public double? Ploidy;
     public int? Cells;
+    public string Batch;
 
     public SpecimenModel Specimen;
     public AnalysisModel Analysis;
@@ -14,6 +17,8 @@ public class SampleModel
     public IEnumerable<Dna.Sm.VariantModel> Sms;
     public IEnumerable<Dna.Cnv.VariantModel> Cnvs;
     public IEnumerable<Dna.Sv.VariantModel> Svs;
-    public IEnumerable<Rna.GeneExpressionModel> Exps;
+    public IEnumerable<Rna.GeneExpressionModel> GeneExpressions;
+    public IEnumerable<Prot.ProteinExpressionModel> ProteinExpressions;
     public IEnumerable<ResourceModel> Resources;
+    public IEnumerable<ProfileModel> CnvProfiles;
 }

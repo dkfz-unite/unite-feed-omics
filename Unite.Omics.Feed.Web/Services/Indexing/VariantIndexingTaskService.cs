@@ -107,6 +107,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         return _variantsRepository.GetRelatedImages<TV>(keys).Result;
     }
 
+    //TODO: Indexing cache could be used instead 
     protected override IEnumerable<int> LoadRelatedSpecimens(IEnumerable<int> keys)
     {
         return _variantsRepository.GetRelatedSpecimens<TV>(keys).Result;
@@ -115,6 +116,11 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
     protected override IEnumerable<int> LoadRelatedGenes(IEnumerable<int> keys)
     {
         return _variantsRepository.GetRelatedGenes<TV>(keys).Result;
+    }
+
+    protected override IEnumerable<int> LoadRelatedProteins(IEnumerable<int> keys)
+    {
+        return _variantsRepository.GetRelatedProteins<TV>(keys).Result;
     }
 
     protected override IEnumerable<int> LoadRelatedSms(IEnumerable<int> keys)
@@ -138,6 +144,11 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
         if (typeof(TV) == typeof(SV.Variant))
             return keys;
         
+        return [];
+    }
+    
+    protected override IEnumerable<int> LoadRelatedCnvProfiles(IEnumerable<int> keys)
+    {
         return [];
     }
 }

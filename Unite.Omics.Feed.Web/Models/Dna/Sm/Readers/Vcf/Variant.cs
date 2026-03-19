@@ -1,5 +1,4 @@
 using Unite.Data.Entities.Omics.Enums;
-using Unite.Essentials.Extensions;
 
 namespace Unite.Omics.Feed.Web.Models.Dna.Sm.Readers.Vcf;
 

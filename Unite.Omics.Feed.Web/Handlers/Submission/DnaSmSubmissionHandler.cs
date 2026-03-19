@@ -4,16 +4,16 @@ using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.Dna;
 using Unite.Omics.Feed.Web.Services.Annotation;
 using Unite.Omics.Feed.Web.Services.Indexing;
-using Unite.Omics.Feed.Web.Submissions;
+using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public class DnaSmSubmissionHandler
+public class DnaSmSubmissionHandler: SubmissionHandler
 {
     private readonly AnalysisWriter _dataWriter;
     private readonly SmAnnotationTaskService _annotationTaskService;
     private readonly SmIndexingTaskService _indexingTaskService;
-    private readonly DnaSubmissionService _submissionService;
+    private readonly SmSubmissionRepository _submissionRepository;
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
@@ -21,27 +21,28 @@ public class DnaSmSubmissionHandler
 
 
     public DnaSmSubmissionHandler(
+        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SmAnnotationTaskService annotationTaskService,
         SmIndexingTaskService indexingTaskService,
-        DnaSubmissionService submissionService,
         TasksProcessingService tasksProcessingService,
-        ILogger<DnaSmSubmissionHandler> logger)
+        SmSubmissionRepository submissionRepository,
+        ILogger<DnaSmSubmissionHandler> logger): base(priority)
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
         _indexingTaskService = indexingTaskService;
-        _submissionService = submissionService;
         _taskProcessingService = tasksProcessingService;
         _logger = logger;
+        _submissionRepository = submissionRepository;
 
         _converter = new Models.Dna.Sm.Converters.AnalysisModelConverter();
     }
 
 
-    public void Handle()
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
 
 
@@ -65,13 +66,13 @@ public class DnaSmSubmissionHandler
 
     private void ProcessSubmission(string submissionId)
     {
-        var submittedData = _submissionService.FindSmSubmission(submissionId);
+        var submittedData = _submissionRepository.Find(submissionId)?.Document;
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
         _annotationTaskService.PopulateTasks(audit.Sms);
         _indexingTaskService.PopulateTasks(audit.SmsEntries.Except(audit.Sms));
-        _submissionService.DeleteSmSubmission(submissionId);
+        _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
     }

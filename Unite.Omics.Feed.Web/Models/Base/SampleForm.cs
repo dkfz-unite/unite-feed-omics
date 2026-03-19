@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Unite.Data.Entities.Omics.Analysis.Enums;
-using Unite.Data.Entities.Specimens.Enums;
-using Unite.Omics.Feed.Web.Models.Base.Binders;
 
 namespace Unite.Omics.Feed.Web.Models.Base;
 
-public record SampleForm
+public record SampleForm: SubmissionForm
 {
     protected string _donorId;
     protected string _specimenId;
@@ -14,12 +11,13 @@ public record SampleForm
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
     protected string _genome;
-    protected IFormFile _resourcesFile;
+    protected string _batch;
 
 
     /// <summary>
     /// Sample donor identifier
     /// </summary>
+    /// //TODO: move to base class
     [FromForm(Name = "donor_id")]
     public string DonorId { get => _donorId?.Trim(); set => _donorId = value; }
 
@@ -60,23 +58,8 @@ public record SampleForm
     public string Genome { get => _genome?.Trim(); set => _genome = value; }
 
     /// <summary>
-    /// Tsv file with resources metadata.
+    /// Batch information
     /// </summary>
-    [FromForm(Name = "resources")]
-    public IFormFile ResourcesFile { get => _resourcesFile; init => _resourcesFile = value; }
-
-
-    public SampleModel Convert()
-    {
-        return new SampleModel
-        {
-            DonorId = DonorId,
-            SpecimenId = SpecimenId,
-            SpecimenType = EnumBinder.Bind<SpecimenType>(SpecimenType).Value,
-            AnalysisType = EnumBinder.Bind<AnalysisType>(AnalysisType).Value,
-            AnalysisDate = AnalysisDate,
-            AnalysisDay = AnalysisDay,
-            Genome = Genome
-        };
-    }
+    [FromForm(Name = "batch")]
+    public string Batch { get => _batch?.Trim(); set => _batch = value; }
 }
