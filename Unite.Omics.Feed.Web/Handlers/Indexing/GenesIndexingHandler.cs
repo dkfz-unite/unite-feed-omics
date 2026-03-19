@@ -46,7 +46,9 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
         await base.BuildIndexEntity(id, indexingCache, indexingContext);
         
         var entities = _geneExpressionIndexEntityBuilder.Create(id, indexingCache);
-        indexingContext.GeneExpressionsToAdd.AddRange(entities);
+
+        if (entities != null)
+            indexingContext.GeneExpressionsToAdd.AddRange(entities);
     }
 
     protected override async Task DeleteIndexEntities(GeneIndexingContext indexingContext)

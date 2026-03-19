@@ -45,7 +45,9 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
         await base.BuildIndexEntity(id, indexingCache, indexingContext);
         
         var entities = _proteinExpressionIndexEntityBuilder.Create(id, indexingCache);
-        indexingContext.ProteinExpressionsToAdd.AddRange(entities);
+
+        if (entities != null)
+            indexingContext.ProteinExpressionsToAdd.AddRange(entities);
     }
 
     protected override async Task DeleteIndexEntities(ProteinIndexingContext indexingContext)
