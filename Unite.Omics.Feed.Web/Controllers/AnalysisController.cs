@@ -6,13 +6,15 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class AnalysisController<TEntry>(
-    SubmissionTaskService submissionTaskService,
-    SubmissionRepository<AnalysisModel<TEntry>> submissionRepository,
-    ILogger<AnalysisController<TEntry>> logger)
-    : SubmissionController<AnalysisModel<TEntry>, AnalysisForm>(submissionTaskService, submissionRepository, logger) 
+public abstract class AnalysisController<TEntry> : SubmissionController<AnalysisModel<TEntry>, AnalysisForm> 
         where TEntry : class, new()
 {
+    protected AnalysisController(SubmissionTaskService submissionTaskService,
+        SubmissionRepository<AnalysisModel<TEntry>> submissionRepository,
+        ILogger<AnalysisController<TEntry>> logger) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
     protected abstract AnalysisType[] AnalysisTypes { get; }
     
     protected override AnalysisModel<TEntry> Convert(AnalysisForm form)

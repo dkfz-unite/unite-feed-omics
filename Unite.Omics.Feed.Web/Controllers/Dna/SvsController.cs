@@ -15,12 +15,14 @@ namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
 [Route("api/dna/analysis/sv")]
 [Authorize(Policy = Policies.Data.Writer)]
-public class SvsController(
-    SubmissionTaskService submissionTaskService,
-    ILogger<SvsController> logger,
-    SvSubmissionRepository submissionRepository)
-    : AnalysisDataController<VariantModel>(submissionTaskService, submissionRepository, logger)
+public class SvsController : AnalysisDataController<VariantModel>
 {
+    public SvsController(SubmissionTaskService submissionTaskService,
+        ILogger<SvsController> logger,
+        SvSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
     protected override IValidator<VariantModel> EntryModelValidator => new VariantModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.Sv;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];

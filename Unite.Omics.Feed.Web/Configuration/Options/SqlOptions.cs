@@ -8,4 +8,12 @@ public class SqlOptions : ISqlOptions
     public string Port => Environment.GetEnvironmentVariable("UNITE_SQL_PORT");
     public string User => Environment.GetEnvironmentVariable("UNITE_SQL_USER");
     public string Password => Environment.GetEnvironmentVariable("UNITE_SQL_PASSWORD");
+    public bool IncludeErrorDetail
+    {
+        get
+        {
+            var value = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            return value == "Development";
+        }
+    }
 }

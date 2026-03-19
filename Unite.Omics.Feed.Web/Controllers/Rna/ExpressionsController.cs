@@ -17,11 +17,11 @@ namespace Unite.Omics.Feed.Web.Controllers.Rna;
 public class ExpressionsController(
     SubmissionTaskService submissionTaskService,
     ILogger<ExpressionsController> logger,
-    Unite.Omics.Feed.Web.Submissions.Repositories.Rna.ExpSubmissionRepository submissionRepository)
+    Submissions.Repositories.Rna.ExpressionSubmissionRepository submissionRepository)
     : AnalysisDataController<ExpressionModel>(submissionTaskService, submissionRepository, logger)
 {
     protected override IValidator<ExpressionModel> EntryModelValidator => new ExpressionModelValidator();
-    protected override string DataType => DataTypes.Omics.Rna.Exp;
+    protected override string DataType => DataTypes.Omics.Rna.Expression;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.RNASeq];
     protected override IReader<ExpressionModel>[] Readers =>
     [

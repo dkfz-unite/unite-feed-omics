@@ -1,3 +1,14 @@
 namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
-public abstract class SubmissionHandler(HandlerPriority priority) : Handler(priority), ISubmissionHandler;
+//TODO: Submission Handlers and corresponding submission models should be moved to Unite.Omics.Feed module(dll)
+public abstract class SubmissionHandler : Handler, ISubmissionHandler
+{
+    private readonly HandlerPriority _priority;
+
+    protected SubmissionHandler(HandlerPriority priority)
+    {
+        _priority = priority;
+    }
+
+    public HandlerPriority Priority => _priority;
+}

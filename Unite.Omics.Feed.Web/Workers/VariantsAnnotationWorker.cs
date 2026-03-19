@@ -52,6 +52,7 @@ public class VariantsAnnotationWorker : BackgroundService
         {
             try
             {
+                //TODO: generalize Worker implementation(use existing base Worker)
                 _smsAnnotationHandler.Handle(_options.SmBucketSize);
                 _cnvsAnnotationHandler.Handle(_options.CnvBucketSize);
                 _svsAnnotationHandler.Handle(_options.SvBucketSize);

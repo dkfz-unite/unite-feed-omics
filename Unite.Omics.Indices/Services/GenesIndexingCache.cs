@@ -6,6 +6,7 @@ using Unite.Data.Entities.Donors;
 using Unite.Data.Entities.Images;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis;
+using Unite.Data.Entities.Omics.Analysis.Prot;
 using Unite.Data.Entities.Omics.Analysis.Rna;
 using Unite.Data.Entities.Specimens;
 using Unite.Essentials.Extensions;
@@ -16,7 +17,7 @@ using SV = Unite.Data.Entities.Omics.Analysis.Dna.Sv;
 
 namespace Unite.Omics.Indices.Services;
 
-public class GenesIndexingCache
+public class GenesIndexingCache: IndexingCache
 {
     private static readonly object _lock = new();
 
@@ -27,10 +28,12 @@ public class GenesIndexingCache
     public IEnumerable<CNV.AffectedTranscript> CnvTranscripts { get; private set; }
     public IEnumerable<SV.AffectedTranscript> SvTranscripts { get; private set; }
     public IEnumerable<Gene> Genes { get; private set; }
+    public IEnumerable<Protein> Proteins { get; private set; }
     public IEnumerable<SM.Variant> Sms { get; private set; }
     public IEnumerable<CNV.Variant> Cnvs { get; private set; }
     public IEnumerable<SV.Variant> Svs { get; private set; }
-    public IEnumerable<GeneExpression> ExpEntries { get; private set; }
+    public IEnumerable<GeneExpression> GeneExpressions { get; private set; }
+    public IEnumerable<ProteinExpression> ProteinExpressions { get; private set; }
     public IEnumerable<SM.VariantEntry> SmEntries { get; private set; }
     public IEnumerable<CNV.VariantEntry> CnvEntries { get; private set; }
     public IEnumerable<SV.VariantEntry> SvEntries { get; private set; }
@@ -40,17 +43,18 @@ public class GenesIndexingCache
     public IEnumerable<Sample> Samples { get; private set; }
     
     
-    public GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory)
+    public GenesIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory): base(dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
     }
 
 
-    public void Load(int[] ids)
+    protected override void Load(int[] ids)
     {
         Task.WaitAll
         ([
-            LoadExpressions(ids),
+            LoadGeneExpressions(ids),
+            LoadProteinExpressions(ids),
             LoadSmTranscripts(ids),
             LoadCnvTranscripts(ids),
             LoadSvTranscripts(ids)
@@ -59,6 +63,7 @@ public class GenesIndexingCache
         Task.WaitAll
         ([
             LoadGenes(ids),
+            LoadProteins(ids),
             LoadSms(),
             LoadCnvs(),
             LoadSvs()
@@ -81,7 +86,7 @@ public class GenesIndexingCache
         Sms = null;
         Cnvs = null;
         Svs = null;
-        ExpEntries = null;
+        GeneExpressions = null;
         SmEntries = null;
         CnvEntries = null;
         SvEntries = null;
@@ -89,14 +94,16 @@ public class GenesIndexingCache
         Images = null;
         Specimens = null;
         Samples = null;
+        ProteinExpressions = null;
+        Proteins = null;
     }
 
 
-    private async Task LoadExpressions(int[] ids)
+    private async Task LoadGeneExpressions(int[] ids)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
-        ExpEntries = await dbContext.Set<GeneExpression>()
+        GeneExpressions = await dbContext.Set<GeneExpression>()
             .AsNoTracking()
             .Where(expression => ids.Contains(expression.EntityId))
             .ToArrayAsync();
@@ -107,6 +114,30 @@ public class GenesIndexingCache
         // {
         //     _sampleIds.AddRange(sampleIds);
         // }
+    }
+    
+    private async Task LoadProteinExpressions(int[] ids)
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        var proteinIds = await dbContext.Set<Protein>()
+            .AsNoTracking()
+            .Where(protein => ids.Contains(protein.Transcript.GeneId.Value))
+            .Select(protein => protein.Id)
+            .Distinct()
+            .ToArrayAsync();
+
+        ProteinExpressions = await dbContext.Set<ProteinExpression>()
+            .AsNoTracking()
+            .Where(expression => proteinIds.Contains(expression.EntityId))
+            .ToArrayAsync();
+
+        var sampleIds = ProteinExpressions.Select(expression => expression.SampleId).Distinct().ToArray();
+
+        lock (_lock)
+        {
+            _sampleIds.AddRange(sampleIds);
+        }
     }
 
     private async Task LoadSmTranscripts(int[] ids)
@@ -152,6 +183,17 @@ public class GenesIndexingCache
         Genes = await dbContext.Set<Gene>()
             .AsNoTracking()
             .Where(gene => ids.Contains(gene.Id))
+            .ToArrayAsync();
+    }
+    
+    private async Task LoadProteins(int[] ids)
+    {
+        using var dbContext = _dbContextFactory.CreateDbContext();
+
+        Proteins = await dbContext.Set<Protein>()
+            .AsNoTracking()
+            .Include(protein => protein.Transcript)
+            .Where(protein => ids.Contains(protein.Transcript.GeneId.Value))
             .ToArrayAsync();
     }
 

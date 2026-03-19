@@ -3,8 +3,9 @@
 public class GeneExpressionModel
 {
     public GeneModel Gene;
-    public int Reads;
+    public int Raw;
     public double FPKM;
     public double TPM;
+    public double Normalized;
 }
 

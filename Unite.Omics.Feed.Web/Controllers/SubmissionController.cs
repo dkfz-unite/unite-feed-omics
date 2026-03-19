@@ -13,31 +13,97 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTaskService submissionTaskService, 
-    SubmissionRepository<TModel> submissionRepository,
-    ILogger logger) : Controller
+public abstract class SubmissionController<TModel, TSubmissionForm> : Controller
     where TModel : SubmissionModel, new()
     where TSubmissionForm : SubmissionForm
 {
     protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
-    
+    private readonly SubmissionTaskService _submissionTaskService;
+    private readonly SubmissionRepository<TModel> _submissionRepository;
+
+    protected SubmissionController(SubmissionTaskService submissionTaskService, 
+        SubmissionRepository<TModel> submissionRepository,
+        ILogger logger)
+    {
+        _submissionTaskService = submissionTaskService;
+        _submissionRepository = submissionRepository;
+    }
+
     protected abstract SubmissionTaskType  SubmissionTaskType { get; }
     protected abstract string DataType { get; }
 
+    [HttpGet("{id}")]
+    [Authorize]
+    public virtual IActionResult Get(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+        if (task == null)
+            return NotFound();
+
+        var submission = FindSubmission(task.Target);
+
+        return Ok(submission);
+    }
+    
+    [HttpGet("{id}/status")]
+    [Authorize]
+    public virtual IActionResult GetStatus(long id)
+    {
+        var task = _submissionTaskService.GetTask(id);
+        if (task == null)
+            return NotFound();
+        
+        return Ok(task.StatusTypeId);
+    }
+    
+    [HttpPost("")]
+    [Consumes("application/json")]
+    [RequestSizeLimit(100_000_000)]
+    [Authorize(Policy = Policies.Data.Writer)]
+    public virtual IActionResult PostJson([FromBody] TModel model, [FromQuery] bool review = true)
+    {
+        model.Resources?.ForEach(resource => resource.Type = DataType);
+        ValidateModel(model);
+
+        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+    }
+    
+    [HttpPost("")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(100_000_000)]
+    [Authorize(Policy = Policies.Data.Writer)]
+    public IActionResult PostForm([FromForm] TSubmissionForm form, [FromQuery] bool review = true, [FromQuery] string format = null)
+    {
+        var model = Convert(form);
+        ValidateModel(model);
+
+        try
+        {
+            ReadSubmissionForm(form, model, format);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+
+        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+    }
+    
     protected abstract void ValidateModel(TModel model);
+    protected abstract TModel Convert(TSubmissionForm form);
     
     protected virtual TModel FindSubmission(string id)
     {
-        return submissionRepository.Find(id)?.Document;
+        return _submissionRepository.Find(id)?.Document;
     }
     
     protected virtual long AddSubmission(TModel model, bool review)
     {
-        string submissionId = submissionRepository.Add(model);
+        string submissionId = _submissionRepository.Add(model);
         
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
 
-        return submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
+        return _submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
     }
 
     protected virtual void ReadSubmissionForm(TSubmissionForm form, TModel model, string format = null)
@@ -85,64 +151,5 @@ public abstract class SubmissionController<TModel, TSubmissionForm>(SubmissionTa
                 }
             }
         }
-    }
-
-    protected abstract TModel Convert(TSubmissionForm form);
-    
-    [HttpGet("{id}")]
-    [Authorize]
-    public virtual IActionResult Get(long id)
-    {
-        var task = submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        var submission = FindSubmission(task.Target);
-
-        return Ok(submission);
-    }
-    
-    [HttpGet("{id}/status")]
-    [Authorize]
-    public virtual IActionResult GetStatus(long id)
-    {
-        var task = submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-        
-        return Ok(task.StatusTypeId);
-    }
-    
-    [HttpPost("")]
-    [Consumes("application/json")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public virtual IActionResult PostJson([FromBody] TModel model, [FromQuery] bool review = true)
-    {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        ValidateModel(model);
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
-    }
-    
-    [HttpPost("")]
-    [Consumes("multipart/form-data")]
-    [RequestSizeLimit(100_000_000)]
-    [Authorize(Policy = Policies.Data.Writer)]
-    public IActionResult PostForm([FromForm] TSubmissionForm form, [FromQuery] bool review = true, [FromQuery] string format = null)
-    {
-        var model = Convert(form);
-        ValidateModel(model);
-
-        try
-        {
-            ReadSubmissionForm(form, model, format);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
     }
 }

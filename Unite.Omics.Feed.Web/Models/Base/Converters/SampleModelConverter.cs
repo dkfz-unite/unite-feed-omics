@@ -15,6 +15,7 @@ public class SampleModelConverter
             Purity = sampleModel.Purity,
             Ploidy = sampleModel.Ploidy ?? SampleModel.DefaultPloidy,
             Cells = sampleModel.Cells,
+            Batch = sampleModel.Batch,
             Specimen = ConvertSpecimen(sampleModel),
             Analysis = ConvertAnalysis(sampleModel),
             Resources = ConvertResources(sampleModel.Resources)

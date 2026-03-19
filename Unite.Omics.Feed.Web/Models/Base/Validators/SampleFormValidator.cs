@@ -72,6 +72,11 @@ public class SampleFormValidator : AbstractValidator<SampleForm>
             .Must(genome => genome.Equals("GRCh37", _comparison) || genome.Equals("GRCh38", _comparison));
 
 
+        RuleFor(model => model.Batch)
+            .MaximumLength(100)
+            .WithMessage("Maximum length is 100");
+
+
         RuleFor(model => model.ResourcesFile)
             .NotEmpty()
             .WithMessage("Should not be empty");

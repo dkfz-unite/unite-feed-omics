@@ -1,7 +1,6 @@
 namespace Unite.Omics.Feed.Web.Handlers;
 
-public abstract class Handler(HandlerPriority priority)
+public abstract class Handler
 {
-    public HandlerPriority Priority => priority;
-    public abstract void Handle();
+    public abstract Task Handle();
 }

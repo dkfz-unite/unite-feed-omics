@@ -8,13 +8,15 @@ using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class AnalysisDataController<TEntry>(
-    SubmissionTaskService submissionTaskService,
-    SubmissionRepository<AnalysisModel<TEntry>> submissionRepository,
-    ILogger<AnalysisDataController<TEntry>> logger)
-    : AnalysisController<TEntry>(submissionTaskService, submissionRepository, logger)
+public abstract class AnalysisDataController<TEntry> : AnalysisController<TEntry>
     where TEntry : class, new()
 {
+    protected AnalysisDataController(SubmissionTaskService submissionTaskService,
+        SubmissionRepository<AnalysisModel<TEntry>> submissionRepository,
+        ILogger<AnalysisDataController<TEntry>> logger) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
     

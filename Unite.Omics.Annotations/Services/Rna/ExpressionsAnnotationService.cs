@@ -66,6 +66,7 @@ public class ExpressionsAnnotationService
 
             expression.TPM = Math.Round(tpm, 3);
             expression.FPKM = Math.Round(fpkm, 3);
+            expression.Normalized = Math.Log2(tpm + 1);
         }
 	}
 }

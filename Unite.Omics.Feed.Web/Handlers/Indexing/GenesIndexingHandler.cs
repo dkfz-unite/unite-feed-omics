@@ -1,107 +1,69 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
-using Unite.Omics.Indices.Services;
 using Unite.Indices.Context;
 using Unite.Indices.Entities.Genes;
+using Unite.Omics.Indices.Services;
+using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class GenesIndexingHandler
+public class GeneIndexingContext : IndexingContext<GeneIndex> 
 {
-    private readonly TasksProcessingService _taskProcessingService;
-    private readonly GenesIndexingCache _indexingCache;
-    private readonly IIndexService<GeneIndex> _indexingService;
-    private readonly ILogger _logger;
+    public List<GeneExpressionIndex> GeneExpressionsToAdd { get; } = [];
+}
 
+public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache, GeneIndexEntityBuilder, GeneIndexingContext>
+{
+    protected override int BucketSize => _options.BucketSize;
+    protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;
+    protected override string IndexEntityKind => "Gene";
 
-    public GenesIndexingHandler(
+    private readonly GeneExpressionIndexEntityBuilder _geneExpressionIndexEntityBuilder;
+    private readonly IIndexService<GeneExpressionIndex> _geneExpressionIndexingService;
+    private readonly GenesIndexingOptions _options;
+    
+    
+    public GenesIndexingHandler( 
+        IDbContextFactory<DomainDbContext> dbContextFactory,
         TasksProcessingService taskProcessingService,
-        GenesIndexingCache indexingCache,
-        IIndexService<GeneIndex> indexingService,
-        ILogger<GenesIndexingHandler> logger)
+        GeneIndexEntityBuilder geneIndexEntityBuilder,
+        IIndexService<GeneIndex> geneIndexingService,
+        GeneExpressionIndexEntityBuilder geneExpressionIndexEntityBuilder,
+        IIndexService<GeneExpressionIndex> geneExpressionIndexingService,
+        GenesIndexingOptions options,
+        ILogger<GenesIndexingHandler> logger
+        ) : base(dbContextFactory, taskProcessingService, geneIndexEntityBuilder, geneIndexingService, logger)
     {
-        _taskProcessingService = taskProcessingService;
-        _indexingCache = indexingCache;
-        _indexingService = indexingService;
-        _logger = logger;
+        _geneExpressionIndexEntityBuilder = geneExpressionIndexEntityBuilder;
+        _geneExpressionIndexingService = geneExpressionIndexingService;
+        _options = options;
     }
 
-
-    public async Task Prepare()
+    protected override async Task BuildIndexEntity(int id, GenesIndexingCache indexingCache, GeneIndexingContext indexingContext)
     {
-        await _indexingService.UpdateIndex();
-    }
-
-    public async Task Handle(int bucketSize)
-    {
-        await ProcessIndexingTasks(bucketSize);
-    }
-
-
-    private async Task ProcessIndexingTasks(int bucketSize)
-    {
-        if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
-            return;
-
-        var stopwatch = new Stopwatch();
+        await base.BuildIndexEntity(id, indexingCache, indexingContext);
         
-        await _taskProcessingService.Process(IndexingTaskType.Gene, bucketSize, async (tasks) =>
-        {
-            stopwatch.Restart();
+        var entities = _geneExpressionIndexEntityBuilder.Create(id, indexingCache);
 
-            _indexingCache.Load(tasks.Select(task => int.Parse(task.Target)).ToArray());
+        if (entities != null)
+            indexingContext.GeneExpressionsToAdd.AddRange(entities);
+    }
 
-            var indicesToDelete = new List<string>();
-            var indicesToCreate = new List<GeneIndex>();
-            var indexCreator = new GeneIndexCreator(_indexingCache);
+    protected override async Task DeleteIndexEntities(GeneIndexingContext indexingContext)
+    {
+        await base.DeleteIndexEntities(indexingContext);
 
-            tasks.ForEach(task =>
-            {
-                var id = int.Parse(task.Target);
+        if (indexingContext.EntitiesToDelete.Any())
+            await _geneExpressionIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+    }
 
-                var index = indexCreator.CreateIndex(id);
+    protected override async Task CreateIndexEntities(GeneIndexingContext indexingContext)
+    {
+        await base.CreateIndexEntities(indexingContext);
 
-                if (index == null)
-                    indicesToDelete.Add($"{id}");
-                else
-                    indicesToCreate.Add(index);
-
-            });
-
-            if (indicesToDelete.Any())
-                await _indexingService.DeleteRange(indicesToDelete);
-
-            if (indicesToCreate.Any())
-            {
-                try
-                {
-                    await _indexingService.AddRange(indicesToCreate);
-                }
-                catch
-                {
-                    foreach (var index in indicesToCreate)
-                    {
-                        try
-                        {
-                            await _indexingService.Add(index);
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogError(e, "Failed to index gene {id}", index.Id);
-                        }
-                    }
-                }
-            }
-
-            _indexingCache.Clear();
-
-            stopwatch.Stop();
-
-            _logger.LogInformation("Indexed {number} genes in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
-
-            return true;
-        });
+        if (indexingContext.GeneExpressionsToAdd.Any())
+            await _geneExpressionIndexingService.AddRange(indexingContext.GeneExpressionsToAdd);
     }
 }

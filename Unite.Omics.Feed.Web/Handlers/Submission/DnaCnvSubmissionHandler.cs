@@ -39,9 +39,9 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
         _converter = new Models.Dna.Cnv.Converters.AnalysisModelConverter();
     }
 
-    public override void Handle()
+    public override Task Handle()
     {
-        ProcessSubmissionTasks();
+        return Task.Run(ProcessSubmissionTasks);
     }
 
 
@@ -69,6 +69,7 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
+        //TODO: If server fails, audit.Cnvs will be lost forever and indexing with annotation won't happen
         _annotationTaskService.PopulateTasks(audit.Cnvs);
         _indexingTaskService.PopulateTasks(audit.CnvsEntries.Except(audit.Cnvs));
         _submissionRepository.Delete(submissionId);

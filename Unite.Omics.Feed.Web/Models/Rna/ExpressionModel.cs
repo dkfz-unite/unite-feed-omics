@@ -39,10 +39,10 @@ public record ExpressionModel
 
 
     /// <summary>
-    /// Retrieves expression data type: gene id (1), gene symbol (2), transcript id (3), transcript symbol (4), location (5), Undefined(0).
+    /// Retrieves key type of the expression: gene id (1), gene symbol (2), transcript id (3), transcript symbol (4), location (5), Undefined(0).
     /// </summary>
-    /// <returns>Type of the expression data.</returns>
-    public int GetDataType()
+    /// <returns>Expression key type.</returns>
+    public int GetKeyType()
     {
         return !string.IsNullOrEmpty(GeneId) ? 1
              : !string.IsNullOrEmpty(GeneSymbol) ? 2
@@ -52,12 +52,12 @@ public record ExpressionModel
     }
 
     /// <summary>
-    /// Retrieves expression data corresponding to data type.
+    /// Retrieves expression data corresponding to the key type.
     /// </summary>
     /// <returns>Expression data.</returns>
     public KeyValuePair<string, (int Reads, int? Length)> GetData()
     {
-        var dataType = GetDataType();
+        var dataType = GetKeyType();
 
         return dataType switch
         {

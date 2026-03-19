@@ -8,13 +8,15 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 namespace Unite.Omics.Feed.Web.Controllers.Meth;
 
 [Route("api/meth/sample")]
-public class SampleController(
-    SubmissionTaskService submissionTaskService,
-    ILogger<SampleController> logger,
-    SampleSubmissionRepository submissionRepository)
-    : Controllers.SampleController(submissionTaskService, submissionRepository, logger)
+public class SampleController : Controllers.SampleController
 {
-    protected override string DataType => DataTypes.Omics.Meth.Sample;
+    public SampleController(SubmissionTaskService submissionTaskService,
+        ILogger<SampleController> logger,
+        SampleSubmissionRepository submissionRepository) : base(submissionTaskService, submissionRepository, logger)
+    {
+    }
+
+    protected override string DataType => DataTypes.Omics.Methylation.Sample;
     protected override AnalysisType[] AnalysisTypes => [AnalysisType.MethArray, AnalysisType.WGBS, AnalysisType.RRBS];
     protected override SubmissionTaskType SubmissionTaskType => SubmissionTaskType.METH;
 
