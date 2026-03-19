@@ -53,12 +53,16 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
     protected override async Task DeleteIndexEntities(ProteinIndexingContext indexingContext)
     {
         await base.DeleteIndexEntities(indexingContext);
-        await _proteinExpressionIndexingService.DeleteWhereEquals(index => index.Protein.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+
+        if (indexingContext.EntitiesToDelete.Any())
+            await _proteinExpressionIndexingService.DeleteWhereEquals(index => index.Protein.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
     }
 
     protected override async Task CreateIndexEntities(ProteinIndexingContext indexingContext)
     {
         await base.CreateIndexEntities(indexingContext);
-        await _proteinExpressionIndexingService.AddRange(indexingContext.ProteinExpressionsToAdd);
+
+        if (indexingContext.ProteinExpressionsToAdd.Any())
+            await _proteinExpressionIndexingService.AddRange(indexingContext.ProteinExpressionsToAdd);
     }
 }
