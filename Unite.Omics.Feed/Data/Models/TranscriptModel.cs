@@ -10,6 +10,7 @@ public class TranscriptModel
     public string Biotype;
     public bool IsCanonical;
     public Chromosome Chromosome;
+    public ChromosomeArm? ChromosomeArm;
     public int Start;
     public int End;
     public bool Strand;

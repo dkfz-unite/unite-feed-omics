@@ -4,9 +4,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Unite.Data.Context" Version="12.8.1" />
+    <PackageReference Include="Unite.Data.Context" Version="12.9.0" />
   </ItemGroup>
   <ItemGroup>
-    <!-- <ProjectReference Include="../../unite-data/Unite.Data.Context/Unite.Data.Context.csproj" /> -->
+    <Folder Include="Data/Configuration/" />
+    <Folder Include="Data/Constants/Centromes/" />
+    <Folder Include="Data/Helpers/" />
   </ItemGroup>
 </Project>

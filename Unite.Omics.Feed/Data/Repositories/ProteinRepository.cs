@@ -98,8 +98,10 @@ public class ProteinRepository
             Description = model.Description,
             Database = model.Database,
             ChromosomeId = model.Chromosome,
+            ChromosomeArmId = model.ChromosomeArm,
             Start = model.Start,
             End = model.End,
+            Strand = model.Strand,
             Length = model.Length,
             IsCanonical = model.IsCanonical
         };

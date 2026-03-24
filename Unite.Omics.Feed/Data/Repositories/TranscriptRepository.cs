@@ -98,6 +98,7 @@ public class TranscriptRepository
             Biotype = model.Biotype,
             IsCanonical = model.IsCanonical,
             ChromosomeId = model.Chromosome,
+            ChromosomeArmId = model.ChromosomeArm,
             Start = model.Start,
             End = model.End,
             Strand = model.Strand,

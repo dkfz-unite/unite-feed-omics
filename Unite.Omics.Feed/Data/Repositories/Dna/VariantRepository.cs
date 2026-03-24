@@ -92,6 +92,7 @@ public abstract class VariantRepository<TEntity, TModel>
     protected virtual void Map(in TModel model, ref TEntity entity)
     {
         entity.ChromosomeId = model.Chromosome;
+        entity.ChromosomeArmId = model.ChromosomeArm;
         entity.Start = model.Start;
         entity.End = model.End;
         entity.Length = model.Length;

@@ -96,6 +96,7 @@ public class GeneRepository
             Description = model.Description,
             Biotype = model.Biotype,
             ChromosomeId = model.Chromosome,
+            ChromosomeArmId = model.ChromosomeArm,
             Start = model.Start,
             End = model.End,
             Strand = model.Strand,

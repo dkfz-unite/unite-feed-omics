@@ -6,6 +6,7 @@ public class VariantModel
 {
     public int? Id;
     public Chromosome Chromosome;
+    public ChromosomeArm? ChromosomeArm;
     public int Start;
     public int End;
     public int? Length;
