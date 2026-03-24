@@ -117,6 +117,7 @@ public class ProteinDataLoader
             Chromosome = resource.Chromosome,
             Start = resource.Start,
             End = resource.End,
+            Strand = resource.Strand,
             Length = resource.Length,
             IsCanonical = resource.IsCanonical,
 

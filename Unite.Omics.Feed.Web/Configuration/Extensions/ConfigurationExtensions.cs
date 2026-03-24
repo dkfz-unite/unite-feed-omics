@@ -7,6 +7,7 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Vep;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers;
 using Unite.Omics.Feed.Web.Handlers.Annotation;
@@ -30,6 +31,7 @@ using GeneExpModel = Unite.Omics.Feed.Web.Models.Rna.ExpressionModel;
 using GeneExpModelValidator = Unite.Omics.Feed.Web.Models.Rna.Validators.ExpressionModelValidator;
 using ProtExpModel = Unite.Omics.Feed.Web.Models.Prot.ExpressionModel;
 using ProtExpModelValidator = Unite.Omics.Feed.Web.Models.Prot.Validators.ExpressionModelValidator;
+
 
 
 namespace Unite.Omics.Feed.Web.Configuration.Extensions;
@@ -156,6 +158,7 @@ public static class ConfigurationExtensions
         services.AddTransient<IElasticOptions, ElasticOptions>();
         services.AddTransient<IEnsemblVepOptions, EnsemblVepOptions>();
         services.AddTransient<IEnsemblDataOptions, EnsemblDataOptions>();
+        services.AddTransient<IGenomeOptions, GenomeOptions>();
 
         return services;
     }

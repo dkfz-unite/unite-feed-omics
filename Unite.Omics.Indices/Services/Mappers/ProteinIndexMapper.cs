@@ -48,6 +48,7 @@ public class ProteinIndexMapper
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
+        index.Strand = entity.Strand;
         index.Length = entity.Length;
     }
 }
