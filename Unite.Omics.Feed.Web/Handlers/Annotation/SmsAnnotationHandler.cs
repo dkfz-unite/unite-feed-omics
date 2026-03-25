@@ -2,8 +2,8 @@
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Vep;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Writers.Dna;
-using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers.Annotation.Converters;
 using Unite.Omics.Feed.Web.Services.Indexing;
 
@@ -15,6 +15,7 @@ public class SmsAnnotationHandler
     private readonly EffectsSmWriter _dataWriter;
     private readonly SmIndexingTaskService _indexingTaskService;
     private readonly TasksProcessingService _taskProcessingService;
+    private readonly IGenomeOptions _genomeOptions;
     private readonly ILogger _logger;
 
 
@@ -23,12 +24,14 @@ public class SmsAnnotationHandler
         EffectsSmWriter dataWriter,
         SmIndexingTaskService indexingTaskService,
         TasksProcessingService taskProcessingService,
+        IGenomeOptions genomeOptions,
         ILogger<SmsAnnotationHandler> logger)
     {
         _annotationService = annotationService;
         _dataWriter = dataWriter;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = taskProcessingService;
+        _genomeOptions = genomeOptions;
         _logger = logger;
     }
 
@@ -68,7 +71,7 @@ public class SmsAnnotationHandler
     private void ProcessAnnotationTasks(Unite.Data.Entities.Tasks.Task[] tasks)
     {
         var variants = tasks.Select(task => int.Parse(task.Target)).ToArray();
-        var annotations = _annotationService.Annotate(variants, GenomeOptions.Version);
+        var annotations = _annotationService.Annotate(variants, _genomeOptions.Version);
         var data = EffectsDataConverter.Convert(annotations);
 
         _dataWriter.SaveData(data, out var audit);

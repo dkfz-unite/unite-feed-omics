@@ -119,6 +119,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
                     Chromosome = model.Protein.Chromosome,
                     Start = model.Protein.Start,
                     End = model.Protein.End,
+                    Strand = model.Protein.Strand,
                     Length = model.Protein.Length,
                     IsCanonical = model.Protein.IsCanonical
                 };

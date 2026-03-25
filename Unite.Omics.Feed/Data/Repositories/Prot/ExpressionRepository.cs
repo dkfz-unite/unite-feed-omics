@@ -1,6 +1,7 @@
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis.Prot;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models.Prot;
 
 namespace Unite.Omics.Feed.Data.Repositories.Prot;
@@ -11,10 +12,10 @@ public class ExpressionRepository
     private readonly ProteinRepository _proteinRepository;
 
 
-    public ExpressionRepository(DomainDbContext dbContext)
+    public ExpressionRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions)
     {
         _dbContext = dbContext;
-        _proteinRepository = new ProteinRepository(dbContext);
+        _proteinRepository = new ProteinRepository(dbContext, genomeOptions);
     }
 
 

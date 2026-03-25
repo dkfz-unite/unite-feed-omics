@@ -1,13 +1,15 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna.Sv;
+using Unite.Omics.Feed.Data.Configuration;
+using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models.Dna.Sv;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna.Sv;
 
 public class VariantRepository : VariantRepository<Variant, VariantModel>
 {
-    public VariantRepository(DomainDbContext dbContext) : base(dbContext)
+    public VariantRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions) : base(dbContext, genomeOptions)
     {
     }
 
@@ -15,9 +17,11 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
     {
         return (entity) =>
             entity.ChromosomeId == model.Chromosome &&
+            entity.ChromosomeArmId == model.ChromosomeArm &&
             entity.Start == model.Start &&
             entity.End == model.End &&
             entity.OtherChromosomeId == model.OtherChromosome &&
+            entity.OtherChromosomeArmId == model.OtherChromosomeArm &&
             entity.OtherStart == model.OtherStart &&
             entity.OtherEnd == model.OtherEnd &&
             entity.TypeId == model.Type &&
@@ -31,6 +35,7 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
         base.Map(model, ref entity);
 
         entity.OtherChromosomeId = model.OtherChromosome;
+        entity.OtherChromosomeArmId = ChromosomeArmDetector.Detect(model.OtherChromosome, model.OtherStart, model.OtherEnd, _genomeOptions.Build);
         entity.OtherStart = model.OtherStart;
         entity.OtherEnd = model.OtherEnd;
         entity.TypeId = model.Type;

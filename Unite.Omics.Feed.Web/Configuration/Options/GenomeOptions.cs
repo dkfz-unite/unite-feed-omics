@@ -1,19 +1,20 @@
+using Unite.Omics.Feed.Data.Configuration;
+using Unite.Omics.Feed.Data.Constants;
+
 namespace Unite.Omics.Feed.Web.Configuration.Options;
 
-public static class GenomeOptions
+public class GenomeOptions : IGenomeOptions
 {
-    private const string _grch37 = "GRCh37";
-    private const string _grch38 = "GRCh38";
-    private static readonly string[] _supportedBuilds = [_grch37, _grch38];
+    private static readonly string[] _supportedBuilds = [Genomes.GRCh37, Genomes.GRCh38];
 
-    public static string Build
+    public string Build
     {
         get
         {
             var option = Environment.GetEnvironmentVariable("UNITE_GENOME_BUILD");
 
             if (string.IsNullOrWhiteSpace(option))
-                return _grch37;
+                return Genomes.GRCh37;
 
             var value = option.Trim();
 
@@ -27,14 +28,14 @@ public static class GenomeOptions
         }
     }
 
-    public static int Version
+    public int Version
     {
         get
         {
             return Build switch
             {
-                _grch37 => 37,
-                _grch38 => 38,
+                Genomes.GRCh37 => 37,
+                Genomes.GRCh38 => 38,
                 _ => throw new InvalidOperationException($"Unsupported GRCh version: {Build}")
             };
         }

@@ -1,18 +1,22 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
+using Unite.Omics.Feed.Data.Configuration;
+using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Data.Repositories;
 
 public class GeneRepository
 {
+    private readonly IGenomeOptions _genomeOptions;
     private readonly DomainDbContext _dbContext;
 
 
-    public GeneRepository(DomainDbContext dbContext)
+    public GeneRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions)
     {
         _dbContext = dbContext;
+        _genomeOptions = genomeOptions;
     }
 
 
@@ -96,6 +100,7 @@ public class GeneRepository
             Description = model.Description,
             Biotype = model.Biotype,
             ChromosomeId = model.Chromosome,
+            ChromosomeArmId = ChromosomeArmDetector.Detect(model.Chromosome, model.Start, model.End, _genomeOptions.Build),
             Start = model.Start,
             End = model.End,
             Strand = model.Strand,
