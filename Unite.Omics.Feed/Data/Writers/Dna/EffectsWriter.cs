@@ -3,6 +3,7 @@ using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis.Dna;
 using Unite.Essentials.Extensions;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models;
 using Unite.Omics.Feed.Data.Models.Dna;
 using Unite.Omics.Feed.Data.Repositories;
@@ -15,6 +16,7 @@ public abstract class EffectsWriter<TAffectedTranscriptEntity, TVariantEntity, T
     where TVariantEntity : Variant
     where TVariantModel : VariantModel
 {
+    protected readonly IGenomeOptions _genomeOptions;
     protected GeneRepository _geneRepository;
     protected ProteinRepository _proteinRepository;
     protected TranscriptRepository _transcriptRepository;
@@ -22,8 +24,10 @@ public abstract class EffectsWriter<TAffectedTranscriptEntity, TVariantEntity, T
     protected AffectedTranscriptRepository<TAffectedTranscriptEntity, TVariantEntity, TVariantModel> _affectedTranscriptRepository;
 
 
-    protected EffectsWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    protected EffectsWriter(IDbContextFactory<DomainDbContext> dbContextFactory, IGenomeOptions genomeOptions) : base(dbContextFactory)
     {
+        _genomeOptions = genomeOptions;
+        
         var dbContext = dbContextFactory.CreateDbContext();
 
         Initialize(dbContext);

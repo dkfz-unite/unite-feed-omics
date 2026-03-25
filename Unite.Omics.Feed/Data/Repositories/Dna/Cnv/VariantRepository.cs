@@ -1,13 +1,14 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models.Dna.Cnv;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna.Cnv;
 
 public class VariantRepository : VariantRepository<Variant, VariantModel>
 {
-    public VariantRepository(DomainDbContext dbContext) : base(dbContext)
+    public VariantRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions) : base(dbContext, genomeOptions)
     {
     }
 
