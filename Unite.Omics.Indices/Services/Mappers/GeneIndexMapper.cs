@@ -44,6 +44,7 @@ public class GeneIndexMapper
         index.Description = entity.Description;
         index.Biotype = entity.Biotype;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
+        index.ChromosomeArm = entity.ChromosomeArmId?.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
         index.Strand = entity.Strand;

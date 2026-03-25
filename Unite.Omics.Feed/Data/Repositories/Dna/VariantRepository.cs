@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna;
+using Unite.Omics.Feed.Data.Configuration;
+using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models.Dna;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna;
@@ -10,11 +12,13 @@ public abstract class VariantRepository<TEntity, TModel>
     where TModel : VariantModel
 {
     protected readonly DomainDbContext _dbContext;
+    protected readonly IGenomeOptions _genomeOptions;
 
 
-    public VariantRepository(DomainDbContext dbContext)
+    public VariantRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions)
     {
         _dbContext = dbContext;
+        _genomeOptions = genomeOptions;
     }
 
 
@@ -92,6 +96,7 @@ public abstract class VariantRepository<TEntity, TModel>
     protected virtual void Map(in TModel model, ref TEntity entity)
     {
         entity.ChromosomeId = model.Chromosome;
+        entity.ChromosomeArmId = ChromosomeArmDetector.Detect(model.Chromosome, model.Start, model.End, _genomeOptions.Build);
         entity.Start = model.Start;
         entity.End = model.End;
         entity.Length = model.Length;
