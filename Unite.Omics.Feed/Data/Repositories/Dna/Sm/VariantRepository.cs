@@ -16,7 +16,6 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
     {
         return (entity) =>
             entity.ChromosomeId == model.Chromosome &&
-            entity.ChromosomeArmId == model.ChromosomeArm &&
             entity.Start == model.Start &&
             entity.End == model.End &&
             entity.Ref == model.Ref &&
