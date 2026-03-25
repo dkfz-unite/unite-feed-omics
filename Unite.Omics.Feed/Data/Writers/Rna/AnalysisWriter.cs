@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Essentials.Extensions;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models;
 using Unite.Omics.Feed.Data.Models.Rna;
 using Unite.Omics.Feed.Data.Repositories;
@@ -12,18 +13,20 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 {
     private const int _batchSize = 1000;
 
+    private readonly IGenomeOptions _genomeOptions;
     private GeneRepository _geneRepository;
     private GeneExpressionRepository _geneExpressionRepository;
 
-    public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory, IGenomeOptions genomeOptions) : base(dbContextFactory)
     {
+        _genomeOptions = genomeOptions;
     }
 
     protected override void Initialize(DomainDbContext dbContext)
     {
         _sampleRepository = new SampleRepository(dbContext);
-        _geneRepository = new GeneRepository(dbContext);
-        _geneExpressionRepository = new GeneExpressionRepository(dbContext);
+        _geneRepository = new GeneRepository(dbContext, _genomeOptions);
+        _geneExpressionRepository = new GeneExpressionRepository(dbContext, _genomeOptions);
         _resourceRepository = new ResourceRepository(dbContext);
     }
 

@@ -1,20 +1,24 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
+using Unite.Omics.Feed.Data.Configuration;
+using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Data.Repositories;
 
 public class ProteinRepository
 {
+    private readonly IGenomeOptions _genomeOptions;
     private readonly DomainDbContext _dbContext;
     private readonly TranscriptRepository _transcriptRepository;
 
 
-    public ProteinRepository(DomainDbContext dbContext)
+    public ProteinRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions)
     {
         _dbContext = dbContext;
-        _transcriptRepository = new TranscriptRepository(dbContext);
+        _genomeOptions = genomeOptions;
+        _transcriptRepository = new TranscriptRepository(dbContext, genomeOptions);
     }
 
 
@@ -98,7 +102,7 @@ public class ProteinRepository
             Description = model.Description,
             Database = model.Database,
             ChromosomeId = model.Chromosome,
-            ChromosomeArmId = model.ChromosomeArm,
+            ChromosomeArmId = ChromosomeArmDetector.Detect(model.Chromosome, model.Start, model.End, _genomeOptions.Build),
             Start = model.Start,
             End = model.End,
             Strand = model.Strand,

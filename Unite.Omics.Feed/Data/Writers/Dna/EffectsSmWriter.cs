@@ -16,10 +16,10 @@ public class EffectsSmWriter : EffectsWriter<AffectedTranscript, Variant, Models
 
     protected override void Initialize(DomainDbContext dbContext)
     {
-        _geneRepository = new GeneRepository(dbContext);
-        _proteinRepository = new ProteinRepository(dbContext);
-        _transcriptRepository = new TranscriptRepository(dbContext);
+        _geneRepository = new GeneRepository(dbContext, _genomeOptions);
+        _proteinRepository = new ProteinRepository(dbContext, _genomeOptions);
+        _transcriptRepository = new TranscriptRepository(dbContext, _genomeOptions);
         _variantRepository = new VariantRepository(dbContext, _genomeOptions);
-        _affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext, (VariantRepository)_variantRepository);
+        _affectedTranscriptRepository = new AffectedTranscriptRepository(dbContext, _genomeOptions, (VariantRepository)_variantRepository);
     }
 }
