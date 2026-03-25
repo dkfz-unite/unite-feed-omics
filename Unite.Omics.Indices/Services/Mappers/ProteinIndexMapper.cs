@@ -46,6 +46,7 @@ public class ProteinIndexMapper
         index.Database = entity.Database;
         index.IsCanonical = entity.IsCanonical;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
+        index.ChromosomeArm = entity.ChromosomeArmId?.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
         index.Strand = entity.Strand;
