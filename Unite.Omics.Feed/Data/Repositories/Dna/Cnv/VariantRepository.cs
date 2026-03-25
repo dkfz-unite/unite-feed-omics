@@ -2,6 +2,7 @@
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
 using Unite.Omics.Feed.Data.Configuration;
+using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models.Dna.Cnv;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna.Cnv;
@@ -46,5 +47,7 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
         entity.Tcn = model.Tcn;
         entity.TcnRatio = model.TcnRatio;
         entity.DhMax = model.DhMax;
+        entity.ChromosomeId = model.Chromosome;
+        entity.ChromosomeArmId = ChromosomeArmDetector.Detect(model.Chromosome, model.Start, model.End, _genomeOptions.Build);
     }
 }
