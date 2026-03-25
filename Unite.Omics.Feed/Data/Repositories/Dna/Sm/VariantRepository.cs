@@ -2,7 +2,6 @@
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna.Sm;
 using Unite.Omics.Feed.Data.Configuration;
-using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models.Dna.Sm;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna.Sm;
@@ -31,7 +30,5 @@ public class VariantRepository : VariantRepository<Variant, VariantModel>
         entity.TypeId = model.Type;
         entity.Ref = model.Ref;
         entity.Alt = model.Alt;
-        entity.ChromosomeId = model.Chromosome;
-        entity.ChromosomeArmId = ChromosomeArmDetector.Detect(model.Chromosome, model.Start, model.End, _genomeOptions.Build);
     }
 }

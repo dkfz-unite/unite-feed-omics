@@ -1,8 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna.Sv;
-using Unite.Data.Entities.Omics.Analysis.Dna.Sv.Enums;
-using Unite.Data.Entities.Omics.Enums;
 using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Helpers;
 using Unite.Omics.Feed.Data.Models.Dna.Sv;
