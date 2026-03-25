@@ -31,7 +31,7 @@ public record ProteinResource : LookupResource
     public int End { get; set; }
 
     [JsonPropertyName("strand")]
-    public bool? Strand { get; set; }
+    public bool Strand { get; set; }
 
     [JsonPropertyName("length")]
     public int Length { get; set; }

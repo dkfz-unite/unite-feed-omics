@@ -14,7 +14,7 @@ public class ProteinModel
     public Chromosome Chromosome;
     public int Start;
     public int End;
-    public bool? Strand;
+    public bool Strand;
     public int Length;
     public bool IsCanonical;
 
