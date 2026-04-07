@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Indices.Context;
-using Unite.Indices.Entities.Genes;
 using Unite.Indices.Entities.Variants;
-using Unite.Indices.Entities.Proteins;
+
+using GeneIndex = Unite.Indices.Entities.Genes.GeneIndex;
+using ProteinIndex = Unite.Indices.Entities.Proteins.ProteinIndex;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
