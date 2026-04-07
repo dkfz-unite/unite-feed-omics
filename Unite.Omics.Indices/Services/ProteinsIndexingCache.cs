@@ -199,7 +199,7 @@ public class ProteinsIndexingCache: IndexingCache
 
         Proteins = await dbContext.Set<Protein>()
             .AsNoTracking()
-            .Include(protein => protein.Transcript)
+            .Include(protein => protein.Transcript.Gene)
             .Where(protein => ids.Contains(protein.Id))
             .ToArrayAsync();
     }

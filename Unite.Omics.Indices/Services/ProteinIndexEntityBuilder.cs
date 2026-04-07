@@ -49,6 +49,20 @@ public class ProteinIndexEntityBuilder: IndexEntityBuilder<ProteinIndex, Protein
         index.Stats = CreateStatsIndex(protein.Id, cache);
         index.Data = CreateDataIndex(protein.Id, cache);
 
+        index.Transcript = new TranscriptIndex
+        {
+            Id = protein.Transcript.Id,
+            StableId = protein.Transcript.StableId,
+            Symbol = protein.Transcript.Symbol
+        };
+
+        index.Gene = new GeneIndex
+        {
+            Id = protein.Transcript.Gene.Id,
+            StableId = protein.Transcript.Gene.StableId,
+            Symbol = protein.Transcript.Gene.Symbol
+        };
+
         return index;
     }
 
