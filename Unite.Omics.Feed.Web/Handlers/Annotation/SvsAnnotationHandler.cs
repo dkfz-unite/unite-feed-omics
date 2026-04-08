@@ -71,7 +71,7 @@ public class SvsAnnotationHandler
     private void ProcessAnnotationTasks(Unite.Data.Entities.Tasks.Task[] tasks)
     {
         var variants = tasks.Select(task => int.Parse(task.Target)).ToArray();
-        var annotations = _annotationService.Annotate(variants, _genomeOptions.Version);
+        var annotations = _annotationService.Annotate(variants);
         var data = EffectsDataConverter.Convert(annotations);
 
         _dataWriter.SaveData(data, out var audit);

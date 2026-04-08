@@ -28,24 +28,24 @@ internal class AnnotationsDataLoader
     }
 
 
-    public async Task<EffectsDataModel[]> LoadData(string[] vepCodes, int grch)
+    public async Task<EffectsDataModel[]> LoadData(string[] vepCodes)
     {
-        var variants = await AnnotateVariants(vepCodes, grch);
-        var genes = await AnnotateGenes(variants, grch);
-        var transcripts = await AnnotateTranscripts(variants, grch);
+        var variants = await AnnotateVariants(vepCodes);
+        var genes = await AnnotateGenes(variants);
+        var transcripts = await AnnotateTranscripts(variants);
 
         return AnnotationsDataConverter.Convert(variants, genes, transcripts);
     }
 
 
-    private async Task<AnnotatedVariantResource[]> AnnotateVariants(string[] vepCodes, int grch)
+    private async Task<AnnotatedVariantResource[]> AnnotateVariants(string[] vepCodes)
     {
         var annotations = await _ensemblVepApiClient.LoadAnnotations(vepCodes);
 
         return Filter(annotations)?.ToArray();
     }
 
-    private async Task<GeneResource[]> AnnotateGenes(AnnotatedVariantResource[] variants, int grch)
+    private async Task<GeneResource[]> AnnotateGenes(AnnotatedVariantResource[] variants)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
@@ -71,12 +71,12 @@ internal class AnnotationsDataLoader
             .Select(id => new GeneResource { Id = id })
             .ToArray();
 
-        var newResources = await _ensemblApiClient.FindById<GeneResource>(newIdentifiers, length: true, grch: grch);
+        var newResources = await _ensemblApiClient.FindById<GeneResource>(newIdentifiers, length: true);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
     }
 
-    private async Task<TranscriptResource[]> AnnotateTranscripts(AnnotatedVariantResource[] variants, int grch)
+    private async Task<TranscriptResource[]> AnnotateTranscripts(AnnotatedVariantResource[] variants)
     {
         using var dbContext = _dbContextFactory.CreateDbContext();
 
@@ -102,7 +102,7 @@ internal class AnnotationsDataLoader
             .Select(id => new TranscriptResource { Id = id })
             .ToArray();
 
-        var newResources = await _ensemblApiClient.FindById<TranscriptResource>(newIdentifiers, length: true, expand: true, grch: grch);
+        var newResources = await _ensemblApiClient.FindById<TranscriptResource>(newIdentifiers, length: true, expand: true);
 
         return Enumerable.Union(existingResources, newResources).ToArray();
     }
