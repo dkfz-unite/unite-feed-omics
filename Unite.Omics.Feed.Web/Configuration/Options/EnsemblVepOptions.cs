@@ -2,7 +2,7 @@
 
 namespace Unite.Omics.Feed.Web.Configuration.Options;
 
-public class EnsemblVepOptions : IEnsemblVepOptions
+public class EnsemblVepOptions : GenomeOptions, IEnsemblVepOptions
 {
     public string Host => Environment.GetEnvironmentVariable("UNITE_ENSEMBL_VEP_HOST");
 }
