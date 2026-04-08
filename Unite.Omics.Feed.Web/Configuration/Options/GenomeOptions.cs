@@ -28,7 +28,7 @@ public class GenomeOptions : IGenomeOptions
         }
     }
 
-    public int Version
+    public byte Version
     {
         get
         {
