@@ -9,16 +9,10 @@ using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class ProteinIndexingContext : IndexingContext<ProteinIndex> 
-{
-    public List<ProteinExpressionIndex> ProteinExpressionsToAdd { get; } = [];
-}
-
 public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsIndexingCache, ProteinIndexEntityBuilder, ProteinIndexingContext>
 {
     protected override int BucketSize => _options.BucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Protein;
-    protected override string IndexEntityKind => "Protein";
 
     private readonly ProteinExpressionIndexEntityBuilder _proteinExpressionIndexEntityBuilder;
     private readonly IIndexService<ProteinExpressionIndex> _proteinExpressionIndexingService;
@@ -40,9 +34,9 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
         _options = options;
     }
 
-    protected override async Task BuildIndexEntity(int id, ProteinsIndexingCache indexingCache, ProteinIndexingContext indexingContext)
+    protected override void BuildIndexEntity(int id, ProteinsIndexingCache indexingCache, ProteinIndexingContext indexingContext)
     {
-        await base.BuildIndexEntity(id, indexingCache, indexingContext);
+        base.BuildIndexEntity(id, indexingCache, indexingContext);
         
         var entities = _proteinExpressionIndexEntityBuilder.Create(id, indexingCache);
 
@@ -50,19 +44,19 @@ public class ProteinsIndexingHandler: IndexingHandler<ProteinIndex, ProteinsInde
             indexingContext.ProteinExpressionsToAdd.AddRange(entities);
     }
 
-    protected override async Task DeleteIndexEntities(ProteinIndexingContext indexingContext)
+    protected override void DeleteIndexEntities(ProteinIndexingContext indexingContext)
     {
-        await base.DeleteIndexEntities(indexingContext);
+        base.DeleteIndexEntities(indexingContext);
 
         if (indexingContext.EntitiesToDelete.Any())
-            await _proteinExpressionIndexingService.DeleteWhereEquals(index => index.Protein.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+            _proteinExpressionIndexingService.DeleteWhereEquals(index => index.Protein.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray()).Wait();
     }
 
-    protected override async Task CreateIndexEntities(ProteinIndexingContext indexingContext)
+    protected override void CreateIndexEntities(ProteinIndexingContext indexingContext)
     {
-        await base.CreateIndexEntities(indexingContext);
+        base.CreateIndexEntities(indexingContext);
 
         if (indexingContext.ProteinExpressionsToAdd.Any())
-            await _proteinExpressionIndexingService.AddRange(indexingContext.ProteinExpressionsToAdd);
+            _proteinExpressionIndexingService.AddRange(indexingContext.ProteinExpressionsToAdd).Wait();
     }
 }

@@ -30,12 +30,12 @@ public class VariantsAnnotationWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // Delay 5 seconds to let the web api start working
+        await Task.Delay(5000, stoppingToken);
+        
         _logger.LogInformation("Variants annotation worker started");
 
         stoppingToken.Register(() => _logger.LogInformation("Variants annotation worker stopped"));
-
-        // Delay 5 seconds to let the web api start working
-        await Task.Delay(5000, stoppingToken);
 
         try
         {

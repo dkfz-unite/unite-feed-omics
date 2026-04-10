@@ -14,7 +14,6 @@ public class SmsIndexingHandler: IndexingHandler<SmIndex, VariantIndexingCache<V
 {
     protected override int BucketSize => _options.SmBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.SM;
-    protected override string IndexEntityKind => "SM";
 
     private readonly VariantsIndexingOptions _options;
     

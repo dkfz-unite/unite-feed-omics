@@ -15,16 +15,14 @@ public abstract class SampleSubmissionHandler: SubmissionHandler
     protected readonly ILogger _logger;
 
     protected readonly SampleModelConverter _converter = new();
-
     protected abstract SubmissionTaskType TaskType { get; }
 
 
     public SampleSubmissionHandler(
-        HandlerPriority priority,
         SampleWriter dataWriter,
         TasksProcessingService taskProcessingService,
         SampleIndexingTaskService indexingTaskService,
-        ILogger logger): base(priority)
+        ILogger logger): base()
     {
         _dataWriter = dataWriter;
         _taskProcessingService = taskProcessingService;
@@ -33,13 +31,7 @@ public abstract class SampleSubmissionHandler: SubmissionHandler
     }
 
 
-    public override Task Handle()
-    {
-        return Task.Run(ProcessSubmissionTasks);
-    }
-
-
-    protected virtual void ProcessSubmissionTasks()
+    public override void Handle()
     {
         var stopwatch = new Stopwatch();
 
@@ -56,6 +48,7 @@ public abstract class SampleSubmissionHandler: SubmissionHandler
             return true;
         });
     }
+    
 
     protected virtual void ProcessSubmission(string submissionId)
     {

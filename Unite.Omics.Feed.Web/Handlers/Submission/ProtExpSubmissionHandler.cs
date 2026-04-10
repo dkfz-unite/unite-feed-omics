@@ -17,38 +17,29 @@ public class ProtExpSubmissionHandler : SubmissionHandler
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Prot.Converters.AnalysisModelConverter _converter;
+    private readonly Models.Prot.Converters.AnalysisModelConverter _converter = new();
 
 
     public ProtExpSubmissionHandler(
-        HandlerPriority priority,
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
         ProteinIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ExpressionSubmissionRepository submissionRepository,
-        ILogger<ProtExpSubmissionHandler> logger) : base(priority)
+        ILogger<ProtExpSubmissionHandler> logger) : base()
     {
         _dataWriter = dataWriter;
         _annotationService = annotationService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
-        _logger = logger;
         _submissionRepository = submissionRepository;
-
-        _converter = new Models.Prot.Converters.AnalysisModelConverter();
+        _logger = logger;
     }
 
 
-    public override Task Handle()
+    public override void Handle()
     {
-        return Task.Run(ProcessSubmissionTasks);
-    }
-
-
-    private void ProcessSubmissionTasks()
-    {
-       var stopwatch = new Stopwatch();
+        var stopwatch = new Stopwatch();
 
         _taskProcessingService.Process(SubmissionTaskType.PROT_EXP, TaskStatusType.Prepared, 1, (tasks) =>
         {

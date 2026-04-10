@@ -9,16 +9,10 @@ using Unite.Omics.Feed.Web.Configuration.Options;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class GeneIndexingContext : IndexingContext<GeneIndex> 
-{
-    public List<GeneExpressionIndex> GeneExpressionsToAdd { get; } = [];
-}
-
 public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache, GeneIndexEntityBuilder, GeneIndexingContext>
 {
     protected override int BucketSize => _options.BucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.Gene;
-    protected override string IndexEntityKind => "Gene";
 
     private readonly GeneExpressionIndexEntityBuilder _geneExpressionIndexEntityBuilder;
     private readonly IIndexService<GeneExpressionIndex> _geneExpressionIndexingService;
@@ -41,9 +35,9 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
         _options = options;
     }
 
-    protected override async Task BuildIndexEntity(int id, GenesIndexingCache indexingCache, GeneIndexingContext indexingContext)
+    protected override void BuildIndexEntity(int id, GenesIndexingCache indexingCache, GeneIndexingContext indexingContext)
     {
-        await base.BuildIndexEntity(id, indexingCache, indexingContext);
+        base.BuildIndexEntity(id, indexingCache, indexingContext);
         
         var entities = _geneExpressionIndexEntityBuilder.Create(id, indexingCache);
 
@@ -51,19 +45,19 @@ public class GenesIndexingHandler: IndexingHandler<GeneIndex, GenesIndexingCache
             indexingContext.GeneExpressionsToAdd.AddRange(entities);
     }
 
-    protected override async Task DeleteIndexEntities(GeneIndexingContext indexingContext)
+    protected override void DeleteIndexEntities(GeneIndexingContext indexingContext)
     {
-        await base.DeleteIndexEntities(indexingContext);
+        base.DeleteIndexEntities(indexingContext);
 
         if (indexingContext.EntitiesToDelete.Any())
-            await _geneExpressionIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray());
+            _geneExpressionIndexingService.DeleteWhereEquals(index => index.Gene.Id, indexingContext.EntitiesToDelete.Select(id => int.Parse(id)).ToArray()).Wait();
     }
 
-    protected override async Task CreateIndexEntities(GeneIndexingContext indexingContext)
+    protected override void CreateIndexEntities(GeneIndexingContext indexingContext)
     {
-        await base.CreateIndexEntities(indexingContext);
+        base.CreateIndexEntities(indexingContext);
 
         if (indexingContext.GeneExpressionsToAdd.Any())
-            await _geneExpressionIndexingService.AddRange(indexingContext.GeneExpressionsToAdd);
+            _geneExpressionIndexingService.AddRange(indexingContext.GeneExpressionsToAdd).Wait();
     }
 }
