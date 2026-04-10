@@ -1,79 +1,87 @@
-using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Handlers;
 
 namespace Unite.Omics.Feed.Web.Workers;
 
-public abstract class Worker<THandlerInterface> : BackgroundService
-    where THandlerInterface : IHandler
+public abstract class Worker : BackgroundService
 {
-    private THandlerInterface[] _handlers;
-    private readonly IHostApplicationLifetime _lifetime;
-    private readonly ILogger<SubmissionsWorker> _logger;
+    protected readonly ILogger _logger;
+    protected IHandler[] _handlers;
+    protected virtual int CycleIntervalMs => 10000;
 
-    protected Worker(IEnumerable<THandlerInterface> handlers,
-        IHostApplicationLifetime lifetime,
-        ILogger<SubmissionsWorker> logger)
+
+    protected Worker(ILogger logger)
     {
-        _lifetime = lifetime;
         _logger = logger;
-        _handlers = handlers.ToArray();
     }
 
-    protected virtual int CyclePauseTimeMs { get; } = 10000;
-    protected abstract string WorkerType { get; }
-
-    protected THandlerInterface[] Handlers => _handlers;
-    protected ILogger Logger => _logger;
-
-    protected abstract Task ScheduleHandlers(CancellationToken stoppingToken);
-    protected abstract Task<THandlerInterface[]> PrepareHandlers(CancellationToken stoppingToken);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        await using var reg = _lifetime.ApplicationStarted.Register(() => started.TrySetResult());
+        // Delay 5 seconds to let the web api start working
+        await Task.Delay(5000, stoppingToken);
 
-        await started.Task.WaitAsync(stoppingToken);
-        
-        _logger.LogInformation("{WorkerType} worker started", WorkerType);
-        
-        try
-        {
-            _handlers = await PrepareHandlers(stoppingToken);
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError("{error}", exception.GetShortMessage());
-        }
+        _logger.LogInformation("Worker started");
 
-        stoppingToken.Register(() => _logger.LogInformation("{WorkerType} worker stopped", WorkerType));
+        stoppingToken.Register(() => _logger.LogInformation("Worker stopped"));
+
+        PrepareHandlers(_handlers, stoppingToken);
         
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                await ScheduleHandlers(stoppingToken);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "{WorkerType} processing failed", WorkerType);
+                RunHandlers(_handlers, stoppingToken);
             }
             finally
             {
-                await Task.Delay(CyclePauseTimeMs, stoppingToken);
+                await Task.Delay(CycleIntervalMs, stoppingToken);
             }
         }
     }
 
-    protected virtual async Task RunHandler(THandlerInterface handler, CancellationToken stoppingToken)
+    protected virtual void PrepareHandlers(IHandler[] handlers, CancellationToken stoppingToken)
+    {
+        foreach (var handler in handlers)
+        {
+            if (stoppingToken.IsCancellationRequested)
+                return;
+
+            PrepareHandler(handler);
+        }
+    }
+
+    protected virtual void PrepareHandler(IHandler handler)
     {
         try
         {
-            await handler.Handle();
+            handler.Prepare();
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            Logger.LogError(e, "{WorkerType} worker: handler failed {FullName}", WorkerType, handler.GetType().FullName);
+            _logger.LogError(exception, "{handler} preparing failed", handler.GetType().Name);
+        }
+    }
+    
+    protected virtual void RunHandlers(IHandler[] handlers, CancellationToken stoppingToken)
+    {
+        foreach (var handler in handlers)
+        {
+            if (stoppingToken.IsCancellationRequested)
+                return;
+
+            RunHandler(handler);
+        }
+    }
+
+    protected virtual void RunHandler(IHandler handler)
+    {
+        try
+        {
+            handler.Handle();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "{handler} failed", handler.GetType().Name);
         }
     }
 }

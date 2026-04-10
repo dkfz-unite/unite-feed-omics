@@ -17,36 +17,27 @@ public class DnaSvSubmissionHandler: SubmissionHandler
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Dna.Sv.Converters.AnalysisModelConverter _converter;
+    private readonly Models.Dna.Sv.Converters.AnalysisModelConverter _converter = new();
 
 
     public DnaSvSubmissionHandler(
-        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SvAnnotationTaskService annotationTaskService,
         SvIndexingTaskService indexingTaskService,
         TasksProcessingService taskProcessingService,
         SvSubmissionRepository submissionRepository,
-        ILogger<DnaSvSubmissionHandler> logger): base(priority)
+        ILogger<DnaSvSubmissionHandler> logger): base()
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = taskProcessingService;
-        _logger = logger;
         _submissionRepository = submissionRepository;
-
-        _converter = new Models.Dna.Sv.Converters.AnalysisModelConverter();
+        _logger = logger;
     }
 
 
-    public override Task Handle()
-    {
-        return Task.Run(ProcessSubmissionTasks);
-    }
-
-
-    private void ProcessSubmissionTasks()
+    public override void Handle()
     {
         var stopwatch = new Stopwatch();
 
@@ -63,6 +54,7 @@ public class DnaSvSubmissionHandler: SubmissionHandler
             return true;
         });
     }
+
 
     private void ProcessSubmission(string submissionId)
     {

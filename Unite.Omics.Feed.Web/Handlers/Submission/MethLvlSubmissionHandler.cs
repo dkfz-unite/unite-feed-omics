@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.RnaSc;
-using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Meth.Converters;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
@@ -21,28 +20,21 @@ public class MethLvlSubmissionHandler: SubmissionHandler
 
 
     public MethLvlSubmissionHandler(
-        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         LevelSubmissionRepository submissionRepository,
-        ILogger<MethLvlSubmissionHandler> logger): base(priority)
+        ILogger<MethLvlSubmissionHandler> logger): base()
     {
         _dataWriter = dataWriter;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
-        _logger = logger;
         _submissionRepository = submissionRepository;
+        _logger = logger;
     }
 
 
-    public override Task Handle()
-    {
-        return Task.Run(ProcessSubmissionTasks);
-    }
-
-
-    private void ProcessSubmissionTasks()
+    public override void Handle()
     {
         var stopwatch = new Stopwatch();
 
@@ -59,6 +51,7 @@ public class MethLvlSubmissionHandler: SubmissionHandler
             return true;
         });
     }
+
 
     private void ProcessSubmission(string submissionId)
     {

@@ -9,13 +9,7 @@ using Unite.Omics.Indices.Services;
 
 namespace Unite.Omics.Feed.Web.Handlers.Indexing;
 
-public class IndexingContext<TIndexEntity>
-{
-    public List<TIndexEntity> EntitiesToAdd { get; } = [];
-    public List<string> EntitiesToDelete { get; } = [];
-}
-
-public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntityBuilder, TIndexingContext> : Handler, IIndexingHandler
+public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntityBuilder, TIndexingContext> : IHandler
     where TIndexEntity : class
     where TIndexingCache : IndexingCache
     where TIndexingContext : IndexingContext<TIndexEntity>, new()
@@ -29,7 +23,6 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
 
     protected abstract int BucketSize { get; }
     protected abstract IndexingTaskType IndexingTaskType { get; }
-    protected abstract string IndexEntityKind { get; }
 
 
     protected IndexingHandler(
@@ -47,46 +40,44 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
     }
 
 
-    public virtual Task Prepare()
+    public void Prepare()
     {
-        return _indexingService.CreateIndex();
+        _indexingService.CreateIndex().Wait();
     }
 
-    public override async Task Handle()
+    public void Handle()
     {
         if (_taskProcessingService.HasTasks(WorkerType.Submission) || _taskProcessingService.HasTasks(WorkerType.Annotation))
             return;
         
-        await _taskProcessingService.Process(IndexingTaskType, BucketSize, ProcessChunk);
-        
-        return;
+        _taskProcessingService.Process(IndexingTaskType, BucketSize, ProcessChunk);        
     }
 
-    protected virtual async Task<bool> ProcessChunk(Unite.Data.Entities.Tasks.Task[] tasks)
+    protected virtual bool ProcessChunk(Unite.Data.Entities.Tasks.Task[] tasks)
     {
         var stopwatch = Stopwatch.StartNew();
 
         var ids = tasks.Select(task => int.Parse(task.Target)).ToArray();
         var cache = IndexingCache.Create<TIndexingCache>(_dbContextFactory, ids);
-        var ontext = new TIndexingContext();
+        var context = new TIndexingContext();
 
         foreach (var task in tasks)
         {
             var id = int.Parse(task.Target);
-            await BuildIndexEntity(id, cache, ontext);
+            BuildIndexEntity(id, cache, context);
         }
 
-        await DeleteIndexEntities(ontext);
-        await CreateIndexEntities(ontext);
+        DeleteIndexEntities(context);
+        CreateIndexEntities(context);
 
         stopwatch.Stop();
         
-        _logger.LogInformation("Indexed {number} {entityKind} in {time}s", tasks.Length, IndexEntityKind, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
+        _logger.LogInformation("Indexed {number} entities in {time}s", tasks.Length, Math.Round(stopwatch.Elapsed.TotalSeconds, 2));
         
         return true;
     }
 
-    protected virtual Task BuildIndexEntity(int id, TIndexingCache indexingCache, TIndexingContext indexingContext)
+    protected virtual void BuildIndexEntity(int id, TIndexingCache indexingCache, TIndexingContext indexingContext)
     {
         var indexEntities = _indexEntityBuilder.Create(id, indexingCache);
 
@@ -94,23 +85,18 @@ public abstract class IndexingHandler<TIndexEntity, TIndexingCache, TIndexEntity
             indexingContext.EntitiesToDelete.Add($"{id}");
         else
             indexingContext.EntitiesToAdd.AddRange(indexEntities);
-        
-        return Task.CompletedTask;
+            
     }
     
-    protected virtual Task DeleteIndexEntities(TIndexingContext indexingContext)
+    protected virtual void DeleteIndexEntities(TIndexingContext indexingContext)
     {
         if(indexingContext.EntitiesToDelete.Any())
-            return _indexingService.DeleteRange(indexingContext.EntitiesToDelete);
-
-        return Task.CompletedTask;
+            _indexingService.DeleteRange(indexingContext.EntitiesToDelete).Wait();
     }
 
-    protected virtual Task CreateIndexEntities(TIndexingContext indexingContext)
+    protected virtual void CreateIndexEntities(TIndexingContext indexingContext)
     {
         if (indexingContext.EntitiesToAdd.Any())
-            return _indexingService.AddRange(indexingContext.EntitiesToAdd);
-        
-        return Task.CompletedTask;
+            _indexingService.AddRange(indexingContext.EntitiesToAdd).Wait();
     }
 }

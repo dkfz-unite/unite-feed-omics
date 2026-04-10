@@ -10,19 +10,21 @@ namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
 public class CnvProfileSubmissionHandler : SubmissionHandler
 {
-    private readonly CnvProfileModelConverter _converter = new();
     private readonly AnalysisWriter _dataWriter;
     private readonly TasksProcessingService _tasksProcessingService;
     private readonly CnvProfileSubmissionRepository _submissionRepository;
     private readonly CnvProfileIndexingTaskService _indexingTaskService;
     private readonly ILogger<CnvProfileSubmissionHandler> _logger;
 
-    public CnvProfileSubmissionHandler(HandlerPriority priority,
+    private readonly CnvProfileModelConverter _converter = new();
+
+
+    public CnvProfileSubmissionHandler(
         AnalysisWriter dataWriter,
         TasksProcessingService tasksProcessingService,
         CnvProfileSubmissionRepository submissionRepository,
         CnvProfileIndexingTaskService indexingTaskService,
-        ILogger<CnvProfileSubmissionHandler> logger) : base(priority)
+        ILogger<CnvProfileSubmissionHandler> logger) : base()
     {
         _dataWriter = dataWriter;
         _tasksProcessingService = tasksProcessingService;
@@ -31,12 +33,8 @@ public class CnvProfileSubmissionHandler : SubmissionHandler
         _logger = logger;
     }
 
-    public override Task Handle()
-    {
-        return Task.Run(ProcessSubmissionTasks);
-    }
-    
-    private void ProcessSubmissionTasks()
+
+    public override void Handle()
     {
         var stopwatch = new Stopwatch();
 
@@ -53,6 +51,7 @@ public class CnvProfileSubmissionHandler : SubmissionHandler
             return true;
         });
     }
+    
 
     private void ProcessSubmission(string submissionId)
     {

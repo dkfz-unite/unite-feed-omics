@@ -17,36 +17,27 @@ public class RnaExpSubmissionHandler: SubmissionHandler
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Rna.Converters.AnalysisModelConverter _converter;
+    private readonly Models.Rna.Converters.AnalysisModelConverter _converter = new();
 
 
 	public RnaExpSubmissionHandler(
-        HandlerPriority priority,
         AnalysisWriter dataWriter,
         ExpressionsAnnotationService annotationService,
         GeneIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ExpressionSubmissionRepository submissionRepository,
-        ILogger<RnaExpSubmissionHandler> logger): base(priority)
+        ILogger<RnaExpSubmissionHandler> logger): base()
 	{
         _dataWriter = dataWriter;
         _annotationService = annotationService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
-        _logger = logger;
         _submissionRepository = submissionRepository;
-
-        _converter = new Models.Rna.Converters.AnalysisModelConverter();
+        _logger = logger;
 	}
 
 
-	public override Task Handle()
-	{
-        return Task.Run(ProcessSubmissionTasks);
-	}
-
-
-	private void ProcessSubmissionTasks()
+	public override void Handle()
 	{
         var stopwatch = new Stopwatch();
 
@@ -61,7 +52,8 @@ public class RnaExpSubmissionHandler: SubmissionHandler
 
             return true;
         });
-    }
+	}
+
 
     private void ProcessSubmission(string submissionId)
     {
