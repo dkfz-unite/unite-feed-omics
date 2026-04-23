@@ -14,7 +14,6 @@ public class CnvsIndexingHandler: IndexingHandler<CnvIndex, VariantIndexingCache
 {
     protected override int BucketSize => _options.CnvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.CNV;
-    protected override string IndexEntityKind => "CNV";
 
     private readonly VariantsIndexingOptions _options;
     

@@ -2,31 +2,37 @@
 
 namespace Unite.Omics.Feed.Web.Workers;
 
-public class SubmissionsWorker : Worker<ISubmissionHandler>
+public class SubmissionsWorker : Worker
 {
-    public SubmissionsWorker(IEnumerable<ISubmissionHandler> handlers,
-        IHostApplicationLifetime lifetime,
-        ILogger<SubmissionsWorker> logger) : base(handlers, lifetime, logger)
+    public SubmissionsWorker(
+        RnaSubmissionHandler rnaSubmissionHandler,
+        RnaExpSubmissionHandler rnaExpSubmissionHandler,
+        ProtExpSubmissionHandler protExpSubmissionHandler,
+        RnascSubmissionHandler rnascSubmissionHandler,
+        RnascExpSubmissionHandler rnascExpSubmissionHandler,
+        DnaSubmissionHandler dnaSubmissionHandler,
+        DnaSmSubmissionHandler dnaSmSubmissionHandler,
+        DnaCnvSubmissionHandler dnaCnvSubmissionHandler,
+        DnaSvSubmissionHandler dnaSvSubmissionHandler,
+        MethSubmissionHandler methSubmissionHandler,
+        MethLvlSubmissionHandler methLvlSubmissionHandler,
+        CnvProfileSubmissionHandler cnvProfileSubmissionHandler,
+        ILogger<SubmissionsWorker> logger) : base(logger)
     {
-    }
-
-    protected override string WorkerType => "Submissions";
-    
-    protected override Task<ISubmissionHandler[]> PrepareHandlers(CancellationToken stoppingToken)
-    {
-        return Task.Run(() =>
-            {
-                return Handlers
-                    .OrderBy(h => h.Priority)
-                    .ToArray();
-            }, stoppingToken);
-    }
-    
-    protected override async Task ScheduleHandlers(CancellationToken stoppingToken)
-    {
-        foreach (var handler in Handlers)
-        {
-            await RunHandler(handler, stoppingToken);
-        }
+        // Ordered by priority from highest to lowest.
+        _handlers = [
+            rnaSubmissionHandler,
+            rnaExpSubmissionHandler,
+            protExpSubmissionHandler,
+            rnascSubmissionHandler,
+            rnascExpSubmissionHandler,
+            dnaSubmissionHandler,
+            dnaSmSubmissionHandler,
+            dnaCnvSubmissionHandler,
+            dnaSvSubmissionHandler,
+            methSubmissionHandler,
+            methLvlSubmissionHandler,
+            cnvProfileSubmissionHandler
+        ];
     }
 }

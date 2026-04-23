@@ -5,7 +5,6 @@ namespace Unite.Omics.Annotations.Clients.Ensembl;
 
 internal class EnsemblVepApiClient
 {
-    private const int _defaultGrch = 37;
     private const string _annotationUrl = @"/api/vep?input={0}&grch={1}";
     private const string _annotationsUrl = @"/api/vep?grch={0}";
 
@@ -16,22 +15,22 @@ internal class EnsemblVepApiClient
         _options = options;
     }
 
-    public async Task<AnnotatedVariantResource> LoadAnnotations(string vepCode, int grch = _defaultGrch)
+    public async Task<AnnotatedVariantResource> LoadAnnotations(string vepCode)
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
-        var url = string.Format(_annotationUrl, vepCode, grch);
+        var url = string.Format(_annotationUrl, vepCode, _options.Version);
 
         var resource = await httpClient.GetAsync<AnnotatedVariantResource>(url);
 
         return resource;
     }
 
-    public async Task<AnnotatedVariantResource[]> LoadAnnotations(string[] vepCodes, int grch = _defaultGrch)
+    public async Task<AnnotatedVariantResource[]> LoadAnnotations(string[] vepCodes)
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
-        var url = string.Format(_annotationsUrl, grch);
+        var url = string.Format(_annotationsUrl, _options.Version);
 
         var resources = await httpClient.PostAsync<AnnotatedVariantResource[], string[]>(url, vepCodes);
 

@@ -1,13 +1,14 @@
 ﻿using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models.Dna;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna.Cnv;
 
 public class AffectedTranscriptRepository : AffectedTranscriptRepository<AffectedTranscript, Variant, Models.Dna.Cnv.VariantModel>
 {
-    public AffectedTranscriptRepository(DomainDbContext dbContext, VariantRepository variantRepository) : base(dbContext, variantRepository)
+    public AffectedTranscriptRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions, VariantRepository variantRepository) : base(dbContext, genomeOptions, variantRepository)
     {
     }
 

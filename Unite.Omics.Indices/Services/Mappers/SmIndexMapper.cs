@@ -41,6 +41,7 @@ public class SmIndexMapper : VariantIndexMapper
 
         index.Id = entity.Id;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
+        index.ChromosomeArm = entity.ChromosomeArmId?.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
         index.Length = entity.Length.Value;

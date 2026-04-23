@@ -3,7 +3,6 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Vep;
 using Unite.Omics.Feed.Data.Writers.Dna;
-using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers.Annotation.Converters;
 using Unite.Omics.Feed.Web.Services.Indexing;
 
@@ -68,7 +67,7 @@ public class SvsAnnotationHandler
     private void ProcessAnnotationTasks(Unite.Data.Entities.Tasks.Task[] tasks)
     {
         var variants = tasks.Select(task => int.Parse(task.Target)).ToArray();
-        var annotations = _annotationService.Annotate(variants, GenomeOptions.Version);
+        var annotations = _annotationService.Annotate(variants);
         var data = EffectsDataConverter.Convert(annotations);
 
         _dataWriter.SaveData(data, out var audit);

@@ -6,6 +6,7 @@ namespace Unite.Omics.Feed.Data.Models.Dna.Sv;
 public class VariantModel : Dna.VariantModel
 {
     public Chromosome OtherChromosome;
+    public ChromosomeArm? OtherChromosomeArm;
     public int OtherStart;
     public int OtherEnd;
     public SvType Type;

@@ -40,9 +40,11 @@ public class SvIndexMapper : VariantIndexMapper
 
         index.Id = entity.Id;
         index.Chromosome = entity.ChromosomeId.ToDefinitionString();
+        index.ChromosomeArm = entity.ChromosomeArmId?.ToDefinitionString();
         index.Start = entity.Start;
         index.End = entity.End;
         index.OtherChromosome = entity.OtherChromosomeId.ToDefinitionString();
+        index.OtherChromosomeArm = entity.OtherChromosomeArmId?.ToDefinitionString();
         index.OtherStart = entity.OtherStart;
         index.OtherEnd = entity.OtherEnd;
         index.Length = entity.Length;

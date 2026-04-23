@@ -17,35 +17,27 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
     private readonly TasksProcessingService _taskProcessingService;
     private readonly ILogger _logger;
 
-    private readonly Models.Dna.Cnv.Converters.AnalysisModelConverter _converter;
+    private readonly Models.Dna.Cnv.Converters.AnalysisModelConverter _converter = new();
 
 
     public DnaCnvSubmissionHandler(
-        HandlerPriority priority,
         AnalysisWriter dataWriter,
         CnvAnnotationTaskService annotationTaskService,
         CnvIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         CnvSubmissionRepository submissionRepository,
-        ILogger<DnaCnvSubmissionHandler> logger): base(priority)
+        ILogger<DnaCnvSubmissionHandler> logger): base()
     {
         _dataWriter = dataWriter;
         _annotationTaskService = annotationTaskService;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
-        _logger = logger;
         _submissionRepository = submissionRepository;
-
-        _converter = new Models.Dna.Cnv.Converters.AnalysisModelConverter();
-    }
-
-    public override Task Handle()
-    {
-        return Task.Run(ProcessSubmissionTasks);
+        _logger = logger;
     }
 
 
-    private void ProcessSubmissionTasks()
+    public override void Handle()
     {
         var stopwatch = new Stopwatch();
 
@@ -62,6 +54,7 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
             return true;
         });
     }
+
 
     private void ProcessSubmission(string submissionId)
     {

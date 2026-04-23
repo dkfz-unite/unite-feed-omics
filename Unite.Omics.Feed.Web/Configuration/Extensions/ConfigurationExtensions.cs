@@ -7,8 +7,8 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Cache.Configuration.Options;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Vep;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Web.Configuration.Options;
-using Unite.Omics.Feed.Web.Handlers;
 using Unite.Omics.Feed.Web.Handlers.Annotation;
 using Unite.Omics.Feed.Web.Handlers.Indexing;
 using Unite.Omics.Feed.Web.Handlers.Submission;
@@ -30,6 +30,7 @@ using GeneExpModel = Unite.Omics.Feed.Web.Models.Rna.ExpressionModel;
 using GeneExpModelValidator = Unite.Omics.Feed.Web.Models.Rna.Validators.ExpressionModelValidator;
 using ProtExpModel = Unite.Omics.Feed.Web.Models.Prot.ExpressionModel;
 using ProtExpModelValidator = Unite.Omics.Feed.Web.Models.Prot.Validators.ExpressionModelValidator;
+
 
 
 namespace Unite.Omics.Feed.Web.Configuration.Extensions;
@@ -80,27 +81,27 @@ public static class ConfigurationExtensions
 
         // Submissions hosted services
         services.AddHostedService<SubmissionsWorker>();
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaSubmissionHandler>(sp, HandlerPriority.Highest));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnaExpSubmissionHandler>(sp, HandlerPriority.Highest));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<ProtExpSubmissionHandler>(sp, HandlerPriority.Highest));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnascSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<RnascExpSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSmSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaCnvSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<DnaSvSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<MethLvlSubmissionHandler>(sp, HandlerPriority.Normal));
-        services.AddTransient<ISubmissionHandler>(sp => ActivatorUtilities.CreateInstance<CnvProfileSubmissionHandler>(sp, HandlerPriority.Normal));
+        services.AddTransient<RnaSubmissionHandler>();
+        services.AddTransient<RnaExpSubmissionHandler>();
+        services.AddTransient<RnascSubmissionHandler>();
+        services.AddTransient<RnascExpSubmissionHandler>();
+        services.AddTransient<ProtExpSubmissionHandler>();
+        services.AddTransient<DnaSubmissionHandler>();
+        services.AddTransient<DnaSmSubmissionHandler>();
+        services.AddTransient<DnaCnvSubmissionHandler>();
+        services.AddTransient<DnaSvSubmissionHandler>();
+        services.AddTransient<MethSubmissionHandler>();
+        services.AddTransient<MethLvlSubmissionHandler>();
+        services.AddTransient<CnvProfileSubmissionHandler>();
         
         //Indexing Handlers
         services.AddHostedService<IndexingWorker>();
-        services.AddTransient<IIndexingHandler, GenesIndexingHandler>();
-        services.AddTransient<IIndexingHandler, CnvsIndexingHandler>();
-        services.AddTransient<IIndexingHandler, SmsIndexingHandler>();
-        services.AddTransient<IIndexingHandler, SvsIndexingHandler>();
-        services.AddTransient<IIndexingHandler, CnvProfileIndexingHandler>();
-        services.AddTransient<IIndexingHandler, ProteinsIndexingHandler>();
+        services.AddTransient<GenesIndexingHandler>();
+        services.AddTransient<ProteinsIndexingHandler>();
+        services.AddTransient<SmsIndexingHandler>();
+        services.AddTransient<CnvsIndexingHandler>();
+        services.AddTransient<SvsIndexingHandler>();
+        services.AddTransient<CnvProfilesIndexingHandler>();
         
         //Index Creators
         services.AddTransient<CnvIndexEntityBuilder>();
@@ -156,6 +157,7 @@ public static class ConfigurationExtensions
         services.AddTransient<IElasticOptions, ElasticOptions>();
         services.AddTransient<IEnsemblVepOptions, EnsemblVepOptions>();
         services.AddTransient<IEnsemblDataOptions, EnsemblDataOptions>();
+        services.AddTransient<IGenomeOptions, GenomeOptions>();
 
         return services;
     }

@@ -14,7 +14,6 @@ public class SvsIndexingHandler: IndexingHandler<SvIndex, VariantIndexingCache<V
 {
     protected override int BucketSize => _options.SvBucketSize;
     protected override IndexingTaskType IndexingTaskType => IndexingTaskType.SV;
-    protected override string IndexEntityKind => "SV";
 
     private readonly VariantsIndexingOptions _options;
     

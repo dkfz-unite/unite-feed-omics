@@ -125,6 +125,7 @@ internal static class AnnotationsDataConverter
         model.Chromosome = resource.Chromosome;
         model.Start = resource.Start;
         model.End = resource.End;
+        model.Strand = resource.Strand;
         model.Length = resource.Length;
         model.IsCanonical = resource.IsCanonical;
     }

@@ -1,6 +1,7 @@
 ﻿using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis.Rna;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models.Rna;
 
 namespace Unite.Omics.Feed.Data.Repositories.Rna;
@@ -11,10 +12,10 @@ public class GeneExpressionRepository
     private readonly GeneRepository _geneRepository;
 
 
-    public GeneExpressionRepository(DomainDbContext dbContext)
+    public GeneExpressionRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions)
     {
         _dbContext = dbContext;
-        _geneRepository = new GeneRepository(dbContext);
+        _geneRepository = new GeneRepository(dbContext, genomeOptions);
     }
 
 

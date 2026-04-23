@@ -4,9 +4,9 @@ namespace Unite.Omics.Feed.Data.Models.Dna.Cnv;
 
 public class ProfileModel
 {
-    public Chromosome Chromosome { get; set; }
-    public ChromosomeArm ChromosomeArm { get; set; }
-    public float Gain { get; set; }
-    public float Loss { get; set; }
-    public float Neutral { get; set; }
+    public Chromosome Chromosome;
+    public ChromosomeArm? ChromosomeArm;
+    public float Gain;
+    public float Loss;
+    public float Neutral;
 }

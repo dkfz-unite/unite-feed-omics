@@ -1,6 +1,7 @@
 ﻿using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis.Dna;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models.Dna;
 
 namespace Unite.Omics.Feed.Data.Repositories.Dna;
@@ -10,16 +11,18 @@ public abstract class AffectedTranscriptRepository<TAffectedTranscriptEntity, TV
     where TVariantEntity : Variant
     where TVariantModel : VariantModel
 {
+    protected readonly IGenomeOptions _genomeOptions;
     protected readonly DomainDbContext _dbContext;
     protected readonly VariantRepository<TVariantEntity, TVariantModel> _variantRepository;
     protected readonly TranscriptRepository _transcriptRepository;
 
 
-    public AffectedTranscriptRepository(DomainDbContext dbContext, VariantRepository<TVariantEntity, TVariantModel> variantRepository)
+    public AffectedTranscriptRepository(DomainDbContext dbContext, IGenomeOptions genomeOptions, VariantRepository<TVariantEntity, TVariantModel> variantRepository)
     {
         _dbContext = dbContext;
+        _genomeOptions = genomeOptions;
         _variantRepository = variantRepository;
-        _transcriptRepository = new TranscriptRepository(dbContext);
+        _transcriptRepository = new TranscriptRepository(dbContext, genomeOptions);
     }
 
 

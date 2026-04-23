@@ -48,6 +48,7 @@ public abstract class VariantIndexMapper
             Biotype = entity.Biotype,
             IsCanonical = entity.IsCanonical,
             Chromosome = entity.ChromosomeId.ToDefinitionString(),
+            ChromosomeArm = entity.ChromosomeArmId?.ToDefinitionString(),
             Start = entity.Start,
             End = entity.End,
             Strand = entity.Strand,

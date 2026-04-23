@@ -2,12 +2,14 @@
 using Unite.Data.Context;
 using Unite.Data.Context.Repositories.Constants;
 using Unite.Essentials.Extensions;
+using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Data.Writers.Dna;
 
 public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
 {
+    private readonly IGenomeOptions _genomeOptions;
     private Repositories.Dna.Sm.VariantRepository _smRepository;
     private Repositories.Dna.Sm.VariantEntryRepository _smEntryRepository;
     private Repositories.Dna.Cnv.VariantRepository _cnvRepository;
@@ -16,8 +18,10 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     private Repositories.Dna.Sv.VariantEntryRepository _svEntryRepository;
     private Repositories.Dna.Cnv.ProfileRepository _cnvProfileRepository;
 
-    public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory, IGenomeOptions genomeOptions) : base(dbContextFactory)
     {
+        _genomeOptions = genomeOptions;
+
         var dbContext = dbContextFactory.CreateDbContext();
 
         Initialize(dbContext);
@@ -27,11 +31,11 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     protected override void Initialize(DomainDbContext dbContext)
     {
         _sampleRepository = new Repositories.SampleRepository(dbContext);
-        _smRepository = new Repositories.Dna.Sm.VariantRepository(dbContext);
+        _smRepository = new Repositories.Dna.Sm.VariantRepository(dbContext, _genomeOptions);
         _smEntryRepository = new Repositories.Dna.Sm.VariantEntryRepository(dbContext, _smRepository);
-        _cnvRepository = new Repositories.Dna.Cnv.VariantRepository(dbContext);
+        _cnvRepository = new Repositories.Dna.Cnv.VariantRepository(dbContext, _genomeOptions);
         _cnvEntryRepository = new Repositories.Dna.Cnv.VariantEntryRepository(dbContext, _cnvRepository);
-        _svRepository = new Repositories.Dna.Sv.VariantRepository(dbContext);
+        _svRepository = new Repositories.Dna.Sv.VariantRepository(dbContext, _genomeOptions);
         _svEntryRepository = new Repositories.Dna.Sv.VariantEntryRepository(dbContext, _svRepository);
         _resourceRepository = new Repositories.ResourceRepository(dbContext);
         _cnvProfileRepository = new Repositories.Dna.Cnv.ProfileRepository(dbContext);

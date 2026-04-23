@@ -2,5 +2,6 @@ namespace Unite.Omics.Feed.Web.Handlers;
 
 public interface IHandler
 {
-    Task Handle();
+    void Prepare();
+    void Handle();
 }

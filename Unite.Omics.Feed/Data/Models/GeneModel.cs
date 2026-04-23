@@ -9,6 +9,7 @@ public class GeneModel
     public string Description;
     public string Biotype;
     public Chromosome Chromosome;
+    public ChromosomeArm? ChromosomeArm;
     public int Start;
     public int End;
     public bool Strand;

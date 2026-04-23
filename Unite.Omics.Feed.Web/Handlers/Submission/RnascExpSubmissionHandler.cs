@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.RnaSc;
-using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Services.Indexing;
 using Unite.Omics.Feed.Web.Submissions.Repositories.RnaSc;
 
@@ -20,28 +19,21 @@ public class RnascExpSubmissionHandler: SubmissionHandler
 
 
     public RnascExpSubmissionHandler(
-        HandlerPriority priority,
         AnalysisWriter dataWriter,
         SampleIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
         ExpressionSubmissionRepository submissionRepository,
-        ILogger<RnascExpSubmissionHandler> logger) : base(priority)
+        ILogger<RnascExpSubmissionHandler> logger) : base()
     {
         _dataWriter = dataWriter;
         _indexingTaskService = indexingTaskService;
         _taskProcessingService = tasksProcessingService;
-        _logger = logger;
         _submissionRepository = submissionRepository;
+        _logger = logger;
     }
 
 
-    public override Task Handle()
-    {
-        return Task.Run(ProcessSubmissionTasks);
-    }
-
-
-    private void ProcessSubmissionTasks()
+    public override void Handle()
     {
         var stopwatch = new Stopwatch();
 
@@ -58,6 +50,7 @@ public class RnascExpSubmissionHandler: SubmissionHandler
             return true;
         });
     }
+
 
     private void ProcessSubmission(string submissionId)
     {
