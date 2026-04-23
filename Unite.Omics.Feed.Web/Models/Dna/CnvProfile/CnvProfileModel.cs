@@ -8,17 +8,21 @@ public class CnvProfileModel
 {
     [JsonPropertyName("chromosome")]
     [Column("chromosome")]
-    public Chromosome Chromosome { get; set; }
+    public Chromosome? Chromosome { get; set; }
+
     [JsonPropertyName("chromosome_arm")]
     [Column("chromosome_arm")]
-    public ChromosomeArm ChromosomeArm { get; set; }
+    public ChromosomeArm? ChromosomeArm { get; set; }
+
     [JsonPropertyName("gain")]
     [Column("gain")]
-    public float Gain { get; set; }
+    public float? Gain { get; set; }
+
     [JsonPropertyName("loss")]
     [Column("loss")]
-    public float Loss { get; set; }
+    public float? Loss { get; set; }
+
     [JsonPropertyName("neutral")]
     [Column("neutral")]
-    public float Neutral { get; set; }
+    public float? Neutral { get; set; }
 }
