@@ -10,6 +10,7 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         DataTypes.Omics.Dna.Sample,
         DataTypes.Omics.Dna.Sm,
         DataTypes.Omics.Dna.Cnv,
+        DataTypes.Omics.Dna.CnvProfile,
         DataTypes.Omics.Dna.Sv,
         DataTypes.Omics.Methylation.Sample,
         DataTypes.Omics.Methylation.Level,

@@ -69,7 +69,8 @@ public class SampleFormValidator : AbstractValidator<SampleForm>
             .WithMessage("Should not be empty");
 
         RuleFor(model => model.Genome)
-            .Must(genome => genome.Equals("GRCh37", _comparison) || genome.Equals("GRCh38", _comparison));
+            .Must(genome => genome.Equals("GRCh37", _comparison) || genome.Equals("GRCh38", _comparison))
+            .WithMessage("Should be either 'GRCh37' or 'GRCh38'");
 
 
         RuleFor(model => model.Batch)
