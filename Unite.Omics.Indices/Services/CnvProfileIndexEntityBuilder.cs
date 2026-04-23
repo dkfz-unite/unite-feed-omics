@@ -23,8 +23,8 @@ public class CnvProfileIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, C
         //TODO: convert Gain, Loss and Neutral to float
         return [new CnvProfileIndex
         {
-            Chromosome = cnvProfile.ChromosomeId.ToString(),
-            ChromosomeArm = cnvProfile.ChromosomeArmId.ToString(),
+            Chromosome = cnvProfile.ChromosomeId.ToDefinitionString(),
+            ChromosomeArm = cnvProfile.ChromosomeArmId.ToDefinitionString(),
             Gain =  (float)cnvProfile.Gain,
             Loss =  (float)cnvProfile.Loss,
             Neutral = (float)cnvProfile.Neutral,

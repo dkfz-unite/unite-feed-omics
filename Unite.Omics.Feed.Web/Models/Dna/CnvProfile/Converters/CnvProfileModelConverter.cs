@@ -5,20 +5,23 @@ namespace Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Converters;
 
 public class CnvProfileModelConverter: Base.Converters.AnalysisModelConverter<CnvProfileModel>
 {
-    protected override void MapEntries(AnalysisModel<CnvProfileModel> cnvProfileSubmission, SampleModel sampleModel)
+    protected override void MapEntries(AnalysisModel<CnvProfileModel> source, SampleModel target)
     {
-        sampleModel.CnvProfiles = cnvProfileSubmission.Entries.Distinct().Select(submissionEntry =>
+        target.CnvProfiles = source.Entries.Distinct().Select(profile =>
         {
-            var model = new Data.Models.Dna.Cnv.ProfileModel
+            var gain = profile.Gain ?? 0;
+            var loss = profile.Loss ?? 0;
+            var neutral = profile.Neutral ?? 1 - gain - loss;
+
+            return new Data.Models.Dna.Cnv.ProfileModel
             {
-                Chromosome =  submissionEntry.Chromosome,
-                ChromosomeArm =  submissionEntry.ChromosomeArm,
-                Gain = submissionEntry.Gain,
-                Loss = submissionEntry.Loss,
-                Neutral = submissionEntry.Neutral
+                Chromosome =  profile.Chromosome.Value,
+                ChromosomeArm =  profile.ChromosomeArm.Value,
+                Gain = gain,
+                Loss = loss,
+                Neutral = neutral
             };
             
-            return model;
         }).ToArray();
     }
 }

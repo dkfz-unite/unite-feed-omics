@@ -13,7 +13,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
 namespace Unite.Omics.Feed.Web.Controllers.Dna;
 
-[Route("api/dna/analysis/cnv-profile")]
+[Route("api/dna/analysis/cnvp")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class CnvProfileController : AnalysisDataController<CnvProfileModel>
 {
