@@ -25,7 +25,7 @@ public class CnvProfileController : AnalysisDataController<CnvProfileModel>
 
     protected override IValidator<CnvProfileModel> EntryModelValidator => new CnvProfileModelValidator();
     protected override string DataType => DataTypes.Omics.Dna.CnvProfile;
-    protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES];
+    protected override AnalysisType[] AnalysisTypes => [AnalysisType.WGS, AnalysisType.WES, AnalysisType.MethArray];
     protected override IReader<CnvProfileModel>[] Readers => 
     [
         new TsvReader<CnvProfileModel>()
