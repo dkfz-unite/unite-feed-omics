@@ -25,9 +25,5 @@ public class CnvProfileModelValidator:  AbstractValidator<CnvProfileModel>
         RuleFor(model => model.Loss)
             .InclusiveBetween(0, 1)
             .WithMessage("Should be in range [0, 1]");
-
-        RuleFor(model => model)
-            .Must(model => model.Gain > 0 || model.Neutral > 0 || model.Loss > 0)
-            .WithMessage("At least one of 'gain', 'neutral' or 'loss' should be greater than 0");
     }
 }

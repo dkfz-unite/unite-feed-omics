@@ -7,7 +7,9 @@ public class CnvProfileModelConverter: Base.Converters.AnalysisModelConverter<Cn
 {
     protected override void MapEntries(AnalysisModel<CnvProfileModel> source, SampleModel target)
     {
-        target.CnvProfiles = source.Entries.Distinct().Select(profile =>
+        var predicate = new Func<CnvProfileModel, bool>(model => model.Gain.HasValue || model.Loss.HasValue || model.Neutral.HasValue);
+
+        target.CnvProfiles = source.Entries.Distinct().Where(predicate).Select(profile =>
         {
             var gain = profile.Gain ?? 0;
             var loss = profile.Loss ?? 0;
