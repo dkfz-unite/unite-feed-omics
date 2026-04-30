@@ -6,4 +6,7 @@
   <ItemGroup>
     <PackageReference Include="Unite.Data.Context" Version="12.10.0" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- <ProjectReference Include="../../unite-data/Unite.Data.Context/Unite.Data.Context.csproj" /> -->
+  </ItemGroup>
 </Project>
