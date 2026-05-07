@@ -1,5 +1,4 @@
-using Unite.Data.Entities.Omics.Enums;
-using Unite.Essentials.Extensions;
+using Unite.Omics.Feed.Web.Models.Base.Helpers;
 using Unite.Omics.Feed.Web.Models.Base.Readers;
 
 namespace Unite.Omics.Feed.Web.Models.Dna.Sm.Readers.Vcf;
@@ -30,7 +29,7 @@ public class Reader : IReader<VariantModel>
     {
         var fields = line.Split('\t');
 
-        if (TryParseChromosome(fields[0], out var chromosome))
+        if (ChromosomeParser.TryParse(fields[0], out var chromosome))
         {
             variant = new Variant
             {
@@ -48,22 +47,5 @@ public class Reader : IReader<VariantModel>
 
             return false;
         }
-    }
-
-    private static bool TryParseChromosome(string s, out Chromosome? result)
-    {
-        var values = Enum.GetValues(typeof(Chromosome)).Cast<Chromosome>().ToArray();
-
-        foreach (var value in values)
-        {
-            if (string.Equals(value.ToDefinitionString(), s.Trim(), StringComparison.InvariantCultureIgnoreCase))
-            {
-                result = value;
-                return true;
-            }
-        }
-        
-        result = null;
-        return false;
     }
 }
