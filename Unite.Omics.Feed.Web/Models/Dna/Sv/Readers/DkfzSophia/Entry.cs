@@ -2,6 +2,7 @@ using Unite.Data.Entities.Omics.Analysis.Dna.Sv.Enums;
 using Unite.Data.Entities.Omics.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Essentials.Tsv.Attributes;
+using Unite.Omics.Feed.Web.Models.Base.Helpers;
 
 namespace Unite.Omics.Feed.Web.Models.Dna.Sv.Readers.DkfzSophia;
 
@@ -58,15 +59,10 @@ public record Entry
 
     private static Chromosome GetChromosome(string value)
     {
-        var enumValues = Enum.GetValues(typeof(Chromosome)).Cast<Chromosome>().ToArray();
-
-        foreach (var enumValue in enumValues)
-        {
-            if (string.Equals(enumValue.ToDefinitionString(), value.Trim(), StringComparison.InvariantCultureIgnoreCase))
-                return enumValue;
-        }
-
-        throw new NotSupportedException($"Chromosome value '{value}' is not supported");
+        if (ChromosomeParser.TryParse(value, out var chromosome))
+            return chromosome.Value;
+        else
+            throw new InvalidDataException($"Invalid chromosome value: {value}");
     }
 
     private static SvType GetVariantType(Entry variant)
