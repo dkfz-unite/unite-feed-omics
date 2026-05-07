@@ -15,7 +15,4 @@
     <ProjectReference Include="../Unite.Omics.Feed/Unite.Omics.Feed.csproj" />
     <ProjectReference Include="../Unite.Omics.Indices/Unite.Omics.Indices.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models/Base/Helpers/" />
-  </ItemGroup>
 </Project>
