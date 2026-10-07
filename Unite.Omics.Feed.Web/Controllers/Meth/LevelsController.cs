@@ -10,6 +10,7 @@ using Unite.Omics.Feed.Web.Submissions.Repositories.Meth;
 
 namespace Unite.Omics.Feed.Web.Controllers.Meth;
 
+// Not used yet: methylation data is currently submitted as samples (e.g. IDAT files) only.
 [Route("api/meth/analysis/levels")]
 [Authorize(Policy = Policies.Data.Writer)]
 public class LevelsController : AnalysisController<EmptyModel>
