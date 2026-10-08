@@ -7,6 +7,7 @@ public class SubmissionsWorker : Worker
     public SubmissionsWorker(
         RnaSubmissionHandler rnaSubmissionHandler,
         RnaExpSubmissionHandler rnaExpSubmissionHandler,
+        ProtSubmissionHandler protSubmissionHandler,
         ProtExpSubmissionHandler protExpSubmissionHandler,
         RnascSubmissionHandler rnascSubmissionHandler,
         RnascExpSubmissionHandler rnascExpSubmissionHandler,
@@ -23,6 +24,7 @@ public class SubmissionsWorker : Worker
         _handlers = [
             rnaSubmissionHandler,
             rnaExpSubmissionHandler,
+            protSubmissionHandler,
             protExpSubmissionHandler,
             rnascSubmissionHandler,
             rnascExpSubmissionHandler,

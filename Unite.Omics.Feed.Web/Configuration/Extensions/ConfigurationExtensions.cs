@@ -85,6 +85,7 @@ public static class ConfigurationExtensions
         services.AddTransient<RnaExpSubmissionHandler>();
         services.AddTransient<RnascSubmissionHandler>();
         services.AddTransient<RnascExpSubmissionHandler>();
+        services.AddTransient<ProtSubmissionHandler>();
         services.AddTransient<ProtExpSubmissionHandler>();
         services.AddTransient<DnaSubmissionHandler>();
         services.AddTransient<DnaSmSubmissionHandler>();
@@ -145,6 +146,7 @@ public static class ConfigurationExtensions
         services.AddTransient<Submissions.Repositories.RnaSc.ExpressionSubmissionRepository>();
         services.AddTransient<Submissions.Repositories.RnaSc.SampleSubmissionRepository>();
 
+        services.AddTransient<Submissions.Repositories.Prot.SampleSubmissionRepository>();
         services.AddTransient<Submissions.Repositories.Prot.ExpressionSubmissionRepository>();
     }
 

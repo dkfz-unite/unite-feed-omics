@@ -19,10 +19,11 @@ API is **proxied** to main API and can be accessed at [[host]/api/feed-omics](ht
 - post:[api/rna/analysis/exp](#post-apirnaanalysisexp) - submit **bulk** RNA gene expressions data.
 - post:[api/rnasc/sample](#post-apirnascsample) - submit **single cell** RNA sample data.
 - post:[api/rnasc/analysis/exp](#post-apirnascanalysisexp) - submit **single cell** RNA gene expressions data.
+- post:[api/prot/sample](#post-apiprotsample) - submit proteomics (MS) sample data.
 - post:[api/prot/analysis/exp](#post-apiprotanalysisexp) - submit protein expressions data.
 
 > [!Note]
-> You can upload only one sample per data type (DNA(WES,WGS), RNA, RNASc, Meth) and matched sample (if required).
+> You can upload only one sample per data type (DNA(WES,WGS), RNA, RNASc, Meth, Prot) and matched sample (if required).
 > Variants callings utilize the same sample alingment files, no need to upload them multiple times.
 
 
@@ -323,6 +324,32 @@ Request body should be in `multipart/form-data` format for [single cell gene exp
 - `400` - Request data didn't pass validation.
 - `401` - Missing JWT token.
 - `403` - Missing required permissions.
+
+## POST: [api/prot/sample](http://localhost:5106/api/prot/sample)
+Submit mass spectrometry (MS) proteomics sample metadata and resources.
+
+Request implements **UPSERT** logic:
+- Missing data will be populated.
+- Existing data will be updated.
+
+### Body
+Request body should be in `multipart/form-data` format for [proteomics sample](./models-prot.md) data.
+
+#### Example
+- `donor_id` - Donor1
+- `specimen_id` - Tumor
+- `specimen_type` - Material
+- `analysis_type` - MS
+- `analysis_date` - 2023-12-01
+- `genome` - GRCh37
+- `resources` - resources.tsv ([Resources](./models-prot.md#resources) metadata file, `mzml` files only)
+
+### Responses
+- `200` - Request was processed successfully.
+- `400` - Request data didn't pass validation.
+- `401` - Missing JWT token.
+- `403` - Missing required permissions.
+
 
 ## POST: [api/prot/analysis/exp](http://localhost:5106/api/prot/analysis/exp)
 Submit protein expressions analysis metadata and data.
