@@ -25,7 +25,6 @@ public class SampleController : Controllers.SampleController
     {
         base.ValidateModel(model);
 
-        // JSON submissions carry resources in the model; form submissions read them later.
         ValidateResourceFormats(model.Resources);
     }
 
@@ -38,10 +37,8 @@ public class SampleController : Controllers.SampleController
 
     private void ValidateResourceFormats(ResourceModel[] resources)
     {
-        // Only the open mzML format is supported, vendor-specific raw formats are not.
-        if (resources?.Any(resource => resource.Format != FileTypes.Sequence.Mzml) == true)
-        {
-            ModelState.AddModelError("Resources", $"Allowed formats are [{FileTypes.Sequence.Mzml}]");
-        }
+        var mzmlFile = resources?.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Mzml);
+        if (mzmlFile == null)
+            ModelState.AddModelError("Resources", $"At least one resource must be in the format [{FileTypes.Sequence.Mzml}]");
     }
 }
