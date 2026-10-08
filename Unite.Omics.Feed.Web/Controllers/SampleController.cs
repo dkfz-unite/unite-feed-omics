@@ -26,7 +26,8 @@ public abstract class SampleController(
             AnalysisType = EnumBinder.Bind<AnalysisType>(form.AnalysisType).Value,
             AnalysisDate = form.AnalysisDate,
             AnalysisDay = form.AnalysisDay,
-            Genome = form.Genome
+            Genome = form.Genome,
+            Batch = form.Batch
         };
     }
 
