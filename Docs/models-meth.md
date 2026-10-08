@@ -40,6 +40,11 @@ The model is used to upload the data of DNA methylation sample metadata and file
 - Possible values: `GRCh37`, `GRCh38`
 - Example: `GRCh38`
 
+**`batch`** - Batch in which the sample was processed, for grouping samples that were measured or analysed together.
+- Type: _String_
+- Limitations: Maximum length 100
+- Example: `Batch1`
+
 **`resources`*** - file with the sample resources metadata.
 - Type: _File_
 - Supported formats: [tsv](#resources)
