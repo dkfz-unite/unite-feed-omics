@@ -12,7 +12,7 @@ public record ResourceModel
 
 
     /// <summary>
-    /// Resource name(case sensitive).
+    /// Resource name (lowercased).
     /// </summary>
     [JsonPropertyName("name")]
     [Column("name")]
