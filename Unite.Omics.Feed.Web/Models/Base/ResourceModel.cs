@@ -20,9 +20,9 @@ public record ResourceModel
 
     /// <summary>
     /// Resource type (dna, dna-sm, dna-cnv, dna-sv, meth, meth-lvl, rna, rna-exp, rnasc, rnasc-exp,  etc.).
+    /// Set by the server from the submission endpoint, never read from the request.
     /// </summary>
-    [JsonPropertyName("type")]
-    [Column("type")]
+    [JsonIgnore]
     public virtual string Type { get => _type?.Trim().ToLower(); set => _type = value; }
 
     /// <summary>
