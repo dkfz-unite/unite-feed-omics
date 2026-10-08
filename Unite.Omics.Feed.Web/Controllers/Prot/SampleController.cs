@@ -3,6 +3,7 @@ using Unite.Data.Constants;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Tasks.Enums;
+using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Submissions.Repositories.Prot;
 
@@ -37,6 +38,9 @@ public class SampleController : Controllers.SampleController
 
     private void ValidateResourceFormats(ResourceModel[] resources)
     {
+        if (resources.IsEmpty())
+            return;
+
         var mzmlFile = resources?.FirstOrDefault(resource => resource.Format == FileTypes.Sequence.Mzml);
         if (mzmlFile == null)
             ModelState.AddModelError("Resources", $"At least one resource must be in the format [{FileTypes.Sequence.Mzml}]");
