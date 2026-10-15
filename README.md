@@ -82,7 +82,9 @@ The easiest way to install the application is to use docker-compose:
 - Omics data feed service configuration and installation scripts: https://github.com/dkfz-unite/unite-env/tree/main/applications/unite-feed-omics
 
 ### Docker
-The image of the service is available in our [registry](https://github.com/dkfz-unite/unite-feed-omics/pkgs/container/unite-feed-omics).
+The image of the service is available in our [registry](https://github.com/dkfz-unite/unite-feed-omics/pkgs/container/unite-feed-omics) for the following environments:
+- `linux/amd64`
+- `linux/arm64`
 
 [Dockerfile](./Dockerfile) is used to build an image of the application.
 To build an image run the following command:
