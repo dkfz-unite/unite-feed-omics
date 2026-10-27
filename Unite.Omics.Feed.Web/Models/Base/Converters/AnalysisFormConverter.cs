@@ -1,10 +1,13 @@
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
-using Unite.Omics.Feed.Web.Models.Base;
 using Unite.Omics.Feed.Web.Models.Base.Binders;
 
-namespace Unite.Omics.Feed.Web.Controllers;
+namespace Unite.Omics.Feed.Web.Models.Base.Converters;
 
+/// <summary>
+/// Converts an AnalysisForm into an AnalysisModel with the specified entry type.
+/// </summary>
+/// <typeparam name="TEntry">Entry type.</typeparam>
 public static class AnalysisFormConverter<TEntry> where TEntry : class, new()
 {
     public static AnalysisModel<TEntry> Convert(AnalysisForm form)
@@ -24,6 +27,7 @@ public static class AnalysisFormConverter<TEntry> where TEntry : class, new()
             SpecimenId = form.SpecimenId,
             SpecimenType = EnumBinder.Bind<SpecimenType>(form.SpecimenType).Value,
             AnalysisType = EnumBinder.Bind<AnalysisType>(form.AnalysisType).Value,
+            Scope = form.Scope,
             AnalysisDate = form.AnalysisDate,
             AnalysisDay = form.AnalysisDay,
             Genome = form.Genome,

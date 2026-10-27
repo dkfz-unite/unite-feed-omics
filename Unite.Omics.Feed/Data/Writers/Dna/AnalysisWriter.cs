@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Repositories.Constants;
+using Unite.Data.Entities.Omics.Analysis.Dna.Sm.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Data.Models;
@@ -46,7 +47,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         var sampleId = WriteSample(model, ref audit);
 
         if (model.Sms.IsNotEmpty())
-            WriteSms(sampleId, model.Sms, ref audit);
+            WriteSms(sampleId, model.SmScope, model.Sms, ref audit);
 
         if (model.Cnvs.IsNotEmpty())
             WriteCnvs(sampleId, model.Cnvs, ref audit);
@@ -61,16 +62,16 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
             WriteCnvProfiles(sampleId, model.CnvProfiles, ref audit);
     }
 
-    private void WriteSms(int sampleId, IEnumerable<Models.Dna.Sm.VariantModel> models, ref AnalysisWriteAudit audit)
+    private void WriteSms(int sampleId, SmType[] types, IEnumerable<Models.Dna.Sm.VariantModel> models, ref AnalysisWriteAudit audit)
     {
-        //TODO: this DbContext is not used?
-        using var dbContext = _dbContextFactory.CreateDbContext();
-
         var variants = _smRepository.CreateMissing(models);
         audit.Sms.AddRange(variants.Select(variant => variant.Id));
         audit.SmsCreated += variants.Count();
 
-        var variantEntries = _smEntryRepository.CreateMissing(sampleId, models, variants);
+        var removedVariants = _smEntryRepository.RemoveAll(sampleId, types);
+        audit.SmsEntries.AddRange(removedVariants);
+
+        var variantEntries = _smEntryRepository.CreateAll(sampleId, models, variants);
         audit.SmsEntries.AddRange(variantEntries.Select(entry => entry.EntityId));
         audit.SmsAssociated += variantEntries.Count();
     }
@@ -83,7 +84,10 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         audit.Cnvs.AddRange(variants.Where(predicate).Select(variant => variant.Id));
         audit.CnvsCreated += variants.Count();
 
-        var variantEntries = _cnvEntryRepository.CreateMissing(sampleId, models, variants);
+        var removedVariants = _cnvEntryRepository.RemoveAll(sampleId);
+        audit.CnvsEntries.AddRange(removedVariants);
+
+        var variantEntries = _cnvEntryRepository.CreateAll(sampleId, models, variants);
         audit.CnvsEntries.AddRange(variantEntries.Select(entry => entry.EntityId));
         audit.CnvsAssociated += variantEntries.Count();
     }
@@ -94,16 +98,21 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         audit.Svs.AddRange(variants.Select(variant => variant.Id));
         audit.SvsCreated += variants.Count();
 
-        var variantEntries = _svEntryRepository.CreateMissing(sampleId, models, variants);
+        var removedVariants = _svEntryRepository.RemoveAll(sampleId);
+        audit.SvsEntries.AddRange(removedVariants);
+
+        var variantEntries = _svEntryRepository.CreateAll(sampleId, models, variants);
         audit.SvsEntries.AddRange(variantEntries.Select(entry => entry.EntityId));
         audit.SvsAssociated += variantEntries.Count();
     }
     
     protected void WriteCnvProfiles(int sampleId, IEnumerable<Models.Dna.Cnv.ProfileModel> models, ref AnalysisWriteAudit audit)
     {
-        _cnvProfileRepository.CreateOrUpdate(sampleId, models, ref audit.CnvProfilesCreated, ref audit.CnvProfilesUpdated);
-        
-        audit.CnvProfilesCreatedCount = audit.CnvProfilesCreated.Count;
-        audit.CnvProfilesUpdatedCount = audit.CnvProfilesUpdated.Count;
+        var removedProfiles = _cnvProfileRepository.RemoveAll(sampleId);
+        audit.CnvProfiles.AddRange(removedProfiles);
+
+        var profiles = _cnvProfileRepository.CreateAll(sampleId, models);
+        audit.CnvProfiles.AddRange(profiles.Select(entity => entity.Id));
+        audit.CnvProfilesCreated = profiles.Length;
     }
 }

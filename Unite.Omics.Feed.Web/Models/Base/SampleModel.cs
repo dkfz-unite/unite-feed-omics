@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
 
@@ -16,6 +16,7 @@ public record SampleModel: SubmissionModel
     protected AnalysisType? _analysisType;
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
+    private string[] _scope;
     private string _genome;
     protected double? _purity;
     protected double? _ploidy;
@@ -58,6 +59,12 @@ public record SampleModel: SubmissionModel
     /// </summary> 
     [JsonPropertyName("analysis_day")]
     public virtual int? AnalysisDay { get => _analysisDay; set => _analysisDay = value; }
+
+    /// <summary>
+    /// Result scope interpreted by the submission endpoint.
+    /// </summary>
+    [JsonPropertyName("scope")]
+    public virtual string[] Scope { get => _scope?.Select(value => value?.Trim()).ToArray(); set => _scope = value; }
 
     /// <summary>
     /// Genome version (GRCh37 or GRCh38)

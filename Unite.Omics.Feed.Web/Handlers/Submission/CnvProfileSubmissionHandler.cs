@@ -60,9 +60,7 @@ public class CnvProfileSubmissionHandler : SubmissionHandler
 
         _dataWriter.SaveData(convertedData, out var audit);
         
-        var allIds = new HashSet<int>(audit.CnvProfilesCreated);
-        allIds.UnionWith(audit.CnvProfilesUpdated);
-        _indexingTaskService.PopulateTasks(allIds);
+        _indexingTaskService.PopulateTasks(audit.CnvProfiles);
         
         _submissionRepository.Delete(submissionId);
 

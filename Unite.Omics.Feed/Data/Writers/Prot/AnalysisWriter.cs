@@ -49,51 +49,34 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     {
         var queue = new Queue<ProteinExpressionModel>(models);
 
-        _proteinExpressionRepository.RemoveAll(sampleId);
+        var removedProteins = _proteinExpressionRepository.RemoveAll(sampleId);
 
         while (queue.Any())
         {
             var chunk = queue.Dequeue(_batchSize).ToArray();
 
-
             var allGenes = chunk.Select(model => model.Protein.Transcript.Gene).DistinctBy(gene => gene.Id).ToArray();
-
             var existingGenes = _geneRepository.Find(allGenes).ToArray();
-
             var createdGenes = _geneRepository.CreateMissing(allGenes, existingGenes).ToArray();
-
             var genesCache = Enumerable.Concat(createdGenes, existingGenes).ToArray();
 
-
             var allTranscripts = chunk.Select(model => model.Protein.Transcript).DistinctBy(transcript => transcript.Id).ToArray();
-
             var existingTranscripts = _transcriptRepository.Find(allTranscripts).ToArray();
-
             var createdTranscripts = _transcriptRepository.CreateMissing(allTranscripts, existingTranscripts, existingGenes).ToArray();
-
             var transcriptsCache = Enumerable.Concat(createdTranscripts, existingTranscripts).ToArray();
 
-
             var allProteins = chunk.Select(model => model.Protein).DistinctBy(protein => protein.Id).ToArray();
-
             var existingProteins = _proteinRepository.Find(allProteins).ToArray();
-
             var createdProteins = _proteinRepository.CreateMissing(allProteins, existingProteins, transcriptsCache, genesCache).ToArray();
-
             var proteinsCache = Enumerable.Concat(createdProteins, existingProteins).ToArray();
-
 
             var expressions = _proteinExpressionRepository.CreateAll(sampleId, chunk, proteinsCache).ToArray();
 
-
             audit.GenesCreated += createdGenes.Length;
-
             audit.TranscriptsCreated += createdTranscripts.Length;
-
             audit.ProteinsCreated += createdProteins.Length;
-
             audit.ExpressionsCreated += expressions.Length;
-
+            audit.Proteins.AddRange(removedProteins);
             audit.Proteins.AddRange(expressions.Select(entity => entity.EntityId));
         }
     }

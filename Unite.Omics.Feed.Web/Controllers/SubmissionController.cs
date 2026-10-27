@@ -63,6 +63,7 @@ public abstract class SubmissionController<TModel, TSubmissionForm> : Controller
     public virtual IActionResult PostJson([FromBody] TModel model, [FromQuery] bool review = true)
     {
         model.Resources?.ForEach(resource => resource.Type = DataType);
+        
         ValidateModel(model);
 
         return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);

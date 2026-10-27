@@ -39,12 +39,7 @@ public class CnvProfileIndexingTaskService : IndexingTaskService<Profile, int>
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            var profiles = dbContext.CnvProfiles
-                .Where(profile => chunk.Contains(profile.Id))
-                .Select(profile => profile.Id)
-                .ToArray();
-
-            CreateTasks(IndexingTaskType.CNVProfile, profiles);
+            CreateTasks(IndexingTaskType.CNVProfile, chunk);
         });
 
         transaction.Commit();
@@ -57,17 +52,11 @@ public class CnvProfileIndexingTaskService : IndexingTaskService<Profile, int>
 
         keys.Iterate(BucketSize, (chunk) =>
         {
-            //TODO: do not make any direct DB queries from this layer
-            var profiles = dbContext.CnvProfiles
-                .Where(profile => chunk.Contains(profile.Id))
-                .Select(profile => profile.Id)
-                .ToArray();
-
-            CreateProjectIndexingTasks(profiles);
-            CreateDonorIndexingTasks(profiles);
-            CreateImageIndexingTasks(profiles);
-            CreateSpecimenIndexingTasks(profiles);
-            CreateCnvProfileIndexingTasks(profiles);
+            CreateProjectIndexingTasks(chunk);
+            CreateDonorIndexingTasks(chunk);
+            CreateImageIndexingTasks(chunk);
+            CreateSpecimenIndexingTasks(chunk);
+            CreateCnvProfileIndexingTasks(chunk);
         });
 
         transaction.Commit();

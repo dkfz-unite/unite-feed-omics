@@ -1,4 +1,4 @@
-﻿namespace Unite.Omics.Feed.Data.Writers.Dna;
+namespace Unite.Omics.Feed.Data.Writers.Dna;
 
 public class AnalysisWriteAudit : DataWriteAudit
 {
@@ -8,8 +8,7 @@ public class AnalysisWriteAudit : DataWriteAudit
     public int CnvsAssociated;
     public int SvsCreated;
     public int SvsAssociated;
-    public int CnvProfilesCreatedCount = 0;
-    public int CnvProfilesUpdatedCount = 0;
+    public int CnvProfilesCreated = 0;
 
     public HashSet<int> Sms = [];
     public HashSet<int> SmsEntries = [];
@@ -17,8 +16,7 @@ public class AnalysisWriteAudit : DataWriteAudit
     public HashSet<int> CnvsEntries = [];
     public HashSet<int> Svs = [];
     public HashSet<int> SvsEntries = [];
-    public ISet<int> CnvProfilesCreated = new HashSet<int>();
-    public ISet<int> CnvProfilesUpdated = new HashSet<int>();
+    public HashSet<int> CnvProfiles = [];
 
     public override string ToString()
     {
@@ -31,8 +29,7 @@ public class AnalysisWriteAudit : DataWriteAudit
             $"{CnvsAssociated} CNVs associated",
             $"{SvsCreated} SVs created",
             $"{SvsAssociated} SVs associated",
-            $"{CnvProfilesCreatedCount} CNV Profiles created",
-            $"{CnvProfilesUpdatedCount} CNV Profiles updated",
+            $"{CnvProfilesCreated} CNV Profiles created",
         ]);
     }
 }

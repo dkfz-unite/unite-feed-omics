@@ -19,6 +19,29 @@ public abstract class AnalysisDataController<TEntry> : AnalysisController<TEntry
 
     protected abstract IValidator<TEntry> EntryModelValidator { get; }
     protected abstract IReader<TEntry>[] Readers { get; }
+    protected virtual string[] Scope => [];
+
+    protected override void ValidateModel(AnalysisModel<TEntry> model)
+    {
+        base.ValidateModel(model);
+
+        ValidateScope(model.TargetSample?.Scope);
+    }
+
+    protected virtual void ValidateScope(string[] scope)
+    {
+        if (scope == null)
+            return;
+
+        var allowedScope = Scope;
+        var allowedValues = string.Join(", ", allowedScope);
+
+        for (var i = 0; i < scope.Length; i++)
+        {
+            if (!allowedScope.Contains(scope[i]))
+                ModelState.AddModelError($"TargetSample.Scope[{i}]", $"Allowed values are [{allowedValues}]");
+        }
+    }
     
     protected override void ReadSubmissionForm(AnalysisForm form, AnalysisModel<TEntry> model, string format = null)
     {

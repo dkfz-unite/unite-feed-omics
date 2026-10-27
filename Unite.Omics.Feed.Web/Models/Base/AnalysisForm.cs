@@ -15,13 +15,13 @@ public record AnalysisForm: SubmissionForm
     protected DateOnly? _analysisDate;
     protected int? _analysisDay;
     protected string _genome;
+    private string[] _scope;
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
     protected string _batch;
     protected string _format;
     protected IFormFile _entriesFile;
-
 
     [FromForm(Name = "donor_id")]
     public string DonorId { get => _donorId?.Trim(); set => _donorId = value; }
@@ -50,6 +50,9 @@ public record AnalysisForm: SubmissionForm
     [FromForm(Name = "genome")]
     public string Genome { get => _genome?.Trim(); set => _genome = value; }
 
+    [FromForm(Name = "scope")]
+    public string[] Scope { get => _scope?.Select(type => type?.Trim()).ToArray(); set => _scope = value; }
+
     [FromForm(Name = "purity")]
     public double? Purity { get => _purity; set => _purity = value; }
 
@@ -61,7 +64,7 @@ public record AnalysisForm: SubmissionForm
 
     [FromForm(Name = "batch")]
     public string Batch { get => _batch?.Trim(); set => _batch = value; }
-    
+
     [FromForm(Name = "entries")]
     public IFormFile EntriesFile { get => _entriesFile; set => _entriesFile = value; }
 }

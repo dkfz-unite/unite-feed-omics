@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Annotations.Services.Rna;
@@ -58,10 +58,14 @@ public class RnaExpSubmissionHandler: SubmissionHandler
     private void ProcessSubmission(string submissionId)
     {
         var submittedData = _submissionRepository.FindDocument(submissionId);
-        var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
-        var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedData = _converter.Convert(submittedData);
-        convertedData.GeneExpressions = convertedExpressions;
+
+        if (submittedData.Entries != null && submittedData.Entries.Length > 0)
+        {
+            var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
+            var convertedExpressions = Convert(annotatedExpressions).ToArray();
+            convertedData.GeneExpressions = convertedExpressions;
+        }
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Genes);

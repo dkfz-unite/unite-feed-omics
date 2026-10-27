@@ -4,6 +4,11 @@ using DataModels = Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Converters;
 
+
+/// <summary>
+/// Converts an AnalysisModel into data layer SampleModel with the specified entry type.
+/// </summary>
+/// <typeparam name="TEntry">Entry type.</typeparam>
 public abstract class AnalysisModelConverter<TEntry> where TEntry : class, new()
 {
     private readonly SampleModelConverter _sampleModelConverter = new();

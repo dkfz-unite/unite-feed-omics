@@ -139,9 +139,25 @@ wait for pending donor or specimen submissions, so that donors are created with
 their real projects first, is under consideration by the owner; do not change
 the ordering without agreement.
 
-Open Jira bugs for this feed: re-uploads of CNV, SV and CNV profiles should
-replace per sample (currently merged), and the sample `genome` should be checked
-against `UNITE_GENOME_BUILD` for position-based data.
+Nonempty result submissions replace CNV, SV, CNV profiles, gene expression and
+protein expression per sample. SM submissions replace their declared
+`Scope` (`SNV`, `INS`, `DEL`, `MNV`), or all SM types when scope is omitted,
+null or empty; the API contract is in
+[SM submissions](Docs/models-dna-sm.md). Empty entries remain invalid, and
+resource-only submissions preserve integrated results. The shared request model
+keeps scope as an optional string array. Endpoint-specific interpretation belongs
+in the virtual `AnalysisDataController.ValidateScope` hook, which checks the
+controller's `Scope` allowlist (empty by default). The SM controller declares
+supported mutation definitions and additionally validates entry types. Removal
+methods return deleted association entity IDs (profile IDs for CNV profiles).
+Writers union these with incoming IDs in the audit, and handlers schedule tasks
+once after writing. Keep new variant IDs in the annotation sets and affected
+association variant IDs in the indexing sets. Existing result task services
+populate related donor/specimen and other indexing tasks from the audited IDs.
+CNV-profile task creation must retain IDs of deleted SQL rows for index cleanup.
+
+The sample `genome` should be checked against `UNITE_GENOME_BUILD` for
+position-based data; the existing issue remains tracked in Jira.
 
 ### Where to change things
 

@@ -2,6 +2,7 @@ using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Models.Base.Converters;
 using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;

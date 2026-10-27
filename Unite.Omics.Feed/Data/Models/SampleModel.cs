@@ -1,8 +1,8 @@
-﻿using Unite.Omics.Feed.Data.Models.Dna.Cnv;
+using Unite.Data.Entities.Omics.Analysis.Dna.Sm.Enums;
 
 namespace Unite.Omics.Feed.Data.Models;
 
-public class SampleModel
+public record SampleModel
 {
     public string Genome;
     public double? Purity;
@@ -20,5 +20,7 @@ public class SampleModel
     public IEnumerable<Rna.GeneExpressionModel> GeneExpressions;
     public IEnumerable<Prot.ProteinExpressionModel> ProteinExpressions;
     public IEnumerable<ResourceModel> Resources;
-    public IEnumerable<ProfileModel> CnvProfiles;
+    public IEnumerable<Dna.Cnv.ProfileModel> CnvProfiles;
+
+    public SmType[] SmScope;
 }

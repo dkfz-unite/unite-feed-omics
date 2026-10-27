@@ -50,10 +50,22 @@ The model is used to upload the data of simple mutations (SM) calling result fil
 - Possible values: `GRCh37`, `GRCh38`
 - Example: `GRCh37`
 
+**`scope`** - Mutation types completely covered by this upload. Optional; omitted, null or empty scope covers all SM types.
+- Type: _Array of strings_
+- Possible values: `SNV`, `INS`, `DEL`, `MNV`
+- Example: `["SNV"]` for an SNV caller; `["INS", "DEL"]` for an INDEL caller.
+- For JSON requests, set `scope` inside the target sample: `"tsample": { ..., "scope": ["INS", "DEL"] }`.
+- For multipart forms, repeat the field: `scope=INS` and `scope=DEL`.
+- Every entry must belong to a declared type; otherwise the entire request is rejected.
+- Existing associations for the target sample and declared types are replaced. Other mutation types and other samples are preserved.
+- A declared type with no entries in a nonempty upload is cleared. For example, `["SNV", "INS", "DEL"]` with only SNV entries also clears previous insertions and deletions.
+- Scope is submission metadata, not a separate stored analysis or result set. It is not inferred from the entries or previous uploads.
+- Submitting entries without scope replaces all SM associations for the target sample, including for existing clients and staged submissions. Separate callers should send an explicit scope to preserve other mutation types.
+
 **`entries`*** - file with the variants data.
 - Type: _File_
 - Supported formats: [tsv](#tsv), [vcf](#vcf)
-- Limitations: Should be set, should contain at least one element
+- Limitations: Entries or resources must be supplied. An entries file must contain at least one element; empty uploads are not used to delete results.
 - Example: `variants.tsv`
 
 **`*`** - Required fields

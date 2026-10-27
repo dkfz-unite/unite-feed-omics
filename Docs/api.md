@@ -62,9 +62,19 @@ Request body should be in `multipart/form-data` format for [DNA sample](./models
 ## POST: [api/dna/analysis/sm](http://localhost:5106/api/dna/analysis/sm)
 Submit simple mutations (SM) analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Entries replace the target sample's existing mutations of the types declared in
+`scope` (`SNV`, `INS`, `DEL`, `MNV`). Types outside the scope are preserved.
+Every entry must belong to the scope. INDEL callers declare both `INS` and `DEL`.
+Scope is an optional string array in the shared sample model; each endpoint
+validates and interprets it. For SM entries, omitted, null or empty scope means
+all SM types and replaces the sample's entire SM result set. An explicit scope
+limits replacement to its supported mutation types.
+In JSON requests, scope belongs to the target sample (`tsample.scope`).
+In multipart forms, `scope` is a flat field alongside `analysis_type`.
+
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace mutations. Entries or resources must be supplied;
+an entries file must contain at least one entry.
 
 ### Parameters
 - `format` - variants data [format](./models-dna-sm.md#formats):
@@ -83,6 +93,7 @@ Request body should be in `multipart/form-data` format for [simple mutations (SM
 - `analysis_type` - WES
 - `analysis_date` - 2023-12-01
 - `genome` - GRCh37
+- `scope` - SNV (repeat the field for additional types)
 - `entries` - variants.tsv (Variants data file in corresponding format)
 
 ### Responses
@@ -95,9 +106,10 @@ Request body should be in `multipart/form-data` format for [simple mutations (SM
 ## POST: [api/dna/analysis/cnv](http://localhost:5106/api/dna/analysis/cnv)
 Submit copy number variants (CNV) analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - variants data [format](./models-dna-cnv.md#formats):
@@ -130,9 +142,10 @@ Request body should be in `multipart/form-data` format for [copy number variants
 ## POST: [api/dna/analysis/sv](http://localhost:5106/api/dna/analysis/sv)
 Submit structural variants (SV) analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - variants data [format](./models-dna-sv.md#formats):
@@ -163,9 +176,10 @@ Request body should be in `multipart/form-data` format for [structural variants 
 ## POST: [api/dna/analysis/cnvp](http://localhost:5106/api/dna/analysis/cnvp)
 Submit copy number variant (CNV) profiles analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - profiles data [format](./models-dna-cnvp.md#formats):
@@ -245,9 +259,10 @@ Request body should be in `multipart/form-data` format for [bulk RNA sample](./m
 ## POST: [api/rna/analysis/exp](http://localhost:5106/api/rna/analysis/exp)
 Submit bulk RNA gene expressions analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - expressions data [format](./models-rna-exp.md#formats):
@@ -327,9 +342,10 @@ Request body should be in `multipart/form-data` format for [single cell gene exp
 ## POST: [api/prot/analysis/exp](http://localhost:5106/api/prot/analysis/exp)
 Submit protein expressions analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - expressions data [format](./models-prot-exp.md#formats):

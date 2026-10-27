@@ -1,4 +1,5 @@
-﻿using Unite.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna;
 using Unite.Omics.Feed.Data.Models.Dna;
 
@@ -9,7 +10,7 @@ public abstract class VariantEntryRepository<TVariantEntryEntity, TVariantEntity
     where TVariantEntity : Variant
     where TVariantModel : VariantModel
 {
-    private readonly DomainDbContext _dbContext;
+    protected readonly DomainDbContext _dbContext;
     private readonly VariantRepository<TVariantEntity, TVariantModel> _variantRepository;
 
 
@@ -46,32 +47,6 @@ public abstract class VariantEntryRepository<TVariantEntryEntity, TVariantEntity
         return Create(sampleId, variant.Id);
     }
 
-    public IEnumerable<TVariantEntryEntity> CreateMissing(int sampleId, IEnumerable<TVariantModel> models, IEnumerable<TVariantEntity> cache = null)
-    {
-        var entitiesToAdd = new List<TVariantEntryEntity>();
-
-        foreach (var model in models)
-        {
-            var variant = _variantRepository.FindOrCreate(model, cache);
-
-            var entity = Find(sampleId, variant.Id);
-
-            if (entity == null)
-            {
-                entity = Convert(sampleId, variant.Id);
-                entitiesToAdd.Add(entity);
-            }
-        }
-
-        if (entitiesToAdd.Any())
-        {
-            _dbContext.AddRange(entitiesToAdd);
-            _dbContext.SaveChanges();
-        }
-
-        return entitiesToAdd;
-    }
-
     public IEnumerable<TVariantEntryEntity> CreateAll(int sampleId, IEnumerable<TVariantModel> models, IEnumerable<TVariantEntity> cache = null)
     {
         var entitiesToAdd = new List<TVariantEntryEntity>();
@@ -94,17 +69,21 @@ public abstract class VariantEntryRepository<TVariantEntryEntity, TVariantEntity
         return entitiesToAdd;
     }
 
-    public void RemoveAll(int sampleId)
+    /// <summary>
+    /// Removes all variant entries associated with the specified sample.
+    /// </summary>
+    /// <param name="sampleId">Sample identifier.</param>
+    /// <returns>Variant identifier of the removed entries.</returns>
+    public int[] RemoveAll(int sampleId)
     {
-        var entitiesToRemove = _dbContext.Set<TVariantEntryEntity>()
-            .Where(entity => entity.SampleId == sampleId)
-            .ToArray();
+        var query = _dbContext.Set<TVariantEntryEntity>()
+            .Where(entity => entity.SampleId == sampleId);
 
-        if (entitiesToRemove.Any())
-        {
-            _dbContext.RemoveRange(entitiesToRemove);
-            _dbContext.SaveChanges();
-        }
+        var ids = query.Select(entity => entity.EntityId).ToArray();
+
+        query.ExecuteDelete();
+
+        return ids;
     }
 
 
