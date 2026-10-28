@@ -143,11 +143,12 @@ the ordering without agreement.
 
 Nonempty result submissions replace CNV, SV, CNV profiles, gene expression and
 protein expression per sample. SM submissions replace their declared
-`Scope` (`SNV`, `INS`, `DEL`, `MNV`), or all SM types when scope is omitted,
+`EntriesScope` (`SNV`, `INS`, `DEL`, `MNV`), or all SM types when scope is omitted,
 null or empty; the API contract is in
 [SM submissions](Docs/models-dna-sm.md). Empty entries remain invalid, and
-data endpoints require entries. The shared analysis form keeps scope as an
-optional string array. The SM submission model validator configures supported mutation definitions
+data endpoints require entries. The Web analysis model keeps `EntriesScope` as
+an optional string array beside `Entries` (`entries_scope` in JSON,
+comma-separated in forms). The SM submission model validator configures supported mutation definitions
 and checks entry types against the declared scope. Other endpoints reject nonempty scope unless explicitly
 configured to support it. Removal
 methods return deleted association entity IDs (profile IDs for CNV profiles).
@@ -160,6 +161,13 @@ CNV-profile task creation must retain IDs of deleted SQL rows for index cleanup.
 The sample `genome` should be checked against `UNITE_GENOME_BUILD` for
 position-based data; the existing issue remains tracked in Jira.
 
+Data payloads and split writer responsibilities are described in
+[Typed data payloads and writers](Docs/submission-flow.md#typed-data-payloads-and-writers).
+Keep entry collections out of sample metadata models. The assay metadata model
+is `AssayModel`; `AnalysisModel<TEntry>` carries one result kind.
+Keep DNA writers flat in `Data/Writers/Dna`, following
+`Analysis<Kind>Writer` and `Effects<Kind>Writer` naming.
+
 ### Where to change things
 
 Use `Cnvp`/`Cnvps` for repository-owned CNV profile identifiers, and keep
@@ -171,7 +179,7 @@ are updated separately.
 | --- | --- |
 | New input format for a result kind | `Models/<Modality>/<Kind>/Readers/<Format>/` (implement `IReader<T>`), register in the controller's `Readers` |
 | Validation of submitted entries | `Models/<Modality>/.../Validators`, base rules in `Models/Base/Validators` |
-| How data is written / merged | `Unite.Omics.Feed/Data/Writers/<Modality>/AnalysisWriter.cs` and repositories |
+| How data is written / merged | `Unite.Omics.Feed/Data/Writers/AnalysisWriter.cs`, concrete modality/result writers and repositories |
 | Annotation | `Unite.Omics.Annotations/Services` and `Handlers/Annotation` |
 | Index document shape | `unite-indices` models, then `Unite.Omics.Indices/Services/*IndexEntityBuilder.cs` |
 | New result kind end to end | Entity/mapper and migration (`unite-data`, `unite-data-migrations`), task type, controller, submission repository and handler, writer, index builder and indexing handler, portal |

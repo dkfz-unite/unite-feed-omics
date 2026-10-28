@@ -13,9 +13,9 @@ public class SampleFormConverter : IFormConverter<SampleModel, SampleForm, Empty
             DonorId = form.DonorId,
             SpecimenId = form.SpecimenId,
             SpecimenType = EnumBinder.Bind<SpecimenType>(form.SpecimenType),
-            AnalysisType = EnumBinder.Bind<AnalysisType>(form.AnalysisType),
-            AnalysisDate = form.AnalysisDate,
-            AnalysisDay = form.AnalysisDay,
+            AssayType = EnumBinder.Bind<AnalysisType>(form.AssayType),
+            AssayDate = form.AssayDate,
+            AssayDay = form.AssayDay,
             Genome = form.Genome,
             Batch = form.Batch,
             Resources = resources

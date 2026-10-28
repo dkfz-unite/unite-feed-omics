@@ -17,7 +17,7 @@ public class SampleModelConverter
             Cells = sampleModel.Cells,
             Batch = sampleModel.Batch,
             Specimen = ConvertSpecimen(sampleModel),
-            Analysis = ConvertAnalysis(sampleModel),
+            Assay = ConvertAssay(sampleModel),
             Resources = ConvertResources(sampleModel.Resources)
         };
     }
@@ -33,13 +33,13 @@ public class SampleModelConverter
         };
     }
 
-    private DataModels.AnalysisModel ConvertAnalysis(SampleModel sampleModel)
+    private DataModels.AssayModel ConvertAssay(SampleModel sampleModel)
     {
-        return new DataModels.AnalysisModel
+        return new DataModels.AssayModel
         {
-            Type = sampleModel.AnalysisType.Value,
-            Date = sampleModel.AnalysisDate,
-            Day = sampleModel.AnalysisDay
+            Type = sampleModel.AssayType.Value,
+            Date = sampleModel.AssayDate,
+            Day = sampleModel.AssayDay
         };
     }
 

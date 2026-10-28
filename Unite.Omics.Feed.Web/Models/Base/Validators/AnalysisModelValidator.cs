@@ -5,14 +5,14 @@ namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
 public abstract class AnalysisModelValidator<TModel> : AbstractValidator<TModel> where TModel : AnalysisModel
 {
-    protected AnalysisModelValidator(AnalysisType[] analysisTypes, string[] scope = null)
+    protected AnalysisModelValidator(AnalysisType[] assayTypes)
     {
         RuleFor(model => model.TargetSample)
             .NotNull().WithMessage("Should not be empty")
-            .SetValidator(new SampleModelValidator(analysisTypes, scope));
+            .SetValidator(new SampleModelValidator(assayTypes));
 
         RuleFor(model => model.MatchedSample)
-            .SetValidator(new SampleModelValidator(analysisTypes));
+            .SetValidator(new SampleModelValidator(assayTypes));
 
         RuleForEach(model => model.Resources)
             .NotNull().WithMessage("Should not be empty")

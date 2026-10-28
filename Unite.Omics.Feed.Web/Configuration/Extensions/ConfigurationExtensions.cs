@@ -32,7 +32,10 @@ public static class ConfigurationExtensions
         services.AddIndexServices();
 
         services.AddTransient<Data.Writers.SampleWriter>();
-        services.AddTransient<Data.Writers.Dna.AnalysisWriter>();
+        services.AddTransient<Data.Writers.Dna.AnalysisSmWriter>();
+        services.AddTransient<Data.Writers.Dna.AnalysisCnvWriter>();
+        services.AddTransient<Data.Writers.Dna.AnalysisSvWriter>();
+        services.AddTransient<Data.Writers.Dna.AnalysisCnvpWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsSmWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsCnvWriter>();
         services.AddTransient<Data.Writers.Dna.EffectsSvWriter>();

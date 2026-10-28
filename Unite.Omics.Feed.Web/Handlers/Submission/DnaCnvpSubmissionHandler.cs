@@ -10,7 +10,7 @@ namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
 public class DnaCnvpSubmissionHandler : SubmissionHandler
 {
-    private readonly AnalysisWriter _dataWriter;
+    private readonly AnalysisCnvpWriter _dataWriter;
     private readonly TasksProcessingService _tasksProcessingService;
     private readonly CnvpSubmissionRepository _submissionRepository;
     private readonly CnvpIndexingTaskService _indexingTaskService;
@@ -20,7 +20,7 @@ public class DnaCnvpSubmissionHandler : SubmissionHandler
 
 
     public DnaCnvpSubmissionHandler(
-        AnalysisWriter dataWriter,
+        AnalysisCnvpWriter dataWriter,
         TasksProcessingService tasksProcessingService,
         CnvpSubmissionRepository submissionRepository,
         CnvpIndexingTaskService indexingTaskService,
@@ -51,7 +51,7 @@ public class DnaCnvpSubmissionHandler : SubmissionHandler
             return true;
         });
     }
-    
+
 
     private void ProcessSubmission(string submissionId)
     {
@@ -59,9 +59,9 @@ public class DnaCnvpSubmissionHandler : SubmissionHandler
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
-        
-        _indexingTaskService.PopulateTasks(audit.Cnvps);
-        
+
+        _indexingTaskService.PopulateTasks(audit.Entries);
+
         _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());

@@ -7,9 +7,9 @@ public record AnalysisForm : SampleForm
     public const double DefaultPloidy = 2.0;
 
 
+    private string _entriesScope;
     protected string _matchedSpecimenId;
     protected string _matchedSpecimenType;
-    private string[] _scope;
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
@@ -21,8 +21,8 @@ public record AnalysisForm : SampleForm
     [FromForm(Name = "matched_specimen_type")]
     public string MatchedSpecimenType { get => _matchedSpecimenType?.Trim(); set => _matchedSpecimenType = value; }
 
-    [FromForm(Name = "scope")]
-    public string[] Scope { get => _scope?.Select(type => type?.Trim()).ToArray(); set => _scope = value; }
+    [FromForm(Name = "entries_scope")]
+    public string EntriesScope { get => _entriesScope?.Trim(); set => _entriesScope = value; }
 
     [FromForm(Name = "purity")]
     public double? Purity { get => _purity; set => _purity = value; }

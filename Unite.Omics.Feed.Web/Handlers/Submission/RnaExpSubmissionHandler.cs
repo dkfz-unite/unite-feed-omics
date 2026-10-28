@@ -64,7 +64,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
         {
             var annotatedExpressions = AnnotateExpressions(_annotationService, submittedData.Entries);
             var convertedExpressions = Convert(annotatedExpressions).ToArray();
-            convertedData.GeneExpressions = convertedExpressions;
+            convertedData.Entries = convertedExpressions;
         }
 
         _dataWriter.SaveData(convertedData, out var audit);

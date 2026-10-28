@@ -4,8 +4,8 @@ Forms and JSON use the same submission model, model validator and staging path:
 
 ```text
 multipart form → read files → form converter ─┐
-                                            ├→ model validator → Mongo + submission task
-JSON body → deserialize submission model ────┘
+                                              ├→ model validator → Mongo + submission task
+JSON body → deserialize submission model ─────┘
 ```
 
 Binding and file-reading errors are retained alongside model validation errors.
@@ -29,7 +29,7 @@ files, as with sample metadata and resource-only analysis submissions.
 
 | Submission kind | Validator | Contents |
 | --- | --- | --- |
-| Sample metadata | `SampleModelValidator` | Metadata, allowed analysis types/scope, optional resources |
+| Sample metadata | `SampleModelValidator` | Metadata, allowed analysis types, optional resources |
 | Analysis data | `AnalysisDataModelValidator<TEntry>` | Target/matched samples, required entries, entry validator, optional resources |
 | Analysis resources | `AnalysisResourcesModelValidator` | Target/matched samples, required resources |
 
@@ -41,7 +41,7 @@ with `SetValidator` and reject null items.
 For endpoint-specific rules, extend the corresponding model validator and select
 it in the controller. SM's `Models/Dna/Sm/Validators/AnalysisModelValidator`
 extends the data validator: it configures WGS/WES, allows SNV/INS/DEL/MNV scope,
-and checks entry types against that scope. Omitted or empty scope still means
+and checks entry types against that scope. Omitted or empty `EntriesScope` still means
 replacement of all SM types. Other endpoints reject nonempty scope unless their
 model validator explicitly supports it.
 
@@ -69,3 +69,64 @@ collection, and analysis resources requires a nonempty resources collection.
 Resources may be submitted independently; a complete IDAT pair or scRNA matrix
 bundle is not required in one request. Resource types are assigned from the
 endpoint before staging.
+
+## Typed data payloads and writers
+
+The Web model is converted into a typed data-layer `AnalysisModel<TEntry>` with
+`TargetSample`, optional `MatchedSample`, analysis `Resources`, and `Entries`.
+`SampleModel` contains only sample/assay metadata and sample resources.
+Web sample models and forms use `AssayType`, `AssayDate` and `AssayDay`; the
+JSON and multipart field names remain `analysis_type`, `analysis_date` and
+`analysis_day`. Existing Mongo staging field names are also retained.
+`AssayModel` holds assay type, date/day and parameters; it is separate
+from the result-submission payload.
+
+The SM data payload extends `AnalysisModel<Sm.VariantModel>` with
+`SmType[] EntriesScope`. Its Web counterpart uses an optional string array named
+`EntriesScope` (JSON/form field `entries_scope`). Both properties belong to the
+Web `AnalysisModel<TEntryModel>`; the non-generic `AnalysisModel` contains only
+common sample/resource metadata. Other analysis validators reject nonempty
+entries scope by default.
+
+Forms accept one comma-separated `entries_scope` value (`SNV, INS, DEL`);
+conversion trims values and removes empty items. JSON uses an array of strings.
+
+| Entries | Data writer |
+| --- | --- |
+| SM variants | `Writers.Dna.AnalysisSmWriter` |
+| CNV variants | `Writers.Dna.AnalysisCnvWriter` |
+| SV variants | `Writers.Dna.AnalysisSvWriter` |
+| CNV profiles | `Writers.Dna.AnalysisCnvpWriter` |
+| Gene expressions | `Writers.Rna.AnalysisWriter` |
+| Protein expressions | `Writers.Prot.AnalysisWriter` |
+| Analysis resources | `Writers.RnaSc.AnalysisWriter` (also used for methylation levels) |
+
+These writers share `AnalysisWriter<TModel, TAudit>`, which writes the target and
+matched-sample association, invokes `WriteEntries`, and writes sample/analysis
+resources in the existing `DataWriter` transaction. Repositories are initialized
+against that transaction's DbContext before processing. Constructors do not
+initialize result repositories.
+
+A supplied matched sample is found by donor, specimen ID/type and assay type,
+or created when missing. Its link is set on new and existing target samples;
+omitting the matched sample preserves the existing link. Reusing a matched
+sample does not update its metadata. Forms inherit only the target's assay
+type for the matched assay, leaving its date/day unset. Submit the matched
+sample separately to provide or update its metadata.
+
+Concrete writers initialize their own entry repositories and override
+`WriteEntries`. Replacement, batching and audit rules remain local to the result
+kind. Empty converted entries preserve existing data; API data submissions still
+require entries before staging. RNA/protein handlers annotate their submitted
+expressions before assigning the typed data payload's `Entries`.
+
+The Web converter is generic over source entry and target analysis model types.
+DNA converters populate `target.Entries`; SM additionally converts
+`source.EntriesScope` into its typed enum array. Resource-only conversions need
+only the common sample/resource mapping.
+
+DNA analysis writers share `AnalysisWriteAudit`. `Variants` contains new variant
+IDs requiring annotation; `Entries` contains affected variant entity IDs (or
+CNVP profile IDs), including removed IDs, for reindexing. The common counters
+are `VariantsCreated` and `EntriesCreated`. Keep the annotation and indexing
+sets distinct when updating writers or submission handlers.

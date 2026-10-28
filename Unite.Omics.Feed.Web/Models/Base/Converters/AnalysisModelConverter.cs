@@ -1,48 +1,30 @@
-﻿using Unite.Essentials.Extensions;
-
 using DataModels = Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Converters;
 
-
-/// <summary>
-/// Converts an AnalysisModel into data layer SampleModel with the specified entry type.
-/// </summary>
-/// <typeparam name="TEntry">Entry type.</typeparam>
-public abstract class AnalysisModelConverter<TEntry> where TEntry : class, new()
+public class AnalysisModelConverter<TEntry, TModel>
+    where TEntry : class, new()
+    where TModel : DataModels.AnalysisModel, new()
 {
     private readonly SampleModelConverter _sampleModelConverter = new();
     private readonly ResourceModelConverter _resourceModelConverter = new();
 
 
-    public virtual DataModels.SampleModel Convert(AnalysisModel<TEntry> analysisModel)
+    public virtual TModel Convert(AnalysisModel<TEntry> source)
     {
-        var sample = _sampleModelConverter.Convert(analysisModel.TargetSample);
-        
-        if (analysisModel.MatchedSample != null)
+        var model = new TModel
         {
-            sample.MatchedSample = _sampleModelConverter.Convert(analysisModel.MatchedSample);
-        }
+            TargetSample = _sampleModelConverter.Convert(source.TargetSample),
+            MatchedSample = source.MatchedSample == null ? null : _sampleModelConverter.Convert(source.MatchedSample),
+            Resources = source.Resources?.Select(_resourceModelConverter.Convert).ToArray()
+        };
 
-        MapResources(analysisModel, sample);  
-        MapEntries(analysisModel, sample);
-        
-        return sample;
+        MapEntries(source, model);
+        return model;
     }
 
 
-    protected virtual void MapResources(AnalysisModel<TEntry> sequencingDataModel, DataModels.SampleModel sample)
+    protected virtual void MapEntries(AnalysisModel<TEntry> source, TModel target)
     {
-        if (sequencingDataModel.Resources.IsNotEmpty())
-        {
-            sample.Resources = Enumerable.Concat
-            (
-                sample.Resources ?? [],
-                sequencingDataModel.Resources.Select(_resourceModelConverter.Convert)
-            )
-            .ToArray();
-        }
     }
-
-    protected abstract void MapEntries(AnalysisModel<TEntry> sequencingDataModel, DataModels.SampleModel sample);
 }

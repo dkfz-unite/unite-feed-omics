@@ -65,7 +65,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
         {
             var annotatedExpressions = AnnotateExpressions(submittedData.Entries);
             var convertedExpressions = Convert(annotatedExpressions).ToArray();
-            convertedData.ProteinExpressions = convertedExpressions;
+            convertedData.Entries = convertedExpressions;
         }
 
         _dataWriter.SaveData(convertedData, out var audit);
@@ -101,7 +101,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
                 Raw = model.Raw,
                 Normalized = model.Normalized
             };
-            
+
             if (model.Protein != null)
             {
                 expressionModel.Protein = new Data.Models.ProteinModel

@@ -53,9 +53,9 @@ For example, an SNV replacement submission:
     "specimen_id": "Tumor",
     "specimen_type": "Material",
     "analysis_type": "WGS",
-    "genome": "GRCh38",
-    "scope": ["SNV"]
+    "genome": "GRCh38"
   },
+  "entries_scope": ["SNV"],
   "entries": [
     { "chromosome": "1", "position": "100", "ref": "A", "alt": "C" }
   ],
@@ -126,14 +126,14 @@ For `multipart/form-data`, use the fields described for [DNA sample](./models-dn
 Submit simple mutations (SM) analysis metadata and data.
 
 Entries replace the target sample's existing mutations of the types declared in
-`scope` (`SNV`, `INS`, `DEL`, `MNV`). Types outside the scope are preserved.
+`entries_scope` (`SNV`, `INS`, `DEL`, `MNV`). Types outside the scope are preserved.
 Every entry must belong to the scope. INDEL callers declare both `INS` and `DEL`.
-Scope is an optional string array in the shared sample model; each endpoint
+`entries_scope` is an optional string array on the analysis model; each endpoint
 validates and interprets it. For SM entries, omitted, null or empty scope means
 all SM types and replaces the sample's entire SM result set. An explicit scope
 limits replacement to its supported mutation types.
-In multipart forms, `scope` is a flat field alongside `analysis_type`.
-In JSON, it belongs to the target sample (`tsample.scope`).
+In multipart forms, use one comma-separated `entries_scope` field, e.g. `SNV, INS, DEL`.
+In JSON, `entries_scope` belongs to the analysis, alongside `entries` and `tsample`.
 
 Sample metadata and resource links retain UPSERT behavior. Entries are
 required and must contain at least one entry; resources are optional.
@@ -155,7 +155,7 @@ For `multipart/form-data`, use the fields described for [simple mutations (SM)](
 - `analysis_type` - WES
 - `analysis_date` - 2023-12-01
 - `genome` - GRCh37
-- `scope` - SNV (repeat the field for additional types)
+- `entries_scope` - SNV, INS, DEL
 - `entries` - variants.tsv (Variants data file in corresponding format)
 
 ### Responses

@@ -11,7 +11,7 @@ namespace Unite.Omics.Feed.Web.Models.Dna.Sm.Validators;
 
 public class AnalysisModelValidator : AnalysisDataModelValidator<VariantModel>
 {
-    private static readonly string[] _scope =
+    private static readonly string[] _entriesScope =
     [
         SmType.SNV.ToDefinitionString(),
         SmType.INS.ToDefinitionString(),
@@ -20,20 +20,20 @@ public class AnalysisModelValidator : AnalysisDataModelValidator<VariantModel>
     ];
 
 
-    public AnalysisModelValidator() : base([AnalysisType.WGS, AnalysisType.WES], new VariantModelValidator(), _scope)
+    public AnalysisModelValidator() : base([AnalysisType.WGS, AnalysisType.WES], new VariantModelValidator(), _entriesScope)
     {
-        RuleFor(model => model).Custom(ValidateScope);
+        RuleFor(model => model).Custom(ValidateEntriesScope);
     }
 
 
-    private static void ValidateScope(AnalysisModel<VariantModel> model, ValidationContext<AnalysisModel<VariantModel>> context)
+    private static void ValidateEntriesScope(AnalysisModel<VariantModel> model, ValidationContext<AnalysisModel<VariantModel>> context)
     {
-        var scope = model.TargetSample?.Scope;
+        var entriesScope = model.EntriesScope;
         var entries = model.Entries;
-        if (scope == null || scope.Length == 0 || entries == null)
+        if (entriesScope == null || entriesScope.Length == 0 || entries == null)
             return;
 
-        var types = scope.Select(EnumBinder.Bind<SmType>).ToArray();
+        var types = entriesScope.Select(EnumBinder.Bind<SmType>).ToArray();
         if (types.Any(type => type == null))
             return;
 

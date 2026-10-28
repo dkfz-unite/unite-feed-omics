@@ -16,6 +16,7 @@ public class AnalysisFormConverter<TEntry> : IFormConverter<AnalysisModel<TEntry
         {
             TargetSample = ConvertSample(form),
             MatchedSample = ConvertMatchedSample(form),
+            EntriesScope = form.EntriesScope?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries),
             Entries = entries,
             Resources = resources
         };
@@ -29,10 +30,9 @@ public class AnalysisFormConverter<TEntry> : IFormConverter<AnalysisModel<TEntry
             DonorId = form.DonorId,
             SpecimenId = form.SpecimenId,
             SpecimenType = EnumBinder.Bind<SpecimenType>(form.SpecimenType),
-            AnalysisType = EnumBinder.Bind<AnalysisType>(form.AnalysisType),
-            Scope = form.Scope,
-            AnalysisDate = form.AnalysisDate,
-            AnalysisDay = form.AnalysisDay,
+            AssayType = EnumBinder.Bind<AnalysisType>(form.AssayType),
+            AssayDate = form.AssayDate,
+            AssayDay = form.AssayDay,
             Genome = form.Genome,
             Purity = form.Purity,
             Ploidy = form.Ploidy,
@@ -51,7 +51,7 @@ public class AnalysisFormConverter<TEntry> : IFormConverter<AnalysisModel<TEntry
             DonorId = form.DonorId,
             SpecimenId = form.MatchedSpecimenId,
             SpecimenType = EnumBinder.Bind<SpecimenType>(form.MatchedSpecimenType),
-            AnalysisType = EnumBinder.Bind<AnalysisType>(form.AnalysisType),
+            AssayType = EnumBinder.Bind<AnalysisType>(form.AssayType),
             Genome = form.Genome
         };
     }

@@ -1,15 +1,14 @@
 using Unite.Omics.Feed.Web.Models.Base;
-using SampleModel = Unite.Omics.Feed.Data.Models.SampleModel;
 
 namespace Unite.Omics.Feed.Web.Models.Dna.Cnv.Converters;
 
-public class ProfileModelConverter : Base.Converters.AnalysisModelConverter<ProfileModel>
+public class ProfileModelConverter : Base.Converters.AnalysisModelConverter<ProfileModel, Data.Models.AnalysisModel<Data.Models.Dna.Cnv.ProfileModel>>
 {
-    protected override void MapEntries(AnalysisModel<ProfileModel> source, SampleModel target)
+    protected override void MapEntries(AnalysisModel<ProfileModel> source, Data.Models.AnalysisModel<Data.Models.Dna.Cnv.ProfileModel> target)
     {
         var predicate = new Func<ProfileModel, bool>(model => model.Gain.HasValue || model.Loss.HasValue || model.Neutral.HasValue);
 
-        target.Cnvps = source.Entries.Distinct().Where(predicate).Select(profile =>
+        target.Entries = source.Entries.Distinct().Where(predicate).Select(profile =>
         {
             var gain = profile.Gain ?? 0;
             var loss = profile.Loss ?? 0;
@@ -23,7 +22,7 @@ public class ProfileModelConverter : Base.Converters.AnalysisModelConverter<Prof
                 Loss = loss,
                 Neutral = neutral
             };
-            
+
         }).ToArray();
     }
 }

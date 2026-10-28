@@ -11,27 +11,26 @@ public abstract class DataWriter<TModel, TAudit> : Unite.Data.Context.Services.D
     protected SampleRepository _sampleRepository;
     protected ResourceRepository _resourceRepository;
 
+
     protected DataWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        using var dbContext = dbContextFactory.CreateDbContext();
-
-        Initialize(dbContext);
     }
 
-    protected int WriteSample(SampleModel model, ref TAudit audit)
+
+    protected int WriteSample(SampleModel model, ref TAudit audit, SampleModel matchedSample = null)
     {
         var sample = _sampleRepository.Find(model);
 
         if (sample == null)
         {
-            sample = _sampleRepository.Create(model);
+            sample = _sampleRepository.Create(model, matchedSample);
 
             audit.Samples.Add(sample.Id);
             audit.SamplesCreated++;
         }
         else
         {
-            _sampleRepository.Update(sample, model);
+            _sampleRepository.Update(sample, model, matchedSample);
 
             audit.Samples.Add(sample.Id);
             audit.SamplesUpdated++;
@@ -56,6 +55,6 @@ public abstract class DataWriter<TModel, TAudit> : Unite.Data.Context.Services.D
                 _resourceRepository.Update(resource, model);
                 audit.ResourcesUpdated++;
             }
-       }   
+        }
     }
 }

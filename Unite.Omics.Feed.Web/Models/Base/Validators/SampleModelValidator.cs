@@ -8,7 +8,7 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
     private readonly StringComparison _comparison = StringComparison.InvariantCultureIgnoreCase;
 
 
-    public SampleModelValidator(AnalysisType[] analysisTypes, string[] scope = null)
+    public SampleModelValidator(AnalysisType[] assayTypes)
     {
         RuleFor(model => model.DonorId)
             .NotEmpty()
@@ -37,30 +37,30 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage($"Invalid value");
 
 
-        RuleFor(model => model.AnalysisType)
+        RuleFor(model => model.AssayType)
             .NotNull()
             .WithMessage("Should not be empty");
 
-        RuleFor(model => model.AnalysisType)
-            .Must(value => analysisTypes.Contains(value.Value))
-            .When(model => model.AnalysisType != null)
+        RuleFor(model => model.AssayType)
+            .Must(value => assayTypes.Contains(value.Value))
+            .When(model => model.AssayType != null)
             .WithMessage($"Invalid value");
 
 
-        RuleFor(model => model.AnalysisDate)
+        RuleFor(model => model.AssayDate)
             .Empty()
-            .When(model => model.AnalysisDay != null)
+            .When(model => model.AssayDay != null)
             .WithMessage("Either exact 'analysis_date' or relative 'analysis_day' can be set, not both");
 
 
-        RuleFor(model => model.AnalysisDay)
+        RuleFor(model => model.AssayDay)
             .Empty()
-            .When(model => model.AnalysisDate != null)
+            .When(model => model.AssayDate != null)
             .WithMessage("Either exact 'analysis_date' or relative 'analysis_day' can be set, not both");
 
-        RuleFor(model => model.AnalysisDay)
+        RuleFor(model => model.AssayDay)
             .GreaterThanOrEqualTo(1)
-            .When(model => model.AnalysisDay != null)
+            .When(model => model.AssayDay != null)
             .WithMessage("Should be greater than or equal to 1");
 
 
@@ -82,11 +82,6 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
         RuleFor(model => model.Ploidy).GreaterThanOrEqualTo(1);
         RuleFor(model => model.Cells).GreaterThanOrEqualTo(1);
 
-
-        var allowedScope = scope ?? [];
-        RuleForEach(model => model.Scope)
-            .Must(value => allowedScope.Contains(value))
-            .WithMessage($"Allowed values are [{string.Join(", ", allowedScope)}]");
 
         RuleForEach(model => model.Resources)
             .NotNull().WithMessage("Should not be empty")

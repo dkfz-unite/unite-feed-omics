@@ -2,34 +2,23 @@ namespace Unite.Omics.Feed.Data.Writers.Dna;
 
 public class AnalysisWriteAudit : DataWriteAudit
 {
-    public int SmsCreated;
-    public int SmsAssociated;
-    public int CnvsCreated;
-    public int CnvsAssociated;
-    public int SvsCreated;
-    public int SvsAssociated;
-    public int CnvpsCreated = 0;
+    public int VariantsCreated;
+    public int EntriesCreated;
 
-    public HashSet<int> Sms = [];
-    public HashSet<int> SmsEntries = [];
-    public HashSet<int> Cnvs = [];
-    public HashSet<int> CnvsEntries = [];
-    public HashSet<int> Svs = [];
-    public HashSet<int> SvsEntries = [];
-    public HashSet<int> Cnvps = [];
+    // New variants requiring annotation.
+    public HashSet<int> Variants = [];
+
+    // Affected variant entity IDs or CNVP profile IDs, including removed IDs.
+    public HashSet<int> Entries = [];
+
 
     public override string ToString()
     {
         return string.Join(Environment.NewLine,
         [
             base.ToString(),
-            $"{SmsCreated} SMs created",
-            $"{SmsAssociated} SMs associated",
-            $"{CnvsCreated} CNVs created",
-            $"{CnvsAssociated} CNVs associated",
-            $"{SvsCreated} SVs created",
-            $"{SvsAssociated} SVs associated",
-            $"{CnvpsCreated} CNV Profiles created",
+            $"{VariantsCreated} variants created",
+            $"{EntriesCreated} entries created"
         ]);
     }
 }

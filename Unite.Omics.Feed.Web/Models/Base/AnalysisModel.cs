@@ -6,6 +6,7 @@ public record AnalysisModel: SubmissionModel
 {
     protected ResourceModel[] _resources;
 
+
     /// <summary>
     /// Analysed sample.
     /// </summary>
@@ -28,7 +29,15 @@ public record AnalysisModel: SubmissionModel
 
 public record AnalysisModel<TEntryModel> : AnalysisModel where TEntryModel : class, new()
 {
+    private string[] _entriesScope;
     protected TEntryModel[] _entries;
+
+
+    /// <summary>
+    /// Entry types completely covered by this submission.
+    /// </summary>
+    [JsonPropertyName("entries_scope")]
+    public virtual string[] EntriesScope { get => _entriesScope?.Select(value => value?.Trim()).ToArray(); set => _entriesScope = value; }
 
     /// <summary>
     /// Entries data.
