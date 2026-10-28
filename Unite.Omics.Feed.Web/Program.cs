@@ -1,4 +1,3 @@
-using FluentValidation.AspNetCore;
 using Unite.Omics.Feed.Web.Configuration.Extensions;
 
 
@@ -18,7 +17,6 @@ builder.Services.AddAuthorization(options => options.AddAuthorizationOptions());
 builder.Services.AddControllers(options => options.AddMvcOptions())
                 .AddJsonOptions(options => options.AddJsonOptions());
 
-builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 

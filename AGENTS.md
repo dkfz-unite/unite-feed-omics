@@ -100,25 +100,27 @@ The base `SubmissionController` stages payloads in Mongo database
 
 ### Submission validation
 
-- Validation order differs between the two upload paths. **JSON**
-  (`PostJson`): the request is validated automatically (FluentValidation)
-  while the body is read, then `ValidateModel` runs with the resources already
-  in the model. **Form** (`PostForm`): `Convert`, then `ValidateModel` with
-  `Resources` still empty, then `ReadSubmissionForm` parses the resources/entries
-  files and calls `ValidateResources`/`ValidateEntries`. A modality-specific
-  resource check must therefore run in both `ValidateModel` (JSON) and
-  `ValidateResources` (form) and must tolerate an empty list; see
-  `Controllers/Prot/SampleController.cs`.
-- Data Source submits samples and results as forms, one resource at a time, so
-  checks that need several resources together (e.g. IDAT Red/Grn pairs, see the
-  commented code in `Controllers/Meth/SampleController.cs`) do not work there.
-- A resource's `type` is set by the server from the endpoint (`DataType`); it is
-  not read from JSON or TSV and not validated. Resource `name`, `format` and
-  `url` are lowercased by `ResourceModel`, following the shared
-  [coding conventions](../unite-meta/AGENTS.md#coding-conventions).
-- Sample metadata follows upsert semantics (provided fields update, missing
-  fields stay); `SampleController.Convert` must copy every form field, including
-  `batch`, into the model.
+See [Submission flow](Docs/submission-flow.md) for controller configuration,
+validator inheritance, conversion, reader behavior and JSON/form examples in
+[API](Docs/api.md#json-submissions).
+
+- Both multipart forms and JSON are supported. Forms are read/converted into
+  the same models as JSON, then both paths use the endpoint's `ModelValidator`
+  and the same staging method. Do not reintroduce form validators or domain
+  validation in controller hooks.
+- All endpoints inherit directly from the generic `SubmissionController`.
+  Existing model types and serialization attributes are retained for Mongo
+  staging and GET responses as well as JSON uploads.
+- File-reader failures and unsupported formats are transport errors added by
+  the controller. Data validation belongs in model validators, including SM
+  scope membership. Readers keep their existing format implementations; do not
+  duplicate TSV parsing or collect per-cell parsing failures.
+- Converters run before validation. Keep nullable enum results and partially
+  supplied matched samples so validators can report errors. Binding errors
+  must survive conversion. Preserve every metadata field, including `batch`.
+- Resource `type` is assigned from the endpoint (`DataType`) before staging.
+  Resource `name`, `format` and `url` are lowercased by `ResourceModel`, following
+  the shared [coding conventions](../unite-meta/AGENTS.md#coding-conventions).
 
 
 ### Processing
@@ -144,11 +146,10 @@ protein expression per sample. SM submissions replace their declared
 `Scope` (`SNV`, `INS`, `DEL`, `MNV`), or all SM types when scope is omitted,
 null or empty; the API contract is in
 [SM submissions](Docs/models-dna-sm.md). Empty entries remain invalid, and
-resource-only submissions preserve integrated results. The shared request model
-keeps scope as an optional string array. Endpoint-specific interpretation belongs
-in the virtual `AnalysisDataController.ValidateScope` hook, which checks the
-controller's `Scope` allowlist (empty by default). The SM controller declares
-supported mutation definitions and additionally validates entry types. Removal
+data endpoints require entries. The shared analysis form keeps scope as an
+optional string array. The SM submission model validator configures supported mutation definitions
+and checks entry types against the declared scope. Other endpoints reject nonempty scope unless explicitly
+configured to support it. Removal
 methods return deleted association entity IDs (profile IDs for CNV profiles).
 Writers union these with incoming IDs in the audit, and handlers schedule tasks
 once after writing. Keep new variant IDs in the annotation sets and affected
@@ -160,6 +161,11 @@ The sample `genome` should be checked against `UNITE_GENOME_BUILD` for
 position-based data; the existing issue remains tracked in Jira.
 
 ### Where to change things
+
+Use `Cnvp`/`Cnvps` for repository-owned CNV profile identifiers, and keep
+`Dna.Cnv.Profile`/`ProfileModel` within the CNV namespace. Shared-library API
+names such as `CnvProfileIndex` retain their upstream names until those libraries
+are updated separately.
 
 | Change | Location |
 | --- | --- |

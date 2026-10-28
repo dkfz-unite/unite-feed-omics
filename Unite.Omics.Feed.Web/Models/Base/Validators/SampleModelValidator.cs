@@ -1,13 +1,14 @@
-﻿using FluentValidation;
+using FluentValidation;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
-public class SampleModelValidator : AbstractValidator<SampleModel> 
+public class SampleModelValidator : AbstractValidator<SampleModel>
 {
     private readonly StringComparison _comparison = StringComparison.InvariantCultureIgnoreCase;
-    private readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
-    public SampleModelValidator()
+
+    public SampleModelValidator(AnalysisType[] analysisTypes, string[] scope = null)
     {
         RuleFor(model => model.DonorId)
             .NotEmpty()
@@ -28,13 +29,22 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
 
 
         RuleFor(model => model.SpecimenType)
-            .NotEmpty()
+            .NotNull()
             .WithMessage("Should not be empty");
 
-        
+        RuleFor(model => model.SpecimenType)
+            .IsInEnum()
+            .WithMessage($"Invalid value");
+
+
         RuleFor(model => model.AnalysisType)
-            .NotEmpty()
+            .NotNull()
             .WithMessage("Should not be empty");
+
+        RuleFor(model => model.AnalysisType)
+            .Must(value => analysisTypes.Contains(value.Value))
+            .When(model => model.AnalysisType != null)
+            .WithMessage($"Invalid value");
 
 
         RuleFor(model => model.AnalysisDate)
@@ -59,24 +69,8 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage("Should not be empty");
 
         RuleFor(model => model.Genome)
-            .Must(genome => genome.Equals("GRCh37", _comparison) || genome.Equals("GRCh38", _comparison))
+            .Must(genome => string.Equals(genome, "GRCh37", _comparison) || string.Equals(genome, "GRCh38", _comparison))
             .WithMessage("Should be either 'GRCh37' or 'GRCh38'");
-
-        
-        RuleFor(model => model.Purity)
-            .GreaterThanOrEqualTo(0)
-            .LessThanOrEqualTo(1)
-            .WithMessage("Should be in range [0, 1]");
-
-        
-        RuleFor(model => model.Ploidy)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("Should be greater than or equal to 1");
-
-
-        RuleFor(model => model.Cells)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("Should be greater than or equal to 1");
 
 
         RuleFor(model => model.Batch)
@@ -84,7 +78,18 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage("Maximum length is 100");
 
 
+        RuleFor(model => model.Purity).InclusiveBetween(0, 1);
+        RuleFor(model => model.Ploidy).GreaterThanOrEqualTo(1);
+        RuleFor(model => model.Cells).GreaterThanOrEqualTo(1);
+
+
+        var allowedScope = scope ?? [];
+        RuleForEach(model => model.Scope)
+            .Must(value => allowedScope.Contains(value))
+            .WithMessage($"Allowed values are [{string.Join(", ", allowedScope)}]");
+
         RuleForEach(model => model.Resources)
-            .SetValidator(_resourceModelValidator);
+            .NotNull().WithMessage("Should not be empty")
+            .SetValidator(new ResourceModelValidator());
     }
 }

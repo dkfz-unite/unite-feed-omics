@@ -54,7 +54,7 @@ The model is used to upload the data of simple mutations (SM) calling result fil
 - Type: _Array of strings_
 - Possible values: `SNV`, `INS`, `DEL`, `MNV`
 - Example: `["SNV"]` for an SNV caller; `["INS", "DEL"]` for an INDEL caller.
-- For JSON requests, set `scope` inside the target sample: `"tsample": { ..., "scope": ["INS", "DEL"] }`.
+- For JSON, set `scope` on the target sample (`tsample.scope`).
 - For multipart forms, repeat the field: `scope=INS` and `scope=DEL`.
 - Every entry must belong to a declared type; otherwise the entire request is rejected.
 - Existing associations for the target sample and declared types are replaced. Other mutation types and other samples are preserved.
@@ -65,7 +65,7 @@ The model is used to upload the data of simple mutations (SM) calling result fil
 **`entries`*** - file with the variants data.
 - Type: _File_
 - Supported formats: [tsv](#tsv), [vcf](#vcf)
-- Limitations: Entries or resources must be supplied. An entries file must contain at least one element; empty uploads are not used to delete results.
+- Limitations: An entries file is required and must contain at least one element; empty uploads are not used to delete results.
 - Example: `variants.tsv`
 
 **`*`** - Required fields

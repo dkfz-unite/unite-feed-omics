@@ -7,6 +7,10 @@ public static class ChromosomeParser
 {
     public static bool TryParse(string source, out Chromosome? result)
     {
+        result = null;
+        if (string.IsNullOrWhiteSpace(source))
+            return false;
+
         var values = Enum.GetValues(typeof(Chromosome)).Cast<Chromosome>().ToArray();
 
         foreach (var value in values)

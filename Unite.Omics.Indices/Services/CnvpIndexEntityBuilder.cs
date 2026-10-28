@@ -4,15 +4,15 @@ using Unite.Indices.Entities.CnvProfiles;
 
 namespace Unite.Omics.Indices.Services;
 
-public class CnvProfileIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, CnvProfileIndexingCache>
+public class CnvpIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, CnvpIndexingCache>
 {
-    public override CnvProfileIndex[] Create(int key, CnvProfileIndexingCache cache)
+    public override CnvProfileIndex[] Create(int key, CnvpIndexingCache cache)
     {
-        var cnvProfile = cache.CnvProfiles.FirstOrDefault(x => x.Id == key);
-        if (cnvProfile == null)
+        var cnvp = cache.Cnvps.FirstOrDefault(x => x.Id == key);
+        if (cnvp == null)
             return null;
 
-        var sample = cache.Samples.FirstOrDefault(x => x.Id == cnvProfile.SampleId);
+        var sample = cache.Samples.FirstOrDefault(x => x.Id == cnvp.SampleId);
         if (sample == null)
             return null;
         
@@ -23,12 +23,12 @@ public class CnvProfileIndexEntityBuilder: IndexEntityBuilder<CnvProfileIndex, C
         //TODO: convert Gain, Loss and Neutral to float
         return [new CnvProfileIndex
         {
-            Chromosome = cnvProfile.ChromosomeId.ToDefinitionString(),
-            ChromosomeArm = cnvProfile.ChromosomeArmId.ToDefinitionString(),
-            Gain =  (float)cnvProfile.Gain,
-            Loss =  (float)cnvProfile.Loss,
-            Neutral = (float)cnvProfile.Neutral,
-            Id =  cnvProfile.Id,
+            Chromosome = cnvp.ChromosomeId.ToDefinitionString(),
+            ChromosomeArm = cnvp.ChromosomeArmId.ToDefinitionString(),
+            Gain =  (float)cnvp.Gain,
+            Loss =  (float)cnvp.Loss,
+            Neutral = (float)cnvp.Neutral,
+            Id =  cnvp.Id,
             Specimen = new SpecimenNavIndex
             {
                 Id = specimen.Id,

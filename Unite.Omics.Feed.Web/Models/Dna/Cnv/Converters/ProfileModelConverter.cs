@@ -1,15 +1,15 @@
 using Unite.Omics.Feed.Web.Models.Base;
 using SampleModel = Unite.Omics.Feed.Data.Models.SampleModel;
 
-namespace Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Converters;
+namespace Unite.Omics.Feed.Web.Models.Dna.Cnv.Converters;
 
-public class CnvProfileModelConverter: Base.Converters.AnalysisModelConverter<CnvProfileModel>
+public class ProfileModelConverter : Base.Converters.AnalysisModelConverter<ProfileModel>
 {
-    protected override void MapEntries(AnalysisModel<CnvProfileModel> source, SampleModel target)
+    protected override void MapEntries(AnalysisModel<ProfileModel> source, SampleModel target)
     {
-        var predicate = new Func<CnvProfileModel, bool>(model => model.Gain.HasValue || model.Loss.HasValue || model.Neutral.HasValue);
+        var predicate = new Func<ProfileModel, bool>(model => model.Gain.HasValue || model.Loss.HasValue || model.Neutral.HasValue);
 
-        target.CnvProfiles = source.Entries.Distinct().Where(predicate).Select(profile =>
+        target.Cnvps = source.Entries.Distinct().Where(predicate).Select(profile =>
         {
             var gain = profile.Gain ?? 0;
             var loss = profile.Loss ?? 0;

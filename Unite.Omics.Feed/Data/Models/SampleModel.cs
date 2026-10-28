@@ -20,7 +20,7 @@ public record SampleModel
     public IEnumerable<Rna.GeneExpressionModel> GeneExpressions;
     public IEnumerable<Prot.ProteinExpressionModel> ProteinExpressions;
     public IEnumerable<ResourceModel> Resources;
-    public IEnumerable<Dna.Cnv.ProfileModel> CnvProfiles;
+    public IEnumerable<Dna.Cnv.ProfileModel> Cnvps;
 
     public SmType[] SmScope;
 }

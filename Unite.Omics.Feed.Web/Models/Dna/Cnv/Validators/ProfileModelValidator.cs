@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace Unite.Omics.Feed.Web.Models.Dna.CnvProfile.Validators;
+namespace Unite.Omics.Feed.Web.Models.Dna.Cnv.Validators;
 
-public class CnvProfileModelValidator:  AbstractValidator<CnvProfileModel>
+public class ProfileModelValidator : AbstractValidator<ProfileModel>
 {
-    public CnvProfileModelValidator()
+    public ProfileModelValidator()
     {
         RuleFor(model => model.Chromosome)
             .NotEmpty()

@@ -8,7 +8,7 @@ public class AnalysisWriteAudit : DataWriteAudit
     public int CnvsAssociated;
     public int SvsCreated;
     public int SvsAssociated;
-    public int CnvProfilesCreated = 0;
+    public int CnvpsCreated = 0;
 
     public HashSet<int> Sms = [];
     public HashSet<int> SmsEntries = [];
@@ -16,7 +16,7 @@ public class AnalysisWriteAudit : DataWriteAudit
     public HashSet<int> CnvsEntries = [];
     public HashSet<int> Svs = [];
     public HashSet<int> SvsEntries = [];
-    public HashSet<int> CnvProfiles = [];
+    public HashSet<int> Cnvps = [];
 
     public override string ToString()
     {
@@ -29,7 +29,7 @@ public class AnalysisWriteAudit : DataWriteAudit
             $"{CnvsAssociated} CNVs associated",
             $"{SvsCreated} SVs created",
             $"{SvsAssociated} SVs associated",
-            $"{CnvProfilesCreated} CNV Profiles created",
+            $"{CnvpsCreated} CNV Profiles created",
         ]);
     }
 }

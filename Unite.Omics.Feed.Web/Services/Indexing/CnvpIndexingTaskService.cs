@@ -8,11 +8,11 @@ using Unite.Essentials.Extensions;
 
 namespace Unite.Omics.Feed.Web.Services.Indexing;
 
-public class CnvProfileIndexingTaskService : IndexingTaskService<Profile, int>
+public class CnvpIndexingTaskService : IndexingTaskService<Profile, int>
 {
     private readonly CnvProfilesRepository _profilesRepository;
 
-    public CnvProfileIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public CnvpIndexingTaskService(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
         _profilesRepository = new CnvProfilesRepository(dbContextFactory);
     }

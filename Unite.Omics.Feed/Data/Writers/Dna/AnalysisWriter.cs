@@ -17,7 +17,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
     private Repositories.Dna.Cnv.VariantEntryRepository _cnvEntryRepository;
     private Repositories.Dna.Sv.VariantRepository _svRepository;
     private Repositories.Dna.Sv.VariantEntryRepository _svEntryRepository;
-    private Repositories.Dna.Cnv.ProfileRepository _cnvProfileRepository;
+    private Repositories.Dna.Cnv.ProfileRepository _cnvpRepository;
 
     public AnalysisWriter(IDbContextFactory<DomainDbContext> dbContextFactory, IGenomeOptions genomeOptions) : base(dbContextFactory)
     {
@@ -39,7 +39,7 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         _svRepository = new Repositories.Dna.Sv.VariantRepository(dbContext, _genomeOptions);
         _svEntryRepository = new Repositories.Dna.Sv.VariantEntryRepository(dbContext, _svRepository);
         _resourceRepository = new Repositories.ResourceRepository(dbContext);
-        _cnvProfileRepository = new Repositories.Dna.Cnv.ProfileRepository(dbContext);
+        _cnvpRepository = new Repositories.Dna.Cnv.ProfileRepository(dbContext);
     }
 
     protected override void ProcessModel(SampleModel model, ref AnalysisWriteAudit audit)
@@ -58,8 +58,8 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         if (model.Resources.IsNotEmpty())
             WriteResources(sampleId, model.Resources, ref audit);
         
-        if (model.CnvProfiles.IsNotEmpty())
-            WriteCnvProfiles(sampleId, model.CnvProfiles, ref audit);
+        if (model.Cnvps.IsNotEmpty())
+            WriteCnvps(sampleId, model.Cnvps, ref audit);
     }
 
     private void WriteSms(int sampleId, SmType[] types, IEnumerable<Models.Dna.Sm.VariantModel> models, ref AnalysisWriteAudit audit)
@@ -106,13 +106,13 @@ public class AnalysisWriter : DataWriter<SampleModel, AnalysisWriteAudit>
         audit.SvsAssociated += variantEntries.Count();
     }
     
-    protected void WriteCnvProfiles(int sampleId, IEnumerable<Models.Dna.Cnv.ProfileModel> models, ref AnalysisWriteAudit audit)
+    protected void WriteCnvps(int sampleId, IEnumerable<Models.Dna.Cnv.ProfileModel> models, ref AnalysisWriteAudit audit)
     {
-        var removedProfiles = _cnvProfileRepository.RemoveAll(sampleId);
-        audit.CnvProfiles.AddRange(removedProfiles);
+        var removedProfiles = _cnvpRepository.RemoveAll(sampleId);
+        audit.Cnvps.AddRange(removedProfiles);
 
-        var profiles = _cnvProfileRepository.CreateAll(sampleId, models);
-        audit.CnvProfiles.AddRange(profiles.Select(entity => entity.Id));
-        audit.CnvProfilesCreated = profiles.Length;
+        var profiles = _cnvpRepository.CreateAll(sampleId, models);
+        audit.Cnvps.AddRange(profiles.Select(entity => entity.Id));
+        audit.CnvpsCreated = profiles.Length;
     }
 }
