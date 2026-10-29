@@ -130,3 +130,6 @@ IDs requiring annotation; `Entries` contains affected variant entity IDs (or
 CNVP profile IDs), including removed IDs, for reindexing. The common counters
 are `VariantsCreated` and `EntriesCreated`. Keep the annotation and indexing
 sets distinct when updating writers or submission handlers.
+
+Variant task population schedules affected genes and proteins alongside the
+variant and related project/donor/specimen tasks, including after annotation.
