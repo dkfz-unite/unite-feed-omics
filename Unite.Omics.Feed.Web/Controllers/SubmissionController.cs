@@ -3,153 +3,152 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
-using Unite.Essentials.Extensions;
-using Unite.Essentials.Tsv;
 using Unite.Omics.Feed.Web.Configuration.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
-using Unite.Omics.Feed.Web.Models.Base.Extensions;
-using Unite.Omics.Feed.Web.Models.Base.Validators;
+using Unite.Omics.Feed.Web.Models.Base.Converters;
+using Unite.Omics.Feed.Web.Models.Base.Readers;
 using Unite.Omics.Feed.Web.Submissions;
 
 namespace Unite.Omics.Feed.Web.Controllers;
 
-public abstract class SubmissionController<TModel, TSubmissionForm> : Controller
+public abstract class SubmissionController<TModel, TForm, TEntry> : Controller
     where TModel : SubmissionModel, new()
-    where TSubmissionForm : SubmissionForm
+    where TForm : SubmissionForm
+    where TEntry : class, new()
 {
-    protected readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
-    private readonly SubmissionTaskService _submissionTaskService;
-    private readonly SubmissionRepository<TModel> _submissionRepository;
+    protected const StringComparison Comparison = StringComparison.InvariantCultureIgnoreCase;
 
-    protected SubmissionController(SubmissionTaskService submissionTaskService, 
-        SubmissionRepository<TModel> submissionRepository,
-        ILogger logger)
+
+    protected readonly SubmissionTaskService _submissionTaskService;
+    protected readonly SubmissionRepository<TModel> _submissionRepository;
+
+
+    protected abstract SubmissionTaskType SubmissionTaskType { get; }
+    protected abstract string DataType { get; }
+    protected abstract IValidator<TModel> ModelValidator { get; }
+    protected virtual IReader<TEntry>[] EntryReaders => [];
+    protected virtual IReader<ResourceModel> ResourceReader => new TsvReader<ResourceModel>();
+    protected abstract IFormConverter<TModel, TForm, TEntry> FormConverter { get; }
+
+
+    protected SubmissionController(SubmissionTaskService submissionTaskService,
+        SubmissionRepository<TModel> submissionRepository, ILogger logger)
     {
         _submissionTaskService = submissionTaskService;
         _submissionRepository = submissionRepository;
     }
 
-    protected abstract SubmissionTaskType  SubmissionTaskType { get; }
-    protected abstract string DataType { get; }
 
     [HttpGet("{id}")]
     [Authorize]
     public virtual IActionResult Get(long id)
     {
         var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-
-        var submission = FindSubmission(task.Target);
-
-        return Ok(submission);
+        return task == null ? NotFound() : Ok(FindSubmission(task.Target));
     }
-    
+
     [HttpGet("{id}/status")]
     [Authorize]
     public virtual IActionResult GetStatus(long id)
     {
         var task = _submissionTaskService.GetTask(id);
-        if (task == null)
-            return NotFound();
-        
-        return Ok(task.StatusTypeId);
+        return task == null ? NotFound() : Ok(task.StatusTypeId);
     }
-    
-    [HttpPost("")]
+
+    [HttpPost]
     [Consumes("application/json")]
     [RequestSizeLimit(100_000_000)]
     [Authorize(Policy = Policies.Data.Writer)]
-    public virtual IActionResult PostJson([FromBody] TModel model, [FromQuery] bool review = true)
+    public IActionResult PostJson([FromBody] TModel model, [FromQuery] bool review = true)
     {
-        model.Resources?.ForEach(resource => resource.Type = DataType);
-        ValidateModel(model);
-
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+        return Submit(model, review);
     }
-    
-    [HttpPost("")]
+
+    [HttpPost]
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(100_000_000)]
     [Authorize(Policy = Policies.Data.Writer)]
-    public IActionResult PostForm([FromForm] TSubmissionForm form, [FromQuery] bool review = true, [FromQuery] string format = null)
+    public IActionResult PostForm([FromForm] TForm form, [FromQuery] bool review = true, [FromQuery] string format = null)
     {
-        var model = Convert(form);
-        ValidateModel(model);
+        var resources = ReadFile(form.ResourcesFile, ResourceReader, "Resources");
+        TEntry[] entries = null;
+        var readers = EntryReaders;
 
-        try
+        if (form.EntriesFile != null && readers.Length > 0)
         {
-            ReadSubmissionForm(form, model, format);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
+            var reader = string.IsNullOrWhiteSpace(format)
+                ? readers[0]
+                : readers.FirstOrDefault(reader => reader.Format.Equals(format.Trim(), Comparison));
+
+            if (reader == null)
+                ModelState.AddModelError("Format", $"Unsupported entries format: {format}");
+            else
+                entries = ReadFile(form.EntriesFile, reader, "Entries");
         }
 
-        return ModelState.IsValid ? Ok(AddSubmission(model, review)) : BadRequest(ModelState);
+        var model = FormConverter.Convert(form, entries, resources);
+        return Submit(model, review);
     }
-    
-    protected abstract void ValidateModel(TModel model);
-    protected abstract TModel Convert(TSubmissionForm form);
-    
+
+
     protected virtual TModel FindSubmission(string id)
     {
         return _submissionRepository.Find(id)?.Document;
     }
-    
+
     protected virtual long AddSubmission(TModel model, bool review)
     {
-        string submissionId = _submissionRepository.Add(model);
-        
+        var submissionId = _submissionRepository.Add(model);
         var taskStatus = review ? TaskStatusType.Preparing : TaskStatusType.Prepared;
-
         return _submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
     }
 
-    protected virtual void ReadSubmissionForm(TSubmissionForm form, TModel model, string format = null)
+
+    private IActionResult Submit(TModel model, bool review)
     {
-        if (!form.ResourcesFile.IsEmpty())
-        {
-            model.Resources = ParseResources(form.ResourcesFile);
-            model.Resources?.ForEach(resource => resource.Type = DataType);
-            ValidateResources(model.Resources);
-        }
+        model ??= new TModel();
+        var validation = ModelValidator.Validate(model);
+        foreach (var error in validation.Errors)
+            ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        foreach (var resource in model.Resources ?? [])
+            resource.Type = DataType;
+
+        return Ok(AddSubmission(model, review));
     }
-    
-    protected virtual ResourceModel[] ParseResources(IFormFile file)
+
+    private T[] ReadFile<T>(IFormFile file, IReader<T> reader, string property) where T : class, new()
     {
+        if (file == null)
+            return null;
+
+        if (reader == null)
+            throw new InvalidOperationException("No file reader configured");
+
         using var stream = file.OpenReadStream();
         using var streamReader = new StreamReader(stream);
 
-        var tsv = streamReader.ReadToEnd();
+        if (TryReadFile(streamReader, reader, out var values))
+            return values;
 
-        return TsvReader.Read<ResourceModel>(tsv).ToArrayOrNull();
+        ModelState.AddModelError(property, $"File could not be read in '{reader.Format}' format");
+        return null;
     }
-    
-    protected virtual void ValidateResources(ResourceModel[] resources)
+
+    private static bool TryReadFile<T>(StreamReader stream, IReader<T> reader, out T[] values) where T : class, new()
     {
-        ValidateItems(resources, _resourceModelValidator, "Resources");
-    }
-    
-    protected virtual void ValidateItems<T>(T[] items, IValidator<T> validator, string prefix)
-    {
-        if (items.IsEmpty())
+        values = null;
+        try
         {
-            ModelState.AddModelError(prefix, "Should not be empty");
-            return;
+            values = reader.Read(stream);
+            return values != null;
         }
-
-        for (int i = 0; i < items.Length; i++)
+        catch
         {
-            var result = validator.Validate(items[i]);
-
-            if (!result.IsValid)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError($"{prefix}[{i}].{error.PropertyName}", error.ErrorMessage);
-                }
-            }
+            return false;
         }
     }
 }

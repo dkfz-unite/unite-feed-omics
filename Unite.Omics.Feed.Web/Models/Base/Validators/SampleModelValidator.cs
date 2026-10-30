@@ -1,13 +1,14 @@
-﻿using FluentValidation;
+using FluentValidation;
+using Unite.Data.Entities.Omics.Analysis.Enums;
 
 namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
-public class SampleModelValidator : AbstractValidator<SampleModel> 
+public class SampleModelValidator : AbstractValidator<SampleModel>
 {
     private readonly StringComparison _comparison = StringComparison.InvariantCultureIgnoreCase;
-    private readonly IValidator<ResourceModel> _resourceModelValidator = new ResourceModelValidator();
 
-    public SampleModelValidator()
+
+    public SampleModelValidator(AnalysisType[] assayTypes)
     {
         RuleFor(model => model.DonorId)
             .NotEmpty()
@@ -28,29 +29,38 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
 
 
         RuleFor(model => model.SpecimenType)
-            .NotEmpty()
+            .NotNull()
             .WithMessage("Should not be empty");
 
-        
-        RuleFor(model => model.AnalysisType)
-            .NotEmpty()
+        RuleFor(model => model.SpecimenType)
+            .IsInEnum()
+            .WithMessage($"Invalid value");
+
+
+        RuleFor(model => model.AssayType)
+            .NotNull()
             .WithMessage("Should not be empty");
 
+        RuleFor(model => model.AssayType)
+            .Must(value => assayTypes.Contains(value.Value))
+            .When(model => model.AssayType != null)
+            .WithMessage($"Invalid value");
 
-        RuleFor(model => model.AnalysisDate)
+
+        RuleFor(model => model.AssayDate)
             .Empty()
-            .When(model => model.AnalysisDay != null)
+            .When(model => model.AssayDay != null)
             .WithMessage("Either exact 'analysis_date' or relative 'analysis_day' can be set, not both");
 
 
-        RuleFor(model => model.AnalysisDay)
+        RuleFor(model => model.AssayDay)
             .Empty()
-            .When(model => model.AnalysisDate != null)
+            .When(model => model.AssayDate != null)
             .WithMessage("Either exact 'analysis_date' or relative 'analysis_day' can be set, not both");
 
-        RuleFor(model => model.AnalysisDay)
+        RuleFor(model => model.AssayDay)
             .GreaterThanOrEqualTo(1)
-            .When(model => model.AnalysisDay != null)
+            .When(model => model.AssayDay != null)
             .WithMessage("Should be greater than or equal to 1");
 
 
@@ -59,24 +69,8 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage("Should not be empty");
 
         RuleFor(model => model.Genome)
-            .Must(genome => genome.Equals("GRCh37", _comparison) || genome.Equals("GRCh38", _comparison))
+            .Must(genome => string.Equals(genome, "GRCh37", _comparison) || string.Equals(genome, "GRCh38", _comparison))
             .WithMessage("Should be either 'GRCh37' or 'GRCh38'");
-
-        
-        RuleFor(model => model.Purity)
-            .GreaterThanOrEqualTo(0)
-            .LessThanOrEqualTo(1)
-            .WithMessage("Should be in range [0, 1]");
-
-        
-        RuleFor(model => model.Ploidy)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("Should be greater than or equal to 1");
-
-
-        RuleFor(model => model.Cells)
-            .GreaterThanOrEqualTo(1)
-            .WithMessage("Should be greater than or equal to 1");
 
 
         RuleFor(model => model.Batch)
@@ -84,7 +78,13 @@ public class SampleModelValidator : AbstractValidator<SampleModel>
             .WithMessage("Maximum length is 100");
 
 
+        RuleFor(model => model.Purity).InclusiveBetween(0, 1);
+        RuleFor(model => model.Ploidy).GreaterThanOrEqualTo(1);
+        RuleFor(model => model.Cells).GreaterThanOrEqualTo(1);
+
+
         RuleForEach(model => model.Resources)
-            .SetValidator(_resourceModelValidator);
+            .NotNull().WithMessage("Should not be empty")
+            .SetValidator(new ResourceModelValidator());
     }
 }

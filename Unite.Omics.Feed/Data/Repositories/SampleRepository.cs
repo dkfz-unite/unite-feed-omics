@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis;
 using Unite.Data.Entities.Specimens;
@@ -9,15 +9,15 @@ namespace Unite.Omics.Feed.Data.Repositories;
 
 public class SampleRepository
 {
-    private DomainDbContext _dbContext;
-    private readonly AnalysisRepository _analysisRepository;
+    private readonly DomainDbContext _dbContext;
+    private readonly AssayRepository _assayRepository;
     private readonly SpecimenRepository _specimenRepository;
-    
+
 
     public SampleRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
-        _analysisRepository = new AnalysisRepository(dbContext);
+        _assayRepository = new AssayRepository(dbContext);
         _specimenRepository = new SpecimenRepository(dbContext);
     }
 
@@ -38,16 +38,16 @@ public class SampleRepository
                 entity.Specimen.Donor.ReferenceId == model.Specimen.Donor.ReferenceId &&
                 entity.Specimen.ReferenceId == model.Specimen.ReferenceId &&
                 entity.Specimen.TypeId == model.Specimen.Type &&
-                entity.Analysis.TypeId == model.Analysis.Type);
+                entity.Analysis.TypeId == model.Assay.Type);
     }
 
-    public Sample Create(SampleModel model)
+    public Sample Create(SampleModel model, SampleModel matchedSample = null)
     {
         var entity = new Sample
         {
-            Analysis = _analysisRepository.Create(model.Analysis),
+            Analysis = _assayRepository.Create(model.Assay),
             SpecimenId = FindOrCreate(model.Specimen).Id,
-            MatchedSampleId = FindOrCreate(model.MatchedSample)?.Id,
+            MatchedSampleId = FindOrCreate(matchedSample)?.Id,
             Genome = model.Genome,
             Purity = model.Purity,
             Ploidy = model.Ploidy,
@@ -61,9 +61,12 @@ public class SampleRepository
         return entity;
     }
 
-    public void Update(Sample entity, SampleModel model)
+    public void Update(Sample entity, SampleModel model, SampleModel matchedSample = null)
     {
-        _analysisRepository.Update(entity.Analysis, model.Analysis);
+        _assayRepository.Update(entity.Analysis, model.Assay);
+
+        if (matchedSample != null)
+            entity.MatchedSampleId = FindOrCreate(matchedSample).Id;
 
         if (model.Genome != null)
             entity.Genome = model.Genome;

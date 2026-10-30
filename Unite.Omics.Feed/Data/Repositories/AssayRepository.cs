@@ -5,18 +5,18 @@ using Unite.Omics.Feed.Data.Models;
 
 namespace Unite.Omics.Feed.Data.Repositories;
 
-internal class AnalysisRepository
+internal class AssayRepository
 {
     private readonly DomainDbContext _dbContext;
 
 
-    public AnalysisRepository(DomainDbContext dbContext)
+    public AssayRepository(DomainDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
 
-    public Analysis Create(AnalysisModel model)
+    public Analysis Create(AssayModel model)
     {
         var entity = new Analysis
         {
@@ -32,14 +32,14 @@ internal class AnalysisRepository
         return entity;
     }
 
-    public void Update(Analysis entity, AnalysisModel model)
+    public void Update(Analysis entity, AssayModel model)
     {
         if (entity.Parameters.IsNotEmpty())
         {
             _dbContext.RemoveRange(entity.Parameters);
             _dbContext.SaveChanges();
         }
-        
+
         if (model.Date != null)
             entity.Date = model.Date;
 
@@ -48,7 +48,7 @@ internal class AnalysisRepository
 
         if (model.Parameters.IsNotEmpty())
             entity.Parameters = model.Parameters;
-        
+
         _dbContext.SaveChanges();
     }
 }

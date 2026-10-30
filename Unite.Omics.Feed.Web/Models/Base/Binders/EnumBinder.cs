@@ -12,7 +12,7 @@ public static class EnumBinder
 
         var type = typeof(T);
         
-        foreach (var field in type.GetFields())
+        foreach (var field in type.GetFields(BindingFlags.Public | BindingFlags.Static))
         {
             var attribute = field.GetCustomAttribute<EnumMemberAttribute>();
 

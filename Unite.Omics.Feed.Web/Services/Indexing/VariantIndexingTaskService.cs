@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Context.Repositories;
 using Unite.Data.Context.Services.Tasks;
@@ -82,6 +82,7 @@ public abstract class VariantIndexingTaskService<TV> : IndexingTaskService<Varia
             CreateImageIndexingTasks(keys);
             CreateSpecimenIndexingTasks(variants);
             CreateGeneIndexingTasks(variants);
+            CreateProteinIndexingTasks(variants);
             CreateVariantIndexingTasks(variants);
         });
 

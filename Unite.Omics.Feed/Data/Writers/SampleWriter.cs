@@ -9,9 +9,6 @@ public class SampleWriter : DataWriter<SampleModel, SampleWriteAudit>
 {
     public SampleWriter(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
-        var dbContext = dbContextFactory.CreateDbContext();
-
-        Initialize(dbContext);
     }
 
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.Dna;
@@ -10,7 +10,7 @@ namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
 public class DnaCnvSubmissionHandler: SubmissionHandler
 {
-    private readonly AnalysisWriter _dataWriter;
+    private readonly AnalysisCnvWriter _dataWriter;
     private readonly CnvAnnotationTaskService _annotationTaskService;
     private readonly CnvIndexingTaskService _indexingTaskService;
     private readonly CnvSubmissionRepository _submissionRepository;
@@ -21,7 +21,7 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
 
 
     public DnaCnvSubmissionHandler(
-        AnalysisWriter dataWriter,
+        AnalysisCnvWriter dataWriter,
         CnvAnnotationTaskService annotationTaskService,
         CnvIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
@@ -62,9 +62,9 @@ public class DnaCnvSubmissionHandler: SubmissionHandler
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
-        //TODO: If server fails, audit.Cnvs will be lost forever and indexing with annotation won't happen
-        _annotationTaskService.PopulateTasks(audit.Cnvs);
-        _indexingTaskService.PopulateTasks(audit.CnvsEntries.Except(audit.Cnvs));
+        //TODO: If server fails, audit.Variants will be lost forever and indexing with annotation won't happen
+        _annotationTaskService.PopulateTasks(audit.Variants);
+        _indexingTaskService.PopulateTasks(audit.Entries.Except(audit.Variants));
         _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());
