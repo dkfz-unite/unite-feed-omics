@@ -21,8 +21,8 @@ The model is used to upload the data of single cell gene expressions calling res
 
 **`analysis_type`*** - Type of the analysis performed on the sample.
 - Type: _String_
-- Possible values: `RNASeq`
-- Example: `RNASeq`
+- Possible values: `scRNASeq`, `snRNASeq`
+- Example: `scRNASeq`
 
 **`analysis_date`** - Date when the sample was analysed.
 - Type: _Date_
@@ -48,7 +48,7 @@ The model is used to upload the data of single cell gene expressions calling res
 **`resources`*** - file with cell expressions files metadata.
 - Type: _File_
 - Supported formats: [tsv](#resources)
-- Limitations: Should be set, should contain at least one element
+- Limitations: Required; must contain the complete 10x bundle described below in one request
 - Example: `resources.tsv`
 
 **`*`** - Required fields
@@ -65,12 +65,12 @@ It's a tab-separated values (TSV) file with the following columns:
 **`name`*** - Resource file name (with extension).
 - Type: _String_
 - Limitations: Maximum length 255
-- Example: `barcodes.mtx.gz`
+- Example: `barcodes.tsv.gz`
 
 **`format`*** - Resource format.
 - Type: _String_
 - Available values: `tsv`, `mtx`
-- Example: `"idat"`
+- Example: `"tsv"`
 
 **`url`*** - Resource URL on remote a server.
 - Type: _String_
@@ -79,7 +79,12 @@ It's a tab-separated values (TSV) file with the following columns:
 **`*`** - Required fields
 
 > [!Note]
-> Uploading single cell RNA sequencing data requires 3 files: `barcodes.tsv.gz`, `features.tsv.gz` and `matrix.tsv.gz`.  
+> Uploading 10x single-cell or single-nucleus expression results requires all
+> three resources in the same request: `barcodes.tsv.gz` and `features.tsv.gz`
+> with format `tsv`, and `matrix.mtx.gz` with format `mtx`. Each required filename
+> must occur exactly once. Missing files, duplicate filenames and incorrect
+> formats are rejected.
+>
 > Do not change the file names, and do not decompress them, otherwise the Portal won't be able to process them correctly.
 
 ### Example

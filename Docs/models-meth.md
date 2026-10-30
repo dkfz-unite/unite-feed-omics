@@ -80,7 +80,12 @@ It's a tab-separated values (TSV) file with the following columns:
 **`*`** - Required fields
 
 > [!Note]
-> Uploading Illumina Methylation Array data requires two files: `*_Red.idat` and `*_Grn.idat`.  
+> Metadata-only sample submissions remain valid. When IDAT resources are supplied
+> for a `MethArray` sample, the same request must contain exactly one `*_Red.idat`
+> and one `*_Grn.idat` file, both with format `idat` and the same filename prefix.
+> Missing channels, mismatched prefixes and additional IDAT files are rejected.
+> Other sample resources remain optional.
+>
 > Do not change the file names, and do not compress them, otherwise the Portal won't be able to process them correctly.
 
 > [!Note]

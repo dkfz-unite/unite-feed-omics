@@ -45,6 +45,13 @@ and checks entry types against that scope. Omitted or empty `EntriesScope` still
 replacement of all SM types. Other endpoints reject nonempty scope unless their
 model validator explicitly supports it.
 
+Methylation's `Models/Meth/Validators/SampleModelValidator` preserves optional
+sample resources. For MethArray samples, supplied IDAT resources must be one
+matching red/green pair. Single-cell expression results use
+`Models/RnaSc/Validators/AnalysisModelValidator`, which requires the complete
+compressed 10x matrix/features/barcodes bundle with the expected formats.
+These endpoint-specific checks apply equally to JSON and converted forms.
+
 Errors use model property paths, such as `TargetSample.SpecimenType` and
 `Entries[2].Reads`, for both JSON and form submissions. There is no mapping back
 to flat form field names.
@@ -66,9 +73,10 @@ validation failures. Successfully read models are validated afterwards.
 
 Sample resources are optional. Analysis data requires a nonempty entries
 collection, and analysis resources requires a nonempty resources collection.
-Resources may be submitted independently; a complete IDAT pair or scRNA matrix
-bundle is not required in one request. Resource types are assigned from the
-endpoint before staging.
+MethArray IDAT resources and 10x single-cell expression resources must be
+submitted as complete bundles in one request. Metadata-only methylation sample
+submissions remain valid. Resource types are assigned from the endpoint before
+staging.
 
 ## Typed data payloads and writers
 
