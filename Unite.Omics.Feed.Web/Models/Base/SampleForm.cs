@@ -7,9 +7,9 @@ public record SampleForm: SubmissionForm
     protected string _donorId;
     protected string _specimenId;
     protected string _specimenType;
-    protected string _analysisType;
-    protected DateOnly? _analysisDate;
-    protected int? _analysisDay;
+    protected string _assayType;
+    protected DateOnly? _assayDate;
+    protected int? _assayDay;
     protected string _genome;
     protected string _batch;
 
@@ -34,22 +34,22 @@ public record SampleForm: SubmissionForm
     public string SpecimenType { get => _specimenType?.Trim(); set => _specimenType = value; }
 
     /// <summary>
-    /// Analysis type (WGS, WES, RNASeq, RNASeqSc)
+    /// Assay type (WGS, WES, RNASeq, RNASeqSc)
     /// </summary>
     [FromForm(Name = "analysis_type")]
-    public string AnalysisType { get => _analysisType?.Trim(); set => _analysisType = value; }
+    public string AssayType { get => _assayType?.Trim(); set => _assayType = value; }
 
     /// <summary>
-    /// Analysis date
+    /// Assay date
     /// </summary>
     [FromForm(Name = "analysis_date")]
-    public DateOnly? AnalysisDate { get => _analysisDate; set => _analysisDate = value; }
+    public DateOnly? AssayDate { get => _assayDate; set => _assayDate = value; }
 
     /// <summary>
-    /// Analysis day - relative day since the diagnosis statement when the analysis was performed
-    /// </summary> 
+    /// Assay day - relative day since the diagnosis statement when the assay was performed
+    /// </summary>
     [FromForm(Name = "analysis_day")]
-    public int? AnalysisDay { get => _analysisDay; set => _analysisDay = value; }
+    public int? AssayDay { get => _assayDay; set => _assayDay = value; }
 
     /// <summary>
     /// Genome version (GRCh37 or GRCh38)

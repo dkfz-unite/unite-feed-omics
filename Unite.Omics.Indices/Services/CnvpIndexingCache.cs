@@ -6,28 +6,28 @@ using Unite.Data.Entities.Specimens;
 
 namespace Unite.Omics.Indices.Services;
 
-public class CnvProfileIndexingCache : IndexingCache
+public class CnvpIndexingCache : IndexingCache
 {
-    public CnvProfileIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
+    public CnvpIndexingCache(IDbContextFactory<DomainDbContext> dbContextFactory) : base(dbContextFactory)
     {
     }
 
-    public IEnumerable<Profile> CnvProfiles { get; private set; }
+    public IEnumerable<Profile> Cnvps { get; private set; }
     public IEnumerable<Specimen> Specimens { get; private set; }
     public IEnumerable<Data.Entities.Omics.Analysis.Sample> Samples { get; private set; }
 
     protected override void Load(int[] ids)
     {
-        LoadCnvProfiles(ids).Wait();
+        LoadCnvps(ids).Wait();
         LoadSamples().Wait();
         LoadSpecimens().Wait();
     }
 
-    async Task LoadCnvProfiles(int[] ids)
+    async Task LoadCnvps(int[] ids)
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
-        CnvProfiles = await dbContext.CnvProfiles
+        Cnvps = await dbContext.CnvProfiles
             .AsNoTracking()
             .Where(x => ids.Contains(x.Id))
             .ToArrayAsync();
@@ -37,7 +37,7 @@ public class CnvProfileIndexingCache : IndexingCache
     {
         await using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
-        var sampleIds = CnvProfiles.Select(p => p.SampleId).Distinct().ToArray();
+        var sampleIds = Cnvps.Select(p => p.SampleId).Distinct().ToArray();
 
         Samples = await dbContext.OmicsSamples
             .AsNoTracking()

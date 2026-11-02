@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
 using Unite.Data.Entities.Omics.Analysis.Enums;
 using Unite.Data.Entities.Specimens.Enums;
 
@@ -10,13 +11,14 @@ public record SampleModel: SubmissionModel
 {
     public const double DefaultPloidy = 2.0;
 
+
+    private string _genome;
     protected string _donorId;
     protected string _specimenId;
     protected SpecimenType? _specimenType;
-    protected AnalysisType? _analysisType;
-    protected DateOnly? _analysisDate;
-    protected int? _analysisDay;
-    private string _genome;
+    protected AnalysisType? _assayType;
+    protected DateOnly? _assayDate;
+    protected int? _assayDay;
     protected double? _purity;
     protected double? _ploidy;
     protected int? _cells;
@@ -42,22 +44,25 @@ public record SampleModel: SubmissionModel
     public virtual SpecimenType? SpecimenType { get => _specimenType; set => _specimenType = value; }
 
     /// <summary>
-    /// Analysis type (WGS, WES, RNASeq, RNASeqSc)
+    /// Assay type (WGS, WES, RNASeq, RNASeqSc)
     /// </summary>
     [JsonPropertyName("analysis_type")]
-    public virtual AnalysisType? AnalysisType { get => _analysisType; set => _analysisType = value; }
+    [BsonElement("AnalysisType")]
+    public virtual AnalysisType? AssayType { get => _assayType; set => _assayType = value; }
 
     /// <summary>
-    /// Analysis date
+    /// Assay date
     /// </summary>
     [JsonPropertyName("analysis_date")]
-    public virtual DateOnly? AnalysisDate { get => _analysisDate; set => _analysisDate = value; }
+    [BsonElement("AnalysisDate")]
+    public virtual DateOnly? AssayDate { get => _assayDate; set => _assayDate = value; }
 
     /// <summary>
-    /// Analysis day - relative day since the diagnosis statement when the analysis was performed
-    /// </summary> 
+    /// Assay day - relative day since the diagnosis statement when the assay was performed
+    /// </summary>
     [JsonPropertyName("analysis_day")]
-    public virtual int? AnalysisDay { get => _analysisDay; set => _analysisDay = value; }
+    [BsonElement("AnalysisDay")]
+    public virtual int? AssayDay { get => _assayDay; set => _assayDay = value; }
 
     /// <summary>
     /// Genome version (GRCh37 or GRCh38)

@@ -59,10 +59,14 @@ public class ProtExpSubmissionHandler : SubmissionHandler
     private void ProcessSubmission(string submissionId)
     {
         var submittedData = _submissionRepository.FindDocument(submissionId);
-        var annotatedExpressions = AnnotateExpressions(submittedData.Entries);
-        var convertedExpressions = Convert(annotatedExpressions).ToArray();
         var convertedData = _converter.Convert(submittedData);
-        convertedData.ProteinExpressions = convertedExpressions;
+
+        if (submittedData.Entries != null && submittedData.Entries.Length > 0)
+        {
+            var annotatedExpressions = AnnotateExpressions(submittedData.Entries);
+            var convertedExpressions = Convert(annotatedExpressions).ToArray();
+            convertedData.Entries = convertedExpressions;
+        }
 
         _dataWriter.SaveData(convertedData, out var audit);
         _indexingTaskService.PopulateTasks(audit.Proteins);
@@ -97,7 +101,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
                 Raw = model.Raw,
                 Normalized = model.Normalized
             };
-            
+
             if (model.Protein != null)
             {
                 expressionModel.Protein = new Data.Models.ProteinModel

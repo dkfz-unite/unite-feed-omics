@@ -10,7 +10,7 @@ public class IndexingWorker : Worker
         SmsIndexingHandler smsIndexingHandler,
         CnvsIndexingHandler cnvsIndexingHandler,
         SvsIndexingHandler svsIndexingHandler,
-        CnvProfilesIndexingHandler cnvProfilesIndexingHandler,
+        CnvpsIndexingHandler cnvpsIndexingHandler,
         ILogger<IndexingWorker> logger) : base(logger)
     {
         _handlers = [
@@ -19,7 +19,7 @@ public class IndexingWorker : Worker
             smsIndexingHandler,
             cnvsIndexingHandler,
             svsIndexingHandler,
-            cnvProfilesIndexingHandler
+            cnvpsIndexingHandler
         ];
     }
 }

@@ -40,10 +40,15 @@ The model is used to upload the data of bulk RNA sample metadata and files.
 - Possible values: `GRCh37`, `GRCh38`
 - Example: `GRCh37`
 
-**`resources`*** - file with the sample resources metadata.
+**`batch`** - Batch in which the sample was processed, for grouping samples that were measured or analysed together.
+- Type: _String_
+- Limitations: Maximum length 100
+- Example: `Batch1`
+
+**`resources`** - file with the sample resources metadata.
 - Type: _File_
 - Supported formats: [tsv](#resources)
-- Limitations: Should be set, should contain at least one element
+- Limitations: Optional; when supplied, must contain at least one element
 - Example: `resources.tsv`
 
 **`*`** - Required fields

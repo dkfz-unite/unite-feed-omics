@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 using Unite.Data.Entities.Omics.Enums;
 using Unite.Essentials.Tsv.Attributes;
 
-namespace Unite.Omics.Feed.Web.Models.Dna.CnvProfile;
+namespace Unite.Omics.Feed.Web.Models.Dna.Cnv;
 
-public class CnvProfileModel
+public record ProfileModel
 {
     [JsonPropertyName("chromosome")]
     [Column("chromosome")]

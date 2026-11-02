@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Unite.Data.Context.Services.Tasks;
 using Unite.Data.Entities.Tasks.Enums;
 using Unite.Omics.Feed.Data.Writers.Dna;
@@ -10,7 +10,7 @@ namespace Unite.Omics.Feed.Web.Handlers.Submission;
 
 public class DnaSmSubmissionHandler: SubmissionHandler
 {
-    private readonly AnalysisWriter _dataWriter;
+    private readonly AnalysisSmWriter _dataWriter;
     private readonly SmAnnotationTaskService _annotationTaskService;
     private readonly SmIndexingTaskService _indexingTaskService;
     private readonly SmSubmissionRepository _submissionRepository;
@@ -21,7 +21,7 @@ public class DnaSmSubmissionHandler: SubmissionHandler
 
 
     public DnaSmSubmissionHandler(
-        AnalysisWriter dataWriter,
+        AnalysisSmWriter dataWriter,
         SmAnnotationTaskService annotationTaskService,
         SmIndexingTaskService indexingTaskService,
         TasksProcessingService tasksProcessingService,
@@ -62,8 +62,8 @@ public class DnaSmSubmissionHandler: SubmissionHandler
         var convertedData = _converter.Convert(submittedData);
 
         _dataWriter.SaveData(convertedData, out var audit);
-        _annotationTaskService.PopulateTasks(audit.Sms);
-        _indexingTaskService.PopulateTasks(audit.SmsEntries.Except(audit.Sms));
+        _annotationTaskService.PopulateTasks(audit.Variants);
+        _indexingTaskService.PopulateTasks(audit.Entries.Except(audit.Variants));
         _submissionRepository.Delete(submissionId);
 
         _logger.LogInformation("{audit}", audit.ToString());

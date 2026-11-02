@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Data.Entities.Omics;
 using Unite.Data.Entities.Omics.Analysis.Prot;
@@ -65,15 +66,21 @@ public class ExpressionRepository
         return entitiesToAdd;
     }
 
-    public void RemoveAll(int sampleId)
+    /// <summary>
+    /// Removes all protein expression entries associated with the specified sample.
+    /// </summary>
+    /// <param name="sampleId">Sample identifier.</param>
+    /// <returns>Protein identifiers of the removed entries.</returns>
+    public int[] RemoveAll(int sampleId)
     {
-        var entitiesToRemove = _dbContext.Set<ProteinExpression>().Where(entity => entity.SampleId == sampleId).ToArray();
+        var query = _dbContext.Set<ProteinExpression>()
+            .Where(entity => entity.SampleId == sampleId);
 
-        if (entitiesToRemove.Any())
-        {
-            _dbContext.RemoveRange(entitiesToRemove);
-            _dbContext.SaveChanges();
-        }
+        var ids = query.Select(entity => entity.EntityId).ToArray();
+
+        query.ExecuteDelete();
+
+        return ids;
     }
 
 

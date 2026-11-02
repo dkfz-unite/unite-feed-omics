@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Unite.Omics.Feed.Web.Models.Dna.Sm.Validators;
 
@@ -16,6 +16,7 @@ public class VariantModelValidator : AbstractValidator<VariantModel>
 
         RuleFor(model => model.Position)
             .Must(IsNumberOrRange)
+            .When(model => !string.IsNullOrWhiteSpace(model.Position))
             .WithMessage("Should be number '1234567890' or range '1234567890-1234567890'");
 
         RuleFor(model => model.Ref)

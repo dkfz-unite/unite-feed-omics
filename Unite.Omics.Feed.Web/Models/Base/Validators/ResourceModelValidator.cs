@@ -5,23 +5,6 @@ namespace Unite.Omics.Feed.Web.Models.Base.Validators;
 
 public class ResourceModelValidator : AbstractValidator<ResourceModel>
 {
-    private static readonly string[] _allowedTypes =
-    [
-        DataTypes.Omics.Dna.Sample,
-        DataTypes.Omics.Dna.Sm,
-        DataTypes.Omics.Dna.Cnv,
-        DataTypes.Omics.Dna.CnvProfile,
-        DataTypes.Omics.Dna.Sv,
-        DataTypes.Omics.Methylation.Sample,
-        DataTypes.Omics.Methylation.Level,
-        DataTypes.Omics.Rna.Sample,
-        DataTypes.Omics.Rna.Expression,
-        DataTypes.Omics.Rnasc.Sample,
-        DataTypes.Omics.Rnasc.Expression,
-        DataTypes.Omics.Proteomics.Sample,
-        DataTypes.Omics.Proteomics.Expression
-    ];
-
     private static readonly string[] _allowedFormats = 
     [
         FileTypes.General.Txt,
@@ -47,14 +30,6 @@ public class ResourceModelValidator : AbstractValidator<ResourceModel>
         RuleFor(model => model.Name)
             .MaximumLength(100)
             .WithMessage("Maximum length is 100");
-
-        RuleFor(model => model.Type)
-            .NotEmpty()
-            .WithMessage("Should not be empty");
-
-        RuleFor(model => model.Type)
-            .Must(type => _allowedTypes.Contains(type))
-            .WithMessage("Type is not allowed");
 
         RuleFor(model => model.Format)
             .NotEmpty()
