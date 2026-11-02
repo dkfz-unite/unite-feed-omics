@@ -1,8 +1,8 @@
-﻿using Unite.Omics.Feed.Web.Models.Dna.Sv.Mappers;
+using Unite.Omics.Feed.Web.Models.Dna.Sv.Mappers;
 
 namespace Unite.Omics.Feed.Web.Models.Dna.Sv.Converters;
 
-public class AnalysisModelConverter : Base.Converters.AnalysisModelConverter<VariantModel>
+public class AnalysisModelConverter : Base.Converters.AnalysisModelConverter<VariantModel, Data.Models.AnalysisModel<Data.Models.Dna.Sv.VariantModel>>
 {
     private readonly VariantModelMapper _variantsModelMapper;
 
@@ -13,9 +13,9 @@ public class AnalysisModelConverter : Base.Converters.AnalysisModelConverter<Var
     }
 
 
-    protected override void MapEntries(Base.AnalysisModel<VariantModel> source, Data.Models.SampleModel target)
+    protected override void MapEntries(Base.AnalysisModel<VariantModel> source, Data.Models.AnalysisModel<Data.Models.Dna.Sv.VariantModel> target)
     {
-        target.Svs = source.Entries.Distinct().Select(variant =>
+        target.Entries = source.Entries.Distinct().Select(variant =>
         {
             var variantModel = new Data.Models.Dna.Sv.VariantModel();
 

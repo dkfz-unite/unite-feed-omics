@@ -1,4 +1,4 @@
-﻿using Unite.Omics.Feed.Web.Handlers.Submission;
+using Unite.Omics.Feed.Web.Handlers.Submission;
 
 namespace Unite.Omics.Feed.Web.Workers;
 
@@ -16,7 +16,7 @@ public class SubmissionsWorker : Worker
         DnaSvSubmissionHandler dnaSvSubmissionHandler,
         MethSubmissionHandler methSubmissionHandler,
         MethLvlSubmissionHandler methLvlSubmissionHandler,
-        CnvProfileSubmissionHandler cnvProfileSubmissionHandler,
+        DnaCnvpSubmissionHandler dnaCnvpSubmissionHandler,
         ILogger<SubmissionsWorker> logger) : base(logger)
     {
         // Ordered by priority from highest to lowest.
@@ -32,7 +32,7 @@ public class SubmissionsWorker : Worker
             dnaSvSubmissionHandler,
             methSubmissionHandler,
             methLvlSubmissionHandler,
-            cnvProfileSubmissionHandler
+            dnaCnvpSubmissionHandler
         ];
     }
 }

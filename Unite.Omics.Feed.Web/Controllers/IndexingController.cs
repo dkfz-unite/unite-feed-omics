@@ -20,13 +20,13 @@ public class IndexingController : Controller
     private readonly IIndexService<SmIndex> _smsIndexService;
     private readonly IIndexService<CnvIndex> _cnvsIndexService;
     private readonly IIndexService<SvIndex> _svsIndexService;
-    private readonly IIndexService<CnvProfileIndex> _cnvProfilesIndexService;
+    private readonly IIndexService<CnvProfileIndex> _cnvpsIndexService;
     private readonly GeneIndexingTaskService _geneTasksService;
     private readonly ProteinIndexingTaskService _proteinTasksService;
     private readonly SmIndexingTaskService _smTasksService;
     private readonly CnvIndexingTaskService _cnvTasksService;
     private readonly SvIndexingTaskService _svTasksService;
-    private readonly CnvProfileIndexingTaskService _cnvProfilesTasksService;
+    private readonly CnvpIndexingTaskService _cnvpsTasksService;
    
 
 
@@ -36,26 +36,26 @@ public class IndexingController : Controller
         IIndexService<SmIndex> smsIndexService,
         IIndexService<CnvIndex> cnvsIndexService,
         IIndexService<SvIndex> svsIndexService,
-        IIndexService<CnvProfileIndex> cnvProfilesIndexService,
+        IIndexService<CnvProfileIndex> cnvpsIndexService,
         GeneIndexingTaskService geneTasksService,
         ProteinIndexingTaskService proteinTasksService,
         SmIndexingTaskService smTasksService,
         CnvIndexingTaskService cnvTasksService,
         SvIndexingTaskService svTasksService,
-        CnvProfileIndexingTaskService cnvProfilesTasksService)
+        CnvpIndexingTaskService cnvpsTasksService)
     {
         _genesIndexService = genesIndexService;
         _proteinsIndexService = proteinsIndexService;
         _smsIndexService = smsIndexService;
         _cnvsIndexService = cnvsIndexService;
         _svsIndexService = svsIndexService;
-        _cnvProfilesIndexService = cnvProfilesIndexService;
+        _cnvpsIndexService = cnvpsIndexService;
         _geneTasksService = geneTasksService;
         _proteinTasksService = proteinTasksService;
         _smTasksService = smTasksService;
         _cnvTasksService = cnvTasksService;
         _svTasksService = svTasksService;
-        _cnvProfilesTasksService = cnvProfilesTasksService;
+        _cnvpsTasksService = cnvpsTasksService;
     }
 
 
@@ -85,12 +85,12 @@ public class IndexingController : Controller
         await DeleteIndex(_smsIndexService.DeleteIndex());
         await DeleteIndex(_cnvsIndexService.DeleteIndex());
         await DeleteIndex(_svsIndexService.DeleteIndex());
-        await DeleteIndex(_cnvProfilesIndexService.DeleteIndex());
+        await DeleteIndex(_cnvpsIndexService.DeleteIndex());
 
         _smTasksService.CreateTasks();
         _cnvTasksService.CreateTasks();
         _svTasksService.CreateTasks();
-        _cnvProfilesTasksService.CreateTasks();
+        _cnvpsTasksService.CreateTasks();
 
         return Ok();
     }

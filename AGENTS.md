@@ -100,25 +100,27 @@ The base `SubmissionController` stages payloads in Mongo database
 
 ### Submission validation
 
-- Validation order differs between the two upload paths. **JSON**
-  (`PostJson`): the request is validated automatically (FluentValidation)
-  while the body is read, then `ValidateModel` runs with the resources already
-  in the model. **Form** (`PostForm`): `Convert`, then `ValidateModel` with
-  `Resources` still empty, then `ReadSubmissionForm` parses the resources/entries
-  files and calls `ValidateResources`/`ValidateEntries`. A modality-specific
-  resource check must therefore run in both `ValidateModel` (JSON) and
-  `ValidateResources` (form) and must tolerate an empty list; see
-  `Controllers/Prot/SampleController.cs`.
-- Data Source submits samples and results as forms, one resource at a time, so
-  checks that need several resources together (e.g. IDAT Red/Grn pairs, see the
-  commented code in `Controllers/Meth/SampleController.cs`) do not work there.
-- A resource's `type` is set by the server from the endpoint (`DataType`); it is
-  not read from JSON or TSV and not validated. Resource `name`, `format` and
-  `url` are lowercased by `ResourceModel`, following the shared
-  [coding conventions](../unite-meta/AGENTS.md#coding-conventions).
-- Sample metadata follows upsert semantics (provided fields update, missing
-  fields stay); `SampleController.Convert` must copy every form field, including
-  `batch`, into the model.
+See [Submission flow](Docs/submission-flow.md) for controller configuration,
+validator inheritance, conversion, reader behavior and JSON/form examples in
+[API](Docs/api.md#json-submissions).
+
+- Both multipart forms and JSON are supported. Forms are read/converted into
+  the same models as JSON, then both paths use the endpoint's `ModelValidator`
+  and the same staging method. Do not reintroduce form validators or domain
+  validation in controller hooks.
+- All endpoints inherit directly from the generic `SubmissionController`.
+  Existing model types and serialization attributes are retained for Mongo
+  staging and GET responses as well as JSON uploads.
+- File-reader failures and unsupported formats are transport errors added by
+  the controller. Data validation belongs in model validators, including SM
+  scope membership. Readers keep their existing format implementations; do not
+  duplicate TSV parsing or collect per-cell parsing failures.
+- Converters run before validation. Keep nullable enum results and partially
+  supplied matched samples so validators can report errors. Binding errors
+  must survive conversion. Preserve every metadata field, including `batch`.
+- Resource `type` is assigned from the endpoint (`DataType`) before staging.
+  Resource `name`, `format` and `url` are lowercased by `ResourceModel`, following
+  the shared [coding conventions](../unite-meta/AGENTS.md#coding-conventions).
 
 
 ### Processing
@@ -139,17 +141,45 @@ wait for pending donor or specimen submissions, so that donors are created with
 their real projects first, is under consideration by the owner; do not change
 the ordering without agreement.
 
-Open Jira bugs for this feed: re-uploads of CNV, SV and CNV profiles should
-replace per sample (currently merged), and the sample `genome` should be checked
-against `UNITE_GENOME_BUILD` for position-based data.
+Nonempty result submissions replace CNV, SV, CNV profiles, gene expression and
+protein expression per sample. SM submissions replace their declared
+`EntriesScope` (`SNV`, `INS`, `DEL`, `MNV`), or all SM types when scope is omitted,
+null or empty; the API contract is in
+[SM submissions](Docs/models-dna-sm.md). Empty entries remain invalid, and
+data endpoints require entries. The Web analysis model keeps `EntriesScope` as
+an optional string array beside `Entries` (`entries_scope` in JSON,
+comma-separated in forms). The SM submission model validator configures supported mutation definitions
+and checks entry types against the declared scope. Other endpoints reject nonempty scope unless explicitly
+configured to support it. Removal
+methods return deleted association entity IDs (profile IDs for CNV profiles).
+Writers union these with incoming IDs in the audit, and handlers schedule tasks
+once after writing. Keep new variant IDs in the annotation sets and affected
+association variant IDs in the indexing sets. Existing result task services
+populate related donor/specimen and other indexing tasks from the audited IDs.
+CNV-profile task creation must retain IDs of deleted SQL rows for index cleanup.
+
+The sample `genome` should be checked against `UNITE_GENOME_BUILD` for
+position-based data; the existing issue remains tracked in Jira.
+
+Data payloads and split writer responsibilities are described in
+[Typed data payloads and writers](Docs/submission-flow.md#typed-data-payloads-and-writers).
+Keep entry collections out of sample metadata models. The assay metadata model
+is `AssayModel`; `AnalysisModel<TEntry>` carries one result kind.
+Keep DNA writers flat in `Data/Writers/Dna`, following
+`Analysis<Kind>Writer` and `Effects<Kind>Writer` naming.
 
 ### Where to change things
+
+Use `Cnvp`/`Cnvps` for repository-owned CNV profile identifiers, and keep
+`Dna.Cnv.Profile`/`ProfileModel` within the CNV namespace. Shared-library API
+names such as `CnvProfileIndex` retain their upstream names until those libraries
+are updated separately.
 
 | Change | Location |
 | --- | --- |
 | New input format for a result kind | `Models/<Modality>/<Kind>/Readers/<Format>/` (implement `IReader<T>`), register in the controller's `Readers` |
 | Validation of submitted entries | `Models/<Modality>/.../Validators`, base rules in `Models/Base/Validators` |
-| How data is written / merged | `Unite.Omics.Feed/Data/Writers/<Modality>/AnalysisWriter.cs` and repositories |
+| How data is written / merged | `Unite.Omics.Feed/Data/Writers/AnalysisWriter.cs`, concrete modality/result writers and repositories |
 | Annotation | `Unite.Omics.Annotations/Services` and `Handlers/Annotation` |
 | Index document shape | `unite-indices` models, then `Unite.Omics.Indices/Services/*IndexEntityBuilder.cs` |
 | New result kind end to end | Entity/mapper and migration (`unite-data`, `unite-data-migrations`), task type, controller, submission repository and handler, writer, index builder and indexing handler, portal |

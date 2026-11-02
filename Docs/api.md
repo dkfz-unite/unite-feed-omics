@@ -1,10 +1,73 @@
 # Omics Data Feed API
 API for uploading omics data to the repository.
 
+All submission POST endpoints accept `multipart/form-data` and `application/json`.
+Both paths validate the same submission model before staging it in Mongo.
+
+| Upload | Entries | Resources |
+| --- | --- | --- |
+| Sample metadata (`*/sample`) | Unused | Optional |
+| Analysis data (SM, CNV, SV, CNV profiles, bulk RNA/protein expression) | Required, nonempty | Optional |
+| Analysis resources (single-cell RNA expression) | Unused | Required, nonempty |
+
+For forms, entries/resources are uploaded files; for JSON they are model arrays.
+Entry files supplied to sample or resource-only endpoints are ignored.
+Binding, reading and model errors return `400 Bad Request`. A read failure
+produces a general error for the file and selected format; an explicitly
+unsupported reader produces a format error. Parsed data is checked by the same
+validator as JSON submissions. Error paths identify model properties such as
+`TargetSample.SpecimenType` and `Entries[0].Reads`, also for form requests.
+Optional resource files use the same `name`, `format`, `url` TSV columns as sample
+resources. Resource links may be submitted independently.
+
 > [!Note]
 > API is accessible for authorized users only and requires `JWT` token as `Authorization` header (read more about [Identity Service](https://github.com/dkfz-unite/unite-identity)).
 
 API is **proxied** to main API and can be accessed at [[host]/api/feed-omics](http://localhost/api/feed-omics) (**without** `api` prefix).
+
+
+## JSON submissions
+
+Sample endpoints accept the sample metadata directly, with an optional
+`resources` array:
+
+```json
+{
+  "donor_id": "Donor1",
+  "specimen_id": "Tumor",
+  "specimen_type": "Material",
+  "analysis_type": "WGS",
+  "genome": "GRCh38"
+}
+```
+
+Analysis endpoints accept `tsample`, optional `msample`, `entries` and
+`resources`. Entry properties correspond to the endpoint's documented TSV
+columns. For resource-only analyses, omit `entries` and supply `resources`.
+For example, an SNV replacement submission:
+
+```json
+{
+  "tsample": {
+    "donor_id": "Donor1",
+    "specimen_id": "Tumor",
+    "specimen_type": "Material",
+    "analysis_type": "WGS",
+    "genome": "GRCh38"
+  },
+  "entries_scope": ["SNV"],
+  "entries": [
+    { "chromosome": "1", "position": "100", "ref": "A", "alt": "C" }
+  ],
+  "resources": [
+    { "name": "calls.vcf", "format": "vcf", "url": "https://example.org/calls.vcf" }
+  ]
+}
+```
+
+JSON enum values use their public definitions, such as `scRNASeq` and
+`snRNASeq` for single-cell/nucleus sequencing. `format` selects the entry-file
+reader for forms; JSON entries are already structured data.
 
 
 ## Overview
@@ -41,7 +104,7 @@ Request implements **UPSERT** logic:
 - Existing data will be updated.
 
 ### Body
-Request body should be in `multipart/form-data` format for [DNA sample](./models-dna.md) data.
+For `multipart/form-data`, use the fields described for [DNA sample](./models-dna.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -62,9 +125,18 @@ Request body should be in `multipart/form-data` format for [DNA sample](./models
 ## POST: [api/dna/analysis/sm](http://localhost:5106/api/dna/analysis/sm)
 Submit simple mutations (SM) analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Entries replace the target sample's existing mutations of the types declared in
+`entries_scope` (`SNV`, `INS`, `DEL`, `MNV`). Types outside the scope are preserved.
+Every entry must belong to the scope. INDEL callers declare both `INS` and `DEL`.
+`entries_scope` is an optional string array on the analysis model; each endpoint
+validates and interprets it. For SM entries, omitted, null or empty scope means
+all SM types and replaces the sample's entire SM result set. An explicit scope
+limits replacement to its supported mutation types.
+In multipart forms, use one comma-separated `entries_scope` field, e.g. `SNV, INS, DEL`.
+In JSON, `entries_scope` belongs to the analysis, alongside `entries` and `tsample`.
+
+Sample metadata and resource links retain UPSERT behavior. Entries are
+required and must contain at least one entry; resources are optional.
 
 ### Parameters
 - `format` - variants data [format](./models-dna-sm.md#formats):
@@ -72,7 +144,7 @@ Request implements **UPSERT** logic:
   - [vcf](./models-dna-sm.md#vcf) - Variant Call Format.
 
 ### Body
-Request body should be in `multipart/form-data` format for [simple mutations (SM)](./models-dna-sm.md) data.
+For `multipart/form-data`, use the fields described for [simple mutations (SM)](./models-dna-sm.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -83,6 +155,7 @@ Request body should be in `multipart/form-data` format for [simple mutations (SM
 - `analysis_type` - WES
 - `analysis_date` - 2023-12-01
 - `genome` - GRCh37
+- `entries_scope` - SNV, INS, DEL
 - `entries` - variants.tsv (Variants data file in corresponding format)
 
 ### Responses
@@ -95,9 +168,10 @@ Request body should be in `multipart/form-data` format for [simple mutations (SM
 ## POST: [api/dna/analysis/cnv](http://localhost:5106/api/dna/analysis/cnv)
 Submit copy number variants (CNV) analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - variants data [format](./models-dna-cnv.md#formats):
@@ -105,7 +179,7 @@ Request implements **UPSERT** logic:
   - [aceseq](./models-dna-cnv.md#aceseq) - ACESeq workflow format.
 
 ### Body
-Request body should be in `multipart/form-data` format for [copy number variants (CNV)](./models-dna-cnv.md) data.
+For `multipart/form-data`, use the fields described for [copy number variants (CNV)](./models-dna-cnv.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -130,9 +204,10 @@ Request body should be in `multipart/form-data` format for [copy number variants
 ## POST: [api/dna/analysis/sv](http://localhost:5106/api/dna/analysis/sv)
 Submit structural variants (SV) analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - variants data [format](./models-dna-sv.md#formats):
@@ -140,7 +215,7 @@ Request implements **UPSERT** logic:
   - [dkfz-sophia](./models-dna-sv.md#dkfz-sophia) - DKFZ SOPHIA workflow format.
 
 ### Body
-Request body should be in `multipart/form-data` format for [structural variants (SV)](./models-dna-sv.md) data.
+For `multipart/form-data`, use the fields described for [structural variants (SV)](./models-dna-sv.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -163,16 +238,17 @@ Request body should be in `multipart/form-data` format for [structural variants 
 ## POST: [api/dna/analysis/cnvp](http://localhost:5106/api/dna/analysis/cnvp)
 Submit copy number variant (CNV) profiles analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - profiles data [format](./models-dna-cnvp.md#formats):
   - [tsv](./models-dna-cnvp.md#tsv) - Default format, the parameter can be omitted.
 
 ### Body
-Request body should be in `multipart/form-data` format for [CNV profiles](./models-dna-cnvp.md) data.
+For `multipart/form-data`, use the fields described for [CNV profiles](./models-dna-cnvp.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -198,7 +274,7 @@ Request implements **UPSERT** logic:
 - Existing data will be updated.
 
 ### Body
-Request body should be in `multipart/form-data` format for [DNA methylation sample](./models-meth.md) data.
+For `multipart/form-data`, use the fields described for [DNA methylation sample](./models-meth.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -224,7 +300,7 @@ Request implements **UPSERT** logic:
 - Existing data will be updated.
 
 ### Body
-Request body should be in `multipart/form-data` format for [bulk RNA sample](./models-rna.md) data.
+For `multipart/form-data`, use the fields described for [bulk RNA sample](./models-rna.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -245,9 +321,10 @@ Request body should be in `multipart/form-data` format for [bulk RNA sample](./m
 ## POST: [api/rna/analysis/exp](http://localhost:5106/api/rna/analysis/exp)
 Submit bulk RNA gene expressions analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - expressions data [format](./models-rna-exp.md#formats):
@@ -255,7 +332,7 @@ Request implements **UPSERT** logic:
   - [dkfz-rnaseq](./models-rna-exp.md#dkfz-rnaseq) - DKFZ RNASeq workflow format.
 
 ### Body
-Request body should be in `multipart/form-data` format for [bulk gene expressions](./models-rna-exp.md) data.
+For `multipart/form-data`, use the fields described for [bulk gene expressions](./models-rna-exp.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -281,7 +358,7 @@ Request implements **UPSERT** logic:
 - Existing data will be updated.
 
 ### Body
-Request body should be in `multipart/form-data` format for [single cell RNA sample](./models-rnasc.md) data.
+For `multipart/form-data`, use the fields described for [single cell RNA sample](./models-rnasc.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -307,7 +384,7 @@ Request implements **UPSERT** logic:
 - Existing data will be updated.
 
 ### Body
-Request body should be in `multipart/form-data` format for [single cell gene expressions](./models-rnasc-exp.md) data.
+For `multipart/form-data`, use the fields described for [single cell gene expressions](./models-rnasc-exp.md) data.
 
 #### Example
 - `donor_id` - Donor1
@@ -327,9 +404,10 @@ Request body should be in `multipart/form-data` format for [single cell gene exp
 ## POST: [api/prot/analysis/exp](http://localhost:5106/api/prot/analysis/exp)
 Submit protein expressions analysis metadata and data.
 
-Request implements **UPSERT** logic:
-- Missing data will be populated.
-- Existing data will be updated.
+Nonempty entries replace all existing results of this kind for the target
+sample. No scope is required. Other result kinds and other samples are preserved.
+Sample metadata and resource links retain UPSERT behavior. Resource-only
+submissions do not replace results.
 
 ### Parameters
 - `format` - expressions data [format](./models-prot-exp.md#formats):
@@ -337,7 +415,7 @@ Request implements **UPSERT** logic:
   - [diann](./models-prot-exp.md#dia-nn) - DIA-NN protein groups format.
 
 ### Body
-Request body should be in `multipart/form-data` format for [protein expressions](./models-prot-exp.md) data.
+For `multipart/form-data`, use the fields described for [protein expressions](./models-prot-exp.md) data.
 
 #### Example
 - `donor_id` - Donor1
