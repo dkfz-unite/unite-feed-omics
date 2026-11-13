@@ -69,9 +69,10 @@ files. Read those first. Developer-specific notes:
 
 - `UNITE_GENOME_BUILD` is the instance's build (Ensembl VEP/Data builds; used by
   the writers and repositories, e.g. for chromosome-arm detection). Each sample
-  declares its own `genome`, validated only as `GRCh37`/`GRCh38` and not yet
-  compared with the instance build. Rules for which data must match are in the
-  [Domain model](../unite-meta/docs/domain.md#genome-build).
+  declares its original `genome`. Valid SM, CNV and SV submissions from the
+  other supported build are lifted synchronously before staging; CNV profiles
+  bypass liftover. Rules for which data must match are in the [Domain
+  model](../unite-meta/docs/domain.md#genome-build).
 - `Docs/api.md` documents the public submission endpoints. It deliberately
   omits `api/indexing/*` (administrator-only reindexing) and
   `api/meth/analysis/levels` (not used yet; Data Source currently sends
@@ -158,8 +159,10 @@ association variant IDs in the indexing sets. Existing result task services
 populate related donor/specimen and other indexing tasks from the audited IDs.
 CNV-profile task creation must retain IDs of deleted SQL rows for index cleanup.
 
-The sample `genome` should be checked against `UNITE_GENOME_BUILD` for
-position-based data; the existing issue remains tracked in Jira.
+SM, CNV and SV controllers compare the sample `genome` with
+`UNITE_GENOME_BUILD` after model validation. Their liftover specialization
+stages successful target-build entries and the failed source entries with
+failure codes. It rejects submissions with no successful entries.
 
 Data payloads and split writer responsibilities are described in
 [Typed data payloads and writers](Docs/submission-flow.md#typed-data-payloads-and-writers).

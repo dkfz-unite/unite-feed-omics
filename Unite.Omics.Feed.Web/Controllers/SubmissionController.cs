@@ -59,16 +59,16 @@ public abstract class SubmissionController<TModel, TForm, TEntry> : Controller
     [Consumes("application/json")]
     [RequestSizeLimit(100_000_000)]
     [Authorize(Policy = Policies.Data.Writer)]
-    public IActionResult PostJson([FromBody] TModel model, [FromQuery] bool review = true)
+    public async Task<IActionResult> PostJson([FromBody] TModel model, [FromQuery] bool review = true)
     {
-        return Submit(model, review);
+        return await Submit(model, review);
     }
 
     [HttpPost]
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(100_000_000)]
     [Authorize(Policy = Policies.Data.Writer)]
-    public IActionResult PostForm([FromForm] TForm form, [FromQuery] bool review = true, [FromQuery] string format = null)
+    public async Task<IActionResult> PostForm([FromForm] TForm form, [FromQuery] bool review = true, [FromQuery] string format = null)
     {
         var resources = ReadFile(form.ResourcesFile, ResourceReader, "Resources");
         TEntry[] entries = null;
@@ -87,7 +87,7 @@ public abstract class SubmissionController<TModel, TForm, TEntry> : Controller
         }
 
         var model = FormConverter.Convert(form, entries, resources);
-        return Submit(model, review);
+        return await Submit(model, review);
     }
 
 
@@ -103,13 +103,23 @@ public abstract class SubmissionController<TModel, TForm, TEntry> : Controller
         return _submissionTaskService.CreateTask(SubmissionTaskType, submissionId, taskStatus);
     }
 
+    protected virtual Task PrepareSubmission(TModel model)
+    {
+        return Task.CompletedTask;
+    }
 
-    private IActionResult Submit(TModel model, bool review)
+
+    private async Task<IActionResult> Submit(TModel model, bool review)
     {
         model ??= new TModel();
         var validation = ModelValidator.Validate(model);
         foreach (var error in validation.Errors)
             ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        await PrepareSubmission(model);
 
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

@@ -31,14 +31,8 @@ internal class JsonHttpClient : IDisposable
 
         if (response.IsSuccessStatusCode)
         {
-            var options = new JsonSerializerOptions()
-            {
-                Converters = { new JsonStringEnumMemberConverter() },
-                WriteIndented = true
-            };
-
             var dataJson = await response.Content.ReadAsStringAsync();
-            var data = JsonSerializer.Deserialize<T>(dataJson, options);
+            var data = JsonSerializer.Deserialize<T>(dataJson, GetSerializerOptions());
 
             return data;
         }
@@ -53,7 +47,7 @@ internal class JsonHttpClient : IDisposable
     {
         var request = new HttpRequestMessage(HttpMethod.Post, url);
 
-        var contentJson = JsonSerializer.Serialize(body);
+        var contentJson = JsonSerializer.Serialize(body, GetSerializerOptions());
         var content = new StringContent(contentJson, encoding: Encoding.UTF8, "application/json");
 
         request.Content = content;
@@ -64,14 +58,8 @@ internal class JsonHttpClient : IDisposable
 
         if (response.IsSuccessStatusCode)
         {
-            var options = new JsonSerializerOptions()
-            {
-                Converters = { new JsonStringEnumMemberConverter() },
-                WriteIndented = true
-            };
-
             var dataJson = await response.Content.ReadAsStringAsync();
-            var data = JsonSerializer.Deserialize<T>(dataJson, options);
+            var data = JsonSerializer.Deserialize<T>(dataJson, GetSerializerOptions());
 
             return data;
         }
@@ -80,6 +68,14 @@ internal class JsonHttpClient : IDisposable
             var message = await response.Content?.ReadAsStringAsync();
             throw new HttpRequestException($"{response.StatusCode} - {response.ReasonPhrase} - {message}{Environment.NewLine}{contentJson}");
         }
+    }
+
+    private static JsonSerializerOptions GetSerializerOptions()
+    {
+        return new JsonSerializerOptions
+        {
+            Converters = { new JsonStringEnumMemberConverter() }
+        };
     }
 
 
