@@ -57,7 +57,7 @@ dotnet run --project Unite.Omics.Feed.Web
   Ensembl VEP.
 - NuGet restore needs the `https://nuget.pkg.github.com/dkfz-unite/index.json`
   source with GitHub credentials in the developer's NuGet configuration; the
-  Dockerfile adds it from build arguments.
+  Dockerfile mounts the package token as a BuildKit secret during restore.
 - Docker: `applications/unite-feed-omics/` in `unite-env`.
 
 ### Configuration and API
