@@ -74,7 +74,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
         _logger.LogInformation("{audit}", audit.ToString());
     }
 
-	private Annotations.Services.Models.Rna.GeneExpressionModel[] AnnotateExpressions(ExpressionsAnnotationService annotationService, Models.Rna.ExpressionModel[] expressions)
+	private Annotations.Models.Rna.GeneExpressionModel[] AnnotateExpressions(ExpressionsAnnotationService annotationService, Models.Rna.ExpressionModel[] expressions)
 	{
         var dataType = expressions.First().GetKeyType();
 
@@ -93,7 +93,7 @@ public class RnaExpSubmissionHandler: SubmissionHandler
         };
     }
 
-    private static IEnumerable<Data.Models.Rna.GeneExpressionModel> Convert(Annotations.Services.Models.Rna.GeneExpressionModel[] source)
+    private static IEnumerable<Data.Models.Rna.GeneExpressionModel> Convert(Annotations.Models.Rna.GeneExpressionModel[] source)
     {
         foreach (var model in source)
         {

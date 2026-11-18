@@ -106,3 +106,4 @@ Q9Y6K9	0
 - `Quantity` - Protein group quantity, used as raw intensity.
 
 Groups with a single accession are used as they are. For ambiguous groups with several accessions, each accession receives the group quantity, unless it is already identified by a single-accession group.
+The original group is retained internally during annotation. If several accessions resolve to the same Ensembl protein, one expression is retained, preferring the smallest source group and then the first source row.

@@ -4,8 +4,8 @@ using Unite.Data.Entities.Omics;
 using Unite.Omics.Annotations.Clients.Ensembl;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Clients.Ensembl.Resources;
-using Unite.Omics.Annotations.Services.Models;
-using Unite.Omics.Annotations.Services.Models.Rna;
+using Unite.Omics.Annotations.Models;
+using Unite.Omics.Annotations.Models.Rna;
 
 namespace Unite.Omics.Annotations.Services.Rna;
 

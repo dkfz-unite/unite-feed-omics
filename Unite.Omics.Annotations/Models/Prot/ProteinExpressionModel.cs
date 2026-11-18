@@ -1,4 +1,4 @@
-namespace Unite.Omics.Annotations.Services.Models.Prot;
+namespace Unite.Omics.Annotations.Models.Prot;
 
 public class ProteinExpressionModel
 {

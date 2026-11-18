@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Omics.Annotations.Services.Models;
+using Unite.Omics.Annotations.Models;
 
 namespace Unite.Omics.Annotations.Services.Prot;
 
