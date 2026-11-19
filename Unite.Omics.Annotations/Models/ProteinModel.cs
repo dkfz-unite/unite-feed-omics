@@ -1,21 +1,22 @@
 ﻿using Unite.Data.Entities.Omics.Enums;
 
-namespace Unite.Omics.Annotations.Services.Models;
+namespace Unite.Omics.Annotations.Models;
 
-public class TranscriptModel
+public class ProteinModel
 {
     public int? Id;
 
     public string StableId;
+    public string Accession;
     public string Symbol;
     public string Description;
-    public string Biotype;
-    public bool IsCanonical;
+    public string Database;
     public Chromosome Chromosome;
     public int Start;
     public int End;
     public bool Strand;
-    public int? ExonicLength;
+    public int Length;
+    public bool IsCanonical;
 
-    public GeneModel Gene;
+    public TranscriptModel Transcript;
 }

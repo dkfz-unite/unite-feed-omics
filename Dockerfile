@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 ENV ASPNETCORE_HTTP_PORTS=80
@@ -9,17 +11,18 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS restore
 ARG USER
-ARG TOKEN
 WORKDIR /src
-RUN dotnet nuget add source https://nuget.pkg.github.com/dkfz-unite/index.json -n github -u ${USER} -p ${TOKEN} --store-password-in-clear-text
 COPY ["Unite.Omics.Annotations/Unite.Omics.Annotations.csproj", "Unite.Omics.Annotations/"]
 COPY ["Unite.Omics.Indices/Unite.Omics.Indices.csproj", "Unite.Omics.Indices/"]
 COPY ["Unite.Omics.Feed/Unite.Omics.Feed.csproj", "Unite.Omics.Feed/"]
 COPY ["Unite.Omics.Feed.Web/Unite.Omics.Feed.Web.csproj", "Unite.Omics.Feed.Web/"]
-RUN dotnet restore "Unite.Omics.Annotations/Unite.Omics.Annotations.csproj"
-RUN dotnet restore "Unite.Omics.Indices/Unite.Omics.Indices.csproj"
-RUN dotnet restore "Unite.Omics.Feed/Unite.Omics.Feed.csproj"
-RUN dotnet restore "Unite.Omics.Feed.Web/Unite.Omics.Feed.Web.csproj"
+RUN --mount=type=secret,id=github_token \
+    dotnet nuget add source https://nuget.pkg.github.com/dkfz-unite/index.json -n github -u ${USER} -p "$(cat /run/secrets/github_token)" --store-password-in-clear-text \
+    && dotnet restore "Unite.Omics.Annotations/Unite.Omics.Annotations.csproj" \
+    && dotnet restore "Unite.Omics.Indices/Unite.Omics.Indices.csproj" \
+    && dotnet restore "Unite.Omics.Feed/Unite.Omics.Feed.csproj" \
+    && dotnet restore "Unite.Omics.Feed.Web/Unite.Omics.Feed.Web.csproj" \
+    && dotnet nuget remove source github
 
 FROM restore AS build
 COPY . .

@@ -3,7 +3,7 @@ using Unite.Data.Context;
 using Unite.Data.Entities.Omics.Analysis.Dna.Cnv;
 using Unite.Essentials.Extensions;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Omics.Annotations.Services.Models.Dna;
+using Unite.Omics.Annotations.Models.Dna;
 
 namespace Unite.Omics.Annotations.Services.Vep;
 

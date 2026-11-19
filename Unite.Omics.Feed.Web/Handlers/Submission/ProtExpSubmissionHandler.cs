@@ -75,13 +75,14 @@ public class ProtExpSubmissionHandler : SubmissionHandler
         _logger.LogInformation("{audit}", audit.ToString());
     }
 
-    private Annotations.Services.Models.Prot.ProteinExpressionModel[] AnnotateExpressions(IEnumerable<Models.Prot.ExpressionModel> expressions)
+    private Annotations.Models.Prot.ProteinExpressionModel[] AnnotateExpressions(IEnumerable<Models.Prot.ExpressionModel> expressions)
     {
         var keyType = expressions.First().GetKeyType();
 
-        var data = expressions.Select(expression => expression.GetData())
+        var data = expressions
+            .Select(expression => expression.GetData())
             .DistinctBy(expression => expression.Key)
-            .ToDictionary(expression => expression.Key, expression => expression.Value);
+            .ToArray();
 
         return keyType switch
         {
@@ -92,7 +93,7 @@ public class ProtExpSubmissionHandler : SubmissionHandler
         };
     }
 
-    private static IEnumerable<Data.Models.Prot.ProteinExpressionModel> Convert(IEnumerable<Annotations.Services.Models.Prot.ProteinExpressionModel> source)
+    private static IEnumerable<Data.Models.Prot.ProteinExpressionModel> Convert(IEnumerable<Annotations.Models.Prot.ProteinExpressionModel> source)
     {
         foreach (var model in source)
         {

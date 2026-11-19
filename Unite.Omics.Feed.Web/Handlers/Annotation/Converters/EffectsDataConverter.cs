@@ -1,7 +1,7 @@
 ﻿namespace Unite.Omics.Feed.Web.Handlers.Annotation.Converters;
 
 using DataModels = Unite.Omics.Feed.Data.Models;
-using DataResources = Unite.Omics.Annotations.Services.Models;
+using DataResources = Unite.Omics.Annotations.Models;
 
 public static class EffectsDataConverter
 {

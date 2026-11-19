@@ -6,6 +6,7 @@ using Unite.Indices.Context.Configuration.Extensions;
 using Unite.Indices.Context.Configuration.Options;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
 using Unite.Omics.Annotations.Services.Vep;
+using Unite.Omics.Annotations.Services.Liftover;
 using Unite.Omics.Feed.Data.Configuration;
 using Unite.Omics.Feed.Web.Configuration.Options;
 using Unite.Omics.Feed.Web.Handlers.Annotation;
@@ -49,6 +50,11 @@ public static class ConfigurationExtensions
         services.AddTransient<SvsAnnotationService>();
         services.AddTransient<Annotations.Services.Rna.ExpressionsAnnotationService>();
         services.AddTransient<Annotations.Services.Prot.ExpressionsAnnotationService>();
+
+        // Liftover services
+        services.AddTransient<SmsLiftoverService>();
+        services.AddTransient<CnvsLiftoverService>();
+        services.AddTransient<SvsLiftoverService>();
 
         // Task processing services
         services.AddTransient<TasksProcessingService>();

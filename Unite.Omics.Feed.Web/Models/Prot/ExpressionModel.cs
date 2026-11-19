@@ -8,6 +8,7 @@ public record class ExpressionModel
     private string _id;
     private string _accession;
     private string _symbol;
+    private string[] _group;
     private double? _intensity;
 
 
@@ -22,6 +23,9 @@ public record class ExpressionModel
     [JsonPropertyName("symbol")]
     [Column("symbol")]
     public string Symbol { get => _symbol?.Trim(); set => _symbol = value; }
+
+    [JsonIgnore]
+    public string[] Group { get => _group; set => _group = value; }
 
     [JsonPropertyName("intensity")]
     [Column("intensity")]
@@ -44,16 +48,16 @@ public record class ExpressionModel
     /// Retrieves expression data corresponding to the key type.
     /// </summary>
     /// <returns>Expression data.</returns>
-    public KeyValuePair<string, double> GetData()
+    public (string Key, double Value, string[] Group) GetData()
     {
         var keyType = GetKeyType();
         var intensity = Intensity.Value;
 
         return keyType switch
         {
-            1 => new KeyValuePair<string, double>(Id, intensity),
-            2 => new KeyValuePair<string, double>(Accession, intensity),
-            3 => new KeyValuePair<string, double>(Symbol, intensity),
+            1 => (Id, intensity, Group),
+            2 => (Accession, intensity, Group),
+            3 => (Symbol, intensity, Group),
             _ => default
         }; 
     }

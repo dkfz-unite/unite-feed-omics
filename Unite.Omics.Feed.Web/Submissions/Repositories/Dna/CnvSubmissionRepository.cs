@@ -1,11 +1,12 @@
 ﻿using Unite.Cache.Configuration.Options;
 using Unite.Data.Constants;
 using Unite.Omics.Feed.Web.Models.Base;
+using Unite.Omics.Feed.Web.Models.Dna;
 using Unite.Omics.Feed.Web.Models.Dna.Cnv;
 
 namespace Unite.Omics.Feed.Web.Submissions.Repositories.Dna;
 
-public class CnvSubmissionRepository : SubmissionRepository<AnalysisModel<VariantModel>>
+public class CnvSubmissionRepository : SubmissionRepository<VariantAnalysisModel<VariantModel>>
 {
     public CnvSubmissionRepository(IMongoOptions options) : base(options, DataTypes.Omics.Dna.Cnv)
     {

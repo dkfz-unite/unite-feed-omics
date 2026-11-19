@@ -1,6 +1,6 @@
 ﻿using Unite.Data.Entities.Omics.Enums;
 
-namespace Unite.Omics.Annotations.Services.Models;
+namespace Unite.Omics.Annotations.Models;
 
 public class GeneModel
 {
