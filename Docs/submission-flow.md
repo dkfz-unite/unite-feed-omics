@@ -12,10 +12,21 @@ Binding and file-reading errors are retained alongside model validation errors.
 Any error returns 400 before staging. The converter builds a C# model object;
 there is no intermediate JSON serialization/deserialization for form requests.
 
+For SM, CNV and SV submissions whose target sample genome differs from the
+instance genome, successful validation is followed by synchronous liftover
+through Ensembl Data before Mongo staging. Successfully lifted variants replace
+the submitted entries. Failed variants are stored in `liftover_failures` with
+their failure code and are not integrated when the submission is approved. The target
+sample retains its submitted source genome, allowing the success rate to be
+derived from the lifted and failed entry counts. A submission for which no
+variant can be lifted is rejected and is not staged.
+
+CNV profiles are statistical data and bypass liftover.
+
 ## Controller configuration
 
-Concrete endpoints inherit directly from
-`SubmissionController<TModel, TForm, TEntry>`. They configure `ModelValidator`,
+Concrete endpoints inherit from
+`SubmissionController<TModel, TForm, TEntry>` or its DNA liftover specialization. They configure `ModelValidator`,
 `FormConverter`, `EntryReaders`, `ResourceReader`, `DataType` and their submission
 repository/task type. Both POST actions call the same model validation and
 staging method. Controllers contain no metadata, entry or scope validation rules.

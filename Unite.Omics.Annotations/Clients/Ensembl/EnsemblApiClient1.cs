@@ -8,9 +8,9 @@ public class EnsemblApiClient1
     private const int _threadsNumber = 5;
     private const int _bucketSize = 200;
 
-    private const string _genesUrl = @"/api/genes";
-    private const string _transcriptsUrl = @"/api/transcripts";
-    private const string _proteinsUrl = @"/api/proteins";
+    private const string _genesUrl = @"/genes";
+    private const string _transcriptsUrl = @"/transcripts";
+    private const string _proteinsUrl = @"/proteins";
 
     private readonly IEnsemblDataOptions _options;
 
@@ -26,7 +26,6 @@ public class EnsemblApiClient1
     /// </summary>
     /// <param name="ensemblId">Ensembl object identifier</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
-    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl object mapped to given type if was found.</returns>
     public Task<T> FindById<T>(string ensemblId, bool length = true, bool expand = false) where T : LookupResource
     {
@@ -40,7 +39,6 @@ public class EnsemblApiClient1
     /// </summary>
     /// <param name="ensemblIds">Ensembl object identifiers</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
-    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
     public Task<T[]> FindById<T>(IEnumerable<string> ensemblIds, bool length = true, bool expand = false) where T : LookupResource
     {
@@ -54,7 +52,6 @@ public class EnsemblApiClient1
     /// </summary>
     /// <param name="accessionId">Ensembl object accession</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
-    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl object mapped to given type if was found.</returns>
     public Task<ProteinResource> FindByAccession(string accessionId, bool length = true, bool expand = false)
     {
@@ -68,7 +65,6 @@ public class EnsemblApiClient1
     /// </summary>
     /// <param name="accessionIds">Ensembl object accessions</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
-    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
     public Task<ProteinResource[]> FindByAccession(IEnumerable<string> accessionIds, bool length = true, bool expand = false)
     {
@@ -82,7 +78,6 @@ public class EnsemblApiClient1
     /// </summary>
     /// <param name="ensemblId">Ensembl object symbol</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
-    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl object mapped to given type if was found.</returns>
     public Task<T> FindByName<T>(string symbol, bool length = true, bool expand = false) where T : LookupResource
     {
@@ -96,7 +91,6 @@ public class EnsemblApiClient1
     /// </summary>
     /// <param name="symbols">Ensembl object symbols</param>
     /// <param name="expand">Expand parameter value (setting this parameter to 'true' will force Ensembl to return all nested data)</param>
-    /// <param name="grch">Genome build version (default is 37)</param>
     /// <returns>Ensembl objects mapped to an array of given type if were found.</returns>
     public Task<T[]> FindByName<T>(IEnumerable<string> symbols, bool length = true, bool expand = false) where T : LookupResource
     {
@@ -110,9 +104,9 @@ public class EnsemblApiClient1
     {
         using var httpClient = new JsonHttpClient(_options.Host);
 
-        url += GetArguments(length, expand);
+        url = $"{url}/{key}{GetArguments(length, expand)}";
 
-        var resource = await httpClient.GetAsync<T>($"{url}/{key}");
+        var resource = await httpClient.GetAsync<T>(url);
 
         return resource;
     }
@@ -155,18 +149,19 @@ public class EnsemblApiClient1
         var arguments = new string[]
         {
             $"length={length}",
-            $"expand={expand}",
-            $"grch={_options.Version}"
+            $"expand={expand}"
         };
 
         return $"?{string.Join('&', arguments)}";
     }
 
-    private static string GetUrl<T>() where T : LookupResource
+    private string GetUrl<T>() where T : LookupResource
     {
-        return typeof(T) == typeof(GeneResource) ? $"{_genesUrl}"
-             : typeof(T) == typeof(TranscriptResource) ? $"{_transcriptsUrl}"
-             : typeof(T) == typeof(ProteinResource) ? $"{_proteinsUrl}"
+        var root = $"/api/grch{_options.Version}";
+
+        return typeof(T) == typeof(GeneResource) ? $"{root}{_genesUrl}"
+             : typeof(T) == typeof(TranscriptResource) ? $"{root}{_transcriptsUrl}"
+             : typeof(T) == typeof(ProteinResource) ? $"{root}{_proteinsUrl}"
              : throw new NotImplementedException();
     }
 }

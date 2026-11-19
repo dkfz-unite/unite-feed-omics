@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Unite.Data.Context;
 using Unite.Omics.Annotations.Clients.Ensembl.Configuration.Options;
-using Unite.Omics.Annotations.Services.Models;
-using Unite.Omics.Annotations.Services.Models.Prot;
+using Unite.Omics.Annotations.Models;
+using Unite.Omics.Annotations.Models.Prot;
 
 namespace Unite.Omics.Annotations.Services.Prot;
 
@@ -17,37 +17,52 @@ public class ExpressionsAnnotationService
     }
 
 
-    public ProteinExpressionModel[] AnnotateByProtreinId(Dictionary<string, double> expressions)
+    public ProteinExpressionModel[] AnnotateByProtreinId((string Key, double Value, string[] Group)[] expressions)
     {
-        var proteins = _annotationsDataLoader.LoadById(expressions.Keys.ToArray()).Result;
+        var proteins = _annotationsDataLoader.LoadById(expressions.Select(expression => expression.Key).ToArray()).Result;
 
         return Normalize(proteins, expressions, model => model.StableId);
     }
 
-    public ProteinExpressionModel[] AnnotateByProteinAccession(Dictionary<string, double> expressions)
+    public ProteinExpressionModel[] AnnotateByProteinAccession((string Key, double Value, string[] Group)[] expressions)
     {
-        var proteins = _annotationsDataLoader.LoadByAccession(expressions.Keys.ToArray()).Result;
+        var proteins = _annotationsDataLoader.LoadByAccession(expressions.Select(expression => expression.Key).ToArray()).Result;
 
         return Normalize(proteins, expressions, model => model.Accession);
     }
 
-    public ProteinExpressionModel[] AnnotateByProteinSymbol(Dictionary<string, double> expressions)
+    public ProteinExpressionModel[] AnnotateByProteinSymbol((string Key, double Value, string[] Group)[] expressions)
     {
-        var proteins = _annotationsDataLoader.LoadBySymbol(expressions.Keys.ToArray()).Result;
+        var proteins = _annotationsDataLoader.LoadBySymbol(expressions.Select(expression => expression.Key).ToArray()).Result;
 
         return Normalize(proteins, expressions, model => model.Symbol);
     }
 
 
-    private static ProteinExpressionModel[] Normalize(ProteinModel[] models, Dictionary<string, double> expressions, Func<ProteinModel, string> keySelector)
+    private static ProteinExpressionModel[] Normalize(ProteinModel[] models, (string Key, double Value, string[] Group)[] expressions, Func<ProteinModel, string> keySelector)
     {
-        var expressionsRaw = models
-            .DistinctBy(model => keySelector(model))
-            .ToDictionary(model => keySelector(model), model => expressions[keySelector(model)]);
+        var proteins = models.ToLookup(keySelector);
+
+        var selectedExpressions = expressions
+            .SelectMany(expression => proteins[expression.Key]
+                .Select(protein => (Protein: protein, expression.Value, GroupSize: expression.Group?.Length ?? 1)))
+            .GroupBy(expression => expression.Protein.StableId)
+            .Select(group => group
+                .OrderBy(expression => expression.GroupSize)
+                .First())
+            .ToArray();
+
+        var expressionsRaw = selectedExpressions
+            .ToDictionary(expression => expression.Protein.StableId, expression => expression.Value);
 
         var expressionsNormalized = CalculateNormalizedIntensities(expressionsRaw);
 
-        var expressionModels = models.Select(model => CreateFrom(model, expressionsRaw[keySelector(model)], expressionsNormalized[keySelector(model)])).ToArray();
+        var expressionModels = selectedExpressions
+            .Select(expression => CreateFrom(
+                expression.Protein,
+                expression.Value,
+                expressionsNormalized[expression.Protein.StableId]))
+            .ToArray();
 
         return expressionModels;
     }

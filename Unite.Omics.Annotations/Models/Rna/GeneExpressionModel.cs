@@ -1,4 +1,4 @@
-﻿namespace Unite.Omics.Annotations.Services.Models.Rna;
+﻿namespace Unite.Omics.Annotations.Models.Rna;
 
 public class GeneExpressionModel
 {

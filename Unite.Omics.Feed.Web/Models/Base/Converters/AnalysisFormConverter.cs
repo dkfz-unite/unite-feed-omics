@@ -8,11 +8,17 @@ namespace Unite.Omics.Feed.Web.Models.Base.Converters;
 /// Converts an AnalysisForm into an AnalysisModel with the specified entry type.
 /// </summary>
 /// <typeparam name="TEntry">Entry type.</typeparam>
-public class AnalysisFormConverter<TEntry> : IFormConverter<AnalysisModel<TEntry>, AnalysisForm, TEntry> where TEntry : class, new()
+public class AnalysisFormConverter<TEntry> : AnalysisFormConverter<TEntry, AnalysisModel<TEntry>> where TEntry : class, new()
 {
-    public virtual AnalysisModel<TEntry> Convert(AnalysisForm form, TEntry[] entries, ResourceModel[] resources)
+}
+
+public class AnalysisFormConverter<TEntry, TModel> : IFormConverter<TModel, AnalysisForm, TEntry>
+    where TEntry : class, new()
+    where TModel : AnalysisModel<TEntry>, new()
+{
+    public virtual TModel Convert(AnalysisForm form, TEntry[] entries, ResourceModel[] resources)
     {
-        return new AnalysisModel<TEntry>
+        return new TModel
         {
             TargetSample = ConvertSample(form),
             MatchedSample = ConvertMatchedSample(form),

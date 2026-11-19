@@ -1,7 +1,7 @@
 ﻿using Unite.Omics.Annotations.Clients.Ensembl.Resources;
 using Unite.Omics.Annotations.Clients.Ensembl.Resources.Vep;
-using Unite.Omics.Annotations.Services.Models;
-using Unite.Omics.Annotations.Services.Models.Dna;
+using Unite.Omics.Annotations.Models;
+using Unite.Omics.Annotations.Models.Dna;
 
 namespace Unite.Omics.Annotations.Services.Vep;
 

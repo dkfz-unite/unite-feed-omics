@@ -20,6 +20,36 @@ validator as JSON submissions. Error paths identify model properties such as
 Optional resource files use the same `name`, `format`, `url` TSV columns as sample
 resources. Resource links may be submitted independently.
 
+## Genome liftover
+
+SM, CNV and SV entries are lifted synchronously before staging when the target
+sample genome differs from the instance genome configured by
+`UNITE_GENOME_BUILD`. The sample metadata keeps the submitted source genome.
+The regular `entries` array contains only successfully lifted variants. Failed
+variants are returned by the submission GET endpoint under `liftover_failures`:
+
+```json
+{
+  "tsample": {
+    "genome": "GRCh37"
+  },
+  "entries": [
+    { "chromosome": "7", "position": "140753336", "ref": "A", "alt": "T" }
+  ],
+  "liftover_failures": [
+    {
+      "variant": { "chromosome": "1", "position": "100", "ref": "A", "alt": "C" },
+      "failure": "coordinate_not_mapped"
+    }
+  ]
+}
+```
+
+The success rate is derived as `entries / (entries + liftover_failures)`. A submission
+is rejected when none of its variants can be lifted. Ensembl Data or
+infrastructure failures fail the request instead of being recorded as variant
+failures. CNV profiles are accepted as submitted without liftover.
+
 > [!Note]
 > API is accessible for authorized users only and requires `JWT` token as `Authorization` header (read more about [Identity Service](https://github.com/dkfz-unite/unite-identity)).
 

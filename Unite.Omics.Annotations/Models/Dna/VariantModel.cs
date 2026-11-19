@@ -1,4 +1,4 @@
-﻿namespace Unite.Omics.Annotations.Services.Models.Dna;
+﻿namespace Unite.Omics.Annotations.Models.Dna;
 
 public class VariantModel
 {
